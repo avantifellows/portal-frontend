@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { listOfSchools } from "../assets/list.js";
+import { listOfSchools } from "@/assets/list.js";
 import { mapActions, mapState } from "vuex";
 
 export default {

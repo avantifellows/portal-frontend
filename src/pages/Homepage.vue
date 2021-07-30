@@ -1,14 +1,16 @@
 <template>
-  <SRNEntry
-    :redirectTo="redirectTo"
-    :redirectID="redirectID"
-    :purpose="purpose"
-    :subPurpose="subPurpose"
-    :plioUse="plioUse"
-  />
-  <div v-if="!plioUse">
-    <h3 class="mx-auto">OR</h3>
-    <StudentSelect />
+  <div>
+    <SRNEntry
+      :redirectTo="redirectTo"
+      :redirectID="redirectID"
+      :purpose="purpose"
+      :subPurpose="subPurpose"
+      :plioUse="plioUse"
+    />
+    <div class="mx-auto" v-if="!plioUse">
+      <h3>OR</h3>
+      <StudentSelect />
+    </div>
   </div>
 </template>
 

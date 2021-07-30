@@ -7,7 +7,7 @@
         type="text"
         placeholder="Student SRN"
         required
-        @keypress="isNumberOrLetter($event)"
+        @keypress="isValidSRNFormat($event)"
         :class="inputStyleClass"
       />
       <button @click="this.processForm" :class="buttonStyleClass">SUBMIT</button>
@@ -25,11 +25,10 @@
           type="text"
           placeholder="Student SRN"
           required
-          @keypress="isNumberOrLetter($event)"
+          @keypress="isValidSRNFormat($event)"
         />
         <inline-svg
-          @click="addField(input, userIDList)"
-          class="ml-2 cursor-pointer"
+          @click="addField(index, userIDList)"
           :src="require('@/assets/images/add-button.svg')"
         ></inline-svg>
         <inline-svg
@@ -68,7 +67,7 @@ export default {
       return "mb-2 mx-auto uppercase font-bold text-lg text-grey-darkest";
     },
     inputStyleClass() {
-      return "border py-2 mx-auto px-3 text-grey-darkest";
+      return "flex border py-2 mx-auto px-3 text-grey-darkest";
     },
     isAnyUserIDPresent() {
       return this.userIDList.length > 1;
@@ -76,7 +75,7 @@ export default {
   },
   methods: {
     //checking to see if each char typed by user is only a letter or number
-    isNumberOrLetter(e) {
+    isValidSRNFormat(e) {
       let char = String.fromCharCode(e.keyCode);
       if (/^[a-z0-9]+$/.test(char)) return true;
       else e.preventDefault();

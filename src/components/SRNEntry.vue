@@ -1,20 +1,21 @@
 <template>
   <section>
-    <div v-if="plioUse" class="flex flex-col mt-8">
-      <label :class="labelStyleClass">Enter Student SRN</label>
+    <div v-if="isRedirectToPlio">
+      <label>Enter your SRN / अपना SRN दर्ज करें</label>
       <input
         v-model="singleUserID"
         type="text"
         placeholder="Student SRN"
         required
         @keypress="isValidSRNFormat($event)"
-        :class="inputStyleClass"
+        :maxlength="10"
+        class="inputStyleClass"
       />
-      <button @click="this.processForm" :class="buttonStyleClass">SUBMIT</button>
+      <button @click="this.processForm" class="buttonStyleClass">SUBMIT</button>
     </div>
 
-    <div v-else class="flex flex-col mt-8">
-      <label :class="labelStyleClass">Enter Student SRN</label>
+    <div v-else>
+      <label :class="labelStyleClass">Enter your SRN</label>
       <div
         v-for="(input, index) in userIDList"
         :key="`IDInput-${index}`"
@@ -28,17 +29,18 @@
           @keypress="isValidSRNFormat($event)"
         />
         <inline-svg
+          v-if="!isRedirectToPlio"
           @click="addField(index, userIDList)"
           :src="require('@/assets/images/add-button.svg')"
         ></inline-svg>
         <inline-svg
-          v-show="isAnyUserIDPresent"
+          v-show="isAnyUserIDPresent && !isRedirectToPlio"
           @click="removeField(index, userIDList)"
           class="ml-2 cursor-pointer"
           :src="require('@/assets/images/delete-button.svg')"
         ></inline-svg>
       </div>
-      <button :class="buttonStyleClass">SUBMIT</button>
+      <button @click="this.processForm" :class="buttonStyleClass">SUBMIT</button>
     </div>
   </section>
 </template>
@@ -49,9 +51,8 @@ export default {
   props: {
     redirectTo: String,
     redirectID: String,
-    purpose: String,
-    subPurpose: String,
-    plioUse: Boolean,
+    purposeParams: String,
+    subPurposeParams: String,
   },
   data() {
     return {
@@ -60,24 +61,18 @@ export default {
     };
   },
   computed: {
-    buttonStyleClass() {
-      return "block bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded";
-    },
-    labelStyleClass() {
-      return "mb-2 mx-auto uppercase font-bold text-lg text-grey-darkest";
-    },
-    inputStyleClass() {
-      return "flex border py-2 mx-auto px-3 text-grey-darkest";
-    },
     isAnyUserIDPresent() {
       return this.userIDList.length > 1;
     },
+    isRedirectToPlio() {
+      return this.redirectTo == "plio";
+    },
   },
   methods: {
-    //checking to see if each char typed by user is only a letter or number
     isValidSRNFormat(e) {
+      //checking to see if each char typed by user is only a letter or number
       let char = String.fromCharCode(e.keyCode);
-      if (/^[a-z0-9]+$/.test(char)) return true;
+      if (/^[0-9]+$/.test(char)) return true;
       else e.preventDefault();
     },
     addField(value, list) {
@@ -86,9 +81,9 @@ export default {
     removeField(index, list) {
       list.splice(index, 1);
     },
-    //this method constructs the URL based on the redirectTo param
     processForm() {
-      if (this.redirectTo == "plio") {
+      //this method constructs the URL based on the redirectTo param
+      if (this.isRedirectToPlio) {
         const redirectURL = process.env.VUE_APP_STAGING_PLIO_LINK;
         let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
         //adds params; api key and student SRN
@@ -103,3 +98,18 @@ export default {
   },
 };
 </script>
+
+<style lang="postcss">
+div {
+  @apply flex flex-col mt-8;
+}
+label {
+  @apply mb-2 mx-auto uppercase font-bold text-lg;
+}
+.inputStyleClass {
+  @apply flex border py-2 mx-auto px-3;
+}
+.buttonStyleClass {
+  @apply bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded;
+}
+</style>

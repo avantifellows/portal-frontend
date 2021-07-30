@@ -3,11 +3,10 @@
     <SRNEntry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
-      :purpose="purpose"
-      :subPurpose="subPurpose"
-      :plioUse="plioUse"
+      :purposeParams="purposeParams"
+      :subPurposeParams="subPurposeParams"
     />
-    <div class="mx-auto" v-if="!plioUse">
+    <div class="mx-auto" v-if="!isRedirectToPlio">
       <h3>OR</h3>
       <StudentSelect />
     </div>
@@ -30,37 +29,32 @@ export default {
     StudentSelect,
     SRNEntry,
   },
-
-  /*these are props expected by this app. 
-  RedirectTo tells what is the resource we are redirecting to. Eg. redirectTo=plio tells us that we are redirecting to a plio. 
-  The plio link is built later on after the student submits their SRN.
-  RedirectID contains the ID of the resource. Eg. the plioID
-  Purpose is the general category of why the data is being captured. Eg: attendance
-  SubPurpose describes the subcategory of the purpose. Eg: plio -> means the attendance is for a plio link
-*/
-
   props: {
     redirectTo: {
+      //the resource we are redirecting to. Eg. redirectTo=plio tells us that we are redirecting to a plio.
       default: "",
       type: String,
     },
     redirectID: {
+      //ID of the resource. Eg. the plioID
       default: "",
       type: String,
     },
-    purpose: {
+    purposeParams: {
+      //general category of why the data is being captured. Eg: attendance
       default: "",
       type: String,
     },
-    subPurpose: {
+    subPurposeParams: {
+      //subcategory of the purpose. Eg: plio -> means the attendance is for a plio link
       default: "",
       type: String,
     },
   },
-  data() {
-    return {
-      plioUse: true,
-    };
+  computed: {
+    isRedirectToPlio() {
+      return this.redirectTo == "plio";
+    },
   },
 };
 </script>

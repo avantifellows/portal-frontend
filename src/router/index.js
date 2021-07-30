@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomePage from "../pages/Homepage.vue";
+import HomePage from "@/pages/Homepage.vue";
 
 const routes = [
     {
         path: "/",
-        name:"HomePage",
+        name:"Homepage",
         component: HomePage,
-      //   props: (route) => ({
-      //     purpose: route.query.purpose
-      //     //redirectURL: route.query.
-      // })
+        props: (route) => ({
+          purpose: route.query.purpose,
+          subPurpose: route.query.subPurpose,
+          redirectTo: route.query.redirectTo,
+          redirectID: route.query.redirectID
+       })
     },
 ]
 

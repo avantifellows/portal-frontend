@@ -1,85 +1,105 @@
 <template>
-  <section class="w-full flex justify-center items-center my-10">
-    <form class="">
-      <div class="form-group">
-        <label class="text-gray-600 font-semibold text-lg">Enter Student ID</label>
-        <div
-          v-for="(input, index) in studentIDs"
-          :key="`IDInput-${index}`"
-          class="input wrapper flex items-center"
-        >
-          <input
-            v-model="input.studentID"
-            type="number"
-            class="h-10 rounded-lg outline-none p-2"
-            placeholder="Student ID"
-            required
-            v-on:keypress="isLetter($event)"
-          />
+  <section>
+    <div v-if="plioUse" class="flex flex-col mt-8">
+      <label :class="labelStyleClass">Enter Student SRN</label>
+      <input
+        v-model="singleUserID"
+        type="text"
+        placeholder="Student SRN"
+        required
+        @keypress="isNumberOrLetter($event)"
+        :class="inputStyleClass"
+      />
+      <button @click="this.processForm" :class="buttonStyleClass">SUBMIT</button>
+    </div>
 
-          <svg
-            @click="addField(input, studentIDs)"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            class="ml-2 cursor-pointer"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path
-              fill="green"
-              d="M11 11V7h2v4h4v2h-4v4h-2v-4H7v-2h4zm1 11C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"
-            />
-          </svg>
-
-          <svg
-            v-show="studentIDs.length > 1"
-            @click="removeField(index, studentIDs)"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            class="ml-2 cursor-pointer"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path
-              fill="#EC4899"
-              d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-9.414l2.828-2.829 1.415 1.415L13.414 12l2.829 2.828-1.415 1.415L12 13.414l-2.828 2.829-1.415-1.415L10.586 12 7.757 9.172l1.415-1.415L12 10.586z"
-            />
-          </svg>
-        </div>
+    <div v-else class="flex flex-col mt-8">
+      <label :class="labelStyleClass">Enter Student SRN</label>
+      <div
+        v-for="(input, index) in userIDList"
+        :key="`IDInput-${index}`"
+        :class="inputStyleClass"
+      >
+        <input
+          v-model="input.userID"
+          type="text"
+          placeholder="Student SRN"
+          required
+          @keypress="isNumberOrLetter($event)"
+        />
+        <inline-svg
+          @click="addField(input, userIDList)"
+          class="ml-2 cursor-pointer"
+          :src="require('@/assets/images/add-button.svg')"
+        ></inline-svg>
+        <inline-svg
+          v-show="isAnyUserIDPresent"
+          @click="removeField(index, userIDList)"
+          class="ml-2 cursor-pointer"
+          :src="require('@/assets/images/delete-button.svg')"
+        ></inline-svg>
       </div>
-    </form>
-    <button
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      @submit.prevent="processForm"
-    >
-      SUBMIT
-    </button>
+      <button :class="buttonStyleClass">SUBMIT</button>
+    </div>
   </section>
 </template>
 
 <script>
 export default {
   name: "SRNEntry",
+  props: {
+    redirectTo: String,
+    redirectID: String,
+    purpose: String,
+    subPurpose: String,
+    plioUse: Boolean,
+  },
   data() {
     return {
-      studentIDs: [{ studentID: "" }],
+      userIDList: [{ userID: "" }],
+      singleUserID: "", //is a temp hack
     };
   },
+  computed: {
+    buttonStyleClass() {
+      return "block bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded";
+    },
+    labelStyleClass() {
+      return "mb-2 mx-auto uppercase font-bold text-lg text-grey-darkest";
+    },
+    inputStyleClass() {
+      return "border py-2 mx-auto px-3 text-grey-darkest";
+    },
+    isAnyUserIDPresent() {
+      return this.userIDList.length > 1;
+    },
+  },
   methods: {
-    isLetter(e) {
+    //checking to see if each char typed by user is only a letter or number
+    isNumberOrLetter(e) {
       let char = String.fromCharCode(e.keyCode);
-      if (/^[0-9]+$/.test(char)) return true;
+      if (/^[a-z0-9]+$/.test(char)) return true;
       else e.preventDefault();
     },
-    addField(value, fieldType) {
-      fieldType.push({ value: "" });
+    addField(value, list) {
+      list.push({ value: "" });
     },
-    removeField(index, fieldType) {
-      fieldType.splice(index, 1);
+    removeField(index, list) {
+      list.splice(index, 1);
     },
+    //this method constructs the URL based on the redirectTo param
     processForm() {
-      // console.log(this.$route.query.redirecturl);
-      this.$router.push(this.$route.query.redirecturl);
+      if (this.redirectTo == "plio") {
+        const redirectURL = process.env.VUE_APP_STAGING_PLIO_LINK;
+        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
+        //adds params; api key and student SRN
+        let queryparams = new URLSearchParams({
+          api_key: process.env.VUE_APP_HARYANA_STAGING_API_KEY,
+          unique_id: this.singleUserID,
+        });
+        let fullurl = url + "?" + queryparams;
+        window.location.href = fullurl;
+      }
     },
   },
 };

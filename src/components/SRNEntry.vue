@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     isAnyUserIDPresent() {
-      return this.userIDList.length > 1;
+      return this.userIDList != null;
     },
     isRedirectToPlio() {
       return this.redirectTo == "plio";
@@ -82,17 +82,17 @@ export default {
       list.splice(index, 1);
     },
     processForm() {
-      //this method constructs the URL based on the redirectTo param
       if (this.isRedirectToPlio) {
-        const redirectURL = process.env.VUE_APP_STAGING_PLIO_LINK;
+        //this method constructs the URL based on the redirectTo param
+        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO_STAGING;
         let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
         //adds params; api key and student SRN
         let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_HARYANA_STAGING_API_KEY,
+          api_key: process.env.VUE_APP_AF_STAGING_API_KEY,
           unique_id: this.singleUserID,
         });
         let fullurl = url + "?" + queryparams;
-        window.location.href = fullurl;
+        window.open(fullurl);
       }
     },
   },

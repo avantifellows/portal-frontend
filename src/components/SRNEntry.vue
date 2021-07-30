@@ -89,15 +89,15 @@ export default {
     //this method constructs the URL based on the redirectTo param
     processForm() {
       if (this.redirectTo == "plio") {
-        const redirectURL = process.env.VUE_APP_STAGING_PLIO_LINK;
+        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO_STAGING;
         let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
         //adds params; api key and student SRN
         let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_HARYANA_STAGING_API_KEY,
+          api_key: process.env.VUE_APP_AF_STAGING_API_KEY,
           unique_id: this.singleUserID,
         });
         let fullurl = url + "?" + queryparams;
-        window.location.href = fullurl;
+        window.open(fullurl);
       }
     },
   },

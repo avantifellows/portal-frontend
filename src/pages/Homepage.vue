@@ -52,7 +52,7 @@ export default {
     },
   },
   computed: {
-    isRedirectToPlio() {
+    isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
   },

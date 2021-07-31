@@ -1,6 +1,6 @@
 <template>
   <section>
-    <div v-if="isRedirectToPlio">
+    <div v-if="isSingleEntryOnly">
       <label>Enter your SRN / अपना SRN दर्ज करें</label>
       <input
         v-model="singleUserID"
@@ -29,12 +29,12 @@
           @keypress="isValidSRNFormat($event)"
         />
         <inline-svg
-          v-if="!isRedirectToPlio"
+          v-if="!isSingleEntryOnly"
           @click="addField(index, userIDList)"
           :src="require('@/assets/images/add-button.svg')"
         ></inline-svg>
         <inline-svg
-          v-show="isAnyUserIDPresent && !isRedirectToPlio"
+          v-show="isAnyUserIDPresent && !isSingleEntryOnly"
           @click="removeField(index, userIDList)"
           class="ml-2 cursor-pointer"
           :src="require('@/assets/images/delete-button.svg')"
@@ -64,13 +64,13 @@ export default {
     isAnyUserIDPresent() {
       return this.userIDList != null;
     },
-    isRedirectToPlio() {
+    isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
   },
   methods: {
     isValidSRNFormat(e) {
-      //checking to see if each char typed by user is only a letter or number
+      //checking to see if each char typed by user is only a number
       let char = String.fromCharCode(e.keyCode);
       if (/^[0-9]+$/.test(char)) return true;
       else e.preventDefault();
@@ -82,7 +82,7 @@ export default {
       list.splice(index, 1);
     },
     processForm() {
-      if (this.isRedirectToPlio) {
+      if (this.isSingleEntryOnly) {
         //this method constructs the URL based on the redirectTo param
         const redirectURL = process.env.VUE_APP_BASE_URL_PLIO_STAGING;
         let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link

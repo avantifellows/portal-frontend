@@ -7,8 +7,8 @@ const routes = [
         name:"Homepage",
         component: HomePage,
         props: (route) => ({
-          purposeParams: route.query.purpose,
-          subPurposeParams: route.query.subPurpose,
+          purpose: route.query.purpose,
+          purposeParams: route.query.subPurpose,
           redirectTo: route.query.redirectTo,
           redirectID: route.query.redirectID
        })

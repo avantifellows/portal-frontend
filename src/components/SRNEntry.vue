@@ -1,32 +1,16 @@
 <template>
   <section>
-    <div v-if="isSingleEntryOnly">
+    <div>
       <label>Enter your SRN / अपना SRN दर्ज करें</label>
-      <input
-        v-model="singleUserID"
-        type="text"
-        placeholder="Student SRN"
-        required
-        @keypress="isValidSRNFormat($event)"
-        :maxlength="10"
-        class="inputStyleClass"
-      />
-      <button @click="this.processForm" class="buttonStyleClass">SUBMIT</button>
-    </div>
-
-    <div v-else>
-      <label :class="labelStyleClass">Enter your SRN</label>
-      <div
-        v-for="(input, index) in userIDList"
-        :key="`IDInput-${index}`"
-        :class="inputStyleClass"
-      >
+      <div v-for="(input, index) in userIDList" :key="`IDInput-${index}`">
         <input
           v-model="input.userID"
           type="text"
           placeholder="Student SRN"
           required
           @keypress="isValidSRNFormat($event)"
+          :maxlength="10"
+          class="inputStyleClass"
         />
         <inline-svg
           v-if="!isSingleEntryOnly"
@@ -40,7 +24,7 @@
           :src="require('@/assets/images/delete-button.svg')"
         ></inline-svg>
       </div>
-      <button @click="this.processForm" :class="buttonStyleClass">SUBMIT</button>
+      <button @click="processForm" class="buttonStyleClass">SUBMIT</button>
     </div>
   </section>
 </template>
@@ -51,13 +35,12 @@ export default {
   props: {
     redirectTo: String,
     redirectID: String,
+    purpose: String,
     purposeParams: String,
-    subPurposeParams: String,
   },
   data() {
     return {
       userIDList: [{ userID: "" }],
-      singleUserID: "", //is a temp hack
     };
   },
   computed: {
@@ -84,12 +67,12 @@ export default {
     processForm() {
       if (this.isSingleEntryOnly) {
         //this method constructs the URL based on the redirectTo param
-        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO_STAGING;
+        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
         let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
         //adds params; api key and student SRN
         let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_AF_STAGING_API_KEY,
-          unique_id: this.singleUserID,
+          api_key: process.env.VUE_APP_AF_API_KEY,
+          unique_id: this.userIDList[0]["userID"],
         });
         let fullurl = url + "?" + queryparams;
         window.open(fullurl);

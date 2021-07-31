@@ -3,30 +3,28 @@
     <SRNEntry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
+      :purpose="purpose"
       :purposeParams="purposeParams"
-      :subPurposeParams="subPurposeParams"
     />
-    <div class="mx-auto" v-if="!isRedirectToPlio">
+    <div class="mx-auto" v-if="!isSingleEntryOnly">
       <h3>OR</h3>
-      <StudentSelect />
+      <!-- student select component to be placed here -->
     </div>
   </div>
 </template>
 
 <script>
-import StudentSelect from "@/components/StudentSelect.vue";
 import SRNEntry from "@/components/SRNEntry.vue";
 
-/* Have a variable plioUse that will help toggle between divs, one that will disable the entry of more 
+/* Have a variable isSingleEntryOnly that will help toggle between divs, one that will disable the entry of more 
 than one SRN. Can be seen used also in SRNEntry.vue.
 This is because the redirect link is one plio link and it takes a singular param of studentID. 
-Maybe in the future could come up with a hack. For now, plioUse is set to true, hence only one SRN can be entered.
+Maybe in the future could come up with a hack. For now, isSingleEntryOnly is set to true, hence only one SRN can be entered.
   Also, the dropdown feature is disabled for now. */
 
 export default {
   name: "HomePage",
   components: {
-    StudentSelect,
     SRNEntry,
   },
   props: {
@@ -40,12 +38,12 @@ export default {
       default: "",
       type: String,
     },
-    purposeParams: {
+    purpose: {
       //general category of why the data is being captured. Eg: attendance
       default: "",
       type: String,
     },
-    subPurposeParams: {
+    purposeParams: {
       //subcategory of the purpose. Eg: plio -> means the attendance is for a plio link
       default: "",
       type: String,

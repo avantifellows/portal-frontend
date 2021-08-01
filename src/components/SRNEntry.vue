@@ -12,17 +12,18 @@
           :maxlength="10"
           class="inputStyleClass"
         />
-        <inline-svg
-          v-if="!isSingleEntryOnly"
-          @click="addField(index, userIDList)"
-          :src="require('@/assets/images/add-button.svg')"
-        ></inline-svg>
-        <inline-svg
-          v-show="isAnyUserIDPresent && !isSingleEntryOnly"
-          @click="removeField(index, userIDList)"
-          class="ml-2 cursor-pointer"
-          :src="require('@/assets/images/delete-button.svg')"
-        ></inline-svg>
+        <div v-if="!isSingleEntryOnly">
+          <inline-svg
+            @click="addField(index, userIDList)"
+            :src="require('@/assets/images/add-button.svg')"
+          ></inline-svg>
+          <inline-svg
+            v-show="isAnyUserIDPresent"
+            @click="removeField(index, userIDList)"
+            class="ml-2 cursor-pointer"
+            :src="require('@/assets/images/delete-button.svg')"
+          ></inline-svg>
+        </div>
       </div>
       <button @click="processForm" class="buttonStyleClass">SUBMIT</button>
     </div>

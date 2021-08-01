@@ -6,12 +6,14 @@
         <input
           v-model="input.userID"
           type="text"
-          placeholder="Student SRN"
+          placeholder="Your SRN / आपका SRN"
           required
           @keypress="isValidSRNFormat($event)"
           :maxlength="10"
           class="inputStyleClass"
+          @input="updateValue"
         />
+        <span class="errorStyleClass" v-if="invalidMessage">{{ invalidMessage }}</span>
         <inline-svg
           v-if="!isSingleEntryOnly"
           @click="addField(index, userIDList)"
@@ -24,7 +26,7 @@
           :src="require('@/assets/images/delete-button.svg')"
         ></inline-svg>
       </div>
-      <button @click="processForm" class="buttonStyleClass">SUBMIT</button>
+      <button @click="processForm" class="buttonStyleClass">SUBMIT / जमा करें</button>
     </div>
   </section>
 </template>
@@ -41,6 +43,7 @@ export default {
   data() {
     return {
       userIDList: [{ userID: "" }],
+      invalidMessage: null,
     };
   },
   computed: {
@@ -64,19 +67,27 @@ export default {
     removeField(index, list) {
       list.splice(index, 1);
     },
-    processForm() {
-      if (this.isSingleEntryOnly) {
-        //this method constructs the URL based on the redirectTo param
-        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-        //adds params; api key and student SRN
-        let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_AF_API_KEY,
-          unique_id: this.userIDList[0]["userID"],
-        });
-        let fullurl = url + "?" + queryparams;
-        window.open(fullurl);
+    updateValue(event) {
+      if (event.target.value.length < 10) {
+        this.invalidMessage = "Please type 10 characters / कृपया १० अक्षर टाइप करें";
+      } else {
+        this.invalidMessage = "";
       }
+    },
+    processForm() {
+      console.log("hello");
+      // if (this.isSingleEntryOnly) {
+      //   //this method constructs the URL based on the redirectTo param
+      //   const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+      //   let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
+      //   //adds params; api key and student SRN
+      //   let queryparams = new URLSearchParams({
+      //     api_key: process.env.VUE_APP_AF_API_KEY,
+      //     unique_id: this.userIDList[0]["userID"],
+      //   });
+      //   let fullurl = url + "?" + queryparams;
+      //   window.open(fullurl);
+      // }
     },
   },
 };
@@ -94,5 +105,9 @@ label {
 }
 .buttonStyleClass {
   @apply bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded;
+}
+
+.errorStyleClass {
+  @apply mx-auto text-red-700 text-base mb-1;
 }
 </style>

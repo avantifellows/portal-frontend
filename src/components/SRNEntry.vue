@@ -75,19 +75,18 @@ export default {
       }
     },
     processForm() {
-      console.log("hello");
-      // if (this.isSingleEntryOnly) {
-      //   //this method constructs the URL based on the redirectTo param
-      //   const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-      //   let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-      //   //adds params; api key and student SRN
-      //   let queryparams = new URLSearchParams({
-      //     api_key: process.env.VUE_APP_AF_API_KEY,
-      //     unique_id: this.userIDList[0]["userID"],
-      //   });
-      //   let fullurl = url + "?" + queryparams;
-      //   window.open(fullurl);
-      // }
+      if (this.isSingleEntryOnly) {
+        //this method constructs the URL based on the redirectTo param
+        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
+        //adds params; api key and student SRN
+        let queryparams = new URLSearchParams({
+          api_key: process.env.VUE_APP_AF_API_KEY,
+          unique_id: this.userIDList[0]["userID"],
+        });
+        let fullurl = url + "?" + queryparams;
+        window.open(fullurl);
+      }
     },
   },
 };

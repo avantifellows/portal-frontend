@@ -6,12 +6,16 @@
         <input
           v-model="input.userID"
           type="text"
-          placeholder="Student SRN"
+          placeholder="Your SRN / आपका SRN"
           required
           @keypress="isValidSRNFormat($event)"
           :maxlength="10"
           class="inputStyleClass"
+          @input="updateValue"
         />
+        <span class="errorStyleClass" v-if="invalidInputMessage">{{
+          invalidInputMessage
+        }}</span>
         <div v-if="!isSingleEntryOnly">
           <inline-svg
             @click="addField(index, userIDList)"
@@ -25,7 +29,13 @@
           ></inline-svg>
         </div>
       </div>
-      <button @click="processForm" class="buttonStyleClass">SUBMIT</button>
+      <button
+        @click="processForm"
+        class="buttonStyleClass"
+        :disabled="isSubmitButtonDisabled"
+      >
+        SUBMIT / जमा करें
+      </button>
     </div>
   </section>
 </template>
@@ -42,14 +52,23 @@ export default {
   data() {
     return {
       userIDList: [{ userID: "" }],
+      invalidInputMessage: null,
     };
   },
   computed: {
     isAnyUserIDPresent() {
-      return this.userIDList != null;
+      return (
+        this.userIDList != null &&
+        this.userIDList != undefined &&
+        this.userIDList.length > 0 &&
+        this.userIDList[0]["userID"] != ""
+      );
     },
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
+    },
+    isSubmitButtonDisabled() {
+      return !this.isAnyUserIDPresent || this.invalidInputMessage != "";
     },
   },
   methods: {
@@ -64,6 +83,13 @@ export default {
     },
     removeField(index, list) {
       list.splice(index, 1);
+    },
+    updateValue(event) {
+      if (event.target.value.length < 10) {
+        this.invalidInputMessage = "Please type 10 characters / कृपया १० अक्षर टाइप करें";
+      } else {
+        this.invalidInputMessage = "";
+      }
     },
     processForm() {
       if (this.isSingleEntryOnly) {
@@ -94,6 +120,10 @@ label {
   @apply flex border py-2 mx-auto px-3;
 }
 .buttonStyleClass {
-  @apply bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded;
+  @apply bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50;
+}
+
+.errorStyleClass {
+  @apply mx-auto text-red-700 text-base mb-1;
 }
 </style>

@@ -1,0 +1,55 @@
+{
+  "name": "event-capturing",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "deploy-staging": "vue-cli-service build --mode staging && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer-staging --delete --acl public-read",
+    "deploy": "vue-cli-service build && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer --delete --acl public-read"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss7-compat": "^2.2.7",
+    "autoprefixer": "^9.8.6",
+    "core-js": "^3.6.5",
+    "dns": "^0.2.2",
+    "postcss": "^7.0.36",
+    "secure-ls": "^1.2.6",
+    "tailwind": "^4.0.0",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.7",
+    "vue": "^3.0.0",
+    "vue-inline-svg": "^2.0.0",
+    "vue-router": "^4.0.10",
+    "vuex": "^4.0.2",
+    "vuex-persistedstate": "^4.0.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

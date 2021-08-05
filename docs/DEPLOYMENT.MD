@@ -11,10 +11,10 @@ This document covers steps on setting up this repository on various cloud hostin
 5. If you choose to set up a SSL, do so at this step.
 6. Use a DNS provider of your choice. Give an appropriate CNAME and enter the target address. This would be the address of the newly created Cloudfront distribution.
 7. Add the following lines to the `scripts` object in `package.json`.
-   {
+   ```sh
     "deploy-staging": "vue-cli-service build --mode staging && aws --profile $YOUR_AWS_PROFILE --region $YOUR_AWS_REGION s3 sync ./dist s3://$S3_STAGING_BUCKET_NAME --delete --acl public-read",
-     "deploy": "vue-cli-service build && aws --profile $YOUR_AWS_PROFILE --region $YOUR_AWS_REGIO s3 sync ./dist s3://$S3_STAGING_BUCKET_NAME --delete --acl public-read"
-}
+     "deploy": "vue-cli-service build && aws --profile $YOUR_AWS_PROFILE --region $YOUR_AWS_REGION s3 sync ./dist s3://$S3_PROD_BUCKET_NAME --delete --acl public-read"
+     ```
 8. To deploy your code on to staging, use `npm run deploy-staging/yarn deploy-staging`.
 
 # Production

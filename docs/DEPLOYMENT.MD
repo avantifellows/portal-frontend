@@ -6,7 +6,7 @@ This document covers steps on setting up this repository on various cloud hostin
 # Staging
 1. Login to your aws console.
 2. Create a S3 bucket and uncheck `Block all plublic access`.
-3. Enable static website hosting and the bucket endpoint is what will be used to set up Cloudfront distribution.
+3. Enable static website hosting and note down the bucket endpoint. We'll use it to set up a Cloudfront distribution later.
 4. In Cloudfront, create a distribution with the S3 origin, created in step 4.
 5. If you choose to set up a SSL, do so at this step.
 6. Use a DNS provider of your choice. The target address would be the address Cloudfront has generated for you.

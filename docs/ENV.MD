@@ -1,5 +1,4 @@
 ## Environment variables
-
 This guide explains all the available configurations in your `.env` file so that you can configure your environments accordingly.
 
 ## VUE_APP_AF_API_KEY=''

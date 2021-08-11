@@ -69,9 +69,6 @@ export default {
         this.invalidInputMessage == ""
       );
     },
-    ifUserEnteredMoreThanOne() {
-      return !this.isSingleEntryOnly && this.invalidInputMessage != null;
-    },
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },

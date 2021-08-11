@@ -27,6 +27,7 @@ pnpm-debug.log*
 *.env
 
 .env
+.env.*
 package-lock.json
 
 # testing

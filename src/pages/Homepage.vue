@@ -6,10 +6,7 @@
       :purpose="purpose"
       :purposeParams="purposeParams"
     />
-    <div class="mx-auto" v-if="!isSingleEntryOnly">
-      <h3>OR</h3>
-      <!-- student select component to be placed here -->
-    </div>
+    
   </div>
 </template>
 

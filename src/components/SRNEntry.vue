@@ -77,7 +77,10 @@ export default {
       return !this.isAnyUserIDPresent || this.invalidInputMessage != "";
     },
     isUserValidated() {
-      return !this.isSingleEntryOnly && this.userIDList[0]["userID"].length == 10;
+      return (
+        !this.isSingleEntryOnly &&
+        this.userIDList[0]["userID"].length > this.maxLength - 1
+      );
     },
   },
   methods: {

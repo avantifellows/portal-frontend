@@ -80,7 +80,6 @@ export default {
     },
   },
   methods: {
-    onInput() {},
     isValidSRNFormat(e) {
       //checking to see if each char typed by user is only a number
       let char = String.fromCharCode(e.keyCode);
@@ -103,20 +102,20 @@ export default {
         event.target.value = event.target.value.slice(0, 10);
       }
     },
-    
+
     processForm() {
       if (this.isSingleEntryOnly) {
-         //this method constructs the URL based on the redirectTo param
-         const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-         let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-         //adds params; api key and student SRN
-         let queryparams = new URLSearchParams({
-           api_key: process.env.VUE_APP_AF_API_KEY,
-           unique_id: this.userIDList[0]["userID"],
-         });
-         let fullurl = url + "?" + queryparams;
-         window.open(fullurl);
-       }
+        //this method constructs the URL based on the redirectTo param
+        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
+        //adds params; api key and student SRN
+        let queryparams = new URLSearchParams({
+          api_key: process.env.VUE_APP_AF_API_KEY,
+          unique_id: this.userIDList[0]["userID"],
+        });
+        let fullurl = url + "?" + queryparams;
+        window.open(fullurl);
+      }
     },
   },
 };

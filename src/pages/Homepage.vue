@@ -6,7 +6,6 @@
       :purpose="purpose"
       :purposeParams="purposeParams"
     />
-    
   </div>
 </template>
 

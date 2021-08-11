@@ -19,11 +19,11 @@
           @input="updateValue"
         />
 
-        <div class="flex flex-row my-auto" v-if="ifUserEnteredMoreThanOne">
+        <div class="flex flex-row my-auto" v-if="isUserValidated">
           <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
           <div
             class="minus-sign"
-            v-show="isAnyUserIDPresent"
+            v-show="ifUserEnteredMoreThanOne"
             @click="removeField(index, userIDList)"
           ></div>
         </div>
@@ -55,7 +55,6 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
-      validated: false,
       maxLength: 10,
     };
   },
@@ -65,18 +64,20 @@ export default {
         this.userIDList != null &&
         this.userIDList != undefined &&
         this.userIDList.length > 0 &&
-        this.userIDList[0]["userID"] != "" &&
-        this.invalidInputMessage == ""
+        this.userIDList[0]["userID"] != ""
       );
     },
     ifUserEnteredMoreThanOne() {
-      return !this.isSingleEntryOnly && this.invalidInputMessage != null;
+      return !this.isSingleEntryOnly && this.userIDList.length > 1;
     },
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
     isSubmitButtonDisabled() {
       return !this.isAnyUserIDPresent || this.invalidInputMessage != "";
+    },
+    isUserValidated() {
+      return !this.isSingleEntryOnly && this.userIDList[0]["userID"].length == 10;
     },
   },
   methods: {
@@ -93,13 +94,13 @@ export default {
       list.splice(index, 1);
     },
     updateValue(event) {
-      if (event.target.value.length < 10) {
+      if (event.target.value.length < this.maxLength) {
         this.invalidInputMessage = "Please type 10 characters / कृपया १० अक्षर टाइप करें";
       } else {
         this.invalidInputMessage = "";
       }
-      if (event.target.value.length > 10) {
-        event.target.value = event.target.value.slice(0, 10);
+      if (event.target.value.length > this.maxLength) {
+        event.target.value = event.target.value.slice(0, this.maxLength);
       }
     },
 

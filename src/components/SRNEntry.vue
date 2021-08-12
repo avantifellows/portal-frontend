@@ -98,7 +98,7 @@ export default {
     },
     updateValue(event) {
       if (event.target.value.length < this.maxLength) {
-        this.invalidInputMessage = "Please type 10 characters / कृपया १० अक्षर टाइप करें";
+        this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
       } else {
         this.invalidInputMessage = "";
       }

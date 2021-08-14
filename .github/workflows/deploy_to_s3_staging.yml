@@ -10,6 +10,11 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+
+    environment:
+      name: staging
+      url: "https://staging-auth.avantifellows.org"
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -28,6 +33,10 @@ jobs:
     
     # build the vuepress docs
     - name: Build
+      env:
+        NODE_ENV: staging
+        VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_AF_API_KEY }}
+        VUE_APP_BASE_URL_PLIO: ${{ secrets.VUE_APP_BASE_URL_PLIO }}
       run: npm run build
 
     - name: Configure AWS Credentials

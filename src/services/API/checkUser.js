@@ -1,12 +1,5 @@
-import axios from 'axios';
-
-const headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  }
-
-//the base URL is the deployed cloud function URL
-const client = axios.create({baseURL: 'https://us-central1-avantifellows.cloudfunctions.net'}, headers)
+import {client} from "./rootClient.js"
+import { checkUserEndpoint } from "./endpoints.js";
 
 export default {
     //checks if the user exists in the database or not
@@ -17,7 +10,7 @@ export default {
             userID : inputUserID
         }
         return new Promise( (resolve) => {
-            client.post('/checkForUser', JSON.stringify(params)).then((response) => {
+            client.post(checkUserEndpoint, JSON.stringify(params)).then((response) => {
                 resolve(response.data)
             })
             

@@ -31,6 +31,9 @@
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>
+      <span class="errorStyleClass" v-if="isincorrectLogin">{{
+        invalidLoginMessage
+      }}</span>
       <button
         @click="processForm"
         class="buttonStyleClass"
@@ -43,6 +46,7 @@
 </template>
 
 <script>
+import firebaseAPI from "@/services/API/checkUser.js";
 export default {
   name: "SRNEntry",
   props: {
@@ -55,7 +59,10 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
+      validated: true,
       maxLength: 10,
+      validateCount: -1,
+      invalidLoginMessage: "Please enter correct SRN",
     };
   },
   computed: {
@@ -82,6 +89,9 @@ export default {
         this.userIDList[0]["userID"].length > this.maxLength - 1
       );
     },
+    isincorrectLogin() {
+      return !this.validated && this.validateCount == 0;
+    },
   },
   methods: {
     isValidSRNFormat(e) {
@@ -99,6 +109,7 @@ export default {
     updateValue(event) {
       if (event.target.value.length < this.maxLength) {
         this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
+        this.invalidLoginMessage = "";
       } else {
         this.invalidInputMessage = "";
       }
@@ -107,18 +118,27 @@ export default {
       }
     },
 
-    processForm() {
-      if (this.isSingleEntryOnly) {
-        //this method constructs the URL based on the redirectTo param
-        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-        //adds params; api key and student SRN
-        let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_AF_API_KEY,
-          unique_id: this.userIDList[0]["userID"],
-        });
-        let fullurl = url + "?" + queryparams;
-        window.open(fullurl);
+    async processForm() {
+      //this.sendSQSMessage();
+      const userID = parseInt(this.userIDList["0"]["userID"]);
+      this.validated = await firebaseAPI.checkUserExists(userID);
+
+      if (!this.validated) {
+        this.validateCount = 0;
+        this.invalidLoginMessage = "Please enter correct SRN";
+      } else {
+        if (this.isSingleEntryOnly) {
+          //this method constructs the URL based on the redirectTo param
+          const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+          let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
+          //adds params; api key and student SRN
+          let queryparams = new URLSearchParams({
+            api_key: process.env.VUE_APP_AF_API_KEY,
+            unique_id: this.userIDList[0]["userID"],
+          });
+          let fullurl = url + "?" + queryparams;
+          window.open(fullurl);
+        }
       }
     },
   },

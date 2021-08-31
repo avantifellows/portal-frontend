@@ -61,8 +61,14 @@ export default {
       invalidInputMessage: null,
       validated: true,
       maxLength: 10,
+      /*this count is used to check how many times the user has been validated. 
+      For now, the count has three possible states : -1 -> the initial state, if the user is validated in the first try. This will set the flag to valid
+      0 -> user has been authenticated once, and is being authenticated again. If yes, then the flag is set to valid. 
+      Otherwise, the state changes to 1, this means the user has tried getting authenticated twice, but is invalid. 
+
+      */
       validateCount: -1,
-      invalidLoginMessage: "Please enter correct SRN",
+      invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
     };
   },
   computed: {
@@ -117,28 +123,39 @@ export default {
         event.target.value = event.target.value.slice(0, this.maxLength);
       }
     },
+    sendPlio() {
+      if (this.isSingleEntryOnly) {
+        //this method constructs the URL based on the redirectTo param
+        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
+        //adds params; api key and student SRN
+        let queryparams = new URLSearchParams({
+          api_key: process.env.VUE_APP_AF_API_KEY,
+          unique_id: this.userIDList[0]["userID"],
+        });
+        let fullurl = url + "?" + queryparams;
+        window.open(fullurl);
+      }
+    },
 
     async processForm() {
-      //this.sendSQSMessage();
+      //parsing the userID from user input
       const userID = parseInt(this.userIDList["0"]["userID"]);
+
+      //response tells us if the user is authenticated.
       this.validated = await firebaseAPI.checkUserExists(userID);
 
-      if (!this.validated) {
+      // this condition checks if the user is getting authenticated the first time. Just shows an error message.
+      if (!this.validated && this.validateCount == -1) {
         this.validateCount = 0;
-        this.invalidLoginMessage = "Please enter correct SRN";
+        this.invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
+      }
+      //this condition checks the second time, since still not valid, just changes the flag and continues with the plio.
+      else if (!this.validated && this.validateCount == 0) {
+        this.validateCount = 1;
+        this.sendPlio();
       } else {
-        if (this.isSingleEntryOnly) {
-          //this method constructs the URL based on the redirectTo param
-          const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-          let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-          //adds params; api key and student SRN
-          let queryparams = new URLSearchParams({
-            api_key: process.env.VUE_APP_AF_API_KEY,
-            unique_id: this.userIDList[0]["userID"],
-          });
-          let fullurl = url + "?" + queryparams;
-          window.open(fullurl);
-        }
+        this.sendPlio();
       }
     },
   },

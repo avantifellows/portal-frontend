@@ -123,7 +123,7 @@ export default {
       //parsing the userID from user input
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
-      //response tells us if the user is authenticated.
+      //invokes the validation function
       const userIsValidated = validateUser(
         userID,
         this.validateCount,

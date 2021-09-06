@@ -31,11 +31,9 @@
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>
-      <span
-        class="errorStyleClass"
-        v-if="!this.doesUserExist && this.validateCount == 1"
-        >{{ invalidLoginMessage }}</span
-      >
+      <span class="errorStyleClass" v-if="!doesUserExist && validateCount == 1">{{
+        invalidLoginMessage
+      }}</span>
 
       <button
         @click="processForm"
@@ -62,10 +60,9 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
-      doesUserExist: false,
+      doesUserExist: false, // whether the user exists in the backend database
       maxLengthOfSRN: 10,
-      //this variable tells us how many times the user has been validated.
-      validateCount: 0,
+      validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
     };
   },
@@ -128,7 +125,7 @@ export default {
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
       //invokes the validation function
-      const userIsValidated = validateSRN(
+      let userIsValidated = validateSRN(
         userID,
         this.validateCount,
         this.isSingleEntryOnly,
@@ -137,9 +134,9 @@ export default {
       );
 
       userIsValidated.then((result) => {
-        this.doesUserExist = result[0];
-        this.validateCount = result[1];
-        this.invalidLoginMessage = result[2];
+        this.doesUserExist = result.doesUserExist;
+        this.validateCount = result.validateCount;
+        this.invalidLoginMessage = result.invalidLoginMessage;
       });
     },
   },

@@ -3,6 +3,8 @@ import { sendPlio } from "./sendPlio";
 
 //this function is invoked only for the check of SRN's.
 export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, doesUserExist){
+
+    var invalidLoginMessage = ""
     //checks the basic conditions of SRN: 
     //      - starts with only '1'
     //      - does not contain same number patterns like '111...', '222...', etc.
@@ -15,7 +17,7 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
     // this condition checks if the user is getting authenticated the first time. Just shows an error message.
     if (!doesUserExist && validateCount == 0) {
     validateCount = 1;
-    var invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
+    invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
     }
     //this condition checks the second time, since still not valid, just changes the flag and continues with the plio.
     else if (!doesUserExist && validateCount == 1) {
@@ -24,5 +26,9 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
     } else {
     sendPlio(isSingleEntryOnly, userID, redirectID);
     }
-    return [doesUserExist, validateCount, invalidLoginMessage]
+    return {
+        doesUserExist: doesUserExist,
+        validateCount: validateCount,
+        invalidLoginMessage: invalidLoginMessage
+    }
 }

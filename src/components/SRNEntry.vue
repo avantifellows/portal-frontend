@@ -31,9 +31,12 @@
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>
-      <span class="errorStyleClass" v-if="isincorrectLogin">{{
-        invalidLoginMessage
-      }}</span>
+      <span
+        class="errorStyleClass"
+        v-if="!this.doesUserExist && this.validateCount == 1"
+        >{{ invalidLoginMessage }}</span
+      >
+
       <button
         @click="processForm"
         class="buttonStyleClass"
@@ -46,7 +49,7 @@
 </template>
 
 <script>
-import firebaseAPI from "@/services/API/checkUser.js";
+import { validateUser } from "@/services/validation.js";
 export default {
   name: "SRNEntry",
   props: {
@@ -59,15 +62,10 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
-      validated: true,
-      maxLength: 10,
-      /*this count is used to check how many times the user has been validated. 
-      For now, the count has three possible states : -1 -> the initial state, if the user is validated in the first try. This will set the flag to valid
-      0 -> user has been authenticated once, and is being authenticated again. If yes, then the flag is set to valid. 
-      Otherwise, the state changes to 1, this means the user has tried getting authenticated twice, but is invalid. 
-
-      */
-      validateCount: -1,
+      doesUserExist: false,
+      maxLengthOfSRN: 10,
+      //this variable tells us how many times the user has been validated.
+      validateCount: 0,
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
     };
   },
@@ -92,11 +90,8 @@ export default {
     isUserValidated() {
       return (
         !this.isSingleEntryOnly &&
-        this.userIDList[0]["userID"].length > this.maxLength - 1
+        this.userIDList[0]["userID"].length > this.maxLengthOfSRN - 1
       );
-    },
-    isincorrectLogin() {
-      return !this.validated && this.validateCount == 0;
     },
   },
   methods: {
@@ -113,28 +108,14 @@ export default {
       list.splice(index, 1);
     },
     updateValue(event) {
-      if (event.target.value.length < this.maxLength) {
+      if (event.target.value.length < this.maxLengthOfSRN) {
         this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
         this.invalidLoginMessage = "";
       } else {
         this.invalidInputMessage = "";
       }
-      if (event.target.value.length > this.maxLength) {
-        event.target.value = event.target.value.slice(0, this.maxLength);
-      }
-    },
-    sendPlio() {
-      if (this.isSingleEntryOnly) {
-        //this method constructs the URL based on the redirectTo param
-        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-        //adds params; api key and student SRN
-        let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_AF_API_KEY,
-          unique_id: this.userIDList[0]["userID"],
-        });
-        let fullurl = url + "?" + queryparams;
-        window.open(fullurl);
+      if (event.target.value.length > this.maxLengthOfSRN) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
       }
     },
 
@@ -143,20 +124,19 @@ export default {
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
       //response tells us if the user is authenticated.
-      this.validated = await firebaseAPI.checkUserExists(userID);
+      const userIsValidated = validateUser(
+        userID,
+        this.validateCount,
+        this.isSingleEntryOnly,
+        this.redirectID,
+        this.doesUserExist
+      );
 
-      // this condition checks if the user is getting authenticated the first time. Just shows an error message.
-      if (!this.validated && this.validateCount == -1) {
-        this.validateCount = 0;
-        this.invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
-      }
-      //this condition checks the second time, since still not valid, just changes the flag and continues with the plio.
-      else if (!this.validated && this.validateCount == 0) {
-        this.validateCount = 1;
-        this.sendPlio();
-      } else {
-        this.sendPlio();
-      }
+      userIsValidated.then((result) => {
+        this.doesUserExist = result[0];
+        this.validateCount = result[1];
+        this.invalidLoginMessage = result[2];
+      });
     },
   },
 };

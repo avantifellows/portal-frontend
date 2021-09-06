@@ -119,6 +119,7 @@ export default {
       }
       if (event.target.value.length > this.maxLengthOfSRN) {
         event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
+        this.userIDList[0]["userID"] = event.target.value;
       }
     },
 

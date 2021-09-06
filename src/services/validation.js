@@ -1,7 +1,8 @@
 import firebaseAPI from "@/services/API/checkUser.js";
 import { sendPlio } from "./sendPlio";
 
-export async function validateUser(userID, validateCount, isSingleEntryOnly, redirectID, doesUserExist){
+//this function is invoked only for the check of SRN's.
+export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, doesUserExist){
     //checks the basic conditions of SRN: 
     //      - starts with only '1'
     //      - does not contain same number patterns like '111...', '222...', etc.
@@ -10,7 +11,7 @@ export async function validateUser(userID, validateCount, isSingleEntryOnly, red
         //if the basic conditions are satisified, only then the request is sent for further checking
         doesUserExist = await firebaseAPI.checkUserExists(userID);
     }
-    
+
     // this condition checks if the user is getting authenticated the first time. Just shows an error message.
     if (!doesUserExist && validateCount == 0) {
     validateCount = 1;

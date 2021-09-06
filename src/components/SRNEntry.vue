@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { validateUser } from "@/services/validation.js";
+import { validateSRN } from "@/services/validation.js";
 export default {
   name: "SRNEntry",
   props: {
@@ -71,6 +71,7 @@ export default {
   },
   computed: {
     isAnyUserIDPresent() {
+      //checks if any userID has been typed
       return (
         this.userIDList != null &&
         this.userIDList != undefined &&
@@ -79,6 +80,7 @@ export default {
       );
     },
     ifUserEnteredMoreThanOne() {
+      //used when multiple SRN's will be allowed to typed
       return !this.isSingleEntryOnly && this.userIDList.length > 1;
     },
     isSingleEntryOnly() {
@@ -88,6 +90,7 @@ export default {
       return !this.isAnyUserIDPresent || this.invalidInputMessage != "";
     },
     isUserValidated() {
+      //if multiple SRN's are allowed, then this helps with the activation of the + button, to add more SRN's
       return (
         !this.isSingleEntryOnly &&
         this.userIDList[0]["userID"].length > this.maxLengthOfSRN - 1
@@ -124,7 +127,7 @@ export default {
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
       //invokes the validation function
-      const userIsValidated = validateUser(
+      const userIsValidated = validateSRN(
         userID,
         this.validateCount,
         this.isSingleEntryOnly,

@@ -1,5 +1,5 @@
 import firebaseAPI from "@/services/API/checkUser.js";
-import { sendPlio } from "./sendPlio";
+import { sendPlio } from "@/services/sendPlio";
 
 //this function is invoked only for the check of SRN's.
 export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, doesUserExist){
@@ -23,8 +23,10 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
     else if (!doesUserExist && validateCount == 1) {
     validateCount = 2;
     sendPlio(isSingleEntryOnly, userID, redirectID);
+
     } else {
     sendPlio(isSingleEntryOnly, userID, redirectID);
+
     }
     return {
         doesUserExist: doesUserExist,

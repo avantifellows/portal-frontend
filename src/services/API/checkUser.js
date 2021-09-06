@@ -1,5 +1,5 @@
-import {client} from "@/API/rootClient.js"
-import { checkUserEndpoint } from "@/API/endpoints.js";
+import {client} from "@/services/API/rootClient.js"
+import { checkUserEndpoint } from "@/services/API/endpoints.js";
 
 export default {
     //checks if the user exists in the database or not

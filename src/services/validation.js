@@ -4,7 +4,7 @@ import {sendSQSMessage} from "@/services/API/sqs";
 
 //this function is invoked only for the check of SRN's.
 export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, doesUserExist, purpose, purposeParams, redirectTo){
-
+    var authType="SRN"
     var invalidLoginMessage = ""
     //checks the basic conditions of SRN: 
     //      - starts with only '1'
@@ -23,10 +23,10 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
     //this condition checks the second time, since still not valid, just changes the flag and continues with the plio.
     else if (!doesUserExist && validateCount == 1) {
     validateCount = 2;
-    sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist);
+    sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType);
     sendPlio(isSingleEntryOnly, userID, redirectID);
     } else {
-    sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist);
+    sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType);
     sendPlio(isSingleEntryOnly, userID, redirectID);
     }
     return {

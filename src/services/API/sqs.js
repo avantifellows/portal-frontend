@@ -5,12 +5,12 @@ const queueURL = "https://sqs.ap-south-1.amazonaws.com/111766607077/EventQueue";
 const sqsClient = new SQSClient({
   region: REGION,
   credentials: {
-    accessKeyId: 'AKIARUBOPCTSSU3W7SML',
-    secretAccessKey: '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',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
   },
 });
 
-async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist) {
+async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType) {
     const messageBody = [
       {
         DateTime: Date.now().toString(),
@@ -22,7 +22,7 @@ async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, us
             id: redirectID,
           },
         },
-        auth_type: "SRN", //for now, this is hardcoded
+        auth_type: authType, //for now, this is hardcoded
         User: {
           values: userID,
           userdata_validated: doesUserExist,

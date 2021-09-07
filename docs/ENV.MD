@@ -6,3 +6,9 @@ API key for third-party access, given to each organization. To know more about c
 
 ## VUE_APP_BASE_URL_PLIO=''
 Base URL for the Plio link.
+
+## AWS_ACCESS_KEY_ID=''
+AWS access key for SQS messaging.
+
+## AWS_SECRET_KEY=''
+AWS secret key for SQS messaging.

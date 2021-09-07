@@ -130,7 +130,10 @@ export default {
         this.validateCount,
         this.isSingleEntryOnly,
         this.redirectID,
-        this.doesUserExist
+        this.doesUserExist,
+        this.purpose,
+        this.purposeParams,
+        this.redirectTo
       );
 
       userIsValidated.then((result) => {

@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.30.0",
     "autoprefixer": "^9.8.6",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "dns": "^0.2.2",
     "postcss": "^7.0.36",

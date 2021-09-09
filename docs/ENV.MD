@@ -8,7 +8,7 @@ API key for third-party access, given to each organization. To know more about c
 Base URL for the Plio link.
 
 ## AWS_ACCESS_KEY_ID=''
-AWS access key for SQS messaging.
+AWS access key for access to AWS SQS.
 
 ## AWS_SECRET_KEY=''
-AWS secret key for SQS messaging.
+AWS secret key for access to AWS SQS.

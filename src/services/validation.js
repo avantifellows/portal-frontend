@@ -1,5 +1,6 @@
 import firebaseAPI from "@/services/API/checkUser.js";
 import { sendPlio } from "@/services/sendPlio";
+
 import {sendSQSMessage} from "@/services/API/sqs";
 
 //this function is invoked only for the check of SRN's.
@@ -25,9 +26,11 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
     validateCount = 2;
     sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType);
     sendPlio(isSingleEntryOnly, userID, redirectID);
+
     } else {
     sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType);
     sendPlio(isSingleEntryOnly, userID, redirectID);
+
     }
     return {
         doesUserExist: doesUserExist,

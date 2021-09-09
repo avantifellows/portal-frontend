@@ -13,19 +13,19 @@ const sqsClient = new SQSClient({
 async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType) {
     const messageBody = [
       {
-        DateTime: Date.now().toString(),
-        Purpose: {
+        dateTime: Date.now().toString(),
+        purpose: {
           type: purpose,
-          subtype: purposeParams,
+          subType: purposeParams,
           params: {
             platform: redirectTo,
             id: redirectID,
           },
         },
-        auth_type: authType, //for now, this is hardcoded
-        User: {
+        authType: authType, //for now, this is hardcoded
+        user: {
           values: userID,
-          userdata_validated: doesUserExist,
+          userDataValidated: doesUserExist,
         },
       },
     ];

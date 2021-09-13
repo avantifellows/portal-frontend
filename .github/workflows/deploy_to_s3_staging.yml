@@ -38,14 +38,14 @@ jobs:
         VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_AF_API_KEY }}
         VUE_APP_BASE_URL_PLIO: ${{ secrets.VUE_APP_BASE_URL_PLIO }}
         VUE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        VUE_APP_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        VUE_APP_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: npm run build
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ap-south-1
 
     # sync with the given S3 bucket

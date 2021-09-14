@@ -6,7 +6,7 @@ import {sendSQSMessage} from "@/services/API/sqs";
 // validateCount = 0, when the user gets validated on the first try
 // validateCount = 1, when the user fails the first validation
 
-export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, doesUserExist, purpose, purposeParams, redirectTo){
+export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, isUserValid, purpose, purposeParams, redirectTo){
     var authType="SRN"
     var invalidLoginMessage = ""
 
@@ -15,26 +15,26 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
     if(!(/^([0-9])\1*$/.test(userID))){
 
         //if the basic conditions are satisified, only then the request is sent for further checking
-        doesUserExist = await firebaseAPI.checkUserExists(userID);
+        isUserValid = await firebaseAPI.checkUserExists(userID);
     }
 
     // this condition checks if the user is getting authenticated the first time. Just shows an error message.
-    if (!doesUserExist && validateCount == 0) {
+    if (!isUserValid && validateCount == 0) {
         validateCount = 1;
         invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
     }
 
     //this condition is entered in one of the three conditions:
-    //  - either the user is found the first time -> doesUserExist = true, validateCount = 0
-    //  - either the user is found the second time -> doesUserExist = true, validateCount = 1
-    //  - either the user is not found the second time -> doesUserExist = false, validateCount = 1
+    //  - either the user is found the first time -> isUserValid = true, validateCount = 0
+    //  - either the user is found the second time -> isUserValid = true, validateCount = 1
+    //  - either the user is not found the second time -> isUserValid = false, validateCount = 1
     else{
-        sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType);
+        sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, isUserValid, authType);
         sendPlio(isSingleEntryOnly, userID, redirectID);
     }
 
     return {
-        doesUserExist: doesUserExist,
+        isUserValid: isUserValid,
         validateCount: validateCount,
         invalidLoginMessage: invalidLoginMessage
     }

@@ -1,7 +1,7 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 const REGION = "ap-south-1";
-const queueURL = "https://sqs.ap-south-1.amazonaws.com/111766607077/EventQueue";
+const QUEUEURL = "https://sqs.ap-south-1.amazonaws.com/111766607077/EventQueue";
 const sqsClient = new SQSClient({
   region: REGION,
   credentials: {
@@ -10,7 +10,7 @@ const sqsClient = new SQSClient({
   },
 });
 
-async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, doesUserExist, authType) {
+async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, isUserValid, authType) {
     const messageBody = [
       {
         dateTime: Date.now().toString(),
@@ -25,13 +25,13 @@ async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, us
         authType: authType,
         user: {
           values: userID,
-          userDataValidated: doesUserExist,
+          userDataValidated: isUserValid,
         },
       },
     ];
     const params = {
       MessageBody: JSON.stringify(messageBody),
-      QueueUrl: queueURL,
+      QueueUrl: QUEUEURL,
     };
 
     try {

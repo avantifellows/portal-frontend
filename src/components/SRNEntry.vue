@@ -31,7 +31,7 @@
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>
-      <span class="errorStyleClass" v-if="!doesUserExist && validateCount == 1">{{
+      <span class="errorStyleClass" v-if="!isUserValid && validateCount == 1">{{
         invalidLoginMessage
       }}</span>
 
@@ -60,7 +60,7 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
-      doesUserExist: false, // whether the user exists in the backend database
+      isUserValid: false, // whether the user exists in the backend database
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
@@ -130,14 +130,14 @@ export default {
         this.validateCount,
         this.isSingleEntryOnly,
         this.redirectID,
-        this.doesUserExist,
+        this.isUserValid,
         this.purpose,
         this.purposeParams,
         this.redirectTo
       );
 
       userIsValidated.then((result) => {
-        this.doesUserExist = result.doesUserExist;
+        this.isUserValid = result.isUserValid;
         this.validateCount = result.validateCount;
         this.invalidLoginMessage = result.invalidLoginMessage;
       });

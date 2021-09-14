@@ -151,7 +151,7 @@ export default {
             this.purposeParams,
             this.redirectTo,
             this.redirectID,
-            this.userID,
+            userID,
             this.isUserValid,
             authType
           );

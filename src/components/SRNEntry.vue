@@ -48,6 +48,8 @@
 
 <script>
 import { validateSRN } from "@/services/validation.js";
+import { sendPlio } from "@/services/sendPlio";
+import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
   props: {
@@ -121,6 +123,7 @@ export default {
     },
 
     async processForm() {
+      var authType = "SRN";
       //parsing the userID from user input
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
@@ -140,6 +143,20 @@ export default {
         this.isUserValid = result.isUserValid;
         this.validateCount = result.validateCount;
         this.invalidLoginMessage = result.invalidLoginMessage;
+
+        // either the user is valid or the user has been checked twice
+        if (this.isUserValid || this.validateCount != 1) {
+          sendSQSMessage(
+            this.purpose,
+            this.purposeParams,
+            this.redirectTo,
+            this.redirectID,
+            this.userID,
+            this.isUserValid,
+            authType
+          );
+          sendPlio(this.isSingleEntryOnly, this.userID, this.redirectID);
+        }
       });
     },
   },

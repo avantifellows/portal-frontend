@@ -1,13 +1,10 @@
 import firebaseAPI from "@/services/API/checkUser.js";
-import { sendPlio } from "@/services/sendPlio";
-import {sendSQSMessage} from "@/services/API/sqs";
 
 // this function is invoked only for the check of SRN's.
 // validateCount = 0, when the user gets validated on the first try
-// validateCount = 1, when the user fails the first validation
-
-export async function validateSRN(userID, validateCount, isSingleEntryOnly, redirectID, isUserValid, purpose, purposeParams, redirectTo){
-    var authType="SRN"
+// validateCount = 1, when the user fails the first check
+// validateCount = 2, when user fails the second check as well -> letting the user go through irrespective.
+export async function validateSRN(userID, validateCount, isUserValid){
     var invalidLoginMessage = ""
 
     //checks the basic condition of SRN: 
@@ -23,16 +20,10 @@ export async function validateSRN(userID, validateCount, isSingleEntryOnly, redi
         validateCount = 1;
         invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
     }
-
-    //this condition is entered in one of the three conditions:
-    //  - either the user is found the first time -> isUserValid = true, validateCount = 0
-    //  - either the user is found the second time -> isUserValid = true, validateCount = 1
-    //  - either the user is not found the second time -> isUserValid = false, validateCount = 1
-    else{
-        sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, isUserValid, authType);
-        sendPlio(isSingleEntryOnly, userID, redirectID);
+    // this condition checks if the user is getting authenticated the second time. 
+    else if(!isUserValid && validateCount == 1){
+        validateCount = 2;
     }
-
     return {
         isUserValid: isUserValid,
         validateCount: validateCount,

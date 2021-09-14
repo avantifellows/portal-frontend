@@ -2,11 +2,11 @@
 
 ## Pre-requisites
 
-# git-secrets
+### git-secrets
 git-secrets scans commits, commit messages, and --no-ff merges to prevent adding secrets into your git repositories.
 For installing, follow steps at https://github.com/awslabs/git-secrets#installing-git-secrets.
 
-# Installation steps
+## Installation steps
 Follow the steps below to set up the repo for development.
 1. Clone the repository and change the working directory
     ```sh

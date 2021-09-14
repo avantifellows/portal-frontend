@@ -9,6 +9,6 @@ export function sendPlio(isSingleEntryOnly, userID, redirectID) {
         unique_id: userID,
       });
       let fullurl = url + "?" + queryparams;
-      window.open(fullurl);
+      window.open(fullurl, "_self");
     }
   }

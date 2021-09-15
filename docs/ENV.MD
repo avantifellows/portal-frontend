@@ -13,9 +13,3 @@ AWS access key for access to AWS SQS.
 ## VUE_APP_AWS_SQS_SECRET_ACCESS_KEY=''
 AWS secret key for access to AWS SQS.
 
-## AWS_S3_ACCESS_KEY_ID=''
-AWS access key for access to AWS S3.
-
-## AWS_S3_SECRET_ACCESS_KEY=''
-AWS secret key for access to AWS S3.
-

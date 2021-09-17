@@ -48,7 +48,7 @@
 
 <script>
 import { validateSRN } from "@/services/validation.js";
-import { filterDestination } from "@/services/filterDest.js";
+import { filterDestination } from "@/services/filterDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",

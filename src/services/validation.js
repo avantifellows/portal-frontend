@@ -1,10 +1,11 @@
 import firebaseAPI from "@/services/API/checkUser.js";
 
-// this function is invoked only for the check of SRN's.
-// validateCount = 0, when the user gets validated on the first try
-// validateCount = 1, when the user fails the first check
-// validateCount = 2, when user fails the second check as well -> letting the user go through irrespective.
 export async function validateSRN(userID, validateCount, isUserValid){
+    // this function is invoked only for the check of SRN's.
+    // validateCount = 0, when the user gets validated on the first try
+    // validateCount = 1, when the user fails the first check
+    // validateCount = 2, when user fails the second check as well -> letting the user go through irrespective.
+    
     var invalidLoginMessage = ""
 
     //checks the basic condition of SRN: 
@@ -13,10 +14,12 @@ export async function validateSRN(userID, validateCount, isUserValid){
 
         //if the basic conditions are satisified, only then the request is sent for further checking
         isUserValid = await firebaseAPI.checkUserExists(userID);
-        return {
-            isUserValid: isUserValid,
-            validateCount: validateCount,
-            invalidLoginMessage: invalidLoginMessage
+        if(isUserValid){
+            return {
+                isUserValid: isUserValid,
+                validateCount: validateCount,
+                invalidLoginMessage: invalidLoginMessage
+            }
         }
     }
 

@@ -5,8 +5,8 @@ const QUEUEURL = "https://sqs.ap-south-1.amazonaws.com/111766607077/EventQueue";
 const sqsClient = new SQSClient({
   region: REGION,
   credentials: {
-    accessKeyId: env.VUE_APP_AWS_ACCESS_KEY_ID,
-    secretAccessKey: env.VUE_APP_AWS_SECRET_KEY,
+    accessKeyId: process.env.VUE_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.VUE_APP_AWS_SECRET_KEY,
   },
 });
 

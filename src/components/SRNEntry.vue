@@ -155,7 +155,7 @@ export default {
             this.isUserValid,
             authType
           );
-          sendPlio(this.isSingleEntryOnly, this.userID, this.redirectID);
+          sendPlio(this.isSingleEntryOnly, userID, this.redirectID);
         }
       });
     },

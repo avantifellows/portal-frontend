@@ -13,6 +13,13 @@ export async function validateSRN(userID, validateCount, isUserValid){
 
         //if the basic conditions are satisified, only then the request is sent for further checking
         isUserValid = await firebaseAPI.checkUserExists(userID);
+        if(isUserValid){
+            return {
+                isUserValid: isUserValid,
+                validateCount: validateCount,
+                invalidLoginMessage: invalidLoginMessage
+            }
+        }
     }
 
     // this condition checks if the user is getting authenticated the first time. Just shows an error message.

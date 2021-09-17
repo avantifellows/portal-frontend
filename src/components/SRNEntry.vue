@@ -48,7 +48,7 @@
 
 <script>
 import { validateSRN } from "@/services/validation.js";
-import { sendPlio } from "@/services/sendPlio";
+import { filterDestination } from "@/services/filterDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
@@ -155,7 +155,7 @@ export default {
             this.isUserValid,
             authType
           );
-          sendPlio(this.isSingleEntryOnly, userID, this.redirectID);
+          filterDestination(this.redirectTo, this.purposeParams, userID, this.redirectID);
         }
       });
     },

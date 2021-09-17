@@ -1,4 +1,4 @@
-import { redirectToPlio, redirectToMeet } from "@/services/API/sendDest";
+import { redirectToPlio, redirectToMeet } from "@/services/API/redirectToDest.js";
 
 export function filterDestination(redirectTo, purposeParams, userID, redirectID){
     if(purposeParams == "plio"){

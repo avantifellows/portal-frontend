@@ -1,3 +1,5 @@
+//expects purposeParams, based on the value redirects to respective destination
+
 export function redirectToDestination(purposeParams, userID, redirectID){
     var redirectURL = "";
     var fullurl = "";

@@ -1,4 +1,4 @@
-export function filterDestination(redirectTo, purposeParams, userID, redirectID){
+export function redirectToDestination(purposeParams, userID, redirectID){
     var redirectURL = "";
     var fullurl = "";
 
@@ -16,6 +16,7 @@ export function filterDestination(redirectTo, purposeParams, userID, redirectID)
             break;
 
         case 'liveclass':
+            console.log("hello")
             //this method constructs the URL based on the redirectTo param
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
             fullurl = new URL(redirectURL + redirectID); //adds meetID to the base plio link

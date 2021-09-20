@@ -19,14 +19,16 @@
           @input="updateValue"
         />
 
-        <div class="flex flex-row my-auto" v-if="isUserValidated">
+        <!--  COMMENTING OUT THIS PIECE OF CODE AND IT IS FOR THE NEXT RELEASE. MULTIPLE SRNS AREN'T SUPPORTED
+              IN THIS VERSION
+          <div class="flex flex-row my-auto" v-if="isUserValidated">
           <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
           <div
             class="minus-sign"
             v-show="ifUserEnteredMoreThanOne"
             @click="removeField(index, userIDList)"
           ></div>
-        </div>
+        </div> -->
       </div>
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
@@ -48,7 +50,7 @@
 
 <script>
 import { validateSRN } from "@/services/validation.js";
-import { filterDestination } from "@/services/filterDestination.js";
+import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
@@ -155,7 +157,12 @@ export default {
             this.isUserValid,
             authType
           );
-          filterDestination(this.redirectTo, this.purposeParams, userID, this.redirectID);
+          redirectToDestination(
+            this.redirectTo,
+            this.purposeParams,
+            userID,
+            this.redirectID
+          );
         }
       });
     },

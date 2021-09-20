@@ -51,7 +51,7 @@
 <script>
 import { validateSRN } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
-import { sendSQSMessage } from "@/services/API/sqs";
+//import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
   props: {
@@ -125,7 +125,7 @@ export default {
     },
 
     async processForm() {
-      var authType = "SRN";
+      // var authType = "SRN";
       //parsing the userID from user input
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
@@ -148,21 +148,16 @@ export default {
 
         // either the user is valid or the user has been checked twice
         if (this.isUserValid || this.validateCount != 1) {
-          sendSQSMessage(
-            this.purpose,
-            this.purposeParams,
-            this.redirectTo,
-            this.redirectID,
-            userID,
-            this.isUserValid,
-            authType
-          );
-          redirectToDestination(
-            this.redirectTo,
-            this.purposeParams,
-            userID,
-            this.redirectID
-          );
+          // sendSQSMessage(
+          //   this.purpose,
+          //   this.purposeParams,
+          //   this.redirectTo,
+          //   this.redirectID,
+          //   userID,
+          //   this.isUserValid,
+          //   authType
+          // );
+          redirectToDestination(this.purposeParams, userID, this.redirectID);
         }
       });
     },

@@ -26,7 +26,7 @@ export function redirectToDestination(purposeParams, userID, redirectID, redirec
         
         default:
             //if destination is invalid, then send an error log into SQS.
-            var purpose = 'RedirectError'
+            var purpose = 'Error'
             sendSQSMessage(
                 purpose,
                 purposeParams,

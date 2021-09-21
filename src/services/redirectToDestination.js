@@ -16,14 +16,14 @@ export function redirectToDestination(purposeParams, userID, redirectID, redirec
                                 unique_id: userID,
                                 });
             fullurl = url + "?" + queryparams;
-            return true
+            
             break;
 
         case 'liveclass':
             //constructs the URL based on the redirectTo param
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
             fullurl = new URL(redirectURL + redirectID); //adds meetID to the base plio link
-            return true
+            
             break;
         
         default:
@@ -42,4 +42,5 @@ export function redirectToDestination(purposeParams, userID, redirectID, redirec
         }
         
     window.open(fullurl, "_self");
+    return true
 }

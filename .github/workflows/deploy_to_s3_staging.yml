@@ -36,10 +36,10 @@ jobs:
       env:
         NODE_ENV: staging
         VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_AF_API_KEY }}
-        VUE_APP_BASE_URL_PLIO: ${{ secrets.VUE_APP_BASE_URL_PLIO }}
+        VUE_APP_BASE_URL_PLIO: 'https://staging-app.plio.in/#/af/play/'
         VUE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VUE_APP_AWS_SQS_ACCESS_KEY }}
         VUE_APP_AWS_SECRET_KEY: ${{ secrets.VUE_APP_AWS_SQS_SECRET_ACCESS_KEY }}
-        VUE_APP_BASE_URL_MEET: ${{ secrets.VUE_APP_BASE_URL_MEET }}
+        VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
       run: npm run build
 
     - name: Configure AWS Credentials

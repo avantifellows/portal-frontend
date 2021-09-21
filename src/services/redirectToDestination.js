@@ -24,7 +24,7 @@ export function redirectToDestination(purposeParams, userID, redirectID){
             break;
         
         default:
-            alert('Destination is unsupported')
+            throw new Error('Destination not supported') 
         }
         
     window.open(fullurl, "_self");

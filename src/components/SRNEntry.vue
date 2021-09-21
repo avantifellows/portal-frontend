@@ -147,7 +147,7 @@ export default {
         // either the user is valid or the user has been checked twice
         if (this.isUserValid || this.validateCount > 1) {
           if (
-            !redirectToDestination(
+            redirectToDestination(
               this.purposeParams,
               userID,
               this.redirectID,

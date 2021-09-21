@@ -147,7 +147,7 @@ export default {
         this.invalidLoginMessage = result.invalidLoginMessage;
 
         // either the user is valid or the user has been checked twice
-        if (this.isUserValid || this.validateCount != 1) {
+        if (this.isUserValid || this.validateCount > 1) {
           sendSQSMessage(
             this.purpose,
             this.purposeParams,

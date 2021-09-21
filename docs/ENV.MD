@@ -13,3 +13,5 @@ AWS access key for access to AWS SQS.
 ## VUE_APP_AWS_SQS_SECRET_ACCESS_KEY=''
 AWS secret key for access to AWS SQS.
 
+## VUE_APP_BASE_URL_MEET=''
+Base URL for Google Meet link.

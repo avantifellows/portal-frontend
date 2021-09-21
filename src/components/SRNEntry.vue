@@ -146,23 +146,26 @@ export default {
 
         // either the user is valid or the user has been checked twice
         if (this.isUserValid || this.validateCount > 1) {
-          sendSQSMessage(
-            this.purpose,
-            this.purposeParams,
-            this.redirectTo,
-            this.redirectID,
-            userID,
-            this.isUserValid,
-            authType
-          );
-          redirectToDestination(
-            this.purposeParams,
-            userID,
-            this.redirectID,
-            this.redirectTo,
-            this.isUserValid,
-            authType
-          );
+          if (
+            !redirectToDestination(
+              this.purposeParams,
+              userID,
+              this.redirectID,
+              this.redirectTo,
+              this.isUserValid,
+              authType
+            )
+          ) {
+            sendSQSMessage(
+              this.purpose,
+              this.purposeParams,
+              this.redirectTo,
+              this.redirectID,
+              userID,
+              this.isUserValid,
+              authType
+            );
+          }
         }
       });
     },

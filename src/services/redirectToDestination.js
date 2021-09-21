@@ -1,6 +1,7 @@
+import { sendSQSMessage } from "@/services/API/sqs";
 //expects purposeParams, based on the value redirects to respective destination
 
-export function redirectToDestination(purposeParams, userID, redirectID){
+export function redirectToDestination(purposeParams, userID, redirectID, redirectTo, isUserValid, authType){
     var redirectURL = "";
     var fullurl = "";
 
@@ -24,7 +25,17 @@ export function redirectToDestination(purposeParams, userID, redirectID){
             break;
         
         default:
-            throw new Error('Destination not supported') 
+            //if destination is invalid, then send an error log into SQS.
+            var purpose = 'RedirectError'
+            sendSQSMessage(
+                purpose,
+                purposeParams,
+                redirectTo,
+                redirectID,
+                userID,
+                isUserValid,
+                authType
+              );
         }
         
     window.open(fullurl, "_self");

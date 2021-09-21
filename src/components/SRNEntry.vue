@@ -19,16 +19,14 @@
           @input="updateValue"
         />
 
-        <!--  COMMENTING OUT THIS PIECE OF CODE AND IT IS FOR THE NEXT RELEASE. MULTIPLE SRNS AREN'T SUPPORTED
-              IN THIS VERSION
-          <div class="flex flex-row my-auto" v-if="isUserValidated">
+        <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
           <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
           <div
             class="minus-sign"
             v-show="ifUserEnteredMoreThanOne"
             @click="removeField(index, userIDList)"
           ></div>
-        </div> -->
+        </div>
       </div>
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
@@ -157,7 +155,14 @@ export default {
             this.isUserValid,
             authType
           );
-          redirectToDestination(this.purposeParams, userID, this.redirectID);
+          redirectToDestination(
+            this.purposeParams,
+            userID,
+            this.redirectID,
+            this.redirectTo,
+            this.isUserValid,
+            authType
+          );
         }
       });
     },
@@ -181,6 +186,14 @@ label {
 
 .errorStyleClass {
   @apply mx-auto text-red-700 text-base mb-1;
+}
+
+.multiple-div {
+  @apply border flex items-center;
+}
+
+.multipleStudentStyle {
+  @apply relative flex flex-row w-1/4 mx-auto;
 }
 
 .plus-sign {
@@ -230,9 +243,5 @@ label {
   margin-left: -10px;
   margin-top: -3px;
   border-top: 7px solid;
-}
-
-.multipleStudentStyle {
-  @apply relative flex flex-row;
 }
 </style>

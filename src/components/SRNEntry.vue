@@ -19,7 +19,7 @@
           @input="updateValue"
         />
 
-        <div class="flex flex-row my-auto" v-if="isUserValidated">
+        <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
           <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
           <div
             class="minus-sign"
@@ -31,6 +31,10 @@
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>
+      <span class="errorStyleClass" v-if="!isUserValid && validateCount == 1">{{
+        invalidLoginMessage
+      }}</span>
+
       <button
         @click="processForm"
         class="buttonStyleClass"
@@ -43,6 +47,9 @@
 </template>
 
 <script>
+import { validateSRN } from "@/services/validation.js";
+import { redirectToDestination } from "@/services/redirectToDestination.js";
+import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
   props: {
@@ -55,11 +62,15 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
-      maxLength: 10,
+      isUserValid: false, // whether the user exists in the backend database
+      maxLengthOfSRN: 10,
+      validateCount: 0, //this variable tells us how many times the user has been validated.
+      invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
     };
   },
   computed: {
     isAnyUserIDPresent() {
+      //checks if any userID has been typed
       return (
         this.userIDList != null &&
         this.userIDList != undefined &&
@@ -68,6 +79,7 @@ export default {
       );
     },
     ifUserEnteredMoreThanOne() {
+      //used when multiple SRN's will be allowed to typed
       return !this.isSingleEntryOnly && this.userIDList.length > 1;
     },
     isSingleEntryOnly() {
@@ -77,9 +89,10 @@ export default {
       return !this.isAnyUserIDPresent || this.invalidInputMessage != "";
     },
     isUserValidated() {
+      //if multiple SRN's are allowed, then this helps with the activation of the + button, to add more SRN's
       return (
         !this.isSingleEntryOnly &&
-        this.userIDList[0]["userID"].length > this.maxLength - 1
+        this.userIDList[0]["userID"].length > this.maxLengthOfSRN - 1
       );
     },
   },
@@ -97,29 +110,64 @@ export default {
       list.splice(index, 1);
     },
     updateValue(event) {
-      if (event.target.value.length < this.maxLength) {
+      if (event.target.value.length < this.maxLengthOfSRN) {
         this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
+        this.invalidLoginMessage = "";
       } else {
         this.invalidInputMessage = "";
       }
-      if (event.target.value.length > this.maxLength) {
-        event.target.value = event.target.value.slice(0, this.maxLength);
+      if (event.target.value.length > this.maxLengthOfSRN) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
+        this.userIDList[0]["userID"] = event.target.value;
       }
     },
 
-    processForm() {
-      if (this.isSingleEntryOnly) {
-        //this method constructs the URL based on the redirectTo param
-        const redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-        let url = new URL(redirectURL + this.redirectID); //adds plioID to the base plio link
-        //adds params; api key and student SRN
-        let queryparams = new URLSearchParams({
-          api_key: process.env.VUE_APP_AF_API_KEY,
-          unique_id: this.userIDList[0]["userID"],
-        });
-        let fullurl = url + "?" + queryparams;
-        window.open(fullurl);
-      }
+    async processForm() {
+      var authType = "SRN";
+      //parsing the userID from user input
+      const userID = parseInt(this.userIDList["0"]["userID"]);
+
+      //invokes the validation function
+      let userIsValidated = validateSRN(
+        userID,
+        this.validateCount,
+        this.isSingleEntryOnly,
+        this.redirectID,
+        this.isUserValid,
+        this.purpose,
+        this.purposeParams,
+        this.redirectTo
+      );
+
+      userIsValidated.then((result) => {
+        this.isUserValid = result.isUserValid;
+        this.validateCount = result.validateCount;
+        this.invalidLoginMessage = result.invalidLoginMessage;
+
+        // either the user is valid or the user has been checked twice
+        if (this.isUserValid || this.validateCount > 1) {
+          if (
+            redirectToDestination(
+              this.purposeParams,
+              userID,
+              this.redirectID,
+              this.redirectTo,
+              this.isUserValid,
+              authType
+            )
+          ) {
+            sendSQSMessage(
+              this.purpose,
+              this.purposeParams,
+              this.redirectTo,
+              this.redirectID,
+              userID,
+              this.isUserValid,
+              authType
+            );
+          }
+        }
+      });
     },
   },
 };
@@ -143,11 +191,20 @@ label {
   @apply mx-auto text-red-700 text-base mb-1;
 }
 
+.multiple-div {
+  @apply flex items-center;
+}
+
+.multipleStudentStyle {
+  @apply relative flex flex-row w-1/4 mx-auto;
+}
+
 .plus-sign {
+  margin: auto;
   border: 1px solid;
   border-radius: 100%;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   color: green;
   transition: color 0.25s;
   position: relative;
@@ -157,26 +214,27 @@ label {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 20px;
-  margin-left: -10px;
-  margin-top: -3px;
-  border-top: 7px solid;
+  width: 15px;
+  margin-left: -8px;
+  margin-top: -2px;
+  border-top: 4px solid;
 }
 .plus-sign::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  height: 20px;
-  margin-left: -3px;
-  margin-top: -10px;
-  border-left: 7px solid;
+  height: 15px;
+  margin-left: -2px;
+  margin-top: -8px;
+  border-left: 4px solid;
 }
 .minus-sign {
+  margin: auto;
   border: 1px solid;
   border-radius: 100%;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   color: red;
   transition: color 0.25s;
   position: relative;
@@ -186,13 +244,9 @@ label {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 20px;
-  margin-left: -10px;
+  width: 15px;
+  margin-left: -8px;
   margin-top: -3px;
-  border-top: 7px solid;
-}
-
-.multipleStudentStyle {
-  @apply relative flex flex-row;
+  border-top: 4px solid;
 }
 </style>

@@ -6,3 +6,12 @@ API key for third-party access, given to each organization. To know more about c
 
 ## VUE_APP_BASE_URL_PLIO=''
 Base URL for the Plio link.
+
+## VUE_APP_AWS_SQS_ACCESS_KEY=''
+AWS access key for access to AWS SQS.
+
+## VUE_APP_AWS_SQS_SECRET_ACCESS_KEY=''
+AWS secret key for access to AWS SQS.
+
+## VUE_APP_BASE_URL_MEET=''
+Base URL for Google Meet link.

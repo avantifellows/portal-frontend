@@ -200,10 +200,11 @@ label {
 }
 
 .plus-sign {
+  margin: auto;
   border: 1px solid;
   border-radius: 100%;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   color: green;
   transition: color 0.25s;
   position: relative;
@@ -213,26 +214,27 @@ label {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 20px;
-  margin-left: -10px;
-  margin-top: -3px;
-  border-top: 7px solid;
+  width: 15px;
+  margin-left: -8px;
+  margin-top: -2px;
+  border-top: 4px solid;
 }
 .plus-sign::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  height: 20px;
-  margin-left: -3px;
-  margin-top: -10px;
-  border-left: 7px solid;
+  height: 15px;
+  margin-left: -2px;
+  margin-top: -8px;
+  border-left: 4px solid;
 }
 .minus-sign {
+  margin: auto;
   border: 1px solid;
   border-radius: 100%;
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   color: red;
   transition: color 0.25s;
   position: relative;
@@ -242,9 +244,9 @@ label {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 20px;
-  margin-left: -10px;
+  width: 15px;
+  margin-left: -8px;
   margin-top: -3px;
-  border-top: 7px solid;
+  border-top: 4px solid;
 }
 </style>

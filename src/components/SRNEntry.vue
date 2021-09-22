@@ -192,7 +192,7 @@ label {
 }
 
 .multiple-div {
-  @apply border flex items-center;
+  @apply flex items-center;
 }
 
 .multipleStudentStyle {

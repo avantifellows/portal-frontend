@@ -19,15 +19,7 @@
           @input="updateValue"
         />
 
-        <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
-          <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
-          <div
-            class="minus-sign"
-            v-show="ifUserEnteredMoreThanOne"
-            @click="removeField(index, userIDList)"
-          ></div>
-        </div>
-      </div>
+        
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>

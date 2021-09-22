@@ -18,8 +18,8 @@
           class="inputStyleClass"
           @input="updateValue"
         />
-
-        
+       </div>
+       
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>

@@ -19,7 +19,7 @@
           @input="updateValue"
         />
 
-        <div class="flex flex-row my-auto" v-if="isUserValidated">
+        <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
           <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
           <div
             class="minus-sign"
@@ -31,7 +31,7 @@
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
         invalidInputMessage
       }}</span>
-      <span class="errorStyleClass" v-if="!doesUserExist && validateCount == 1">{{
+      <span class="errorStyleClass" v-if="!isUserValid && validateCount == 1">{{
         invalidLoginMessage
       }}</span>
 
@@ -48,6 +48,8 @@
 
 <script>
 import { validateSRN } from "@/services/validation.js";
+import { redirectToDestination } from "@/services/redirectToDestination.js";
+import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
   props: {
@@ -60,7 +62,7 @@ export default {
     return {
       userIDList: [{ userID: "" }],
       invalidInputMessage: null,
-      doesUserExist: false, // whether the user exists in the backend database
+      isUserValid: false, // whether the user exists in the backend database
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
@@ -121,6 +123,7 @@ export default {
     },
 
     async processForm() {
+      var authType = "SRN";
       //parsing the userID from user input
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
@@ -130,13 +133,40 @@ export default {
         this.validateCount,
         this.isSingleEntryOnly,
         this.redirectID,
-        this.doesUserExist
+        this.isUserValid,
+        this.purpose,
+        this.purposeParams,
+        this.redirectTo
       );
 
       userIsValidated.then((result) => {
-        this.doesUserExist = result.doesUserExist;
+        this.isUserValid = result.isUserValid;
         this.validateCount = result.validateCount;
         this.invalidLoginMessage = result.invalidLoginMessage;
+
+        // either the user is valid or the user has been checked twice
+        if (this.isUserValid || this.validateCount > 1) {
+          if (
+            redirectToDestination(
+              this.purposeParams,
+              userID,
+              this.redirectID,
+              this.redirectTo,
+              this.isUserValid,
+              authType
+            )
+          ) {
+            sendSQSMessage(
+              this.purpose,
+              this.purposeParams,
+              this.redirectTo,
+              this.redirectID,
+              userID,
+              this.isUserValid,
+              authType
+            );
+          }
+        }
       });
     },
   },
@@ -159,6 +189,14 @@ label {
 
 .errorStyleClass {
   @apply mx-auto text-red-700 text-base mb-1;
+}
+
+.multiple-div {
+  @apply border flex items-center;
+}
+
+.multipleStudentStyle {
+  @apply relative flex flex-row w-1/4 mx-auto;
 }
 
 .plus-sign {
@@ -208,9 +246,5 @@ label {
   margin-left: -10px;
   margin-top: -3px;
   border-top: 7px solid;
-}
-
-.multipleStudentStyle {
-  @apply relative flex flex-row;
 }
 </style>

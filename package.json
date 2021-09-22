@@ -1,5 +1,5 @@
 {
-  "name": "event-capturing",
+  "name": "auth-layer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,20 +10,16 @@
     "deploy": "vue-cli-service build && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer --delete --acl public-read"
   },
   "dependencies": {
-    "@tailwindcss/postcss7-compat": "^2.2.7",
+    "@aws-sdk/client-sqs": "^3.30.0",
     "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "dns": "^0.2.2",
     "postcss": "^7.0.36",
-    "secure-ls": "^1.2.6",
-    "tailwind": "^4.0.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.7",
     "vue": "^3.0.0",
-    "vue-inline-svg": "^2.0.0",
     "vue-router": "^4.0.10",
-    "vuex": "^4.0.2",
-    "vuex-persistedstate": "^4.0.0"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

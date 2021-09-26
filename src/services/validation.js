@@ -8,20 +8,15 @@ export async function validateSRN(userID, validateCount, isUserValid){
     
     var invalidLoginMessage = ""
 
-    //checks the basic condition of SRN: 
-    //      - does not contain same number patterns like '111...', '222...', etc.
-    if(!(/^([0-9])\1*$/.test(userID))){
-
-        //if the basic conditions are satisified, only then the request is sent for further checking
-        isUserValid = await firebaseAPI.checkUserExists(userID);
-        if(isUserValid){
-            return {
-                isUserValid: isUserValid,
-                validateCount: validateCount,
-                invalidLoginMessage: invalidLoginMessage
+    isUserValid = await firebaseAPI.checkUserExists(userID);
+    if(isUserValid){
+        return {
+            isUserValid: isUserValid,
+            validateCount: validateCount,
+            invalidLoginMessage: invalidLoginMessage
             }
         }
-    }
+
 
     // this condition checks if the user is getting authenticated the first time. Just shows an error message.
     if (!isUserValid && validateCount == 0) {

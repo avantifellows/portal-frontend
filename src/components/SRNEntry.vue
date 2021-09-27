@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import { validateSRN } from "@/services/validation.js";
+//import { validateSRN } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
-import { sendSQSMessage } from "@/services/API/sqs";
+//import { sendSQSMessage } from "@/services/API/sqs";
 export default {
   name: "SRNEntry",
   props: {
@@ -119,7 +119,7 @@ export default {
       //parsing the userID from user input
       const userID = parseInt(this.userIDList["0"]["userID"]);
 
-      //invokes the validation function
+      /*//invokes the validation function
       let userIsValidated = validateSRN(
         userID,
         this.validateCount,
@@ -138,7 +138,7 @@ export default {
 
         // either the user is valid or the user has been checked twice
         if (this.isUserValid || this.validateCount > 1) {
-          if (
+          if (*/
             redirectToDestination(
               this.purposeParams,
               userID,
@@ -147,7 +147,7 @@ export default {
               this.isUserValid,
               authType
             )
-          ) {
+        /*  ) {
             sendSQSMessage(
               this.purpose,
               this.purposeParams,
@@ -159,7 +159,7 @@ export default {
             );
           }
         }
-      });
+      });*/
     },
   },
 };

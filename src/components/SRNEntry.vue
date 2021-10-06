@@ -9,7 +9,7 @@
       >
         <input
           v-model="input.userID"
-          type="text"
+          type="tel"
           inputmode="numeric"
           pattern="[0-9]*"
           placeholder="Your SRN / आपका SRN"

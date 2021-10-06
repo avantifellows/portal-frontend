@@ -198,7 +198,6 @@ export default {
             this.userIDList,
             this.redirectID,
             this.redirectTo,
-            this.isUserValid,
             authType
           )
         ) {
@@ -208,7 +207,6 @@ export default {
             this.redirectTo,
             this.redirectID,
             this.userIDList,
-            this.isUserValid,
             authType
           );
         }

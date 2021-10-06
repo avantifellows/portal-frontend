@@ -1,7 +1,7 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 //expects purposeParams, based on the value redirects to respective destination
 
-export function redirectToDestination(purposeParams, userIDList, redirectID, redirectTo, isUserValid, authType){
+export function redirectToDestination(purposeParams, userIDList, redirectID, redirectTo, authType){
     var redirectURL = "";
     var fullurl = "";
     
@@ -35,7 +35,6 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
                 redirectTo,
                 redirectID,
                 userIDList,
-                isUserValid,
                 authType
               );
             return false

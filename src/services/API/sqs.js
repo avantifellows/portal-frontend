@@ -14,7 +14,7 @@ export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirec
 
     const messageBody = [
       {
-        dateTime: new Date(),
+        dateTime: Date.parse(new Date()),
         purpose: {
           type: purpose,
           subType: purposeParams,

@@ -1,12 +1,13 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 //expects purposeParams, based on the value redirects to respective destination
 
-export function redirectToDestination(purposeParams, userID, redirectID, redirectTo, isUserValid, authType){
+export function redirectToDestination(purposeParams, userIDList, redirectID, redirectTo, isUserValid, authType){
     var redirectURL = "";
     var fullurl = "";
-
+    
     switch(purposeParams){
-        case 'plio':
+        case 'plio':    
+            var userID = userIDList[0]["userID"]
             //constructs the URL based on the redirectTo param
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
             var url = new URL(redirectURL + redirectID); //adds plioID to the base plio link
@@ -20,6 +21,7 @@ export function redirectToDestination(purposeParams, userID, redirectID, redirec
 
         case 'liveclass':
             //constructs the URL based on the redirectTo param
+            
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
             fullurl = new URL(redirectURL + redirectID); //adds meetID to the base plio link
             break;
@@ -32,7 +34,7 @@ export function redirectToDestination(purposeParams, userID, redirectID, redirec
                 purposeParams,
                 redirectTo,
                 redirectID,
-                userID,
+                userIDList,
                 isUserValid,
                 authType
               );

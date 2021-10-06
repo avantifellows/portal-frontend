@@ -5,12 +5,12 @@ const QUEUEURL = "https://sqs.ap-south-1.amazonaws.com/111766607077/EventQueue";
 const sqsClient = new SQSClient({
   region: REGION,
   credentials: {
-    accessKeyId: process.env.VUE_APP_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.VUE_APP_AWS_SECRET_KEY,
+    accessKeyId: process.env.VUE_APP_AWS_SQS_ACCESS_KEY,
+    secretAccessKey: process.env.VUE_APP_AWS_SQS_SECRET_ACCESS_KEY,
   },
 });
 
-export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, isUserValid, authType) {
+export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userIDList, authType) {
 
     const messageBody = [
       {
@@ -25,8 +25,7 @@ export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirec
         },
         authType: authType,
         user: {
-          values: userID,
-          userDataValidated: isUserValid,
+          values: userIDList,
         },
       },
     ];

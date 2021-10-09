@@ -165,9 +165,9 @@ export default {
         this.purposeParams,
         this.redirectTo
       );
-      this.isUserValid = userIsValidated.isUserValid;
-      this.validateCount = userIsValidated.validateCount;
-      this.invalidLoginMessage = userIsValidated.invalidLoginMessage;
+      this.isUserValid = userValidationResponse.isUserValid;
+      this.validateCount = userValidationResponse.validateCount;
+      this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
     },
     //method called after clicking the submit button
     async processForm() {

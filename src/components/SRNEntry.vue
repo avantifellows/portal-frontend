@@ -155,7 +155,7 @@ export default {
     //method that authentiates the SRN
     async authenticateSRN(userID) {
       //invokes the validation function
-      let userIsValidated = await validateSRN(
+      let userValidationResponse = await validateSRN(
         userID,
         this.validateCount,
         this.isSingleEntryOnly,

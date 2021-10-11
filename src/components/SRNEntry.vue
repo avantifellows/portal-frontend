@@ -123,11 +123,7 @@ export default {
     },
   },
   methods: {
-<<<<<<< HEAD
-    isValidNumericEntry(e) {
-=======
     allowNumericEntriesOnly(e) {
->>>>>>> e3c51f09b5d9b31d8178a09c5d9ad3a051a12072
       //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();

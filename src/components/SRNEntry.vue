@@ -34,17 +34,12 @@
         invalidLoginMessage
       }}</span>
 
-<<<<<<< HEAD
+
       <div class="flex flex-row my-auto multiple-div" v-if="isAddButtonAllowed">
         <button @click="addField" class="addButtonStyleClass">
           <span class="material-icons addButton"> add_box </span>
           Add another SRN <br />
           एक और SRN दर्ज करें
-=======
-      <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
-        <button @click="addField(userIDList)" class="addButtonStyleClass">
-          Add another SRN / एक और SRN दर्ज करें
->>>>>>> e3c51f09b5d9b31d8178a09c5d9ad3a051a12072
         </button>
       </div>
       <button

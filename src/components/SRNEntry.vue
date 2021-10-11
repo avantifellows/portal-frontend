@@ -105,7 +105,7 @@ export default {
     },
   },
   methods: {
-    isValidSRNFormat(e) {
+    allowNumericEntriesOnly(e) {
       //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();

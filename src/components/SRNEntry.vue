@@ -18,13 +18,14 @@
           class="inputStyleClass"
           @input="updateValue($event, index)"
         />
-        <div
-          class="minus-sign"
+
+        <button
+          class="material-icons minusButton"
           v-show="ifUserEnteredMoreThanOne"
           @click="removeField(index, userIDList)"
         >
-          <span class="material-icons minusButton"> remove_circle </span>
-        </div>
+          remove_circle
+        </button>
       </div>
 
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
@@ -33,18 +34,14 @@
       <span class="errorStyleClass" v-if="!isUserValid && validateCount == 1">{{
         invalidLoginMessage
       }}</span>
-
-<<<<<<< HEAD
+      <div v-if="isLoading" class="loadingSpinner"></div>
       <div class="flex flex-row my-auto multiple-div" v-if="isAddButtonAllowed">
         <button @click="addField" class="addButtonStyleClass">
           <span class="material-icons addButton"> add_box </span>
-          Add another SRN <br />
-          एक और SRN दर्ज करें
-=======
-      <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
-        <button @click="addField(userIDList)" class="addButtonStyleClass">
-          Add another SRN / एक और SRN दर्ज करें
->>>>>>> e3c51f09b5d9b31d8178a09c5d9ad3a051a12072
+          <p>
+            Add another SRN <br />
+            एक और SRN दर्ज करें
+          </p>
         </button>
       </div>
       <button
@@ -81,6 +78,7 @@ export default {
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
+      isLoading: false,
     };
   },
   computed: {
@@ -128,11 +126,7 @@ export default {
     },
   },
   methods: {
-<<<<<<< HEAD
     isValidNumericEntry(e) {
-=======
-    allowNumericEntriesOnly(e) {
->>>>>>> e3c51f09b5d9b31d8178a09c5d9ad3a051a12072
       //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
@@ -199,6 +193,7 @@ export default {
     },
     //method that authentiates the SRN
     async authenticateSRN(userID) {
+      this.isLoading = true;
       //invokes the validation function
       let userValidationResponse = await validateSRN(
         userID,
@@ -213,10 +208,12 @@ export default {
       this.isUserValid = userValidationResponse.isUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
+      this.isLoading = false;
     },
     //method called after clicking the submit button
     async processForm() {
       var authType = "SRN";
+
       //all previously typed SRN's will be authenticated through the addField method.
       // The last SRN will be authenticated after Submit button is clicked
       // (will work even for single entry as the first entry can be also considered as the last entry)
@@ -279,5 +276,8 @@ label {
 }
 .minusButton {
   @apply text-red-500;
+}
+.loadingSpinner {
+  @apply mx-auto w-4 h-4 border-4 border-primary border-dotted rounded-full animate-spin;
 }
 </style>

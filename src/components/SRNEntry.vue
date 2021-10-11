@@ -85,7 +85,6 @@ export default {
     isAnyUserIDPresent() {
       //checks if any userID has been typed
       return (
-        this.userIDList != null &&
         this.userIDList != undefined &&
         this.userIDList.length > 0 &&
         this.userIDList[0]["userID"] != ""

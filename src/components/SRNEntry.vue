@@ -14,7 +14,7 @@
           pattern="[0-9]*"
           placeholder="Your SRN / आपका SRN"
           required
-          @keypress="isValidSRNFormat($event)"
+          @keypress="isValidNumericEntry($event)"
           class="inputStyleClass"
           @input="updateValue($event, index)"
         />
@@ -22,7 +22,9 @@
           class="minus-sign"
           v-show="ifUserEnteredMoreThanOne"
           @click="removeField(index, userIDList)"
-        ></div>
+        >
+          <span class="material-icons minusButton"> remove_circle </span>
+        </div>
       </div>
 
       <span class="errorStyleClass" v-if="invalidInputMessage">{{
@@ -32,10 +34,11 @@
         invalidLoginMessage
       }}</span>
 
-      <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
-        <button @click="addField(userIDList)" class="addButtonStyleClass">
-          <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
-          Add another SRN / एक और SRN दर्ज करें
+      <div class="flex flex-row my-auto multiple-div" v-if="isAddButtonAllowed">
+        <button @click="addField" class="addButtonStyleClass">
+          <span class="material-icons addButton"> add_box </span>
+          Add another SRN <br />
+          एक और SRN दर्ज करें
         </button>
       </div>
       <button
@@ -53,6 +56,9 @@
 import { validateSRN } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
+
+const numberOfSRNsAllowed = 10;
+
 export default {
   name: "SRNEntry",
   props: {
@@ -93,63 +99,92 @@ export default {
       return (
         !this.isAnyUserIDPresent ||
         this.invalidInputMessage != "" ||
-        this.userIDList.slice(-1)[0]["userID"].length < this.maxLengthOfSRN - 1
+        this.isCurrentEntryIncomplete
       );
     },
-    isUserValidated() {
+    isAddButtonAllowed() {
       //if multiple SRN's are allowed, then this helps with the activation of the + button, to add more SRN's
       return (
         !this.isSingleEntryOnly &&
-        this.userIDList.slice(-1)[0]["userID"].length > this.maxLengthOfSRN - 1 &&
-        this.userIDList.length < 10
+        this.isInputLengthComplete &&
+        this.userIDList.length < numberOfSRNsAllowed
       );
+    },
+    isInputLengthComplete() {
+      return this.getLatestEntry["userID"].length == this.maxLengthOfSRN;
+    },
+
+    isCurrentEntryIncomplete() {
+      return this.getLatestEntry["userID"].length < this.maxLengthOfSRN - 1;
+    },
+    getLatestEntry() {
+      return this.userIDList.slice(-1)[0];
     },
   },
   methods: {
-    isValidSRNFormat(e) {
+    isValidNumericEntry(e) {
       //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
     },
-    async addField(list) {
+    addNewEmptyField() {
+      this.userIDList.push({ userID: "", valid: false });
+    },
+    removeInputField(index) {
+      this.userIDList.splice(index, 1);
+    },
+    resetInvalidInputMessage() {
+      this.invalidInputMessage = "";
+    },
+    resetInvalidLoginMessage() {
+      this.invalidLoginMessage = "";
+    },
+    resetValidFlag() {
+      this.isUserValid = false;
+    },
+    setValidFlag() {
+      this.getLatestEntry["valid"] = this.isUserValid;
+    },
+
+    async addField() {
       //for adding another field, the previously entered ID is validated against the database
-      const userID = parseInt(this.userIDList.slice(-1)[0]["userID"]);
-      if (!isNaN(userID)) {
-        await this.authenticateSRN(userID);
+      const latestUserID = parseInt(this.getLatestEntry["userID"]);
+      if (!isNaN(latestUserID)) {
+        await this.authenticateSRN(latestUserID);
         //only if the SRN is valid or if the user is entering a SRN for the second time,the loop is entered
         if (this.isUserValid || this.validateCount > 1) {
           //setting the flag of the SRN
-          this.userIDList.slice(-1)[0]["valid"] = this.isUserValid;
-          list.push({ userID: "", valid: false });
+          this.setValidFlag();
+          this.addNewEmptyField();
           //resetting flags to default for processing next SRN
-          this.isUserValid = false;
+          this.resetValidFlag;
           this.validateCount = 0;
         }
       }
     },
-    removeField(index, list) {
+    removeField(index) {
       //resetting all messages to default before deleting the input field
-      this.invalidInputMessage = "";
-      this.invalidLoginMessage = "";
+      this.resetInvalidInputMessage;
+      this.resetInvalidLoginMessage;
       //edge case: user enters an invalid SRN. Error message is displayed. The user is given another chance. User adds another input field but decided to remove it.
       // At this point, the variables are reset. So the previously entered SRN is checked again, which should not happen. so setting this validateCount = 2 will bypass this.
       //Will not affect any other case. The user can either submit or decide to add another field again.
       this.validateCount = 2;
-      list.splice(index, 1);
+      this.removeInputField(index);
     },
     updateValue(event, index) {
       //checks if the 10 characters are entered
       if (event.target.value.length < this.maxLengthOfSRN) {
         this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
-        this.invalidLoginMessage = "";
+        this.resetInvalidLoginMessage();
       } else {
-        this.invalidInputMessage = "";
+        this.resetInvalidInputMessage();
       }
       //if more than 10 characters are entered, slicing the input to only 10
       // index tells us which input field is being considered
       if (event.target.value.length > this.maxLengthOfSRN) {
         event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
-        this.userIDList[index]["userID"] = event.target.value;
+        this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
     //method that authentiates the SRN
@@ -172,24 +207,15 @@ export default {
     //method called after clicking the submit button
     async processForm() {
       var authType = "SRN";
-      //if only one SRN is entered
-      if (this.userIDList.length == 1) {
-        //parsing the userID from user input
-        let userID = parseInt(this.userIDList["0"]["userID"]);
-        //invokes the validation function
-        await this.authenticateSRN(userID);
-        //sets the valid flag for that SRN
-        this.userIDList[0]["valid"] = this.isUserValid;
-      } else {
-        //all previously typed SRN's will be authenticated through the addField method.
-        // The last SRN will be authenticated after Submit button is clicked
-        let last = this.userIDList.slice(-1);
-        let userID = parseInt(last[0]["userID"]);
-        if (!isNaN(userID)) {
-          await this.authenticateSRN(userID);
-          last[0]["valid"] = this.isUserValid;
-        }
+      //all previously typed SRN's will be authenticated through the addField method.
+      // The last SRN will be authenticated after Submit button is clicked
+      // (will work even for single entry as the first entry can be also considered as the last entry)
+      let latestUserID = parseInt(this.getLatestEntry["userID"]);
+      if (!isNaN(latestUserID)) {
+        await this.authenticateSRN(latestUserID);
+        this.setValidFlag();
       }
+
       // either the user is valid or the user has been checked twice
       if (this.isUserValid || this.validateCount > 1) {
         if (
@@ -230,62 +256,18 @@ label {
   @apply bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50;
 }
 .addButtonStyleClass {
-  @apply bg-white flex flex-row mx-auto p-2;
+  @apply bg-white flex flex-row mx-auto p-2 items-center space-x-12;
 }
 .errorStyleClass {
   @apply mx-auto text-red-700 text-base mb-1;
 }
 .multipleStudentStyle {
-  @apply flex flex-row w-1/2 md:w-1/6 lg:w-1/6  mx-auto;
+  @apply flex flex-row w-1/2 md:w-1/6 lg:w-1/6  mx-auto items-center;
 }
-.plus-sign {
-  margin: auto;
-  border: 1px solid;
-  border-radius: 100%;
-  width: 20px;
-  height: 20px;
-  color: green;
-  transition: color 0.25s;
-  position: relative;
+.addButton {
+  @apply text-green-500;
 }
-.plus-sign::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 15px;
-  margin-left: -8px;
-  margin-top: -2px;
-  border-top: 4px solid;
-}
-.plus-sign::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  height: 15px;
-  margin-left: -2px;
-  margin-top: -8px;
-  border-left: 4px solid;
-}
-.minus-sign {
-  margin: auto;
-  border: 1px solid;
-  border-radius: 100%;
-  width: 20px;
-  height: 20px;
-  color: red;
-  transition: color 0.25s;
-  position: relative;
-}
-.minus-sign::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 15px;
-  margin-left: -8px;
-  margin-top: -2px;
-  border-top: 4px solid;
+.minusButton {
+  @apply text-red-500;
 }
 </style>

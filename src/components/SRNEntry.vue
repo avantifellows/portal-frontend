@@ -1,12 +1,29 @@
 <template>
-  <section>
-    <div>
-      <label>Enter your SRN / अपना SRN दर्ज करें</label>
-      <div
-        class="multipleStudentStyle"
-        v-for="(input, index) in userIDList"
-        :key="`IDInput-${index}`"
-      >
+  <!-- loading spinner -->
+  <div v-if="isLoading" class="h-full w-full fixed z-50">
+    <div class="flex mx-auto w-full h-full">
+      <span class="material-icons text-black text-4xl m-auto animate-spin">
+        autorenew
+      </span>
+    </div>
+  </div>
+  <!-- main div -->
+  <div
+    class="flex flex-col my-auto h-full py-32 space-y-6"
+    :class="{ 'opacity-20 pointer-events-none': isLoading }"
+  >
+    <!-- title -->
+    <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
+      Enter your SRN / अपना SRN दर्ज करें
+    </p>
+    <!-- input options and delete options icon -->
+    <div
+      class="flex flex-row justify-center"
+      v-for="(input, index) in userIDList"
+      :key="`IDInput-${index}`"
+      :class="{ 'pl-12': ifUserEnteredMoreThanOne }"
+    >
+      <div>
         <input
           v-model="input.userID"
           type="tel"
@@ -15,44 +32,57 @@
           placeholder="Your SRN / आपका SRN"
           required
           @keypress="isValidNumericEntry($event)"
-          class="inputStyleClass"
+          class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
+          :class="calculateInputboxStyleClasses(index)"
           @input="updateValue($event, index)"
         />
+      </div>
 
+      <div class="my-auto px-3" v-show="ifUserEnteredMoreThanOne">
         <button
-          class="material-icons minusButton"
-          v-show="ifUserEnteredMoreThanOne"
+          class="material-icons text-red-500"
           @click="removeField(index, userIDList)"
         >
           remove_circle
         </button>
       </div>
+    </div>
 
-      <span class="errorStyleClass" v-if="invalidInputMessage">{{
-        invalidInputMessage
-      }}</span>
-      <span class="errorStyleClass" v-if="!isUserValid && validateCount == 1">{{
-        invalidLoginMessage
-      }}</span>
-      <div v-if="isLoading" class="loadingSpinner"></div>
-      <div class="flex flex-row my-auto multiple-div" v-if="isAddButtonAllowed">
-        <button @click="addField" class="addButtonStyleClass">
-          <span class="material-icons addButton"> add_box </span>
-          <p>
+    <!-- invalid input and login message  -->
+    <span class="mx-auto text-red-700 text-base mb-1" v-if="invalidInputMessage">{{
+      invalidInputMessage
+    }}</span>
+    <span
+      class="mx-auto text-red-700 text-base mb-1"
+      v-if="!isUserValid && validateCount == 1"
+      >{{ invalidLoginMessage }}</span
+    >
+    <!-- add srn button -->
+    <div class="my-auto" v-if="isAddButtonAllowed">
+      <button
+        @click="addField"
+        class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
+      >
+        <span class="material-icons text-green-500 text-4xl pr-2">
+          add_circle_outline
+        </span>
+        <div class="border-l-2 border-gray-500 pl-4">
+          <p class="leading-tight">
             Add another SRN <br />
             एक और SRN दर्ज करें
           </p>
-        </button>
-      </div>
-      <button
-        @click="processForm"
-        class="buttonStyleClass"
-        :disabled="isSubmitButtonDisabled"
-      >
-        SUBMIT / जमा करें
+        </div>
       </button>
     </div>
-  </section>
+    <!-- submit button -->
+    <button
+      @click="processForm"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
+      :disabled="isSubmitButtonDisabled"
+    >
+      SUBMIT / जमा करें
+    </button>
+  </div>
 </template>
 
 <script>
@@ -82,17 +112,20 @@ export default {
     };
   },
   computed: {
+    userIdListLength() {
+      return this.userIDList.length;
+    },
     isAnyUserIDPresent() {
       //checks if any userID has been typed
       return (
         this.userIDList != undefined &&
-        this.userIDList.length > 0 &&
+        this.userIdListLength > 0 &&
         this.userIDList[0]["userID"] != ""
       );
     },
     ifUserEnteredMoreThanOne() {
       //used when multiple SRN's will be allowed to typed
-      return !this.isSingleEntryOnly && this.userIDList.length > 1;
+      return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
@@ -109,22 +142,27 @@ export default {
       //if multiple SRN's are allowed, then this helps with the activation of the + button, to add more SRN's
       return (
         !this.isSingleEntryOnly &&
-        this.isInputLengthComplete &&
-        this.userIDList.length < numberOfSRNsAllowed
+        !this.isCurrentEntryIncomplete &&
+        this.userIdListLength < numberOfSRNsAllowed
       );
     },
-    isInputLengthComplete() {
-      return this.getLatestEntry["userID"].length == this.maxLengthOfSRN;
-    },
-
     isCurrentEntryIncomplete() {
-      return this.getLatestEntry["userID"].length < this.maxLengthOfSRN - 1;
+      return this.getLatestEntry["userID"].length < this.maxLengthOfSRN;
     },
     getLatestEntry() {
       return this.userIDList.slice(-1)[0];
     },
   },
   methods: {
+    calculateInputboxStyleClasses(index) {
+      return [
+        {
+          "border-red-600 focus:border-red-600":
+            this.invalidInputMessage && index == this.userIdListLength - 1,
+          "pointer-events-none opacity-30": index < this.userIdListLength - 1,
+        },
+      ];
+    },
     isValidNumericEntry(e) {
       //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
@@ -148,7 +186,6 @@ export default {
     setValidFlag() {
       this.getLatestEntry["valid"] = this.isUserValid;
     },
-
     async addField() {
       //for adding another field, the previously entered ID is validated against the database
       const latestUserID = parseInt(this.getLatestEntry["userID"]);
@@ -177,7 +214,9 @@ export default {
     },
     updateValue(event, index) {
       //checks if the 10 characters are entered
-      if (event.target.value.length < this.maxLengthOfSRN) {
+      if (event.target.value.length == 0) {
+        this.invalidInputMessage = "";
+      } else if (event.target.value.length < this.maxLengthOfSRN) {
         this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
         this.resetInvalidLoginMessage();
       } else {
@@ -249,34 +288,10 @@ export default {
 </script>
 
 <style lang="postcss">
-div {
-  @apply flex flex-col mt-8;
+.btn {
+  border-bottom: outset;
 }
-label {
-  @apply mb-2 mx-auto uppercase font-bold text-lg;
-}
-.inputStyleClass {
-  @apply flex border py-2 mx-auto px-3 h-12;
-}
-.buttonStyleClass {
-  @apply bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50;
-}
-.addButtonStyleClass {
-  @apply bg-white flex flex-row mx-auto p-2 items-center space-x-12;
-}
-.errorStyleClass {
-  @apply mx-auto text-red-700 text-base mb-1;
-}
-.multipleStudentStyle {
-  @apply flex flex-row w-1/2 md:w-1/6 lg:w-1/6  mx-auto items-center;
-}
-.addButton {
-  @apply text-green-500;
-}
-.minusButton {
-  @apply text-red-500;
-}
-.loadingSpinner {
-  @apply mx-auto w-4 h-4 border-4 border-primary border-dotted rounded-full animate-spin;
+.btn:active {
+  border-bottom: unset;
 }
 </style>

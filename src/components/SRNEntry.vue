@@ -9,7 +9,7 @@
       >
         <input
           v-model="input.userID"
-          type="text"
+          type="tel"
           inputmode="numeric"
           pattern="[0-9]*"
           placeholder="Your SRN / आपका SRN"
@@ -34,11 +34,17 @@
         invalidLoginMessage
       }}</span>
 
+<<<<<<< HEAD
       <div class="flex flex-row my-auto multiple-div" v-if="isAddButtonAllowed">
         <button @click="addField" class="addButtonStyleClass">
           <span class="material-icons addButton"> add_box </span>
           Add another SRN <br />
           एक और SRN दर्ज करें
+=======
+      <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
+        <button @click="addField(userIDList)" class="addButtonStyleClass">
+          Add another SRN / एक और SRN दर्ज करें
+>>>>>>> e3c51f09b5d9b31d8178a09c5d9ad3a051a12072
         </button>
       </div>
       <button
@@ -122,7 +128,11 @@ export default {
     },
   },
   methods: {
+<<<<<<< HEAD
     isValidNumericEntry(e) {
+=======
+    allowNumericEntriesOnly(e) {
+>>>>>>> e3c51f09b5d9b31d8178a09c5d9ad3a051a12072
       //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
@@ -190,7 +200,7 @@ export default {
     //method that authentiates the SRN
     async authenticateSRN(userID) {
       //invokes the validation function
-      let userIsValidated = await validateSRN(
+      let userValidationResponse = await validateSRN(
         userID,
         this.validateCount,
         this.isSingleEntryOnly,
@@ -200,9 +210,9 @@ export default {
         this.purposeParams,
         this.redirectTo
       );
-      this.isUserValid = userIsValidated.isUserValid;
-      this.validateCount = userIsValidated.validateCount;
-      this.invalidLoginMessage = userIsValidated.invalidLoginMessage;
+      this.isUserValid = userValidationResponse.isUserValid;
+      this.validateCount = userValidationResponse.validateCount;
+      this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
     },
     //method called after clicking the submit button
     async processForm() {

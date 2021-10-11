@@ -34,7 +34,6 @@
 
       <div class="flex flex-row my-auto multiple-div" v-if="isUserValidated">
         <button @click="addField(userIDList)" class="addButtonStyleClass">
-          <div class="plus-sign mr-3" @click="addField(index, userIDList)"></div>
           Add another SRN / एक और SRN दर्ज करें
         </button>
       </div>

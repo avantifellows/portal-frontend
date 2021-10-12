@@ -34,14 +34,14 @@ jobs:
     # build the vuepress docs
     - name: Build
       env:
-        NODE_ENV: staging
+        NODE_ENV: production
         VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_AF_API_KEY }}
         VUE_APP_BASE_URL_PLIO: 'https://staging-app.plio.in/#/af/play/'
         VUE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VUE_APP_AWS_SQS_ACCESS_KEY }}
         VUE_APP_AWS_SECRET_KEY: ${{ secrets.VUE_APP_AWS_SQS_SECRET_ACCESS_KEY }}
         VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
 
-      run: npm run build
+      run: npm run build --mode staging
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1

@@ -10,7 +10,7 @@ const sqsClient = new SQSClient({
   },
 });
 
-export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userID, isUserValid, authType) {
+export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userIDList, authType) {
 
     const messageBody = [
       {
@@ -25,8 +25,7 @@ export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirec
         },
         authType: authType,
         user: {
-          values: userID,
-          userDataValidated: isUserValid,
+          values: userIDList,
         },
       },
     ];

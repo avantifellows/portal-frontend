@@ -2,9 +2,9 @@
   <!-- loading spinner -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <span class="material-icons text-black text-4xl m-auto animate-spin">
-        autorenew
-      </span>
+      <img class="text-black text-4xl m-auto animate-spin"
+          src="@/assets/autorenew.svg"/>
+    
     </div>
   </div>
   <!-- main div -->
@@ -40,10 +40,10 @@
 
       <div class="my-auto px-3" v-show="ifUserEnteredMoreThanOne">
         <button
-          class="material-icons text-red-500"
           @click="removeField(index, userIDList)"
         >
-          remove_circle
+          <img class="text-red-500"
+          src="@/assets/remove_circle.svg"/>
         </button>
       </div>
     </div>
@@ -63,9 +63,8 @@
         @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
       >
-        <span class="material-icons text-green-500 text-4xl pr-2">
-          add_circle_outline
-        </span>
+      <img class="text-green-500 text-4xl pr-2"
+          src="@/assets/add_circle.svg"/>
         <div class="border-l-2 border-gray-500 pl-4">
           <p class="leading-tight">
             Add another SRN <br />

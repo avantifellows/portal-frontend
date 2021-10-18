@@ -2,8 +2,8 @@
   <!-- loading spinner -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <img class="text-black text-4xl m-auto animate-spin"
-          src="@/assets/autorenew.svg"/>
+      <inline-svg class="text-black text-4xl m-auto animate-spin"
+          :src="require('@/assets/images/autorenew.svg')"></inline-svg>
     
     </div>
   </div>
@@ -42,8 +42,8 @@
         <button
           @click="removeField(index, userIDList)"
         >
-          <img class="text-red-500"
-          src="@/assets/remove_circle.svg"/>
+          <inline-svg
+          :src="require('@/assets/images/remove_circle.svg')"></inline-svg>
         </button>
       </div>
     </div>
@@ -63,9 +63,9 @@
         @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
       >
-      <img class="text-green-500 text-4xl pr-2"
-          src="@/assets/add_circle.svg"/>
-        <div class="border-l-2 border-gray-500 pl-4">
+       <inline-svg class="text-4xl pr-1"
+          :src="require('@/assets/images/add_circle.svg')"></inline-svg>
+        <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             Add another SRN <br />
             एक और SRN दर्ज करें

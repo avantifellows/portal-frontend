@@ -2,8 +2,8 @@
   <!-- loading spinner -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <inline-svg class="text-black text-4xl m-auto animate-spin"
-          :src="require('@/assets/images/autorenew.svg')"></inline-svg>
+      <inline-svg class="text-black text-4xl m-auto animate-spin h-6 w-6"
+          :src="require('@/assets/images/loading_spinner.svg')"></inline-svg>
     
     </div>
   </div>
@@ -42,7 +42,7 @@
         <button
           @click="removeField(index, userIDList)"
         >
-          <inline-svg
+          <inline-svg class="fill-current text-red-600 pt-2 pl-2 h-10 w-10"
           :src="require('@/assets/images/remove_circle.svg')"></inline-svg>
         </button>
       </div>
@@ -63,7 +63,7 @@
         @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
       >
-       <inline-svg class="text-4xl pr-1"
+       <inline-svg class="fill-current text-green-600 pt-2 pl-2 h-10 w-10"
           :src="require('@/assets/images/add_circle.svg')"></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">

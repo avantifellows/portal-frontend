@@ -91,6 +91,7 @@ import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 
 const numberOfSRNsAllowed = 10;
+const authType = "SRN";
 
 export default {
   name: "SRNEntry",
@@ -247,10 +248,27 @@ export default {
       this.validateCount = userValidationResponse.validateCount;
       this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
       this.isLoading = false;
+
+      //clear the input field if entry is incorrect
+      if(this.invalidLoginMessage != ""){
+        this.getLatestEntry["userID"] = "";
+      }
+
+      if(!this.isUserValid && this.validateCount == 1){
+        var purposeParams = "incorrect-entry"
+        sendSQSMessage(
+            this.purpose,
+            purposeParams,
+            this.redirectTo,
+            this.redirectID,
+            this.userIDList,
+            authType
+          );
+      }
     },
     //method called after clicking the submit button
     async processForm() {
-      var authType = "SRN";
+   
 
       //all previously typed SRN's will be authenticated through the addField method.
       // The last SRN will be authenticated after Submit button is clicked

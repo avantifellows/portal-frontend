@@ -63,7 +63,7 @@
         @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
       >
-       <inline-svg class="fill-current text-green-600 pt-1 pl-1 h-10 w-10"
+       <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1"
           :src="require('@/assets/images/add_circle.svg')"></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">

@@ -42,7 +42,7 @@
         <button
           @click="removeField(index, userIDList)"
         >
-          <inline-svg class="fill-current text-red-600 pt-2 pl-2 h-10 w-10"
+          <inline-svg class="fill-current text-red-600 h-8 w-8"
           :src="require('@/assets/images/remove_circle.svg')"></inline-svg>
         </button>
       </div>

@@ -2,7 +2,7 @@
   <!-- loading spinner -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <inline-svg class="text-black text-4xl m-auto animate-spin h-10 w-10"
+      <inline-svg class="text-black text-4xl m-auto animate-spin h-20 w-20"
           :src="require('@/assets/images/loading_spinner.svg')"></inline-svg>
     
     </div>

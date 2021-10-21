@@ -254,14 +254,16 @@ export default {
         this.getLatestEntry["userID"] = "";
       }
 
+      //incorrect entry the first time
       if(!this.isUserValid && this.validateCount == 1){
         var purposeParams = "incorrect-entry"
+        var tempUserIDList = [{userID: userID.toString(), valid: this.isUserValid}]
         sendSQSMessage(
             this.purpose,
             purposeParams,
             this.redirectTo,
             this.redirectID,
-            this.userIDList,
+            tempUserIDList,
             authType
           );
       }

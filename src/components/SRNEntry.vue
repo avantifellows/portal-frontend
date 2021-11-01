@@ -196,7 +196,9 @@ export default {
       const latestUserID = parseInt(this.getLatestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
-        this.handleIncorrectEntry(latestUserID);
+        if(!this.isUserValid && this.validateCount == 1){
+          this.handleIncorrectEntry(latestUserID);
+        }
         //only if the SRN is valid or if the user is entering a SRN for the second time,the loop is entered
         if (this.isUserValid || this.validateCount > 1) {
           //setting the flag of the SRN
@@ -235,9 +237,8 @@ export default {
         this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
+    //incorrect entry the first time
     handleIncorrectEntry(userID){
-      //incorrect entry the first time
-      if(!this.isUserValid && this.validateCount == 1){
         var purposeParams = "incorrect-entry"
         var tempUserIDList = [{userID: userID.toString(), valid: this.isUserValid}]
         sendSQSMessage(
@@ -248,7 +249,6 @@ export default {
             tempUserIDList,
             authType
           );
-      }
     },
     //method that authentiates the SRN
     async authenticateSRN(userID) {
@@ -286,7 +286,9 @@ export default {
       let latestUserID = parseInt(this.getLatestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
+        if(!this.isUserValid && this.validateCount == 1){
         this.handleIncorrectEntry(latestUserID);
+        }
         this.setValidFlag();
       }
 

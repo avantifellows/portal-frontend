@@ -117,7 +117,7 @@ export default {
     userIdListLength() {
       return this.userIDList.length;
     },
-    //checks if any userID has been typed
+    /** checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
         this.userIDList != undefined &&

@@ -5,7 +5,7 @@ firebaseAPI service is used to validate and it returns a boolean value, indicati
 If the user is valid and validateCount = 0, then the function returns.
 If the user is not valid and validateCount = 0, then the user is not valid, so validateCount becomes 1 and login message displays an error, allowing the user to correct their entry.
 If the user is not valid and validateCount = 1, then the user has already been authenticated once before and the user has retyped, yet the entry is still invalid, then validateCount becomes 2 to indicate this behaviour.
-@params {String} - userID - current ID being authenticated 
+@params {String} - userID - the ID that needs to be validated 
 @params {Number} - validateCount - indicates how many times the user has been validated 
 @params {Boolean} - isCurrentUserValid - holds the value returned by the API */
 export async function validateSRN(userID, validateCount, isCurrentUserValid){

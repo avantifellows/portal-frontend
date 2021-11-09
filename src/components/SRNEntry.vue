@@ -105,7 +105,7 @@ export default {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-id's and a valid flag for each
       invalidInputMessage: null, //flag to check if the input is in correct format
-      isCurrentUserValid: false, // temp flag which contains the validity of the most recent user ID
+      isCurrentUserValid: false, // whether the current user is valid
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",

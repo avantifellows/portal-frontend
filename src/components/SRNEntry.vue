@@ -129,7 +129,7 @@ export default {
     ifUserEnteredMoreThanOne() {
       return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },
-    //for now, plio does not support multiple input entries
+    /** for now, plio does not support multiple input entries */
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },

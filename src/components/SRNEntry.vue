@@ -113,7 +113,7 @@ export default {
     };
   },
   computed: {
-    //returns length of the userID list
+    /** returns length of the list of user IDs */
     userIdListLength() {
       return this.userIDList.length;
     },

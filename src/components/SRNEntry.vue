@@ -162,8 +162,8 @@ export default {
     isCurrentEntryIncomplete() {
       return this.getLatestEntry["userID"].length < this.maxLengthOfSRN;
     },
-    // returns the most recent typed input entry
-    getLatestEntry() {
+    // returns the most recently entered input
+    latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
   },

@@ -125,7 +125,7 @@ export default {
         this.userIDList[0]["userID"] != ""
       );
     },
-    //checks if multiple entries are allowed and if one entry is already inputted
+    /** whether multiple entries have been made by the user */
     ifUserEnteredMoreThanOne() {
       return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },

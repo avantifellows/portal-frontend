@@ -2,8 +2,10 @@ import {client} from "@/services/API/rootClient.js"
 import { checkUserEndpoint } from "@/services/API/endpoints.js";
 
 export default {
-    /* this method validates the ID against the database
-    @params {String} inputUserID - each ID being typed*/
+    /**
+      * validates that the ID exists
+      * @param {String} inputUserID - the id that needs to be validated
+      */
     checkUserExists(inputUserID)
     {
         const params = {

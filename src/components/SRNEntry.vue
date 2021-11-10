@@ -183,7 +183,7 @@ export default {
       ];
     },
     /* checks to see if the input character is a number. Makes use of ASCII values.
-    @param {Event} - e - event triggered when a character is typed.  */
+    @param {Object} - e - event triggered when a character is typed.  */
     isValidNumericEntry(e) {
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();

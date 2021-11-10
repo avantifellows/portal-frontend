@@ -104,7 +104,7 @@ export default {
   data() {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-id's and a valid flag for each
-      invalidInputMessage: null, //flag to check if the input is in correct format
+      invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.

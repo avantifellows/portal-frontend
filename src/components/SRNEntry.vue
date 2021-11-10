@@ -133,10 +133,13 @@ export default {
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
-    /* returns submit button as disabled if any of the following is true:
-     - no SRN has been typed
-     - input is invalid
-     - SRN hasn't been completely typed */
+    /**
+      * whether the submit button is disabled
+      * true if any of the following conditions are met:
+      * - no SRN has been typed
+      * - input is invalid
+      * - SRN hasn't been completely typed
+      */
     isSubmitButtonDisabled() {
       return (
         !this.isAnyUserIDPresent ||

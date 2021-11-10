@@ -260,7 +260,7 @@ export default {
     /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed. 
     Until then, it prompts the user to type the required characters. 
     If the user types more than the desired number of characters, the input is sliced and the user wont be able to see the extra characters.
-    @params {Event} - event - the event which triggered this function
+    @param {Object} - event - the event which triggered this function
     @params {Number} - index - the index of the input field */
     updateValue(event, index) {
       if (event.target.value.length == 0) {

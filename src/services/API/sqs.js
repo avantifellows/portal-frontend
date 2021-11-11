@@ -26,7 +26,7 @@ export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirec
       {
         dateTime: new Date(),
         purpose: {
-          type: "staging",
+          type: purpose,
           subType: purposeParams,
           params: {
             platform: redirectTo,

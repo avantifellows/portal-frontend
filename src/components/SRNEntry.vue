@@ -52,11 +52,9 @@
     <span class="mx-auto text-red-700 text-base mb-1" v-if="invalidInputMessage">{{
       invalidInputMessage
     }}</span>
-    <span
-      class="mx-auto text-red-700 text-base mb-1"
-      v-if="isInvalidLoginMessageShown"
-      >{{ invalidLoginMessage }}</span
-    >
+    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
+      invalidLoginMessage
+    }}</span>
     <!-- add srn button -->
     <div class="my-auto" v-if="isAddButtonAllowed">
       <button
@@ -109,7 +107,7 @@ export default {
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
-      isLoading: false, 
+      isLoading: false,
     };
   },
   computed: {
@@ -147,11 +145,11 @@ export default {
         this.isCurrentEntryIncomplete
       );
     },
-    /** 
+    /**
      * checks if + button should be displayed. Will be activated only if:
      * - multiple entries are allowed
      * - if current input entry is complete
-     * - if cap of maximum entries hasn't been reached yet 
+     * - if cap of maximum entries hasn't been reached yet
      */
     isAddButtonAllowed() {
       return (
@@ -170,10 +168,10 @@ export default {
     },
   },
   methods: {
-    /* determines how the input box should look like depending on which box it is. 
+    /* determines how the input box should look like depending on which box it is.
       - if the input box is the current one (i.e. being typed) and if the input is invalid (invalid input message is being displayed),
         then, the box has a border of red
-      - if the input box is a past one (i.e. already typed), then the box is shown as unclickable 
+      - if the input box is a past one (i.e. already typed), then the box is shown as unclickable
       @param {Number} - index - index of the input box */
     calculateInputboxStyleClasses(index) {
       return [
@@ -194,7 +192,7 @@ export default {
     addNewEmptyField() {
       this.userIDList.push({ userID: "", valid: false });
     },
-    /* removes an element in the array at a given index. 
+    /* removes an element in the array at a given index.
     @param {Number} - index - the index of the input box where - button is clicked. */
     removeInputField(index) {
       this.userIDList.splice(index, 1);
@@ -219,8 +217,8 @@ export default {
     resetEntry(index){
         this.userIDList[index]["userID"] = "";
     },
-    /** This function is called whenever the + button is clicked. 
-    * The most recent typed entry is authenticated against the database. 
+    /** This function is called whenever the + button is clicked.
+    * The most recent typed entry is authenticated against the database.
     */
     async addField() {
       const latestUserID = parseInt(this.getLatestEntry["userID"]);
@@ -247,14 +245,14 @@ export default {
       this.removeInputField(index);
     },
 <<<<<<< HEAD
-    /** This function is called whenever something is entered in the input box. 
-    * It checks if the required number of characters are being typed. 
+    /** This function is called whenever something is entered in the input box.
+    * It checks if the required number of characters are being typed.
     * @param {Event} event - the event which triggered this function
     * @param {Number} index - the index of the input field
     */
 =======
-    /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed. 
-    Until then, it prompts the user to type the required characters. 
+    /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed.
+    Until then, it prompts the user to type the required characters.
     If the user types more than the desired number of characters, the input is sliced and the user wont be able to see the extra characters.
     @param {Object} - event - the event which triggered this function
     @params {Number} - index - the index of the input field */
@@ -288,8 +286,8 @@ export default {
             authType
           );
     },
-      
-    /** This method is called whenever + button is clicked. It authenticates the most recent typed ID. 
+
+    /** This method is called whenever + button is clicked. It authenticates the most recent typed ID.
     * @param {String} userID - most recent ID
     */
     async authenticateSRN(userID) {
@@ -297,8 +295,8 @@ export default {
       let userValidationResponse = await validateSRN(
         userID,
         this.validateCount
-        
-       
+
+
       );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
@@ -310,7 +308,7 @@ export default {
       }
     },
 
-    /** This method is called after the user clicks the submit button. 
+    /** This method is called after the user clicks the submit button.
     */
     async processForm() {
       let latestUserID = parseInt(this.getLatestEntry["userID"]);

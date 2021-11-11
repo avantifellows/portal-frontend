@@ -1,10 +1,9 @@
 import firebaseAPI from "@/services/API/checkUser.js";
 
-/** this function validates the entry against the database (for this usecase, it is firestore). 
+/** This function validates an entry against the database (for this usecase, it is firestore). 
 * firebaseAPI service is used to validate and it returns a boolean value, indicating whether the user is valid or not.
 * @param {String} userID - current ID being authenticated 
 * @param {Number} validateCount - indicates how many times the user has been validated 
-* @param {Boolean} isCurrentUserValid - holds the value returned by the API 
 */
 
 export async function validateSRN(userID, validateCount){

@@ -111,11 +111,11 @@ export default {
     };
   },
   computed: {
-    /** returns length of the list of user IDs */
+    /** Returns length of the list of user IDs */
     userIdListLength() {
       return this.userIDList.length;
     },
-    /** checks if any userID has been entered */
+    /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
         this.userIDList != undefined &&
@@ -123,16 +123,16 @@ export default {
         this.userIDList[0]["userID"] != ""
       );
     },
-    /** whether multiple entries have been made by the user */
+    /** Whether multiple entries have been made by the user */
     ifUserEnteredMoreThanOne() {
       return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },
-    /** for now, plio does not support multiple input entries */
+    /** For now, plio does not support multiple input entries */
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
     /**
-     * whether the submit button is disabled
+     * Whether the submit button is disabled
      * true if any of the following conditions are met:
      * - no SRN has been typed
      * - input is invalid
@@ -146,7 +146,7 @@ export default {
       );
     },
     /**
-     * checks if + button should be displayed. Will be activated only if:
+     * Checks if + button should be displayed. Will be activated only if:
      * - multiple entries are allowed
      * - if current input entry is complete
      * - if cap of maximum entries hasn't been reached yet
@@ -158,21 +158,19 @@ export default {
         this.userIdListLength < numberOfSRNsAllowed
       );
     },
-    /** checks if the current input entry has the required number of characters */
+    /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.getLatestEntry["userID"].length < this.maxLengthOfSRN;
+      return this.latestEntry["userID"].length < this.maxLengthOfSRN;
     },
-    // returns the most recently entered input
+    /** Returns the most recently entered input */
     latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
   },
   methods: {
-    /* determines how the input box should look like depending on which box it is.
-      - if the input box is the current one (i.e. being typed) and if the input is invalid (invalid input message is being displayed),
-        then, the box has a border of red
-      - if the input box is a past one (i.e. already typed), then the box is shown as unclickable
-      @param {Number} - index - index of the input box */
+    /** Determines how the input box should look like depending on which input field it is.
+     * @param {Number} index - index of the input box
+     */
     calculateInputboxStyleClasses(index) {
       return [
         {
@@ -182,38 +180,40 @@ export default {
         },
       ];
     },
-    /* checks to see if the input character is a number. Makes use of ASCII values.
-    @param {Object} - e - event triggered when a character is typed.  */
+    /** Checks to see if the input character is a number. Makes use of ASCII values.
+     * @param {Object} e - event triggered when a character is typed
+     */
     isValidNumericEntry(e) {
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
     },
-    // adds a new dict to the array - userIDList
+    /** Adds a new dict to the array - userIDList */
     addNewEmptyField() {
       this.userIDList.push({ userID: "", valid: false });
     },
-    /* removes an element in the array at a given index.
-    @param {Number} - index - the index of the input box where - button is clicked. */
+    /** Removes an element in the array at a given index.
+     * @param {Number} index - the index of the input box where - button is clicked
+     */
     removeInputField(index) {
       this.userIDList.splice(index, 1);
     },
-    // sets the invalid input message to null (default)
+    /** Sets the invalid input message to null (default) */
     resetInvalidInputMessage() {
       this.invalidInputMessage = "";
     },
-    // sets the invalid login message to null (default)
+    /** Sets the invalid login message to null (default) */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
     },
-    // sets the temp valid flag to false (default) for authentication of a possible next user
+    /** Sets the temp valid flag to false (default) for authentication of a possible next user */
     resetValidFlag() {
       this.isCurrentUserValid = false;
     },
-    // sets the valid key of the latest user to the value of the temp flag. The temp flag contains the value returned by the backend
+    /** Sets the valid key of the latest user to the value of the temp flag. The temp flag contains the value returned by the backend */
     setValidFlag() {
-      this.getLatestEntry["valid"] = this.isCurrentUserValid;
+      this.latestEntry["valid"] = this.isCurrentUserValid;
     },
-    //resets the userID key of an element in the array at a particular index.
+    /** Resets the userID key of an element in the array at a particular index */
     resetEntry(index) {
       this.userIDList[index]["userID"] = "";
     },
@@ -221,7 +221,7 @@ export default {
      * The most recent typed entry is authenticated against the database.
      */
     async addField() {
-      const latestUserID = parseInt(this.getLatestEntry["userID"]);
+      const latestUserID = parseInt(this.latestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
         if (!this.isCurrentUserValid && this.validateCount == 1) {
@@ -301,7 +301,7 @@ export default {
     /** This method is called after the user clicks the submit button.
      */
     async processForm() {
-      let latestUserID = parseInt(this.getLatestEntry["userID"]);
+      let latestUserID = parseInt(this.latestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
         if (!this.isCurrentUserValid && this.validateCount == 1) {

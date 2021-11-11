@@ -1,6 +1,6 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 
-/** this is function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built. 
+/** This is function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built. 
 * @param {String} purposeparams - extracted from auth layer URL
 * @param {Array} userIDList - list of userID's wanting to go through the layer 
 * @param {String} redirectID - extracted from auth layer URL

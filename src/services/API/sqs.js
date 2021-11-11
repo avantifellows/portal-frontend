@@ -10,22 +10,23 @@ const sqsClient = new SQSClient({
   },
 });
 
-/* This function is used to send an SQS message to the queue on AWS. Makes use of the AWS SDK. (SendMessageCommand)
-@params {String} - purpose
-@params {String} - purposeParams
-@params {String} - redirectTo
-@params {String} - redirectID
-@params {Array} - userIDList - list of users wanting to go through the layer
-@params {String} - authType
-Everything, except the userIDList, is extracted from the auth layer URL
+/** This function is used to send an SQS message to the queue on AWS. 
+* @param {String} purpose
+* @param {String} purposeParams
+* @param {String} redirectTo
+* @param {String} redirectID
+* @param {Array} userIDList - list of users wanting to go through the layer
+* @param {String} authType
+* Everything, except the userIDList, is extracted from the auth layer URL
 */
+
 export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userIDList, authType) {
 
     const messageBody = [
       {
         dateTime: new Date(),
         purpose: {
-          type: purpose,
+          type: "staging",
           subType: purposeParams,
           params: {
             platform: redirectTo,

@@ -54,7 +54,7 @@
     }}</span>
     <span
       class="mx-auto text-red-700 text-base mb-1"
-      v-if="!isCurrentUserValid && validateCount == 1"
+      v-if="isInvalidLoginMessageShown"
       >{{ invalidLoginMessage }}</span
     >
     <!-- add srn button -->
@@ -113,6 +113,10 @@ export default {
     };
   },
   computed: {
+    /** checks if invalid login error needs to be displayed */
+    isInvalidLoginMessageShown(){
+      return !this.isCurrentUserValid && this.validateCount == 1;
+    },
     //returns length of the userID list
     userIdListLength() {
       return this.userIDList.length;
@@ -144,10 +148,12 @@ export default {
         this.isCurrentEntryIncomplete
       );
     },
-    /* checks if + button should be displayed. Will be activated only if:
-     - multiple entries are allowed
-     - if current input entry is complete
-     - if cap of maximum entries hasn't been reached yet */
+    /** 
+     * checks if + button should be displayed. Will be activated only if:
+     * - multiple entries are allowed
+     * - if current input entry is complete
+     * - if cap of maximum entries hasn't been reached yet 
+     */
     isAddButtonAllowed() {
       return (
         !this.isSingleEntryOnly &&
@@ -155,7 +161,7 @@ export default {
         this.userIdListLength < numberOfSRNsAllowed
       );
     },
-    // checks if the current input entry has the required number of characters.
+    /** checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
       return this.getLatestEntry["userID"].length < this.maxLengthOfSRN;
     },
@@ -214,10 +220,9 @@ export default {
     resetEntry(index){
         this.userIDList[index]["userID"] = "";
     },
-    /* this function is called whenever the + button is clicked. The most recent typed entry is authenticated against the database. 
-    - if it does not exist and it is the first time being authenticated, handleIncorrectEntry() is called. 
-    - if the entry exists or if it is being authenticated the second time, the 'valid' flag of the entry is set to whatever the value is returned by the backend. 
-      Also, isCurrentUserValid and validateCount are reset to their default values, so that a possible next entry can be processed. */
+    /** This function is called whenever the + button is clicked. 
+    * The most recent typed entry is authenticated against the database. 
+    */
     async addField() {
       const latestUserID = parseInt(this.getLatestEntry["userID"]);
       if (!isNaN(latestUserID)) {
@@ -233,32 +238,20 @@ export default {
         }
       }
     },
-    /* Before an element is removed from the userIDList array, the login message and input message are reset to default values. 
-       removeInputField() is called to remove the element. 
-       In most cases, this would be enough. But there is one edge case:
-      Let's say the user typed in ID 'A' and decides to add another entry. This means 'A' is authenticated and it is valid/invalid. 
-      The user types in the ID 'B' as the next entry and it is invalid. 
-      The user changed their mind and decided to delete this entry ('B'). At this point, the variables will be in the following state:
-        validateCount = 1
-        isCurrentUserValid = false
-      The state of the variables contradict the fact that 'A' is already authenticated. This means any of the two cases:
-      - A is valid, so validateCount = 0 and isCurrentUserValid = true
-      - A is invalid, so validateCount = 2 and isCurrentUserValid = false
-      So when the user clicks submit, 'A' is authenticated again, which is a behaviour we do not want. So to bypass this, validateCount is set to 2. 
-      (To better understand how this will help, understanding processForm() will help.) 
-      isCurrentUserValid flag is ignored because the value is already set in each user's valid flag. 
-      @params {Number} - index - index of input field to be removed */
+    /** This method is called whenever - button is clicked, to remove an input field
+    * @param {Number} index - index of input field to be removed
+    */
     removeField(index) {
       this.resetInvalidInputMessage;
       this.resetInvalidLoginMessage;
       this.validateCount = 2;
       this.removeInputField(index);
     },
-    /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed. 
-    Until then, it prompts the user to type the required characters. 
-    If the user types more than the desired number of characters, the input is sliced and the user wont be able to see the extra characters.
-    @params {Event} - event - the event which triggered this function
-    @params {Number} - index - the index of the input field */
+    /** This function is called whenever something is entered in the input box. 
+    * It checks if the required number of characters are being typed. 
+    * @param {Event} event - the event which triggered this function
+    * @param {Number} index - the index of the input field
+    */
     updateValue(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
@@ -273,14 +266,9 @@ export default {
         this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
-    /* this functions handle all invalid/incorrect entries. An SQS message is sent with the following parameters:
-    - purpose - from URL
-    - purposeParams - "incorrect-entry"
-    - redirectTo - from URL
-    - redirectID - from URL
-    - tempUserIDList - which contains only the ID of the incorrect entry
-    - authType - from URL 
-    @params {String} - userID - ID of the incorrect entry field */
+    /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
+    * @param {String} userID - ID of the incorrect entry field
+    */
     handleIncorrectEntry(userID){
         var purposeParams = "incorrect-entry"
         var tempUserIDList = [{userID: userID.toString(), valid: this.isCurrentUserValid}]
@@ -293,20 +281,17 @@ export default {
             authType
           );
     },
-    /* this method is called whenever + button is clicked. It authenticates the most recent typed ID. 
-    If the ID is invalid, then the login mesasge displays an error and the input field is cleared for the user to correct their entry.
-    @params {String} - userID - most recent ID  */
+      
+    /** This method is called whenever + button is clicked. It authenticates the most recent typed ID. 
+    * @param {String} userID - most recent ID
+    */
     async authenticateSRN(userID) {
       this.isLoading = true;
       let userValidationResponse = await validateSRN(
         userID,
-        this.validateCount,
-        this.isSingleEntryOnly,
-        this.redirectID,
-        this.isCurrentUserValid,
-        this.purpose,
-        this.purposeParams,
-        this.redirectTo
+        this.validateCount
+        
+       
       );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
@@ -317,9 +302,9 @@ export default {
         this.resetEntry(this.userIdListLength - 1)
       }
     },
-    /* this method is called after the user clicks the submit button. Since all the ID's but the last are authenticated, this method calls authenticateSRN(). 
-    If the user is invalid and is being authenticated the first time, handleIncorrectEntry() is called. 
-    If the user is valid or is being authenticated the second time, the user is reidrected to their destination and an SQS message is sent. */
+
+    /** This method is called after the user clicks the submit button. 
+    */
     async processForm() {
       let latestUserID = parseInt(this.getLatestEntry["userID"]);
       if (!isNaN(latestUserID)) {
@@ -330,7 +315,6 @@ export default {
         this.setValidFlag();
       }
 
-      // either the user is valid or the user has been checked twice
       if (this.isCurrentUserValid || this.validateCount > 1) {
         if (
           redirectToDestination(

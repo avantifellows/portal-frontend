@@ -246,19 +246,12 @@ export default {
       this.validateCount = 2;
       this.removeInputField(index);
     },
-<<<<<<< HEAD
+
     /** This function is called whenever something is entered in the input box. 
     * It checks if the required number of characters are being typed. 
     * @param {Event} event - the event which triggered this function
     * @param {Number} index - the index of the input field
     */
-=======
-    /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed. 
-    Until then, it prompts the user to type the required characters. 
-    If the user types more than the desired number of characters, the input is sliced and the user wont be able to see the extra characters.
-    @param {Object} - event - the event which triggered this function
-    @params {Number} - index - the index of the input field */
->>>>>>> 2b97ba371f0057cfd46588c4ee89d5e1d1bdb0e2
     updateValue(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";

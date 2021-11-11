@@ -132,12 +132,12 @@ export default {
       return this.redirectTo == "plio";
     },
     /**
-      * whether the submit button is disabled
-      * true if any of the following conditions are met:
-      * - no SRN has been typed
-      * - input is invalid
-      * - SRN hasn't been completely typed
-      */
+     * whether the submit button is disabled
+     * true if any of the following conditions are met:
+     * - no SRN has been typed
+     * - input is invalid
+     * - SRN hasn't been completely typed
+     */
     isSubmitButtonDisabled() {
       return (
         !this.isAnyUserIDPresent ||
@@ -214,17 +214,17 @@ export default {
       this.getLatestEntry["valid"] = this.isCurrentUserValid;
     },
     //resets the userID key of an element in the array at a particular index.
-    resetEntry(index){
-        this.userIDList[index]["userID"] = "";
+    resetEntry(index) {
+      this.userIDList[index]["userID"] = "";
     },
     /** This function is called whenever the + button is clicked.
-    * The most recent typed entry is authenticated against the database.
-    */
+     * The most recent typed entry is authenticated against the database.
+     */
     async addField() {
       const latestUserID = parseInt(this.getLatestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
-        if(!this.isCurrentUserValid && this.validateCount == 1){
+        if (!this.isCurrentUserValid && this.validateCount == 1) {
           this.handleIncorrectEntry(latestUserID);
         }
         if (this.isCurrentUserValid || this.validateCount > 1) {
@@ -236,27 +236,20 @@ export default {
       }
     },
     /** This method is called whenever - button is clicked, to remove an input field
-    * @param {Number} index - index of input field to be removed
-    */
+     * @param {Number} index - index of input field to be removed
+     */
     removeField(index) {
       this.resetInvalidInputMessage;
       this.resetInvalidLoginMessage;
       this.validateCount = 2;
       this.removeInputField(index);
     },
-<<<<<<< HEAD
+
     /** This function is called whenever something is entered in the input box.
-    * It checks if the required number of characters are being typed.
-    * @param {Event} event - the event which triggered this function
-    * @param {Number} index - the index of the input field
-    */
-=======
-    /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed.
-    Until then, it prompts the user to type the required characters.
-    If the user types more than the desired number of characters, the input is sliced and the user wont be able to see the extra characters.
-    @param {Object} - event - the event which triggered this function
-    @params {Number} - index - the index of the input field */
->>>>>>> 2b97ba371f0057cfd46588c4ee89d5e1d1bdb0e2
+     * It checks if the required number of characters are being typed.
+     * @param {Event} event - the event which triggered this function
+     * @param {Number} index - the index of the input field
+     */
     updateValue(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
@@ -272,50 +265,47 @@ export default {
       }
     },
     /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
-    * @param {String} userID - ID of the incorrect entry field
-    */
-    handleIncorrectEntry(userID){
-        var purposeParams = "incorrect-entry"
-        var tempUserIDList = [{userID: userID.toString(), valid: this.isCurrentUserValid}]
-        sendSQSMessage(
-            this.purpose,
-            purposeParams,
-            this.redirectTo,
-            this.redirectID,
-            tempUserIDList,
-            authType
-          );
+     * @param {String} userID - ID of the incorrect entry field
+     */
+    handleIncorrectEntry(userID) {
+      var purposeParams = "incorrect-entry";
+      var tempUserIDList = [
+        { userID: userID.toString(), valid: this.isCurrentUserValid },
+      ];
+      sendSQSMessage(
+        this.purpose,
+        purposeParams,
+        this.redirectTo,
+        this.redirectID,
+        tempUserIDList,
+        authType
+      );
     },
 
     /** This method is called whenever + button is clicked. It authenticates the most recent typed ID.
-    * @param {String} userID - most recent ID
-    */
+     * @param {String} userID - most recent ID
+     */
     async authenticateSRN(userID) {
       this.isLoading = true;
-      let userValidationResponse = await validateSRN(
-        userID,
-        this.validateCount
-
-
-      );
+      let userValidationResponse = await validateSRN(userID, this.validateCount);
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
       this.isLoading = false;
 
-      if(this.invalidLoginMessage != ""){
-        this.resetEntry(this.userIdListLength - 1)
+      if (this.invalidLoginMessage != "") {
+        this.resetEntry(this.userIdListLength - 1);
       }
     },
 
     /** This method is called after the user clicks the submit button.
-    */
+     */
     async processForm() {
       let latestUserID = parseInt(this.getLatestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
-        if(!this.isCurrentUserValid && this.validateCount == 1){
-        this.handleIncorrectEntry(latestUserID);
+        if (!this.isCurrentUserValid && this.validateCount == 1) {
+          this.handleIncorrectEntry(latestUserID);
         }
         this.setValidFlag();
       }

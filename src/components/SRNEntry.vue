@@ -104,8 +104,8 @@ export default {
   data() {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-id's and a valid flag for each
-      invalidInputMessage: null, //flag to check if the input is in correct format
-      isCurrentUserValid: false, // temp flag which contains the validity of the most recent user ID
+      invalidInputMessage: null, // whether the input is in correct format
+      isCurrentUserValid: false, // whether the current user is valid
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
@@ -113,15 +113,11 @@ export default {
     };
   },
   computed: {
-    /** checks if invalid login error needs to be displayed */
-    isInvalidLoginMessageShown(){
-      return !this.isCurrentUserValid && this.validateCount == 1;
-    },
-    //returns length of the userID list
+    /** returns length of the list of user IDs */
     userIdListLength() {
       return this.userIDList.length;
     },
-    //checks if any userID has been typed
+    /** checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
         this.userIDList != undefined &&
@@ -129,18 +125,21 @@ export default {
         this.userIDList[0]["userID"] != ""
       );
     },
-    //checks if multiple entries are allowed and if one entry is already inputted
+    /** whether multiple entries have been made by the user */
     ifUserEnteredMoreThanOne() {
       return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },
-    //for now, plio does not support multiple input entries
+    /** for now, plio does not support multiple input entries */
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
-    /* returns submit button as disabled if any of the following is true:
-     - no SRN has been typed
-     - input is invalid
-     - SRN hasn't been completely typed */
+    /**
+      * whether the submit button is disabled
+      * true if any of the following conditions are met:
+      * - no SRN has been typed
+      * - input is invalid
+      * - SRN hasn't been completely typed
+      */
     isSubmitButtonDisabled() {
       return (
         !this.isAnyUserIDPresent ||
@@ -165,8 +164,8 @@ export default {
     isCurrentEntryIncomplete() {
       return this.getLatestEntry["userID"].length < this.maxLengthOfSRN;
     },
-    // returns the most recent typed input entry
-    getLatestEntry() {
+    // returns the most recently entered input
+    latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
   },
@@ -186,7 +185,7 @@ export default {
       ];
     },
     /* checks to see if the input character is a number. Makes use of ASCII values.
-    @param {Event} - e - event triggered when a character is typed.  */
+    @param {Object} - e - event triggered when a character is typed.  */
     isValidNumericEntry(e) {
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
@@ -247,11 +246,19 @@ export default {
       this.validateCount = 2;
       this.removeInputField(index);
     },
+<<<<<<< HEAD
     /** This function is called whenever something is entered in the input box. 
     * It checks if the required number of characters are being typed. 
     * @param {Event} event - the event which triggered this function
     * @param {Number} index - the index of the input field
     */
+=======
+    /*  this function is called whenever something is entered in the input box. It checks if the required number of characters are being typed. 
+    Until then, it prompts the user to type the required characters. 
+    If the user types more than the desired number of characters, the input is sliced and the user wont be able to see the extra characters.
+    @param {Object} - event - the event which triggered this function
+    @params {Number} - index - the index of the input field */
+>>>>>>> 2b97ba371f0057cfd46588c4ee89d5e1d1bdb0e2
     updateValue(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";

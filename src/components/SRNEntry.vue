@@ -134,7 +134,7 @@ export default {
     },
     /**
      * Whether the submit button is disabled
-     * true if any of the following conditions are met:
+     * Returns true if any of the following conditions are met:
      * - no SRN has been typed
      * - input is invalid
      * - SRN hasn't been completely typed
@@ -169,7 +169,7 @@ export default {
     },
   },
   methods: {
-    /** Determines how the input box should look like depending on which input field it is.
+    /** Determines how the input box should look.
      * @param {Number} index - index of the input box
      */
     calculateInputboxStyleClasses(index) {
@@ -188,21 +188,21 @@ export default {
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
     },
-    /** Adds a new dict to the array - userIDList */
+    /** Adds a new object to the userIDList array */
     addNewEmptyField() {
       this.userIDList.push({ userID: "", valid: false });
     },
     /** Removes an element in the array at a given index.
-     * @param {Number} index - the index of the input box where - button is clicked
+     * @param {Number} index - the index of the input box where "-" button is clicked
      */
     removeInputField(index) {
       this.userIDList.splice(index, 1);
     },
-    /** Sets the invalid input message to null (default) */
+    /** Resets the invalid input message */
     resetInvalidInputMessage() {
       this.invalidInputMessage = "";
     },
-    /** Sets the invalid login message to null (default) */
+    /** Resets the invalid login message */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
     },
@@ -249,7 +249,7 @@ export default {
 
     /** This function is called whenever something is entered in the input box.
      * It checks if the required number of characters are being typed.
-     * @param {Event} event - the event which triggered this function
+     * @param {Object} event - the event which triggered this function
      * @param {Number} index - the index of the input field
      */
     updateValue(event, index) {

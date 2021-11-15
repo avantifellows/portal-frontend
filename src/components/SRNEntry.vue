@@ -127,7 +127,8 @@ export default {
     ifUserEnteredMoreThanOne() {
       return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },
-    /** For now, plio does not support multiple input entries */
+    /** Whether only a single entry is allowed.
+     * For now, plio does not support multiple input entries */
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
@@ -217,8 +218,8 @@ export default {
     resetEntry(index) {
       this.userIDList[index]["userID"] = "";
     },
-    /** This function is called whenever the + button is clicked.
-     * The most recent typed entry is authenticated against the database.
+    /** This function is called whenever the "+"" button is clicked.
+     * Authenticates the most recent typed entry against the database.
      */
     async addField() {
       const latestUserID = parseInt(this.latestEntry["userID"]);
@@ -235,7 +236,8 @@ export default {
         }
       }
     },
-    /** This method is called whenever - button is clicked, to remove an input field
+    /** This method is called whenever - button is clicked.
+     * Removes the selected entry from the entry list and resets appropriate variables
      * @param {Number} index - index of input field to be removed
      */
     removeField(index) {
@@ -298,7 +300,8 @@ export default {
       }
     },
 
-    /** This method is called after the user clicks the submit button.
+    /** Authenticates the last entry typed before the submit button is clicked.
+     * Also, redirects user to the destination and sends a SQS message.
      */
     async processForm() {
       let latestUserID = parseInt(this.latestEntry["userID"]);

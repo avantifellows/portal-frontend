@@ -52,11 +52,9 @@
     <span class="mx-auto text-red-700 text-base mb-1" v-if="invalidInputMessage">{{
       invalidInputMessage
     }}</span>
-    <span
-      class="mx-auto text-red-700 text-base mb-1"
-      v-if="!isUserValid && validateCount == 1"
-      >{{ invalidLoginMessage }}</span
-    >
+    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
+      invalidLoginMessage
+    }}</span>
     <!-- add srn button -->
     <div class="my-auto" v-if="isAddButtonAllowed">
       <button
@@ -104,8 +102,8 @@ export default {
   data() {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-id's and a valid flag for each
-      invalidInputMessage: null, //flag to check if the input is in correct format
-      isUserValid: false, // whether the user exists in the backend database
+      invalidInputMessage: null, // whether the input is in correct format
+      isCurrentUserValid: false, // whether the current user is valid
       maxLengthOfSRN: 10,
       validateCount: 0, //this variable tells us how many times the user has been validated.
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
@@ -113,48 +111,67 @@ export default {
     };
   },
   computed: {
+    /** Returns length of the list of user IDs */
     userIdListLength() {
       return this.userIDList.length;
     },
+    /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
-      //checks if any userID has been typed
       return (
         this.userIDList != undefined &&
         this.userIdListLength > 0 &&
         this.userIDList[0]["userID"] != ""
       );
     },
+    /** Whether multiple entries have been made by the user */
     ifUserEnteredMoreThanOne() {
-      //used when multiple SRN's will be allowed to typed
       return !this.isSingleEntryOnly && this.userIdListLength > 1;
     },
+    /** Whether only a single entry is allowed.
+     * For now, plio does not support multiple input entries */
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
     },
+    /**
+     * Whether the submit button is disabled
+     * Returns true if any of the following conditions are met:
+     * - no SRN has been typed
+     * - input is invalid
+     * - SRN hasn't been completely typed
+     */
     isSubmitButtonDisabled() {
-      //submit button is disabled if no SRN has been typed or input is invalid or SRN hasn't been completely typed
       return (
         !this.isAnyUserIDPresent ||
         this.invalidInputMessage != "" ||
         this.isCurrentEntryIncomplete
       );
     },
+    /**
+     * Checks if "+" button should be displayed. Will be activated only if:
+     * - multiple entries are allowed
+     * - if current input entry is complete
+     * - if cap of maximum entries hasn't been reached yet
+     */
     isAddButtonAllowed() {
-      //if multiple SRN's are allowed, then this helps with the activation of the + button, to add more SRN's
       return (
         !this.isSingleEntryOnly &&
         !this.isCurrentEntryIncomplete &&
         this.userIdListLength < numberOfSRNsAllowed
       );
     },
+    /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.getLatestEntry["userID"].length < this.maxLengthOfSRN;
+      return this.latestEntry["userID"].length < this.maxLengthOfSRN;
     },
-    getLatestEntry() {
+    /** Returns the most recently entered input */
+    latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
   },
   methods: {
+    /** Determines how the input box should look.
+     * @param {Number} index - index of the input box
+     */
     calculateInputboxStyleClasses(index) {
       return [
         {
@@ -164,64 +181,78 @@ export default {
         },
       ];
     },
+    /** Checks to see if the input character is a number. Makes use of ASCII values.
+     * @param {Object} e - event triggered when a character is typed
+     */
     isValidNumericEntry(e) {
-      //checking to see if each char typed by user is only a number
       if (e.keyCode >= 48 && e.keyCode <= 57) return true;
       else e.preventDefault();
     },
+    /** Adds a new object to the userIDList array */
     addNewEmptyField() {
       this.userIDList.push({ userID: "", valid: false });
     },
+    /** Removes an element in the array at a given index.
+     * @param {Number} index - the index of the input box where "-" button is clicked
+     */
     removeInputField(index) {
       this.userIDList.splice(index, 1);
     },
+    /** Resets the invalid input message */
     resetInvalidInputMessage() {
       this.invalidInputMessage = "";
     },
+    /** Resets the invalid login message */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
     },
+    /** Sets the temp valid flag to false (default) for authentication of a possible next user */
     resetValidFlag() {
-      this.isUserValid = false;
+      this.isCurrentUserValid = false;
     },
+    /** Sets the valid key of the latest user to the value of the temp flag. The temp flag contains the value returned by the backend */
     setValidFlag() {
-      this.getLatestEntry["valid"] = this.isUserValid;
+      this.latestEntry["valid"] = this.isCurrentUserValid;
     },
-    //resets input field at an index
-    resetEntry(index){
-        this.userIDList[index]["userID"] = "";
+    /** Resets the userID key of an element in the array at a particular index */
+    resetEntry(index) {
+      this.userIDList[index]["userID"] = "";
     },
+    /** This function is called whenever the "+" button is clicked.
+     * Authenticates the most recent typed entry against the database.
+     */
     async addField() {
-      //for adding another field, the previously entered ID is validated against the database
-      const latestUserID = parseInt(this.getLatestEntry["userID"]);
+      const latestUserID = parseInt(this.latestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
-        if(!this.isUserValid && this.validateCount == 1){
+        if (!this.isCurrentUserValid && this.validateCount == 1) {
           this.handleIncorrectEntry(latestUserID);
         }
-        //only if the SRN is valid or if the user is entering a SRN for the second time,the loop is entered
-        if (this.isUserValid || this.validateCount > 1) {
-          //setting the flag of the SRN
+        if (this.isCurrentUserValid || this.validateCount > 1) {
           this.setValidFlag();
           this.addNewEmptyField();
-          //resetting flags to default for processing next SRN
-          this.resetValidFlag;
+          this.resetValidFlag();
           this.validateCount = 0;
         }
       }
     },
+    /** This method is called whenever "-" button is clicked.
+     * Removes the selected entry from the entry list and resets appropriate variables
+     * @param {Number} index - index of input field to be removed
+     */
     removeField(index) {
-      //resetting all messages to default before deleting the input field
-      this.resetInvalidInputMessage;
-      this.resetInvalidLoginMessage;
-      //edge case: user enters an invalid SRN. Error message is displayed. The user is given another chance. User adds another input field but decided to remove it.
-      // At this point, the variables are reset. So the previously entered SRN is checked again, which should not happen. so setting this validateCount = 2 will bypass this.
-      //Will not affect any other case. The user can either submit or decide to add another field again.
+      this.resetInvalidInputMessage();
+      this.resetInvalidLoginMessage();
       this.validateCount = 2;
       this.removeInputField(index);
     },
+
+    /** This function is called whenever something is entered in the input box.
+     * It checks if the required number of characters are being typed.
+     * @param {Object} event - the event which triggered this function
+     * @param {Number} index - the index of the input field
+     */
     updateValue(event, index) {
-      //checks if the 10 characters are entered
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
       } else if (event.target.value.length < this.maxLengthOfSRN) {
@@ -230,70 +261,59 @@ export default {
       } else {
         this.resetInvalidInputMessage();
       }
-      //if more than 10 characters are entered, slicing the input to only 10
-      // index tells us which input field is being considered
       if (event.target.value.length > this.maxLengthOfSRN) {
         event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
         this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
-    //incorrect entry the first time
-    handleIncorrectEntry(userID){
-        var purposeParams = "incorrect-entry"
-        var tempUserIDList = [{userID: userID.toString(), valid: this.isUserValid}]
-        sendSQSMessage(
-            this.purpose,
-            purposeParams,
-            this.redirectTo,
-            this.redirectID,
-            tempUserIDList,
-            authType
-          );
+    /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
+     * @param {String} userID - ID of the incorrect entry field
+     */
+    handleIncorrectEntry(userID) {
+      var purposeParams = "incorrect-entry";
+      var tempUserIDList = [
+        { userID: userID.toString(), valid: this.isCurrentUserValid },
+      ];
+      sendSQSMessage(
+        this.purpose,
+        purposeParams,
+        this.redirectTo,
+        this.redirectID,
+        tempUserIDList,
+        authType
+      );
     },
-    //method that authentiates the SRN
+
+    /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
+     * @param {String} userID - most recent ID
+     */
     async authenticateSRN(userID) {
       this.isLoading = true;
-      //invokes the validation function
-      let userValidationResponse = await validateSRN(
-        userID,
-        this.validateCount,
-        this.isSingleEntryOnly,
-        this.redirectID,
-        this.isUserValid,
-        this.purpose,
-        this.purposeParams,
-        this.redirectTo
-      );
-      this.isUserValid = userValidationResponse.isUserValid;
+      let userValidationResponse = await validateSRN(userID, this.validateCount);
+      this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
       this.isLoading = false;
-      //clear the input field if entry is incorrect
-      if(this.invalidLoginMessage != ""){
-        this.resetEntry(this.userIdListLength - 1)
+
+      if (this.invalidLoginMessage != "") {
+        this.resetEntry(this.userIdListLength - 1);
       }
-      
-
-      
     },
-    //method called after clicking the submit button
-    async processForm() {
-   
 
-      //all previously typed SRN's will be authenticated through the addField method.
-      // The last SRN will be authenticated after Submit button is clicked
-      // (will work even for single entry as the first entry can be also considered as the last entry)
-      let latestUserID = parseInt(this.getLatestEntry["userID"]);
+    /** Authenticates the last entry typed before the submit button is clicked.
+     * Also, redirects user to the destination and sends a SQS message.
+     */
+    async processForm() {
+      let latestUserID = parseInt(this.latestEntry["userID"]);
       if (!isNaN(latestUserID)) {
         await this.authenticateSRN(latestUserID);
-        if(!this.isUserValid && this.validateCount == 1){
-        this.handleIncorrectEntry(latestUserID);
+        if (!this.isCurrentUserValid && this.validateCount == 1) {
+          this.handleIncorrectEntry(latestUserID);
         }
         this.setValidFlag();
       }
 
-      // either the user is valid or the user has been checked twice
-      if (this.isUserValid || this.validateCount > 1) {
+      if (this.isCurrentUserValid || this.validateCount > 1) {
         if (
           redirectToDestination(
             this.purposeParams,

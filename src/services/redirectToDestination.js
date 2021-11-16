@@ -1,5 +1,12 @@
 import { sendSQSMessage } from "@/services/API/sqs";
-//expects purposeParams, based on the value redirects to respective destination
+
+/** This is function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built. 
+* @param {String} purposeparams - extracted from auth layer URL
+* @param {Array} userIDList - list of userID's wanting to go through the layer 
+* @param {String} redirectID - extracted from auth layer URL
+* @param {String} redirectTo - extracted from auth layer URL
+* @param {String} authType - extracted from auth layer URL 
+*/
 
 export function redirectToDestination(purposeParams, userIDList, redirectID, redirectTo, authType){
     var redirectURL = "";
@@ -8,10 +15,8 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
     switch(redirectTo){
         case 'plio':    
             var userID = userIDList[0]["userID"]
-            //constructs the URL based on the redirectTo param
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-            var url = new URL(redirectURL + redirectID); //adds plioID to the base plio link
-            //adds params; api key and student SRN
+            var url = new URL(redirectURL + redirectID); 
             var queryparams = new URLSearchParams({
                                 api_key: process.env.VUE_APP_AF_API_KEY,
                                 unique_id: userID,
@@ -20,10 +25,8 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             break;
 
         case 'meet':
-            //constructs the URL based on the redirectTo param
-            
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
-            fullurl = new URL(redirectURL + redirectID); //adds meetID to the base plio link
+            fullurl = new URL(redirectURL + redirectID);
             break;
         
         case 'zoom':
@@ -31,7 +34,6 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             break;
             
         default:
-            //if destination is invalid, then send an error log into SQS.
             var purpose = 'Error'
             sendSQSMessage(
                 purpose,

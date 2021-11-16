@@ -147,7 +147,7 @@ export default {
       );
     },
     /**
-     * Checks if + button should be displayed. Will be activated only if:
+     * Checks if "+" button should be displayed. Will be activated only if:
      * - multiple entries are allowed
      * - if current input entry is complete
      * - if cap of maximum entries hasn't been reached yet
@@ -218,7 +218,7 @@ export default {
     resetEntry(index) {
       this.userIDList[index]["userID"] = "";
     },
-    /** This function is called whenever the "+"" button is clicked.
+    /** This function is called whenever the "+" button is clicked.
      * Authenticates the most recent typed entry against the database.
      */
     async addField() {

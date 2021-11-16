@@ -231,18 +231,18 @@ export default {
         if (this.isCurrentUserValid || this.validateCount > 1) {
           this.setValidFlag();
           this.addNewEmptyField();
-          this.resetValidFlag;
+          this.resetValidFlag();
           this.validateCount = 0;
         }
       }
     },
-    /** This method is called whenever - button is clicked.
+    /** This method is called whenever "-" button is clicked.
      * Removes the selected entry from the entry list and resets appropriate variables
      * @param {Number} index - index of input field to be removed
      */
     removeField(index) {
-      this.resetInvalidInputMessage;
-      this.resetInvalidLoginMessage;
+      this.resetInvalidInputMessage();
+      this.resetInvalidLoginMessage();
       this.validateCount = 2;
       this.removeInputField(index);
     },
@@ -284,7 +284,7 @@ export default {
       );
     },
 
-    /** This method is called whenever + button is clicked. It authenticates the most recent typed ID.
+    /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
     async authenticateSRN(userID) {

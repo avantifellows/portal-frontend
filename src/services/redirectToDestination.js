@@ -12,7 +12,7 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
     var redirectURL = "";
     var fullurl = "";
     
-    switch(purposeParams){
+    switch(redirectTo){
         case 'plio':    
             var userID = userIDList[0]["userID"]
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
@@ -24,11 +24,15 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             fullurl = url + "?" + queryparams;
             break;
 
-        case 'liveclass':           
+        case 'meet':
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
             fullurl = new URL(redirectURL + redirectID);
             break;
         
+        case 'zoom':
+            fullurl = redirectID
+            break;
+            
         default:
             var purpose = 'Error'
             sendSQSMessage(

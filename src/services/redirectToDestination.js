@@ -5,7 +5,7 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
     var redirectURL = "";
     var fullurl = "";
     
-    switch(purposeParams){
+    switch(redirectTo){
         case 'plio':    
             var userID = userIDList[0]["userID"]
             //constructs the URL based on the redirectTo param
@@ -19,13 +19,17 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             fullurl = url + "?" + queryparams;
             break;
 
-        case 'liveclass':
+        case 'meet':
             //constructs the URL based on the redirectTo param
             
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
             fullurl = new URL(redirectURL + redirectID); //adds meetID to the base plio link
             break;
         
+        case 'zoom':
+            fullurl = redirectID
+            break;
+            
         default:
             //if destination is invalid, then send an error log into SQS.
             var purpose = 'Error'

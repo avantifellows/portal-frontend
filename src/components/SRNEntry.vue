@@ -166,6 +166,10 @@ export default {
     latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
+    /** Whether the current typed ID is valid */
+    isInvalidLoginMessageShown() {
+      return !this.isCurrentUserValid && this.validateCount == 1;
+    },
   },
   methods: {
     /** Determines how the input box should look.

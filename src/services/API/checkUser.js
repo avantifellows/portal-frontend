@@ -2,10 +2,12 @@ import {client} from "@/services/API/rootClient.js"
 import { checkUserEndpoint } from "@/services/API/endpoints.js";
 
 export default {
-    //checks if the user exists in the database or not
+    /**
+      * Validates that the ID exists
+      * @param {String} inputUserID - the id that needs to be validated
+      */
     checkUserExists(inputUserID)
     {
-        //sending the entered userID to firebase for checking
         const params = {
             userID : inputUserID
         }

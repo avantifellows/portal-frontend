@@ -5,5 +5,5 @@ const headers = {
     'Content-Type': 'application/json',
   }
 
-//the base URL is the deployed cloud function URL
+/** the base URL is the deployed cloud function URL */
 export const client = axios.create({baseURL: 'https://us-central1-avantifellows.cloudfunctions.net'}, headers)

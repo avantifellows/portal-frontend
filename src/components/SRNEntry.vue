@@ -103,7 +103,7 @@ export default {
   },
   data() {
     return {
-      userIDList: [{ userID: "", valid: false }], //array containing user-id's and a valid flag for each
+      userIDList: [{ userID: "", valid: false }], //array containing user-ids and a valid flag for each
       invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
       maxLengthOfSRN: 10,

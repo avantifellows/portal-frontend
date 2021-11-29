@@ -22,7 +22,7 @@
       class="flex flex-row justify-center"
       v-for="(input, index) in userIDList"
       :key="`IDInput-${index}`"
-      :class="{ 'pl-12': ifUserEnteredMoreThanOne }"
+      :class="{ 'pl-12': hasUserEnteredMoreThanOne }"
     >
       <div>
         <input
@@ -34,13 +34,13 @@
           required
           @keypress="isValidNumericEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
-          :class="calculateInputboxStyleClasses(index)"
-          @input="updateValue($event, index)"
+          :class="calculateInputClasses(index)"
+          @input="updateUserId($event, index)"
         />
       </div>
 
-      <div class="my-auto px-3" v-show="ifUserEnteredMoreThanOne">
-        <button @click="removeField(index, userIDList)">
+      <div class="my-auto px-3" v-show="hasUserEnteredMoreThanOne">
+        <button @click="deleteInputBox(index, userIDList)">
           <inline-svg
             class="fill-current text-red-600 h-8 w-8"
             :src="require('@/assets/images/remove_circle.svg')"
@@ -50,7 +50,7 @@
     </div>
 
     <!-- invalid input and login message  -->
-    <span class="mx-auto text-red-700 text-base mb-1" v-if="invalidInputMessage">{{
+    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidInputMessageShown">{{
       invalidInputMessage
     }}</span>
     <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
@@ -76,7 +76,7 @@
     </div>
     <!-- submit button -->
     <button
-      @click="processForm"
+      @click="authenticate"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
@@ -90,7 +90,7 @@ import { validateSRN } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 
-const numberOfSRNsAllowed = 10;
+const NUMBER_OF_INPUTS_ALLOWED = 10;
 const authType = "SRN";
 
 export default {
@@ -107,27 +107,27 @@ export default {
       invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
       maxLengthOfSRN: 10,
-      validateCount: 0, //this variable tells us how many times the user has been validated.
+      validateCount: 0, // count the number of times the user has been validated
       invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
       isLoading: false,
     };
   },
   computed: {
     /** Returns length of the list of user IDs */
-    userIdListLength() {
+    numOfUserIds() {
       return this.userIDList.length;
     },
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
         this.userIDList != undefined &&
-        this.userIdListLength > 0 &&
+        this.numOfUserIds > 0 &&
         this.userIDList[0]["userID"] != ""
       );
     },
     /** Whether multiple entries have been made by the user */
-    ifUserEnteredMoreThanOne() {
-      return !this.isSingleEntryOnly && this.userIdListLength > 1;
+    hasUserEnteredMoreThanOne() {
+      return !this.isSingleEntryOnly && this.numOfUserIds > 1;
     },
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
@@ -158,7 +158,7 @@ export default {
       return (
         !this.isSingleEntryOnly &&
         !this.isCurrentEntryIncomplete &&
-        this.userIdListLength < numberOfSRNsAllowed
+        this.numOfUserIds < NUMBER_OF_INPUTS_ALLOWED
       );
     },
     /** Checks if the current input entry has the required number of characters */
@@ -173,17 +173,21 @@ export default {
     isInvalidLoginMessageShown() {
       return !this.isCurrentUserValid && this.validateCount == 1;
     },
+    /** Whether input being typed is in the correct format */
+    isInvalidInputMessageShown() {
+      return this.invalidInputMessage == null;
+    },
   },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box
      */
-    calculateInputboxStyleClasses(index) {
+    calculateInputClasses(index) {
       return [
         {
           "border-red-600 focus:border-red-600":
-            this.invalidInputMessage && index == this.userIdListLength - 1,
-          "pointer-events-none opacity-30": index < this.userIdListLength - 1,
+            this.invalidInputMessage && index == this.numOfUserIds - 1,
+          "pointer-events-none opacity-30": index < this.numOfUserIds - 1,
         },
       ];
     },
@@ -244,7 +248,7 @@ export default {
      * Removes the selected entry from the entry list and resets appropriate variables
      * @param {Number} index - index of input field to be removed
      */
-    removeField(index) {
+    deleteInputBox(index) {
       this.resetInvalidInputMessage();
       this.resetInvalidLoginMessage();
       this.validateCount = 2;
@@ -256,7 +260,7 @@ export default {
      * @param {Object} event - the event which triggered this function
      * @param {Number} index - the index of the input field
      */
-    updateValue(event, index) {
+    updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
       } else if (event.target.value.length < this.maxLengthOfSRN) {
@@ -300,14 +304,14 @@ export default {
       this.isLoading = false;
 
       if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.userIdListLength - 1);
+        this.resetEntry(this.numOfUserIds - 1);
       }
     },
 
     /** Authenticates the last entry typed before the submit button is clicked.
      * Also, redirects user to the destination and sends a SQS message.
      */
-    async processForm() {
+    async authenticate() {
       let latestUserID = parseInt(this.latestEntry["userID"]);
       await this.authenticateSRN(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {

@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomePage from "@/pages/Homepage.vue";
+import Home from "@/pages/Home.vue";
 
 const routes = [
     {
         path: "/",
-        name:"Homepage",
-        component: HomePage,
+        name:"Home",
+        component: Home,
         props: (route) => ({
           purpose: route.query.purpose,
           purposeParams: route.query.subPurpose,

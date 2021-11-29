@@ -2,9 +2,10 @@
   <!-- loading spinner -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <inline-svg class="text-black text-4xl m-auto animate-spin h-20 w-20"
-          :src="require('@/assets/images/loading_spinner.svg')"></inline-svg>
-    
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="require('@/assets/images/loading_spinner.svg')"
+      ></inline-svg>
     </div>
   </div>
   <!-- main div -->
@@ -39,11 +40,11 @@
       </div>
 
       <div class="my-auto px-3" v-show="ifUserEnteredMoreThanOne">
-        <button
-          @click="removeField(index, userIDList)"
-        >
-          <inline-svg class="fill-current text-red-600 h-8 w-8"
-          :src="require('@/assets/images/remove_circle.svg')"></inline-svg>
+        <button @click="removeField(index, userIDList)">
+          <inline-svg
+            class="fill-current text-red-600 h-8 w-8"
+            :src="require('@/assets/images/remove_circle.svg')"
+          ></inline-svg>
         </button>
       </div>
     </div>
@@ -61,8 +62,10 @@
         @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
       >
-       <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1"
-          :src="require('@/assets/images/add_circle.svg')"></inline-svg>
+        <inline-svg
+          class="fill-current text-green-600 h-10 w-10 pr-1"
+          :src="require('@/assets/images/add_circle.svg')"
+        ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             Add another SRN <br />
@@ -185,11 +188,11 @@ export default {
       ];
     },
     /** Checks to see if the input character is a number. Makes use of ASCII values.
-     * @param {Object} e - event triggered when a character is typed
+     * @param {Object} event - event triggered when a character is typed
      */
-    isValidNumericEntry(e) {
-      if (e.keyCode >= 48 && e.keyCode <= 57) return true;
-      else e.preventDefault();
+    isValidNumericEntry(event) {
+      if (event.keyCode >= 48 && event.keyCode <= 57) return true;
+      else event.preventDefault();
     },
     /** Adds a new object to the userIDList array */
     addNewEmptyField() {
@@ -226,17 +229,15 @@ export default {
      */
     async addField() {
       const latestUserID = parseInt(this.latestEntry["userID"]);
-      if (!isNaN(latestUserID)) {
-        await this.authenticateSRN(latestUserID);
-        if (!this.isCurrentUserValid && this.validateCount == 1) {
-          this.handleIncorrectEntry(latestUserID);
-        }
-        if (this.isCurrentUserValid || this.validateCount > 1) {
-          this.setValidFlag();
-          this.addNewEmptyField();
-          this.resetValidFlag();
-          this.validateCount = 0;
-        }
+      await this.authenticateSRN(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 1) {
+        this.handleIncorrectEntry(latestUserID);
+      }
+      if (this.isCurrentUserValid || this.validateCount > 1) {
+        this.setValidFlag();
+        this.addNewEmptyField();
+        this.resetValidFlag();
+        this.validateCount = 0;
       }
     },
     /** This method is called whenever "-" button is clicked.
@@ -308,13 +309,11 @@ export default {
      */
     async processForm() {
       let latestUserID = parseInt(this.latestEntry["userID"]);
-      if (!isNaN(latestUserID)) {
-        await this.authenticateSRN(latestUserID);
-        if (!this.isCurrentUserValid && this.validateCount == 1) {
-          this.handleIncorrectEntry(latestUserID);
-        }
-        this.setValidFlag();
+      await this.authenticateSRN(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 1) {
+        this.handleIncorrectEntry(latestUserID);
       }
+      this.setValidFlag();
 
       if (this.isCurrentUserValid || this.validateCount > 1) {
         if (

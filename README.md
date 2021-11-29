@@ -5,8 +5,8 @@
 This layer is being built to authenticate, authorize and keep track of the students who will use Avanti Fellows resources or any external resource.
 This repo contains code for the frontend of the layer written in VueJS.
 
-# Installation
+## Installation
 To set up this project, visit the [installation steps](docs/INSTALLATION.md).
 
-# Deployment
+## Deployment
 Visit our [deployment guideline](docs/DEPLOYMENT.md) for setting up this repository on a production environment.

@@ -1,7 +1,7 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
-const REGION = "ap-south-1";
-const QUEUEURL = "https://sqs.ap-south-1.amazonaws.com/111766607077/EventQueue";
+const REGION = process.env.VUE_APP_AWS_REGION;
+const QUEUEURL = process.env.VUE_APP_AWS_SQS_URL;
 const sqsClient = new SQSClient({
   region: REGION,
   credentials: {
@@ -10,7 +10,7 @@ const sqsClient = new SQSClient({
   },
 });
 
-/** This function is used to send an SQS message to the queue on AWS. 
+/** This function is used to send an SQS message to the queue on AWS.
 * @param {String} purpose
 * @param {String} purposeParams
 * @param {String} redirectTo

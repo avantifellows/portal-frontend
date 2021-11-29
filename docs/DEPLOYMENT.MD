@@ -1,11 +1,10 @@
 # DEPLOYMENT
 This document covers steps on setting up this repository on various cloud hosting providers.
 
-# AWS
-
-# Staging
+## AWS
+### Staging
 1. Login to your aws console.
-2. Create a S3 bucket and uncheck `Block all plublic access`.
+2. Create a S3 bucket and uncheck `Block all public access`.
 3. Enable static website hosting and note down the bucket endpoint. We'll use it to set up a Cloudfront distribution later.
 4. In Cloudfront, create a distribution with the S3 origin, created in the step above.
 5. If you choose to set up a SSL, do so at this step.
@@ -17,5 +16,5 @@ This document covers steps on setting up this repository on various cloud hostin
      ```
 8. To deploy your code on to staging, use `npm run deploy-staging/yarn deploy-staging`.
 
-# Production
+### Production
 Setting up a production environment on AWS is same as staging.

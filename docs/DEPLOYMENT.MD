@@ -17,4 +17,4 @@ This document covers steps on setting up this repository on various cloud hostin
 8. To deploy your code on to staging, use `npm run deploy-staging/yarn deploy-staging`.
 
 ### Production
-Setting up a production environment on AWS is same as staging.
+Setting up a production environment on AWS is the same as setting up a staging environment.

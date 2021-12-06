@@ -40,7 +40,7 @@ export default {
     },
   },
   computed: {
-    isSingleEntryOnly() {
+    isMultipleIDEntryAllowedEntryOnly() {
       return this.redirectTo == "plio";
     },
   },

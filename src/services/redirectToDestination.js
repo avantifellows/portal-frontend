@@ -18,7 +18,7 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
             var url = new URL(redirectURL + redirectID);
             var queryparams = new URLSearchParams({
-                                api_key: process.env.VUE_APP_AF_API_KEY,
+                                api_key: process.env.VUE_APP_API_KEY,
                                 unique_id: userID,
                                 });
             fullurl = url + "?" + queryparams;

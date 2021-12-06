@@ -21,7 +21,7 @@
     <div
       class="flex flex-row justify-center"
       v-for="(input, index) in userIDList"
-      :key="`IDInput-${index}`"
+      :key="`idInput-${index}`"
       :class="{ 'pl-12': hasUserEnteredMoreThanOne }"
     >
       <div>
@@ -127,11 +127,11 @@ export default {
     },
     /** Whether multiple entries have been made by the user */
     hasUserEnteredMoreThanOne() {
-      return !this.isSingleEntryOnly && this.numOfUserIds > 1;
+      return !this.isMultipleIDEntryAllowedEntryOnly && this.numOfUserIds > 1;
     },
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
-    isSingleEntryOnly() {
+    isMultipleIDEntryAllowedEntryOnly() {
       return this.redirectTo == "plio";
     },
     /**
@@ -156,7 +156,7 @@ export default {
      */
     isAddButtonAllowed() {
       return (
-        !this.isSingleEntryOnly &&
+        !this.isMultipleIDEntryAllowedEntryOnly &&
         !this.isCurrentEntryIncomplete &&
         this.numOfUserIds < NUMBER_OF_INPUTS_ALLOWED
       );

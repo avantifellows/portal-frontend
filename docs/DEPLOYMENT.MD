@@ -18,3 +18,5 @@ This document covers steps on setting up this repository on various cloud hostin
 
 ### Production
 Setting up a production environment on AWS is the same as setting up a staging environment.
+
+**Make sure to setup `.env.staging` for staging environment and `.env.production` for production environment.**

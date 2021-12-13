@@ -175,7 +175,7 @@ export default {
     },
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
-      return this.invalidInputMessage == null;
+      return this.invalidInputMessage != null;
     },
   },
   methods: {

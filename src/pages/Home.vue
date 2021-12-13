@@ -19,22 +19,22 @@ export default {
   },
   props: {
     redirectTo: {
-      //the resource we are redirecting to. Eg. redirectTo=plio tells us that we are redirecting to a plio.
+      /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
       default: "",
       type: String,
     },
     redirectID: {
-      //ID of the resource. Eg. the plioID
+      /** ID of the resource. Eg. the plioID */
       default: "",
       type: String,
     },
     purpose: {
-      //general category of why the data is being captured. Eg: attendance
+      /** General category of why the data is being captured. Eg: attendance */
       default: "",
       type: String,
     },
     purposeParams: {
-      //subcategory of the purpose. Eg: plio -> means the attendance is for a plio link
+      /** Subcategory of the purpose. Eg: plio -> means the attendance is for a plio link */
       default: "",
       type: String,
     },

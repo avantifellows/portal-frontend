@@ -15,8 +15,7 @@ export default {
             client.post(checkUserEndpoint, JSON.stringify(params)).then((response) => {
                 resolve(response.data)
             })
-            
+
         })
     }
-} 
-            
+}

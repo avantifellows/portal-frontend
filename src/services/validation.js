@@ -7,7 +7,7 @@ import firebaseAPI from "@/services/API/checkUser.js";
 */
 
 export async function validateSRN(userID, validateCount){
-    var invalidLoginMessage = ""
+    let invalidLoginMessage = ""
 
     let isCurrentUserValid = await firebaseAPI.checkUserExists(userID);
     if(isCurrentUserValid){

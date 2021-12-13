@@ -9,28 +9,28 @@ import { sendSQSMessage } from "@/services/API/sqs";
 */
 
 export function redirectToDestination(purposeParams, userIDList, redirectID, redirectTo, authType){
-    var redirectURL = "";
-    var fullurl = "";
+    let redirectURL = "";
+    let fullURL = "";
 
     switch(redirectTo){
         case 'plio':
             var userID = userIDList[0]["userID"]
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
             var url = new URL(redirectURL + redirectID);
-            var queryparams = new URLSearchParams({
+            var queryParams = new URLSearchParams({
                                 api_key: process.env.VUE_APP_API_KEY,
                                 unique_id: userID,
                                 });
-            fullurl = url + "?" + queryparams;
+            fullURL = url + "?" + queryParams;
             break;
 
         case 'meet':
             redirectURL = process.env.VUE_APP_BASE_URL_MEET;
-            fullurl = new URL(redirectURL + redirectID);
+            fullURL = new URL(redirectURL + redirectID);
             break;
 
         case 'zoom':
-            fullurl = redirectID
+            fullURL = redirectID
             break;
 
         default:
@@ -46,6 +46,6 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             return false
         }
 
-    window.open(fullurl, "_self");
+    window.open(fullURL, "_self");
     return true
 }

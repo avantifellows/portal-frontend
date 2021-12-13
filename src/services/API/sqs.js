@@ -51,7 +51,3 @@ export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirec
       console.log("Error", err);
     }
   }
-
-
-
-

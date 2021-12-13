@@ -278,8 +278,8 @@ export default {
      * @param {String} userID - ID of the incorrect entry field
      */
     handleIncorrectEntry(userID) {
-      var purposeParams = "incorrect-entry";
-      var tempUserIDList = [
+      let purposeParams = "incorrect-entry";
+      let tempUserIDList = [
         { userID: userID.toString(), valid: this.isCurrentUserValid },
       ];
       sendSQSMessage(

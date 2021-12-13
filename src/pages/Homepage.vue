@@ -11,10 +11,10 @@
 
 <script>
 import SRNEntry from "@/components/SRNEntry.vue";
-
-/* Have a variable isSingleEntryOnly that will help toggle between divs, one that will disable the entry of more 
+import firebaseAPI from "@/services/API/getProgramData.js";
+/* Have a variable isSingleEntryOnly that will help toggle between divs, one that will disable the entry of more
 than one SRN. Can be seen used also in SRNEntry.vue.
-This is because the redirect link is one plio link and it takes a singular param of studentID. 
+This is because the redirect link is one plio link and it takes a singular param of studentID.
 Maybe in the future could come up with a hack. For now, isSingleEntryOnly is set to true, hence only one SRN can be entered.
   Also, the dropdown feature is disabled for now. */
 
@@ -48,6 +48,15 @@ export default {
   computed: {
     isSingleEntryOnly() {
       return this.redirectTo == "plio";
+    },
+    getProgramData() {
+      return this.getProgramInfo();
+    },
+  },
+  methods: {
+    getProgramInfo() {
+      var programData = firebaseAPI.getProgramData();
+      console.log(programData);
     },
   },
 };

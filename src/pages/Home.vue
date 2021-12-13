@@ -11,6 +11,7 @@
 
 <script>
 import SRNEntry from "@/components/SRNEntry.vue";
+import firebaseAPI from "@/services/API/getProgramData.js";
 
 export default {
   name: "Home",
@@ -42,6 +43,15 @@ export default {
   computed: {
     isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
+    },
+    getProgramData() {
+      return this.getProgramInfo();
+    },
+  },
+  methods: {
+    getProgramInfo() {
+      var programData = firebaseAPI.getProgramData();
+      console.log(programData);
     },
   },
 };

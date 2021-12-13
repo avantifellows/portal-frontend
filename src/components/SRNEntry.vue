@@ -127,11 +127,11 @@ export default {
     },
     /** Whether multiple entries have been made by the user */
     hasUserEnteredMoreThanOne() {
-      return !this.isMultipleIDEntryAllowedEntryOnly && this.numOfUserIds > 1;
+      return !this.isMultipleIDEntryAllowed && this.numOfUserIds > 1;
     },
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
-    isMultipleIDEntryAllowedEntryOnly() {
+    isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
     },
     /**
@@ -156,7 +156,7 @@ export default {
      */
     isAddButtonAllowed() {
       return (
-        !this.isMultipleIDEntryAllowedEntryOnly &&
+        !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
         this.numOfUserIds < NUMBER_OF_INPUTS_ALLOWED
       );

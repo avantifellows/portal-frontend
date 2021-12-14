@@ -6,9 +6,9 @@ import firebaseAPI from "@/services/API/checkUser.js";
 * @param {Number} validateCount - indicates how many times the user has been validated
 */
 
-export async function validateSRN(userID, validateCount, documentName, columnName){
+export async function validateSRN(userID, validateCount, collectionName, columnName){
 
-    let isCurrentUserValid = await firebaseAPI.checkUserExists(userID, documentName, columnName);
+    let isCurrentUserValid = await firebaseAPI.checkUserExists(userID, collectionName, columnName);
     if(isCurrentUserValid){
         return {
             isCurrentUserValid: isCurrentUserValid,

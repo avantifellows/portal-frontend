@@ -10,7 +10,7 @@ export default {
     {
 
         const params = {
-            program : programName + "_en"
+            program : programName
         }
         return new Promise( (resolve) => {
             client.post(getProgramDataEndpoint, JSON.stringify(params)).then((response) => {

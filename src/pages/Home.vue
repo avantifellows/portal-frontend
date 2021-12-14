@@ -89,7 +89,7 @@ export default {
     /** Program name is sent to the API to retrieve all details */
     var programData = await firebaseAPI.getProgramData(this.program);
 
-    let textObject = programData["text"];
+    let textObject = programData["text"]["default"];
     this.textObject["placeholderText"] = textObject["placeholder"];
     this.textObject["displayText"] = textObject["display"];
     this.textObject["addButtonText"] = textObject["addButton"];

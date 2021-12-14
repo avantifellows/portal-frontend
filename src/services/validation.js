@@ -7,20 +7,17 @@ import firebaseAPI from "@/services/API/checkUser.js";
 */
 
 export async function validateSRN(userID, validateCount){
-    let invalidLoginMessage = ""
 
     let isCurrentUserValid = await firebaseAPI.checkUserExists(userID);
     if(isCurrentUserValid){
         return {
             isCurrentUserValid: isCurrentUserValid,
             validateCount: validateCount,
-            invalidLoginMessage: invalidLoginMessage
             }
         }
 
     if (validateCount == 0) {
         validateCount += 1;
-        invalidLoginMessage = "Please enter correct SRN / कृपया सही SRN दर्ज करें";
     }
 
     else if(validateCount == 1){
@@ -29,6 +26,5 @@ export async function validateSRN(userID, validateCount){
     return {
         isCurrentUserValid: isCurrentUserValid,
         validateCount: validateCount,
-        invalidLoginMessage: invalidLoginMessage
     }
 }

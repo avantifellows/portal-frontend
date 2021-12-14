@@ -15,7 +15,7 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      Enter your SRN / अपना SRN दर्ज करें
+      {{ this.textObject["displayText"] }}
     </p>
     <!-- input options and delete options icon -->
     <div
@@ -30,7 +30,7 @@
           type="tel"
           inputmode="numeric"
           pattern="[0-9]*"
-          placeholder="Your SRN / आपका SRN"
+          :placeholder="placeholderText"
           required
           @keypress="isValidNumericEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
@@ -68,8 +68,7 @@
         ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
-            Add another SRN <br />
-            एक और SRN दर्ज करें
+            {{ this.textObject["addButtonText"] }}
           </p>
         </div>
       </button>
@@ -80,7 +79,7 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
-      SUBMIT / जमा करें
+      {{ this.textObject["submitButtonText"] }}
     </button>
   </div>
 </template>
@@ -90,29 +89,36 @@ import { validateSRN } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 
-const NUMBER_OF_INPUTS_ALLOWED = 10;
 const authType = "SRN";
 
 export default {
-  name: "SRNEntry",
+  name: "IdEntry",
   props: {
     redirectTo: String,
     redirectID: String,
     purpose: String,
     purposeParams: String,
+    textObject: Object,
+    inputObject: Object,
+    dataSourceObject: Object,
+    maxNumberOfInput: Number,
+    program: String,
+    authType: String,
   },
   data() {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-ids and a valid flag for each
       invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
-      maxLengthOfSRN: 10,
       validateCount: 0, // count the number of times the user has been validated
-      invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
+      invalidLoginMessage: this.textObject["invalidLoginMessage"],
       isLoading: false,
     };
   },
   computed: {
+    placeholderText() {
+      return this.textObject["placeholderText"];
+    },
     /** Returns length of the list of user IDs */
     numOfUserIds() {
       return this.userIDList.length;
@@ -158,12 +164,12 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < NUMBER_OF_INPUTS_ALLOWED
+        this.numOfUserIds < this.maxNumberOfInput
       );
     },
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.latestEntry["userID"].length < this.maxLengthOfSRN;
+      return this.latestEntry["userID"].length < this.inputObject["maxLengthOfId"];
     },
     /** Returns the most recently entered input */
     latestEntry() {
@@ -263,14 +269,17 @@ export default {
     updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
-      } else if (event.target.value.length < this.maxLengthOfSRN) {
-        this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
+      } else if (event.target.value.length < this.inputObject["maxLengthOfId"]) {
+        this.invalidInputMessage = this.textObject["invalidInputMessage"];
         this.resetInvalidLoginMessage();
       } else {
         this.resetInvalidInputMessage();
       }
-      if (event.target.value.length > this.maxLengthOfSRN) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
+      if (event.target.value.length > this.inputObject["maxLengthOfId"]) {
+        event.target.value = event.target.value.slice(
+          0,
+          this.inputObject["maxLengthOfId"]
+        );
         this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
@@ -300,9 +309,11 @@ export default {
       let userValidationResponse = await validateSRN(userID, this.validateCount);
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
-      this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
       this.isLoading = false;
 
+      if (this.validateCount == 1) {
+        this.invalidLoginMessage = this.textObject["invalidLoginMessage"];
+      }
       if (this.invalidLoginMessage != "") {
         this.resetEntry(this.numOfUserIds - 1);
       }

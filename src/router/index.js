@@ -10,7 +10,9 @@ const routes = [
           purpose: route.query.purpose,
           purposeParams: route.query.subPurpose,
           redirectTo: route.query.redirectTo,
-          redirectID: route.query.redirectID
+          redirectID: route.query.redirectID,
+          program: route.query.program,
+          authType: route.query.authType
        })
     },
 ]

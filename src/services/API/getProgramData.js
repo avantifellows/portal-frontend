@@ -4,14 +4,14 @@ import { getProgramDataEndpoint } from "@/services/API/endpoints.js";
 export default {
     /**
       * Validates that the ID exists
-      * @param {String} inputUserID - the id that needs to be validated
+      * @param {String} programName - the name of the program whose data needs to be retrieved
       */
-    getProgramData()
+    getProgramData(programName)
     {
+
         const params = {
-            program : "HaryanaStudents_hi"
+            program : programName + "_en"
         }
-        console.log("HERE!")
         return new Promise( (resolve) => {
             client.post(getProgramDataEndpoint, JSON.stringify(params)).then((response) => {
                 resolve(response.data)

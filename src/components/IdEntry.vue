@@ -111,17 +111,20 @@ export default {
       invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
       validateCount: 0, // count the number of times the user has been validated
-      invalidLoginMessage: this.textObject["invalidLoginMessage"],
+      invalidLoginMessage: "",
       isLoading: false,
     };
   },
   computed: {
+    /** Returns the input mode stored against the program */
     inputMode() {
       return this.inputObject["mode"];
     },
+    /** Returns the input type stored against the program */
     inputType() {
       return this.inputObject["type"];
     },
+    /** Returns the placeholder text stored against the program */
     placeholderText() {
       return this.textObject["placeholderText"];
     },
@@ -203,7 +206,7 @@ export default {
         },
       ];
     },
-    /** Checks to see if the input character is a number. Makes use of ASCII values.
+    /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
     isValidEntry(event) {
@@ -254,6 +257,7 @@ export default {
         this.setValidFlag();
         this.addNewEmptyField();
         this.resetValidFlag();
+        this.resetInvalidLoginMessage();
         this.validateCount = 0;
       }
     },
@@ -358,7 +362,8 @@ export default {
             this.redirectTo,
             this.redirectID,
             this.userIDList,
-            authType
+            authType,
+            this.program
           );
         }
       }

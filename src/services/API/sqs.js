@@ -20,7 +20,7 @@ const sqsClient = new SQSClient({
 * Everything, except the userIDList, is extracted from the auth layer URL
 */
 
-export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userIDList, authType) {
+export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirectID, userIDList, authType, programName) {
 
     const messageBody = [
       {
@@ -37,6 +37,7 @@ export async function sendSQSMessage(purpose, purposeParams, redirectTo, redirec
         user: {
           values: userIDList,
         },
+        program: programName
       },
     ];
     const params = {

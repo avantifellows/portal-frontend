@@ -80,11 +80,13 @@ export default {
     };
   },
   computed: {
+    /** Whether multiple ID can be entered */
     isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
     },
   },
   async created() {
+    /** Program name is sent to the API to retrieve all details */
     var programData = await firebaseAPI.getProgramData(this.program);
 
     let textObject = programData["text"];

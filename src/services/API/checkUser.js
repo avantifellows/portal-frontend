@@ -5,6 +5,8 @@ export default {
     /**
       * Validates that the ID exists
       * @param {String} inputUserID - the id that needs to be validated
+      * @param {String} collectionName - firestore collection against which the ID needs to be validated
+      * @param {String} columnName - name of the column which contains the ID
       */
     checkUserExists(inputUserID, collectionName, columnName)
     {

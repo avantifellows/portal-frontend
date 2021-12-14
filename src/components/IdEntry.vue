@@ -56,7 +56,7 @@
     <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
       invalidLoginMessage
     }}</span>
-    <!-- add srn button -->
+    <!-- add button -->
     <div class="my-auto" v-if="isAddButtonAllowed">
       <button
         @click="addField"
@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { validateSRN } from "@/services/validation.js";
+import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { typeToFunctionMap } from "@/services/basicValidationMapping.js";
@@ -152,9 +152,9 @@ export default {
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
-     * - no SRN has been typed
+     * - no ID has been typed
      * - input is invalid
-     * - SRN hasn't been completely typed
+     * - ID hasn't been completely typed
      */
     isSubmitButtonDisabled() {
       return (
@@ -249,7 +249,7 @@ export default {
      */
     async addField() {
       const latestUserID = parseInt(this.latestEntry["userID"]);
-      await this.authenticateSRN(latestUserID);
+      await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
       }
@@ -315,9 +315,9 @@ export default {
     /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
-    async authenticateSRN(userID) {
+    async authenticateID(userID) {
       this.isLoading = true;
-      let userValidationResponse = await validateSRN(
+      let userValidationResponse = await validateID(
         userID,
         this.validateCount,
         this.dataSourceObject["name"],
@@ -340,7 +340,7 @@ export default {
      */
     async authenticate() {
       let latestUserID = parseInt(this.latestEntry["userID"]);
-      await this.authenticateSRN(latestUserID);
+      await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
       }

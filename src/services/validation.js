@@ -8,7 +8,7 @@ import firebaseAPI from "@/services/API/checkUser.js";
 * @param {String} columnName - name of the column which contains the ID
 */
 
-export async function validateSRN(userID, validateCount, collectionName, columnName){
+export async function validateID(userID, validateCount, collectionName, columnName){
     let isCurrentUserValid = await firebaseAPI.checkUserExists(userID, collectionName, columnName);
     if(isCurrentUserValid){
         return {

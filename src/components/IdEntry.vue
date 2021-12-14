@@ -27,12 +27,12 @@
       <div>
         <input
           v-model="input.userID"
-          type="tel"
-          inputmode="numeric"
+          :type="inputType"
+          :inputmode="inputMode"
           pattern="[0-9]*"
           :placeholder="placeholderText"
           required
-          @keypress="isValidNumericEntry($event)"
+          @keypress="isValidEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
           :class="calculateInputClasses(index)"
           @input="updateUserId($event, index)"
@@ -88,7 +88,7 @@
 import { validateSRN } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
-
+import { typeToFunctionMap } from "@/services/basicValidationMapping.js";
 const authType = "SRN";
 
 export default {
@@ -116,6 +116,12 @@ export default {
     };
   },
   computed: {
+    inputMode() {
+      return this.inputObject["mode"];
+    },
+    inputType() {
+      return this.inputObject["type"];
+    },
     placeholderText() {
       return this.textObject["placeholderText"];
     },
@@ -200,9 +206,10 @@ export default {
     /** Checks to see if the input character is a number. Makes use of ASCII values.
      * @param {Object} event - event triggered when a character is typed
      */
-    isValidNumericEntry(event) {
-      if (event.keyCode >= 48 && event.keyCode <= 57) return true;
-      else event.preventDefault();
+    isValidEntry(event) {
+      if (typeToFunctionMap[this.inputObject["basicInputValidationType"]](event)) {
+        return true;
+      } else event.preventDefault();
     },
     /** Adds a new object to the userIDList array */
     addNewEmptyField() {

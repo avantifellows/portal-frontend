@@ -6,10 +6,12 @@ export default {
       * Validates that the ID exists
       * @param {String} inputUserID - the id that needs to be validated
       */
-    checkUserExists(inputUserID)
+    checkUserExists(inputUserID, documentName, columnName)
     {
         const params = {
-            userID : inputUserID
+            userID : inputUserID,
+            documentName: documentName,
+            columnName: columnName
         }
         return new Promise( (resolve) => {
             client.post(checkUserEndpoint, JSON.stringify(params)).then((response) => {

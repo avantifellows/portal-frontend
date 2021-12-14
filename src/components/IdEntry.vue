@@ -313,7 +313,12 @@ export default {
      */
     async authenticateSRN(userID) {
       this.isLoading = true;
-      let userValidationResponse = await validateSRN(userID, this.validateCount);
+      let userValidationResponse = await validateSRN(
+        userID,
+        this.validateCount,
+        this.dataSourceObject["name"],
+        this.dataSourceObject["column"]
+      );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.isLoading = false;

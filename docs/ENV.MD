@@ -16,6 +16,9 @@ AWS secret key for access to AWS SQS.
 ## VUE_APP_BASE_URL_MEET
 Base URL for Google Meet link.
 
+## VUE_APP_BASE_URL_YOUTUBE
+Base URL for YouTube link.
+
 ## VUE_APP_AWS_REGION
 AWS region
 

@@ -1,6 +1,6 @@
 <template>
   <!-- Entry component -->
-  <div v-if="isAuthTypeID">
+  <div v-if="isAuthTypeID && programData">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -56,7 +56,7 @@ export default {
   },
   data() {
     return {
-      programData: {},
+      programData: null,
     };
   },
   computed: {

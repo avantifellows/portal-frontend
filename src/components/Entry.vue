@@ -327,7 +327,8 @@ export default {
         this.validateCount,
         this.programData["dataSource"]["name"],
         this.programData["dataSource"]["column"],
-        this.programData["dataSource"]["type"]
+        this.programData["dataSource"]["type"],
+        this.authType
       );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;

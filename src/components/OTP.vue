@@ -63,10 +63,6 @@
     <span class="mx-auto text-red-700 text-base mb-1" v-if="displayOTPMessage">{{
       displayOTPMessage
     }}</span>
-    <!-- button to request resending OTP -->
-    <div v-if="isOTPRequested && !resentOtp" class="flex flex-row justify-center">
-      <p class="pr-7">{{ programData["text"]["default"]["receiveError"] }}</p>
-    </div>
 
     <!-- submit button -->
     <button
@@ -86,7 +82,10 @@ import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import OTPAuth from "@/services/API/otp";
-
+import {
+  mapVerifyStatusCodeToMessage,
+  mapSendStatusCodeToMessage,
+} from "@/services/OTPCodes.js";
 export default {
   name: "OTP",
   props: {
@@ -105,16 +104,8 @@ export default {
       isOTPRequested: false,
       OTPCode: "",
       isLoading: false,
-      resentOtp: false,
       displayOTPMessage: "",
       invalidInputMessage: null,
-      mapCodeToMessage: {
-        311: "This OTP does not exist",
-        309: "You have exceeded maximum number of attempts. Please try after sometime.",
-        301: "OTP token is expired.",
-        310: "This OTP is incorrect.",
-        308: "You are re-trying too early. Please wait for sometime.",
-      },
     };
   },
 
@@ -215,7 +206,9 @@ export default {
     async requestOTP() {
       const response = await OTPAuth.sendOTP(parseInt(this.userId));
       if (response.status == 200) {
-        this.displayOTPMessage = "OTP sent!";
+        this.displayOTPMessage = this.mapSendStatusCodeToMessage[
+          response.status.toString()
+        ];
       }
       this.isOTPRequested = true;
     },
@@ -224,7 +217,9 @@ export default {
         parseInt(this.userId),
         parseInt(this.OTPCode)
       );
-      this.displayOTPMessage = this.mapCodeToMessage[response.status.toString()];
+      this.displayOTPMessage = this.mapVerifyStatusCodeToMessage[
+        response.status.toString()
+      ];
       if (response.status == 200) {
         this.authenticate();
       }

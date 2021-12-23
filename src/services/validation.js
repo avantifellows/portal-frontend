@@ -8,8 +8,14 @@ import firebaseAPI from "@/services/API/checkUser.js";
 * @param {String} columnName - name of the column which contains the ID
 */
 
-export async function validateID(userID, validateCount, collectionName, columnName){
+async function checkPhoneNumberInFirestore(phoneNumber, collectionName, columnName){
+    return await firebaseAPI.checkUserExists(phoneNumber, collectionName, columnName);
+}
+async function checkUserIdInFirestore(userID, validateCount, collectionName, columnName)
+{
     let isCurrentUserValid = await firebaseAPI.checkUserExists(userID, collectionName, columnName);
+
+
     if(isCurrentUserValid){
         return {
             isCurrentUserValid: isCurrentUserValid,
@@ -28,4 +34,18 @@ export async function validateID(userID, validateCount, collectionName, columnNa
         isCurrentUserValid: isCurrentUserValid,
         validateCount: validateCount,
     }
+
+}
+export async function validateID(userID, validateCount, collectionName, columnName, dataSourceType, authType){
+    if(dataSourceType == "Firestore"){
+        if(authType == "ID")
+    {
+        return checkUserIdInFirestore(userID, validateCount, collectionName, columnName)
+    }
+    else if(authType == "OTP")
+    {
+        return checkPhoneNumberInFirestore(userID, collectionName, columnName)
+    }
+}
+
 }

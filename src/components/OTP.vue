@@ -232,26 +232,16 @@ export default {
     /** This method authenticates the  ID.
      * @param {String} userID - most recent ID
      */
-    async authenticateID() {
+    async authenticatePhoneNumber() {
       this.isLoading = true;
-      let userValidationResponse = await validateID(
+      this.isUserValid = await validateID(
         this.userID,
         this.validateCount,
         this.programData["dataSource"]["name"],
-        this.programData["dataSource"]["column"]
+        this.programData["dataSource"]["column"],
+        this.authType
       );
-      this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
-      this.validateCount = userValidationResponse.validateCount;
       this.isLoading = false;
-
-      if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.programData["text"]["default"]["invalid"][
-          "login"
-        ];
-      }
-      if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.numOfUserIds - 1);
-      }
     },
 
     /** Authenticates the last entry typed before the submit button is clicked.
@@ -261,12 +251,13 @@ export default {
       if (
         redirectToDestination(
           this.purposeParams,
-          this.userIDList,
+          this.userId,
           this.redirectID,
           this.redirectTo,
           this.authType
         )
       ) {
+        this.authenticatePhoneNumber();
         sendSQSMessage(
           this.purpose,
           this.purposeParams,

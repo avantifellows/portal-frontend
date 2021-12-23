@@ -206,9 +206,7 @@ export default {
     async requestOTP() {
       const response = await OTPAuth.sendOTP(parseInt(this.userId));
       if (response.status == 200) {
-        this.displayOTPMessage = this.mapSendStatusCodeToMessage[
-          response.status.toString()
-        ];
+        this.displayOTPMessage = mapSendStatusCodeToMessage[response.status.toString()];
       }
       this.isOTPRequested = true;
     },
@@ -217,9 +215,7 @@ export default {
         parseInt(this.userId),
         parseInt(this.OTPCode)
       );
-      this.displayOTPMessage = this.mapVerifyStatusCodeToMessage[
-        response.status.toString()
-      ];
+      this.displayOTPMessage = mapVerifyStatusCodeToMessage[response.status.toString()];
       if (response.status == 200) {
         this.authenticate();
       }

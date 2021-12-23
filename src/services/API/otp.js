@@ -2,10 +2,10 @@ import {OTPClient} from "@/services/API/rootClient.js"
 import { sendOTPEndpoint, verifyOTPEndpoint } from "@/services/API/endpoints.js";
 
 export default {
-    //checks if the user exists in the database or not
+
+    /** Sends OTP to the phone number */
     sendOTP(phoneNumber)
     {
-        //sending the entered userID to firebase for checking
         const params = {
             phone: phoneNumber
         }
@@ -16,10 +16,9 @@ export default {
 
         })
     },
-     //checks if the user exists in the database or not
+     /*  Verifies OTP entered by user */
      verifyOTP(phoneNumber, OTPCode)
      {
-         //sending the entered userID to firebase for checking
          const params = {
              phone: phoneNumber,
              code: OTPCode

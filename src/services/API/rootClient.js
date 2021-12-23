@@ -7,4 +7,6 @@ const headers = {
 
 /** the base URL is the deployed cloud function URL */
 export const client = axios.create({baseURL: 'https://us-central1-avantifellows.cloudfunctions.net'}, headers)
-export const OTPClient = axios.create({baseURL: 'https://i2y4afje6j.execute-api.ap-south-1.amazonaws.com/dev/'})
+
+/** the base URL is the OTP service URL */
+export const OTPClient = axios.create({baseURL: process.env.VUE_APP_OTP_URL})

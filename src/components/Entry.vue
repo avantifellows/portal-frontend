@@ -15,7 +15,7 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      {{ this.textObject["displayText"] }}
+      {{ programData["text"]["default"]["display"] }}
     </p>
     <!-- input options and delete options icon -->
     <div
@@ -56,7 +56,7 @@
     <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
       invalidLoginMessage
     }}</span>
-    <!-- add button -->
+    <!-- button to add another input -->
     <div class="my-auto" v-if="isAddButtonAllowed">
       <button
         @click="addField"
@@ -68,7 +68,7 @@
         ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
-            {{ this.textObject["addButtonText"] }}
+            {{ programData["text"]["default"]["addButton"] }}
           </p>
         </div>
       </button>
@@ -79,7 +79,7 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
-      {{ this.textObject["submitButtonText"] }}
+      {{ programData["text"]["default"]["submitButton"] }}
     </button>
   </div>
 </template>
@@ -88,45 +88,42 @@
 import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
-import { typeToFunctionMap } from "@/services/basicValidationMapping.js";
-const authType = "SRN";
+import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 
 export default {
-  name: "IdEntry",
+  name: "Entry",
   props: {
     redirectTo: String,
     redirectID: String,
     purpose: String,
     purposeParams: String,
-    textObject: Object,
-    inputObject: Object,
-    dataSourceObject: Object,
-    maxNumberOfInput: Number,
+    programData: Object,
     program: String,
     authType: String,
   },
   data() {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-ids and a valid flag for each
-      invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
       validateCount: 0, // count the number of times the user has been validated
       invalidLoginMessage: "",
       isLoading: false,
+      invalidInputMessage: null,
     };
   },
+
   computed: {
     /** Returns the input mode stored against the program */
     inputMode() {
-      return this.inputObject["mode"];
+      return this.programData["input"]["mode"];
     },
     /** Returns the input type stored against the program */
     inputType() {
-      return this.inputObject["type"];
+      return this.programData["input"]["type"];
     },
     /** Returns the placeholder text stored against the program */
     placeholderText() {
-      return this.textObject["placeholderText"];
+      return this.programData["text"]["default"]["placeholder"];
     },
     /** Returns length of the list of user IDs */
     numOfUserIds() {
@@ -152,9 +149,9 @@ export default {
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
-     * - no ID has been typed
+     * - no ID has been entered
      * - input is invalid
-     * - ID hasn't been completely typed
+     * - ID hasn't been completely entered
      */
     isSubmitButtonDisabled() {
       return (
@@ -173,12 +170,14 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < this.maxNumberOfInput
+        this.numOfUserIds < this.programData["maxNumberOfIds"]
       );
     },
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.latestEntry["userID"].length < this.inputObject["maxLengthOfId"];
+      return (
+        this.latestEntry["userID"].length < this.programData["input"]["maxLengthOfId"]
+      );
     },
     /** Returns the most recently entered input */
     latestEntry() {
@@ -210,7 +209,11 @@ export default {
      * @param {Object} event - event triggered when a character is typed
      */
     isValidEntry(event) {
-      if (typeToFunctionMap[this.inputObject["basicInputValidationType"]](event)) {
+      if (
+        validationTypeToFunctionMap[this.programData["input"]["basicValidationType"]](
+          event
+        )
+      ) {
         return true;
       } else event.preventDefault();
     },
@@ -280,16 +283,18 @@ export default {
     updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
-      } else if (event.target.value.length < this.inputObject["maxLengthOfId"]) {
-        this.invalidInputMessage = this.textObject["invalidInputMessage"];
+      } else if (event.target.value.length < this.programData["input"]["maxLengthOfId"]) {
+        this.invalidInputMessage = this.programData["text"]["default"]["invalid"][
+          "input"
+        ];
         this.resetInvalidLoginMessage();
       } else {
         this.resetInvalidInputMessage();
       }
-      if (event.target.value.length > this.inputObject["maxLengthOfId"]) {
+      if (event.target.value.length > this.programData["input"]["maxLengthOfId"]) {
         event.target.value = event.target.value.slice(
           0,
-          this.inputObject["maxLengthOfId"]
+          this.programData["input"]["maxLengthOfId"]
         );
         this.userIDList[index]["userID"] = event.target.value.toString();
       }
@@ -308,7 +313,7 @@ export default {
         this.redirectTo,
         this.redirectID,
         tempUserIDList,
-        authType
+        this.authType
       );
     },
 
@@ -320,15 +325,18 @@ export default {
       let userValidationResponse = await validateID(
         userID,
         this.validateCount,
-        this.dataSourceObject["name"],
-        this.dataSourceObject["column"]
+        this.programData["dataSource"]["name"],
+        this.programData["dataSource"]["column"],
+        this.programData["dataSource"]["type"]
       );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.isLoading = false;
 
       if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.textObject["invalidLoginMessage"];
+        this.invalidLoginMessage = this.programData["text"]["default"]["invalid"][
+          "login"
+        ];
       }
       if (this.invalidLoginMessage != "") {
         this.resetEntry(this.numOfUserIds - 1);
@@ -353,7 +361,7 @@ export default {
             this.userIDList,
             this.redirectID,
             this.redirectTo,
-            authType
+            this.authType
           )
         ) {
           sendSQSMessage(
@@ -362,7 +370,7 @@ export default {
             this.redirectTo,
             this.redirectID,
             this.userIDList,
-            authType,
+            this.authType,
             this.program
           );
         }

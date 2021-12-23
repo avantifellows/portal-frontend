@@ -3,12 +3,11 @@ import { getProgramDataEndpoint } from "@/services/API/endpoints.js";
 
 export default {
     /**
-      * Validates that the ID exists
+      * Retrieves details about a particular program
       * @param {String} programName - the name of the program whose data needs to be retrieved
       */
     getProgramData(programName)
     {
-
         const params = {
             program : programName
         }

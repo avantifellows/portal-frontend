@@ -1,14 +1,23 @@
 <template>
-  <div>
-    <IdEntry
+  <!-- Entry component -->
+  <div v-if="isAuthTypeID">
+    <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
       :purpose="purpose"
       :purposeParams="purposeParams"
-      :textObject="textObject"
-      :inputObject="inputObject"
-      :maxNumberOfInput="maxNumberOfInput"
-      :dataSourceObject="dataSourceObject"
+      :programData="programData"
+      :program="program"
+      :authType="authType"
+    />
+  </div>
+  <div v-else-if="isAuthTypeOTP">
+    <OTP
+      :redirectTo="redirectTo"
+      :redirectID="redirectID"
+      :purpose="purpose"
+      :purposeParams="purposeParams"
+      :programData="programData"
       :program="program"
       :authType="authType"
     />
@@ -16,67 +25,51 @@
 </template>
 
 <script>
-import IdEntry from "@/components/IdEntry.vue";
-import firebaseAPI from "@/services/API/getProgramData.js";
+import Entry from "@/components/Entry.vue";
+import OTP from "@/components/OTP.vue";
+import programAPIService from "@/services/API/programData.js";
 
 export default {
   name: "Home",
   components: {
-    IdEntry,
+    Entry,
+    OTP,
   },
   props: {
+    /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
     redirectTo: {
-      /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
       default: "",
       type: String,
     },
+    /** ID of the resource. Eg. the plioID */
     redirectID: {
-      /** ID of the resource. Eg. the plioID */
       default: "",
       type: String,
     },
+    /** General category of why the data is being captured. Eg: attendance */
     purpose: {
-      /** General category of why the data is being captured. Eg: attendance */
       default: "",
       type: String,
     },
+    /** Subcategory of the purpose. Eg: plio -> means the attendance is for a plio link */
     purposeParams: {
-      /** Subcategory of the purpose. Eg: plio -> means the attendance is for a plio link */
       default: "",
       type: String,
     },
+    /** The program the user falls under. Eg: HaryanaStudents, DelhiStudents */
     program: {
-      /** The program the user falls under. Eg: HaryanaStudents, DelhiStudents */
-      default: "",
+      default: "HaryanaStudents",
       type: String,
     },
+    /** The authentication method used by the user */
     authType: {
-      /** The authentication method used by the user */
-      default: "",
+      default: "ID",
       type: String,
     },
   },
   data() {
     return {
-      textObject: {
-        placeholderText: "",
-        displayText: "",
-        addButtonText: "",
-        invalidInputMessage: "",
-        invalidLoginMessage: "",
-        submitButtonText: "",
-      },
-      maxNumberOfInput: 0,
-      inputObject: {
-        basicInputValidationType: "",
-        maxLengthOfId: 0,
-        mode: null,
-        type: null,
-      },
-      dataSourceObject: {
-        name: "",
-        column: "",
-      },
+      programData: {},
     };
   },
   computed: {
@@ -84,30 +77,18 @@ export default {
     isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
     },
+    /** Whether authentication method chosen is an ID entry */
+    isAuthTypeID() {
+      return this.authType == "ID";
+    },
+    /** Whether authentication method chosen is OTP */
+    isAuthTypeOTP() {
+      return this.authType == "OTP";
+    },
   },
   async created() {
     /** Program name is sent to the API to retrieve all details */
-    var programData = await firebaseAPI.getProgramData(this.program);
-
-    let textObject = programData["text"]["default"];
-    this.textObject["placeholderText"] = textObject["placeholder"];
-    this.textObject["displayText"] = textObject["display"];
-    this.textObject["addButtonText"] = textObject["addButton"];
-    this.textObject["invalidInputMessage"] = textObject["invalid"]["input"];
-    this.textObject["invalidLoginMessage"] = textObject["invalid"]["login"];
-    this.textObject["submitButtonText"] = textObject["submitButton"];
-
-    this.maxNumberOfInput = programData["maxNumberOfIds"];
-
-    let inputObject = programData["input"];
-    this.inputObject["basicInputValidationType"] = inputObject["basicValidationType"];
-    this.inputObject["maxLengthOfId"] = inputObject["maxLengthOfId"];
-    this.inputObject["mode"] = inputObject["mode"];
-    this.inputObject["type"] = inputObject["type"];
-
-    let dataSourceObject = programData["dataSource"];
-    this.dataSourceObject["name"] = dataSourceObject["name"];
-    this.dataSourceObject["column"] = dataSourceObject["column"];
+    this.programData = await programAPIService.getProgramData(this.program);
   },
 };
 </script>

@@ -7,6 +7,6 @@ export const mapVerifyStatusCodeToMessage = {
   }
 
   export function mapSendStatusCodeToMessage(code) {
-    code == "200" ? "OTP has been sent!" : "Oh no!"
+    return code == "200" ? "OTP has been sent!" : "Oh no!"
 
   }

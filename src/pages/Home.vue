@@ -11,6 +11,7 @@
       :authType="authType"
     />
   </div>
+  <!-- OTP component -->
   <div v-else-if="isAuthTypeOTP && programData">
     <OTP
       :redirectTo="redirectTo"

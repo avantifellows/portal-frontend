@@ -17,6 +17,7 @@
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
       {{ programData["text"]["default"]["display"] }}
     </p>
+
     <!--text box to enter phone number-->
     <div class="flex flex-row justify-center">
       <input
@@ -234,7 +235,7 @@ export default {
     async authenticatePhoneNumber() {
       this.isLoading = true;
       this.isUserValid = await validateID(
-        this.userID,
+        this.userId,
         this.validateCount,
         this.programData["dataSource"]["name"],
         this.programData["dataSource"]["column"],
@@ -262,7 +263,7 @@ export default {
           this.purposeParams,
           this.redirectTo,
           this.redirectID,
-          this.userIDList,
+          this.userId,
           this.authType,
           this.program
         );

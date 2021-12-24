@@ -6,6 +6,7 @@ export const mapVerifyStatusCodeToMessage = {
     308: "You are re-trying too early. Please wait for sometime.",
   }
 
-  export const mapSendStatusCodeToMessage = {
-    200: "OTP has been sent!",
+  export function mapSendStatusCodeToMessage(code) {
+    code == "200" ? "OTP has been sent!" : "Oh no!"
+
   }

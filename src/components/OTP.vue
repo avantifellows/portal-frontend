@@ -18,7 +18,6 @@
       {{ programData["text"]["default"]["display"] }}
     </p>
     <!--text box to enter phone number-->
-
     <div class="flex flex-row justify-center">
       <input
         v-model="userId"
@@ -34,13 +33,13 @@
       />
     </div>
 
-    <!-- invalid input and login message  -->
+    <!-- invalid input message  -->
     <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidInputMessageShown">{{
       invalidInputMessage
     }}</span>
 
     <!--text box to enter OTP-->
-    <div class="flex flex-col justify-center" v-if="isOTPRequested">
+    <div class="flex flex-col justify-center" v-if="isOTPSent">
       <p class="text-md sm:text-l md:text-l lg:text-xl xl:text-2xl mx-auto font-bold">
         {{ programData["text"]["default"]["enterOTP"] }}
       </p>
@@ -52,21 +51,22 @@
 
     <!-- button to request for OTP -->
     <button
-      @click="requestOTP"
+      @click="sendOTP"
       class="bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded-3xl border-2 disabled:opacity-50"
       :disabled="isRequestOTPButtonDisabled"
-      v-show="!isOTPRequested"
+      v-show="!isOTPSent"
     >
       {{ programData["text"]["default"]["requestOTP"] }}
     </button>
-    <!-- invalid input message  -->
+
+    <!-- OTP response message  -->
     <span class="mx-auto text-red-700 text-base mb-1" v-if="displayOTPMessage">{{
       displayOTPMessage
     }}</span>
 
     <!-- submit button -->
     <button
-      v-show="isOTPRequested"
+      v-show="isOTPSent"
       @click="verifyOTP"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
@@ -86,6 +86,7 @@ import {
   mapVerifyStatusCodeToMessage,
   mapSendStatusCodeToMessage,
 } from "@/services/OTPCodes.js";
+
 export default {
   name: "OTP",
   props: {
@@ -100,8 +101,8 @@ export default {
   data() {
     return {
       userId: "",
-      isUserValid: false, // whether the user exists in the backend database
-      isOTPRequested: false,
+      isUserValid: false,
+      isOTPSent: false,
       OTPCode: "",
       isLoading: false,
       displayOTPMessage: "",
@@ -126,19 +127,19 @@ export default {
     isAnyUserIDPresent() {
       return this.userId != undefined && this.userId != "";
     },
+    /** Whether the 'Request OTP' button should be disabled */
     isRequestOTPButtonDisabled() {
       return (
         this.userId == undefined ||
         this.invalidInputMessage != "" ||
-        this.isOTPRequested == true
+        this.isOTPSent == true
       );
     },
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
-     * - no ID has been entered
-     * - input is invalid
-     * - ID hasn't been completely entered
+     * - if 'Request OTP' button is enabled
+     * - if OTP is being typed
      */
     isSubmitButtonDisabled() {
       return !(this.isRequestOTPButtonDisabled || this.OTPCode.length > 0);
@@ -203,13 +204,21 @@ export default {
         this.userId = event.target.value.toString();
       }
     },
-    async requestOTP() {
+    /** Function that calls the API to send an OTP
+     * If the status is 200, the OTP has been sent.
+     * Otherwise, retry
+     */
+    async sendOTP() {
       const response = await OTPAuth.sendOTP(parseInt(this.userId));
       if (response.status == 200) {
-        this.displayOTPMessage = mapSendStatusCodeToMessage[response.status.toString()];
+        this.displayOTPMessage = mapSendStatusCodeToMessage(response.status.toString());
+        this.isOTPSent = true;
+      } else {
+        this.displayOTPMessage = mapSendStatusCodeToMessage(response.status.toString());
+        this.isOTPSent = false;
       }
-      this.isOTPRequested = true;
     },
+    /** Function that verifies the OTP */
     async verifyOTP() {
       const response = await OTPAuth.verifyOTP(
         parseInt(this.userId),
@@ -220,8 +229,7 @@ export default {
         this.authenticate();
       }
     },
-    /** This method authenticates the  ID.
-     * @param {String} userID - most recent ID
+    /** This method authenticates the phone number.
      */
     async authenticatePhoneNumber() {
       this.isLoading = true;
@@ -235,7 +243,7 @@ export default {
       this.isLoading = false;
     },
 
-    /** Authenticates the last entry typed before the submit button is clicked.
+    /** Method called when submit button is clicked. Calls method to authenticate phone number.
      * Also, redirects user to the destination and sends a SQS message.
      */
     async authenticate() {

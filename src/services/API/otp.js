@@ -11,6 +11,7 @@ export default {
         }
         return new Promise( (resolve) => {
             OTPClient.post(sendOTPEndpoint, null, {params}).then((response) => {
+                console.log(response)
                 resolve(response)
             })
 

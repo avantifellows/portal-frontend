@@ -33,6 +33,10 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             fullURL = redirectID
             break;
 
+        case 'teacher-web-app':
+            fullURL = process.env.VUE_APP_TEACHER_WEB_APP_URL
+            break;
+
         default:
             var purpose = 'Error'
             sendSQSMessage(

@@ -25,20 +25,18 @@
       v-for="(input, index) in userIDList"
       :key="`idInput-${index}`"
     >
-      <div>
-        <input
-          v-model="input.userID"
-          :type="inputType"
-          :inputmode="inputMode"
-          pattern="[0-9]*"
-          :placeholder="placeholderText"
-          required
-          @keypress="isValidEntry($event)"
-          class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
-          :class="calculateInputClasses(index)"
-          @input="updateUserId($event, index)"
-        />
-      </div>
+      <input
+        v-model="input.userID"
+        :type="inputType"
+        :inputmode="inputMode"
+        pattern="[0-9]*"
+        :placeholder="placeholderText"
+        required
+        @keypress="isValidEntry($event)"
+        class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
+        :class="calculateInputClasses"
+        @input="updateUserId($event)"
+      />
     </div>
 
     <!-- invalid input message  -->
@@ -119,6 +117,9 @@ export default {
   },
 
   computed: {
+    userId() {
+      return this.userIDList["0"]["userID"];
+    },
     /** Returns the input mode stored against the program */
     inputMode() {
       return this.programData["input"]["mode"];
@@ -133,7 +134,7 @@ export default {
     },
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
-      return this.userIDList != undefined && this.userIDList[0]["userID"] != "";
+      return this.userIDList != undefined && this.userId != "";
     },
     /** Whether the 'Request OTP' button should be disabled */
     isRequestOTPButtonDisabled() {
@@ -154,9 +155,7 @@ export default {
     },
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return (
-        this.userIDList[0]["userID"].length < this.programData["input"]["maxLengthOfId"]
-      );
+      return this.userId.length < this.programData["input"]["maxLengthOfId"];
     },
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
@@ -211,7 +210,7 @@ export default {
           0,
           this.programData["input"]["maxLengthOfId"]
         );
-        this.userIDList[0]["userID"] = event.target.value.toString();
+        this.userId = event.target.value.toString();
       }
     },
     /** Function that calls the API to send an OTP
@@ -219,7 +218,7 @@ export default {
      * Otherwise, retry
      */
     async sendOTP() {
-      const response = await OTPAuth.sendOTP(parseInt(this.userIDList[0]["userID"]));
+      const response = await OTPAuth.sendOTP(parseInt(this.userId));
       if (response.status == 200) {
         this.displayOTPMessage = mapSendStatusCodeToMessage(response.status.toString());
         this.isOTPSent = true;
@@ -231,7 +230,7 @@ export default {
     /** Function that verifies the OTP */
     async verifyOTP() {
       const response = await OTPAuth.verifyOTP(
-        parseInt(this.userIDList[0]["userID"]),
+        parseInt(this.userId),
         parseInt(this.OTPCode)
       );
       this.displayOTPMessage = mapVerifyStatusCodeToMessage[response.status.toString()];
@@ -244,7 +243,7 @@ export default {
     async authenticatePhoneNumber() {
       this.isLoading = true;
       this.userIDList[0]["valid"] = await validateID(
-        this.userIDList[0]["userID"],
+        this.userId,
         this.validateCount,
         this.programData["dataSource"]["name"],
         this.programData["dataSource"]["column"],

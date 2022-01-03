@@ -34,7 +34,7 @@
         required
         @keypress="isValidEntry($event)"
         class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
-        :class="calculateInputClasses"
+        :class="selectInputBoxClasses"
         @input="updateUserId($event)"
       />
     </div>
@@ -130,14 +130,17 @@ export default {
     inputType() {
       return this.programData["input"]["type"];
     },
-    /** Returns the placeholder text stored against the program */
-    placeholderText() {
+
+    /** Returns the placeholder text, stored against the program, for the phone number input box. */
+    inputBoxPlaceholderText() {
       return this.programData["text"]["default"]["placeholder"];
     },
+
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return this.userIDList != undefined && this.userId != "";
     },
+
     /** Whether the 'Request OTP' button should be disabled */
     isRequestOTPButtonDisabled() {
       return (
@@ -146,6 +149,7 @@ export default {
         this.isOTPSent == true
       );
     },
+
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
@@ -155,10 +159,12 @@ export default {
     isSubmitButtonDisabled() {
       return !(this.isRequestOTPButtonDisabled || this.OTPCode.length > 0);
     },
+
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
       return this.userId.length < this.programData["input"]["maxLengthOfId"];
     },
+
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
       return this.invalidInputMessage != null;
@@ -166,9 +172,11 @@ export default {
   },
   methods: {
     /** Determines how the input box should look.
+     * - If an input error needs to be displayed, the box has a a red border.
+     * - Otherwise, it has an opacity of 30.
      * @param {Number} index - index of the input box
      */
-    calculateInputClasses() {
+    selectInputBoxClasses() {
       return [
         {
           "border-red-600 focus:border-red-600": this.invalidInputMessage,
@@ -176,6 +184,7 @@ export default {
         },
       ];
     },
+
     /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
@@ -188,10 +197,12 @@ export default {
         return true;
       } else event.preventDefault();
     },
+
     /** Resets the invalid input message */
     resetInvalidInputMessage() {
       this.invalidInputMessage = "";
     },
+
     /** This function is called whenever something is entered in the input box.
      * It checks if the required number of characters are being typed.
      * @param {Object} event - the event which triggered this function
@@ -215,6 +226,7 @@ export default {
         this.userId = event.target.value.toString();
       }
     },
+
     /** Function that calls the API to send an OTP
      * If the status is 200, the OTP has been sent.
      * Otherwise, retry
@@ -229,6 +241,7 @@ export default {
         this.isOTPSent = false;
       }
     },
+
     /** Function that verifies the OTP */
     async verifyOTP() {
       const response = await OTPAuth.verifyOTP(
@@ -240,6 +253,7 @@ export default {
         this.authenticate();
       }
     },
+
     /** This method authenticates the phone number.
      */
     async authenticatePhoneNumber() {

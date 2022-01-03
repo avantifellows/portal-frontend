@@ -15,9 +15,9 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
 
     switch(redirectTo){
         case 'plio':
-            let userID = userIDList[0]["userID"]
+            var userID = userIDList[0]["userID"]
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-            let url = new URL(redirectURL + redirectID);
+            var url = new URL(redirectURL + redirectID);
             queryParams = new URLSearchParams({
                                 api_key: process.env.VUE_APP_API_KEY,
                                 unique_id: userID,

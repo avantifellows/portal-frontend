@@ -39,7 +39,7 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
                 teacherID: userID,
                 programID: program
                 });
-            fullURL = process.env.VUE_APP_TEACHER_WEB_APP_URL + "?" + queryParams;
+            fullURL = redirectID+ "?" + queryParams;
             break;
 
         default:

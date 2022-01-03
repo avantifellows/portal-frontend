@@ -24,6 +24,3 @@ Base URL for AWS SQS
 
 ## VUE_APP_OTP_URL
 Base URL for OTP service
-
-## VUE_APP_TEACHER_WEB_APP_URL
-URL for Teacher Web App

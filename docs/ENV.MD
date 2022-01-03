@@ -10,7 +10,7 @@ Base URL for the Plio link.
 ## VUE_APP_AWS_SQS_ACCESS_KEY
 AWS access key for access to AWS SQS.
 
-## VUE_APP_AWS_SQS_SECRET_ACCESS_KEY
+## VUE_APP_AWS_SQS_SECRET_KEY
 AWS secret key for access to AWS SQS.
 
 ## VUE_APP_BASE_URL_MEET

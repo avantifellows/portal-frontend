@@ -120,10 +120,12 @@ export default {
     userId() {
       return this.userIDList["0"]["userID"];
     },
+
     /** Returns the input mode stored against the program */
     inputMode() {
       return this.programData["input"]["mode"];
     },
+
     /** Returns the input type stored against the program */
     inputType() {
       return this.programData["input"]["type"];
@@ -262,7 +264,8 @@ export default {
           this.userIDList,
           this.redirectID,
           this.redirectTo,
-          this.authType
+          this.authType,
+          this.program
         )
       ) {
         this.authenticatePhoneNumber();

@@ -12,10 +12,10 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
     let redirectURL = "";
     let fullURL = "";
     let queryParams = "";
+    var userID = userIDList[0]["userID"]
 
     switch(redirectTo){
         case 'plio':
-            var userID = userIDList[0]["userID"]
             redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
             var url = new URL(redirectURL + redirectID);
             queryParams = new URLSearchParams({
@@ -39,7 +39,7 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
                 teacherID: userID,
                 programID: program
                 });
-            fullURL = redirectID+ "?" + queryParams;
+            fullURL = redirectID + "?" + queryParams;
             break;
 
         default:

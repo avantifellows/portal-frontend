@@ -42,7 +42,8 @@ jobs:
         VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
         VUE_APP_OTP_SERVICE: ${{ secrets.VUE_APP_OTP_SERVICE }}
         VUE_APP_BASE_URL_YOUTUBE: ${{ secrets.VUE_APP_BASE_URL_YOUTUBE }}
-
+        VUE_APP_AWS_SQS_URL: ${{ secrets.VUE_APP_AWS_SQS_URL }}
+        
       run: npm run build
 
     - name: Configure AWS Credentials

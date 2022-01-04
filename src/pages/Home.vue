@@ -88,7 +88,6 @@ export default {
     },
   },
   async created() {
-    console.log(this.program, this.authType);
     /** Program name is sent to the API to retrieve all details */
     this.programData = await programAPIService.getProgramData(this.program);
   },

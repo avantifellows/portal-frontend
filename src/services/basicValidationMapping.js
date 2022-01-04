@@ -1,20 +1,26 @@
-/**
- * Mapping between basicValidationType and the basic validation login
+/** Function to check if the key press by user is a number.
  * @param {Object} event - event triggered when a character is typed
  */
-
-function isNumeric(event){
-    return (event.keyCode >= 48 && event.keyCode <= 57);
+function isNumeric(event) {
+  return event.keyCode >= 48 && event.keyCode <= 57;
 }
 
-function isAlphanumeric(event){
-    return isNumeric(event) || (event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 97 && event.keyCode <= 122)
+/** Function to check if the key press by user is a number or an alphabet.
+ * @param {Object} event - event triggered when a character is typed
+ */
+function isAlphanumeric(event) {
+  return (
+    isNumeric(event) ||
+    (event.keyCode >= 65 && event.keyCode <= 90) ||
+    (event.keyCode >= 97 && event.keyCode <= 122)
+  );
 }
+
+/** Mapping between basicValidationType and the basic validation logic */
 export const validationTypeToFunctionMap = {
-    "numeric": isNumeric,
-    "alphanumeric": isAlphanumeric,
-    undefined: function (){
-        return false
-    }
-
-}
+  numeric: isNumeric,
+  alphanumeric: isAlphanumeric,
+  undefined: function () {
+    return false;
+  },
+};

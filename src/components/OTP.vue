@@ -16,26 +16,26 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      {{ programData["text"]["default"]["display"] }}
+      {{ inputBoxDisplayText }}
     </p>
 
     <!--text box to enter phone number-->
     <div
       class="flex flex-row justify-center"
-      v-for="(input, index) in userIDList"
+      v-for="(phoneNumberObject, index) in phoneNumberList"
       :key="`idInput-${index}`"
     >
       <input
-        v-model="input.userID"
+        v-model="phoneNumberObject.userID"
         :type="inputType"
         :inputmode="inputMode"
         pattern="[0-9]*"
-        :placeholder="placeholderText"
+        :placeholder="inputBoxPlaceholderText"
         required
-        @keypress="isValidEntry($event)"
+        @keypress="isValidPhoneNumber($event)"
         class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
         :class="selectInputBoxClasses"
-        @input="updateUserId($event)"
+        @input="updatephoneNumber($event)"
       />
     </div>
 
@@ -47,7 +47,7 @@
     <!--text box to enter OTP-->
     <div class="flex flex-col justify-center" v-if="isOTPSent">
       <p class="text-md sm:text-l md:text-l lg:text-xl xl:text-2xl mx-auto font-bold">
-        {{ programData["text"]["default"]["enterOTP"] }}
+        {{ enterOTPInputBoxDisplayText }}
       </p>
       <input
         v-model="OTPCode"
@@ -58,11 +58,11 @@
     <!-- button to request for OTP -->
     <button
       @click="sendOTP"
-      class="bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 rounded-3xl border-2 disabled:opacity-50"
+      class="bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 disabled:opacity-50"
       :disabled="isRequestOTPButtonDisabled"
       v-show="!isOTPSent"
     >
-      {{ programData["text"]["default"]["requestOTP"] }}
+      {{ requestOTPButtonDisplayText }}
     </button>
 
     <!-- OTP response message  -->
@@ -77,7 +77,7 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
-      {{ programData["text"]["default"]["submitButton"] }}
+      {{ submitButtonDisplayText }}
     </button>
   </div>
 </template>
@@ -106,45 +106,45 @@ export default {
   },
   data() {
     return {
-      userIDList: [{ userID: "", valid: false }],
-      isUserValid: false,
-      isOTPSent: false,
-      OTPCode: "",
+      phoneNumberList: [{ userID: "", valid: false }], // contains the phone number entered by the user
+      isUserValid: false, // whether the user exists in our database
+      isOTPSent: false, // has the OTP been sent
+      OTPCode: "", // string that contain the OTP code entered by the user
       isLoading: false,
-      displayOTPMessage: "",
-      invalidInputMessage: null,
+      displayOTPMessage: "", // string that contains any messages returned by the OTP service
+      invalidInputMessage: null, // whether the input being entered by the user matches the basic validation criteria
     };
   },
 
   computed: {
-    userId() {
-      return this.userIDList["0"]["userID"];
+    phoneNumber() {
+      return this.phoneNumberList["0"]["userID"];
     },
 
     /** Returns the input mode stored against the program */
     inputMode() {
-      return this.programData["input"]["mode"];
+      return this.programData.input.mode;
     },
 
     /** Returns the input type stored against the program */
     inputType() {
-      return this.programData["input"]["type"];
+      return this.programData.input.type;
     },
 
     /** Returns the placeholder text, stored against the program, for the phone number input box. */
     inputBoxPlaceholderText() {
-      return this.programData["text"]["default"]["placeholder"];
+      return this.programData.text.default.placeholder;
     },
 
-    /** Checks if any userID has been entered */
-    isAnyUserIDPresent() {
-      return this.userIDList != undefined && this.userId != "";
+    /** Checks if any phoneNumber has been entered */
+    isAnyphoneNumberPresent() {
+      return this.phoneNumberList != undefined && this.phoneNumber != "";
     },
 
     /** Whether the 'Request OTP' button should be disabled */
     isRequestOTPButtonDisabled() {
       return (
-        this.userId == undefined ||
+        this.phoneNumber == undefined ||
         this.invalidInputMessage != "" ||
         this.isOTPSent == true
       );
@@ -154,7 +154,7 @@ export default {
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
      * - if 'Request OTP' button is enabled
-     * - if OTP is being typed
+     * - if OTP hasn't been typed yet
      */
     isSubmitButtonDisabled() {
       return !(this.isRequestOTPButtonDisabled || this.OTPCode.length > 0);
@@ -162,38 +162,67 @@ export default {
 
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.userId.length < this.programData["input"]["maxLengthOfId"];
+      return this.phoneNumber.length < this.maxLengthOfId;
     },
 
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
       return this.invalidInputMessage != null;
     },
+
+    /** Returns the heading text for the input box */
+    inputBoxDisplayText() {
+      return this.programData.text.default.display;
+    },
+
+    /** Returns the text for the OTP code input box */
+    enterOTPInputBoxDisplayText() {
+      return this.programData.text.default.enterOTP;
+    },
+
+    /** Returns the text for the button to request an OTP */
+    requestOTPButtonDisplayText() {
+      return this.programData.text.default.requestOTP;
+    },
+
+    /** Returns the text for the submit button */
+    submitButtonDisplayText() {
+      return this.programData.text.default.submitButton;
+    },
+
+    /** Returns the maximum length of the ID */
+    maxLengthOfId() {
+      return this.programData.input.maxLengthOfId;
+    },
+
+    /** Returns the basic validation type for the input */
+    basicValidationType() {
+      return this.programData.input.basicValidationType;
+    },
+
+    /** Returns the invalid input message stored against each program */
+    invalidInputText() {
+      return this.programData.text.default.invalid.input;
+    },
   },
   methods: {
     /** Determines how the input box should look.
      * - If an input error needs to be displayed, the box has a a red border.
      * - Otherwise, it has an opacity of 30.
-     * @param {Number} index - index of the input box
      */
     selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidInputMessage,
-          "pointer-events-none opacity-30": !this.invalidInputMessage,
-        },
-      ];
+      let baseStyle =
+        "border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none";
+      return this.invalidInputMessage
+        ? baseStyle + "border-red-600 focus:border-red-600"
+        : baseStyle + "pointer-events-none opacity-30";
     },
 
     /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
-    isValidEntry(event) {
-      if (
-        validationTypeToFunctionMap[this.programData["input"]["basicValidationType"]](
-          event
-        )
-      ) {
+    isValidPhoneNumber(event) {
+      if (validationTypeToFunctionMap[this.basicValidationType](event)) {
         return true;
       } else event.preventDefault();
     },
@@ -206,24 +235,17 @@ export default {
     /** This function is called whenever something is entered in the input box.
      * It checks if the required number of characters are being typed.
      * @param {Object} event - the event which triggered this function
-     * @param {Number} index - the index of the input field
      */
-    updateUserId(event) {
+    updatephoneNumber(event) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
-      } else if (event.target.value.length < this.programData["input"]["maxLengthOfId"]) {
-        this.invalidInputMessage = this.programData["text"]["default"]["invalid"][
-          "input"
-        ];
+      } else if (event.target.value.length > this.maxLengthOfId) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
+        this.phoneNumber = event.target.value.toString();
+      } else if (event.target.value.length < this.maxLengthOfId) {
+        this.invalidInputMessage = this.invalidInputText;
       } else {
         this.resetInvalidInputMessage();
-      }
-      if (event.target.value.length > this.programData["input"]["maxLengthOfId"]) {
-        event.target.value = event.target.value.slice(
-          0,
-          this.programData["input"]["maxLengthOfId"]
-        );
-        this.userId = event.target.value.toString();
       }
     },
 
@@ -232,7 +254,7 @@ export default {
      * Otherwise, retry
      */
     async sendOTP() {
-      const response = await OTPAuth.sendOTP(parseInt(this.userId));
+      const response = await OTPAuth.sendOTP(parseInt(this.phoneNumber));
       if (response.status == 200) {
         this.displayOTPMessage = mapSendStatusCodeToMessage(response.status.toString());
         this.isOTPSent = true;
@@ -245,12 +267,13 @@ export default {
     /** Function that verifies the OTP */
     async verifyOTP() {
       const response = await OTPAuth.verifyOTP(
-        parseInt(this.userId),
+        parseInt(this.phoneNumber),
         parseInt(this.OTPCode)
       );
       this.displayOTPMessage = mapVerifyStatusCodeToMessage[response.status.toString()];
       if (response.status == 200) {
-        this.authenticate();
+        this.isLoading = true;
+        this.authenticateAndRedirect();
       }
     },
 
@@ -258,12 +281,11 @@ export default {
      */
     async authenticatePhoneNumber() {
       this.isLoading = true;
-      this.userIDList[0]["valid"] = await validateID(
-        this.userId,
-        this.validateCount,
-        this.programData["dataSource"]["name"],
-        this.programData["dataSource"]["column"],
-        this.authType
+      this.phoneNumberList[0]["valid"] = await validateID(
+        this.phoneNumber,
+        this.programData.dataSource,
+        this.authType,
+        this.validateCount
       );
       this.isLoading = false;
     },
@@ -271,24 +293,25 @@ export default {
     /** Method called when submit button is clicked. Calls method to authenticate phone number.
      * Also, redirects user to the destination and sends a SQS message.
      */
-    async authenticate() {
+    async authenticateAndRedirect() {
       if (
         redirectToDestination(
           this.purposeParams,
-          this.userIDList,
+          this.phoneNumberList,
           this.redirectID,
           this.redirectTo,
           this.authType,
           this.program
         )
       ) {
+        this.isLoading = false;
         this.authenticatePhoneNumber();
         sendSQSMessage(
           this.purpose,
           this.purposeParams,
           this.redirectTo,
           this.redirectID,
-          this.userIDList,
+          this.phoneNumberList,
           this.authType,
           this.program
         );

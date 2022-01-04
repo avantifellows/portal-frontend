@@ -1,7 +1,3 @@
 module.exports = {
-  transpileDependencies: [
-    /@vue\/*/,
-    'vue-router',
-    '@aws-sdk',
-  ],
-}
+  transpileDependencies: [/@vue\/*/, "vue-router", "@aws-sdk"],
+};

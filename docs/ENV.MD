@@ -2,7 +2,7 @@
 This guide explains all the available configurations in your `.env` file so that you can configure your environments accordingly.
 
 ## VUE_APP_AF_API_KEY=''
-API key for third-party access, given to each organization. To know more about custom authentication, click [here].(https://docs.plio.in/plio-for-teams/#custom-authentication)    
+API key to link user ID entered in auth layer to user in the DB of Plio. To know more about custom authentication and to know how to get an API key for your organization, click [here].(https://docs.plio.in/plio-for-teams/#custom-authentication)    
 
 ## VUE_APP_BASE_URL_PLIO=''
 Base URL for the Plio link.

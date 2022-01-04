@@ -15,7 +15,9 @@
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
-    <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
+    <p
+      class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold px-6"
+    >
       {{ inputBoxDisplayText }}
     </p>
 
@@ -40,13 +42,17 @@
     </div>
 
     <!-- invalid input message  -->
-    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidInputMessageShown">{{
-      invalidInputMessage
-    }}</span>
+    <span
+      class="mx-auto text-red-700 text-base mb-1 px-2"
+      v-if="isInvalidInputMessageShown"
+      >{{ invalidInputMessage }}</span
+    >
 
     <!--text box to enter OTP-->
     <div class="flex flex-col justify-center" v-if="isOTPSent">
-      <p class="text-md sm:text-l md:text-l lg:text-xl xl:text-2xl mx-auto font-bold">
+      <p
+        class="text-md sm:text-l md:text-l lg:text-xl xl:text-2xl mx-auto font-bold px-6"
+      >
         {{ enterOTPInputBoxDisplayText }}
       </p>
       <input
@@ -66,7 +72,7 @@
     </button>
 
     <!-- OTP response message  -->
-    <span class="mx-auto text-red-700 text-base mb-1" v-if="displayOTPMessage">{{
+    <span class="mx-auto text-red-700 text-base mb-1 px-4" v-if="displayOTPMessage">{{
       displayOTPMessage
     }}</span>
 

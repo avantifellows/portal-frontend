@@ -115,7 +115,7 @@ export default {
       phoneNumberList: [{ userID: "", valid: false }], // contains the phone number entered by the user
       isUserValid: false, // whether the user exists in our database
       isOTPSent: false, // has the OTP been sent
-      OTPCode: "", // string that contain the OTP code entered by the user
+      OTPCode: "", // string that contains the OTP code entered by the user
       isLoading: false,
       displayOTPMessage: "", // string that contains any messages returned by the OTP service
       invalidInputMessage: null, // whether the input being entered by the user matches the basic validation criteria

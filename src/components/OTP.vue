@@ -176,7 +176,7 @@ export default {
       return this.invalidInputMessage != null;
     },
 
-    /** Returns the heading text for the input box */
+    /** Returns the title text for the input box */
     inputBoxDisplayText() {
       return this.programData.text.default.display;
     },

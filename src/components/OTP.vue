@@ -45,7 +45,7 @@
     <!-- invalid input message  -->
     <span
       class="mx-auto text-red-700 text-base mb-1 px-2"
-      v-if="isinvalidPhoneNumberMessageShown"
+      v-if="isInvalidPhoneNumberMessageShown"
       >{{ invalidPhoneNumberMessage }}</span
     >
 
@@ -71,26 +71,29 @@
     >
       {{ requestOTPButtonDisplayText }}
     </button>
-    <p
-      v-show="isOTPSent"
-      class="text-md sm:text-l md:text-l lg:text-xl xl:text-2xl mx-auto font-bold px-6"
-    >
-      Re-send OTP in :
-      {{ resendOTPCountdown }}
-    </p>
+
     <!-- button to resend OTP -->
     <button
       @click="sendOTP"
       class="bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 disabled:opacity-50"
-      v-show="isOTPSentAndResent"
+      v-show="isCountdownFinished"
     >
       {{ resendOTPButtonText }}
     </button>
 
     <!-- OTP response message  -->
-    <span v-if="willDisplayOTPMessage" :class="displayOTPMessageClass">{{
-      willDisplayOTPMessage
+    <span v-show="willDisplayOTPMessage" :class="displayOTPMessageClass">{{
+      OTPMessage
     }}</span>
+
+    <!-- timer for resending OTP -->
+    <p
+      v-show="startCountdown"
+      class="text-sm sm:text-md md:text-md lg:text-l xl:text-xl mx-auto font-bold px-6"
+    >
+      {{ resendOTPText }}
+      {{ resendOTPCountdownFormat }}
+    </p>
 
     <!-- submit button -->
     <button
@@ -135,8 +138,9 @@ export default {
       isLoading: false,
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
-      OTPResendButton: false,
-      resendOTPTimer: 60,
+      OTPResendButton: false, // whether OTP resend button should be shown
+      resendOTPTimer: 60, // seconds timer after when the resend OTP button needs to be displayed
+      OTPInterval: null, // to store the interval instance of the countdown timer
     };
   },
 
@@ -182,7 +186,10 @@ export default {
      * - if OTP hasn't been typed yet
      */
     isSubmitButtonDisabled() {
-      return !(this.isRequestOTPButtonDisabled || this.OTPCode.length > 0);
+      return (
+        this.OTPCode.length === 0 &&
+        (this.isRequestOTPButtonDisabled || this.OTPResendButton)
+      );
     },
 
     /** Checks if the current input entry has the required number of characters */
@@ -191,7 +198,7 @@ export default {
     },
 
     /** Whether input being typed is in the correct format */
-    isinvalidPhoneNumberMessageShown() {
+    isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
 
@@ -230,8 +237,18 @@ export default {
       return this.programData.text.default.invalid.input;
     },
 
-    /** Displays message returned from OTP service */
+    /** Whether OTP message will be displayed.
+     * Will not be displayed if the timer is finished. Will be replaced by the resend OTP button
+     */
     willDisplayOTPMessage() {
+      if (this.resendOTPTimer === 0) {
+        return false;
+      }
+      return true;
+    },
+
+    /** Extracts message returned from OTP service*/
+    OTPMessage() {
       return this.displayOTPMessage["message"];
     },
 
@@ -246,26 +263,44 @@ export default {
         : baseStyle + " text-green-700";
     },
 
-    isOTPSentAndResent() {
-      return this.isOTPSent && this.OTPResendButton;
+    /** Whether the timer is done */
+    isCountdownFinished() {
+      return this.resendOTPTimer === 0;
     },
-    isOTPSentOrResent() {
-      return this.isOTPSent || this.OTPResendButton;
+
+    /** When to start the timer */
+    startCountdown() {
+      return this.resendOTPTimer !== 0 && this.isOTPSent;
     },
+
+    /** Returns text for resend OTP button */
     resendOTPButtonText() {
-      return this.programData.text.default.resendOTP;
+      return this.programData.text.default.resendOTPButton;
     },
-    resendOTPCountdown() {
-      const timeLeft = this.resendOTPTimer;
-      const minutes = Math.floor(timeLeft / 60);
-      let seconds = timeLeft % 60;
+
+    /** Returns text for resend OTP title */
+    resendOTPText() {
+      return this.programData.text.default.resendOTPText;
+    },
+
+    /** Format for the timer */
+    resendOTPCountdownFormat() {
+      const minutes = Math.floor(this.resendOTPTimer / 60);
+      let seconds = this.resendOTPTimer % 60;
       if (seconds < 10) {
         seconds = `0${seconds}`;
       }
       return `${minutes}:${seconds}`;
     },
   },
-
+  watch: {
+    /** Watches for the timer to finish */
+    resendOTPTimer: function () {
+      if (this.resendOTPTimer === 0) {
+        clearInterval(this.interval);
+      }
+    },
+  },
   methods: {
     /** Determines how the input box should look.
      * - If an input error needs to be displayed, the box has a a red border.
@@ -279,17 +314,9 @@ export default {
         : baseStyle + "pointer-events-none opacity-30";
     },
 
+    /** Starts the timer */
     startTimer() {
-      setInterval(() => (this.resendOTPTimer -= 1), 1000);
-    },
-
-    resendOTPButton() {
-      console.log(this.isOTPSent);
-      if (this.isOTPSent) {
-        this.OTPResendButton = true;
-        return true;
-      }
-      return false;
+      this.interval = setInterval(() => (this.resendOTPTimer -= 1), 1000);
     },
 
     /** Calls the mapping function to validate the typed character
@@ -336,6 +363,7 @@ export default {
       this.displayOTPMessage["status"] === "success"
         ? (this.isOTPSent = true)
         : (this.isOTPSent = false);
+      this.resendOTPTimer = 60;
       if (this.isOTPSent) {
         this.startTimer();
       }

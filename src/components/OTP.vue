@@ -38,6 +38,7 @@
         class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
         :class="selectInputBoxClasses"
         @input="updatePhoneNumber($event)"
+        :disabled="isOTPSent"
       />
     </div>
 
@@ -69,6 +70,21 @@
       v-show="!isOTPSent"
     >
       {{ requestOTPButtonDisplayText }}
+    </button>
+    <p
+      v-show="isOTPSent"
+      class="text-md sm:text-l md:text-l lg:text-xl xl:text-2xl mx-auto font-bold px-6"
+    >
+      Re-send OTP in :
+      {{ resendOTPCountdown }}
+    </p>
+    <!-- button to resend OTP -->
+    <button
+      @click="sendOTP"
+      class="bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 disabled:opacity-50"
+      v-show="isOTPSentAndResent"
+    >
+      {{ resendOTPButtonText }}
     </button>
 
     <!-- OTP response message  -->
@@ -119,6 +135,8 @@ export default {
       isLoading: false,
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
+      OTPResendButton: false,
+      resendOTPTimer: 60,
     };
   },
 
@@ -227,7 +245,27 @@ export default {
         ? baseStyle + " text-red-700"
         : baseStyle + " text-green-700";
     },
+
+    isOTPSentAndResent() {
+      return this.isOTPSent && this.OTPResendButton;
+    },
+    isOTPSentOrResent() {
+      return this.isOTPSent || this.OTPResendButton;
+    },
+    resendOTPButtonText() {
+      return this.programData.text.default.resendOTP;
+    },
+    resendOTPCountdown() {
+      const timeLeft = this.resendOTPTimer;
+      const minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      if (seconds < 10) {
+        seconds = `0${seconds}`;
+      }
+      return `${minutes}:${seconds}`;
+    },
   },
+
   methods: {
     /** Determines how the input box should look.
      * - If an input error needs to be displayed, the box has a a red border.
@@ -239,6 +277,19 @@ export default {
       return this.invalidPhoneNumberMessage
         ? baseStyle + "border-red-600 focus:border-red-600"
         : baseStyle + "pointer-events-none opacity-30";
+    },
+
+    startTimer() {
+      setInterval(() => (this.resendOTPTimer -= 1), 1000);
+    },
+
+    resendOTPButton() {
+      console.log(this.isOTPSent);
+      if (this.isOTPSent) {
+        this.OTPResendButton = true;
+        return true;
+      }
+      return false;
     },
 
     /** Calls the mapping function to validate the typed character
@@ -262,13 +313,14 @@ export default {
     updatePhoneNumber(event) {
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
-      } else if (event.target.value.length > this.maxLengthOfPhoneNumber) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfPhoneNumber);
-        this.phoneNumber = event.target.value.toString();
       } else if (event.target.value.length < this.maxLengthOfPhoneNumber) {
         this.invalidPhoneNumberMessage = this.invalidPhoneNumberMessageFromDatabase;
       } else {
         this.resetinvalidPhoneNumberMessage();
+      }
+      if (event.target.value.length > this.maxLengthOfPhoneNumber) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfPhoneNumber);
+        this.phoneNumberList[0]["userID"] = event.target.value.toString();
       }
     },
 
@@ -284,6 +336,9 @@ export default {
       this.displayOTPMessage["status"] === "success"
         ? (this.isOTPSent = true)
         : (this.isOTPSent = false);
+      if (this.isOTPSent) {
+        this.startTimer();
+      }
     },
 
     /** Function that verifies the OTP */

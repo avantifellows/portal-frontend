@@ -181,12 +181,12 @@ export default {
       return this.programData.text.default.display;
     },
 
-    /** Returns the text for the OTP code input box */
+    /** Returns the title text for the OTP code input box */
     enterOTPInputBoxDisplayText() {
       return this.programData.text.default.enterOTP;
     },
 
-    /** Returns the text for the button to request an OTP */
+    /** Returns the text for the Request OTP button */
     requestOTPButtonDisplayText() {
       return this.programData.text.default.requestOTP;
     },
@@ -196,7 +196,7 @@ export default {
       return this.programData.text.default.submitButton;
     },
 
-    /** Returns the maximum length of the ID */
+    /** Returns the maximum allowed length of the ID */
     maxLengthOfId() {
       return this.programData.input.maxLengthOfId;
     },

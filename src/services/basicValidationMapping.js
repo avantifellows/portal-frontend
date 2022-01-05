@@ -1,4 +1,4 @@
-/** Function to check if the key press by user is a number.
+/** Function to check if the key pressed by user is a number.
  * @param {Object} event - event triggered when a character is typed
  */
 function isNumeric(event) {

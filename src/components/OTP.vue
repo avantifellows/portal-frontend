@@ -115,7 +115,7 @@ export default {
       phoneNumberList: [{ userID: "", valid: false }], // contains the phone number entered by the user
       isUserValid: false, // whether the user exists in our database
       isOTPSent: false, // has the OTP been sent
-      OTPCode: "", // string that contain the OTP code entered by the user
+      OTPCode: "", // string that contains the OTP code entered by the user
       isLoading: false,
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches the basic validation criteria
@@ -181,12 +181,12 @@ export default {
       return this.programData.text.default.display;
     },
 
-    /** Returns the text for the OTP code input box */
+    /** Returns the title text for the OTP code input box */
     enterOTPInputBoxDisplayText() {
       return this.programData.text.default.enterOTP;
     },
 
-    /** Returns the text for the button to request an OTP */
+    /** Returns the text for the Request OTP button */
     requestOTPButtonDisplayText() {
       return this.programData.text.default.requestOTP;
     },

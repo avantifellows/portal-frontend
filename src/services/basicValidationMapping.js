@@ -1,11 +1,11 @@
-/** Function to check if the key press by user is a number.
+/** Function to check if the key pressed by user is a number.
  * @param {Object} event - event triggered when a character is typed
  */
 function isNumeric(event) {
   return event.keyCode >= 48 && event.keyCode <= 57;
 }
 
-/** Function to check if the key press by user is a number or an alphabet.
+/** Function to check if the key pressed by user is a number or an alphabet.
  * @param {Object} event - event triggered when a character is typed
  */
 function isAlphanumeric(event) {
@@ -16,7 +16,7 @@ function isAlphanumeric(event) {
   );
 }
 
-/** Mapping between basicValidationType and the basic validation logic */
+/** Mapping between basicValidationType and the validation method to use */
 export const validationTypeToFunctionMap = {
   numeric: isNumeric,
   alphanumeric: isAlphanumeric,

@@ -42,7 +42,7 @@ jobs:
         VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
         VUE_APP_AWS_REGION: ${{ secrets.VUE_APP_AWS_REGION }}
         VUE_APP_AWS_SQS_URL: ${{ secrets.VUE_APP_AWS_SQS_URL }}
-        VUE_APP_BASE_URL_YOUTUBE: ${{ secrets.VUE_APP_BASE_URL_YOUTUBE }}
+        VUE_APP_BASE_URL_YOUTUBE: 'https://www.youtube.com/watch?v='
         VUE_APP_OTP_URL: ${{ secrets.VUE_APP_OTP_URL }}
       run: npm run build
 

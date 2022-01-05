@@ -15,7 +15,7 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      {{ inputBoxDisplayText }}
+      {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
     <div
@@ -68,7 +68,7 @@
         ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
-            {{ programData["text"]["default"]["addButton"] }}
+            {{ addButtonText }}
           </p>
         </div>
       </button>
@@ -108,7 +108,7 @@ export default {
       validateCount: 0, // count the number of times the user has been validated
       invalidLoginMessage: "",
       isLoading: false,
-      invalidInputMessage: null, // whether the input being entered by the user matches the basic validation criteria
+      invalidInputMessage: null, // message to show when the input being entered does not match the ID format
     };
   },
 
@@ -178,7 +178,7 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < this.maxNumberOfInput
+        this.numOfUserIds < this.maxNumberOfIds
       );
     },
 
@@ -203,7 +203,7 @@ export default {
     },
 
     /** Returns the heading text for the input box */
-    inputBoxDisplayText() {
+    inputBoxDisplayTitle() {
       return this.programData.text.default.display;
     },
 
@@ -228,13 +228,25 @@ export default {
     },
 
     /** Returns the maximum number of ID's a user can enter */
-    maxNumberOfInput() {
+    maxNumberOfIds() {
       return this.programData.maxNumberOfIds;
     },
 
     /** Returns the invalid login message stored against each program  */
     invalidLoginText() {
       return this.programData.text.default.invalid.login;
+    },
+
+    addButtonText() {
+      return this.programData.text.default.addButton;
+    },
+    /** Returns the text for the submit button */
+    submitButtonDisplayText() {
+      return this.programData.text.default.submitButton;
+    },
+    /** Returns the basic validation type for the input */
+    basicValidationType() {
+      return this.programData.input.basicValidationType;
     },
   },
   methods: {
@@ -254,11 +266,7 @@ export default {
      * @param {Object} event - event triggered when a character is typed
      */
     isValidEntry(event) {
-      if (
-        validationTypeToFunctionMap[this.programData["input"]["basicValidationType"]](
-          event
-        )
-      ) {
+      if (validationTypeToFunctionMap[this.basicValidationType](event)) {
         return true;
       } else event.preventDefault();
     },

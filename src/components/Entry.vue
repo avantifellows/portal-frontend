@@ -15,7 +15,7 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      {{ programData["text"]["default"]["display"] }}
+      {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
     <div
@@ -30,11 +30,11 @@
           :type="inputType"
           :inputmode="inputMode"
           pattern="[0-9]*"
-          :placeholder="placeholderText"
+          :placeholder="inputBoxPlaceholderText"
           required
           @keypress="isValidEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
-          :class="calculateInputClasses(index)"
+          :class="selectInputBoxClasses(index)"
           @input="updateUserId($event, index)"
         />
       </div>
@@ -68,7 +68,7 @@
         ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
-            {{ programData["text"]["default"]["addButton"] }}
+            {{ addButtonText }}
           </p>
         </div>
       </button>
@@ -79,7 +79,7 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
-      {{ programData["text"]["default"]["submitButton"] }}
+      {{ submitButtonDisplayText }}
     </button>
   </div>
 </template>
@@ -108,27 +108,31 @@ export default {
       validateCount: 0, // count the number of times the user has been validated
       invalidLoginMessage: "",
       isLoading: false,
-      invalidInputMessage: null,
+      invalidInputMessage: null, // message to show when the input being entered does not match the ID format
     };
   },
 
   computed: {
     /** Returns the input mode stored against the program */
     inputMode() {
-      return this.programData["input"]["mode"];
+      return this.programData.input.mode;
     },
+
     /** Returns the input type stored against the program */
     inputType() {
-      return this.programData["input"]["type"];
+      return this.programData.input.type;
     },
+
     /** Returns the placeholder text stored against the program */
-    placeholderText() {
-      return this.programData["text"]["default"]["placeholder"];
+    inputBoxPlaceholderText() {
+      return this.programData.text.default.placeholder;
     },
+
     /** Returns length of the list of user IDs */
     numOfUserIds() {
       return this.userIDList.length;
     },
+
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
@@ -137,15 +141,18 @@ export default {
         this.userIDList[0]["userID"] != ""
       );
     },
+
     /** Whether multiple entries have been made by the user */
     hasUserEnteredMoreThanOne() {
       return !this.isMultipleIDEntryAllowed && this.numOfUserIds > 1;
     },
+
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
     isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
     },
+
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
@@ -160,6 +167,7 @@ export default {
         this.isCurrentEntryIncomplete
       );
     },
+
     /**
      * Checks if "+" button should be displayed. Will be activated only if:
      * - multiple entries are allowed
@@ -170,33 +178,82 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < this.programData["maxNumberOfIds"]
+        this.numOfUserIds < this.maxNumberOfIds
       );
     },
+
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return (
-        this.latestEntry["userID"].length < this.programData["input"]["maxLengthOfId"]
-      );
+      return this.latestEntry["userID"].length < this.maxLengthOfId;
     },
+
     /** Returns the most recently entered input */
     latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
+
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
       return !this.isCurrentUserValid && this.validateCount == 1;
     },
+
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
       return this.invalidInputMessage != null;
+    },
+
+    /** Returns the heading text for the input box */
+    inputBoxDisplayTitle() {
+      return this.programData.text.default.display;
+    },
+
+    /** Returns the button text for adding another input box */
+    inputBoxAddButtonText() {
+      return this.programData.text.default.addButton;
+    },
+
+    /** Returns the maximum length of the ID */
+    maxLengthOfId() {
+      return this.programData.input.maxLengthOfId;
+    },
+
+    /** Returns the basic validation type for the input */
+    basicValidationType() {
+      return this.programData.input.basicValidationType;
+    },
+
+    /** Returns the invalid input message stored against each program */
+    invalidInputText() {
+      return this.programData.text.default.invalid.input;
+    },
+
+    /** Returns the maximum number of ID's a user can enter */
+    maxNumberOfIds() {
+      return this.programData.maxNumberOfIds;
+    },
+
+    /** Returns the invalid login message stored against each program  */
+    invalidLoginText() {
+      return this.programData.text.default.invalid.login;
+    },
+
+    addButtonText() {
+      return this.programData.text.default.addButton;
+    },
+    /** Returns the text for the submit button */
+    submitButtonDisplayText() {
+      return this.programData.text.default.submitButton;
+    },
+    /** Returns the basic validation type for the input */
+    basicValidationType() {
+      return this.programData.input.basicValidationType;
     },
   },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box
      */
-    calculateInputClasses(index) {
+    selectInputBoxClasses(index) {
       return [
         {
           "border-red-600 focus:border-red-600":
@@ -209,11 +266,7 @@ export default {
      * @param {Object} event - event triggered when a character is typed
      */
     isValidEntry(event) {
-      if (
-        validationTypeToFunctionMap[this.programData["input"]["basicValidationType"]](
-          event
-        )
-      ) {
+      if (validationTypeToFunctionMap[this.basicValidationType](event)) {
         return true;
       } else event.preventDefault();
     },
@@ -283,19 +336,14 @@ export default {
     updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
-      } else if (event.target.value.length < this.programData["input"]["maxLengthOfId"]) {
-        this.invalidInputMessage = this.programData["text"]["default"]["invalid"][
-          "input"
-        ];
+      } else if (event.target.value.length < this.maxLengthOfId) {
+        this.invalidInputMessage = this.invalidInputText;
         this.resetInvalidLoginMessage();
       } else {
         this.resetInvalidInputMessage();
       }
-      if (event.target.value.length > this.programData["input"]["maxLengthOfId"]) {
-        event.target.value = event.target.value.slice(
-          0,
-          this.programData["input"]["maxLengthOfId"]
-        );
+      if (event.target.value.length > this.maxLengthOfId) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
         this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
@@ -324,20 +372,16 @@ export default {
       this.isLoading = true;
       let userValidationResponse = await validateID(
         userID,
-        this.validateCount,
-        this.programData["dataSource"]["name"],
-        this.programData["dataSource"]["column"],
-        this.programData["dataSource"]["type"],
-        this.authType
+        this.programData.dataSource,
+        this.authType,
+        this.validateCount
       );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.isLoading = false;
 
       if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.programData["text"]["default"]["invalid"][
-          "login"
-        ];
+        this.invalidLoginMessage = this.invalidLoginText;
       }
       if (this.invalidLoginMessage != "") {
         this.resetEntry(this.numOfUserIds - 1);

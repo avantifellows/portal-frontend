@@ -244,10 +244,6 @@ export default {
     submitButtonDisplayText() {
       return this.programData.text.default.submitButton;
     },
-    /** Returns the basic validation type for the input */
-    basicValidationType() {
-      return this.programData.input.basicValidationType;
-    },
   },
   methods: {
     /** Determines how the input box should look.

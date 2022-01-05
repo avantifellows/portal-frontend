@@ -118,11 +118,12 @@ export default {
       OTPCode: "", // string that contains the OTP code entered by the user
       isLoading: false,
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
-      invalidPhoneNumberMessage: null, // whether the input being entered by the user matches the basic validation criteria
+      invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
     };
   },
 
   computed: {
+    /** Extracts phone number from list */
     phoneNumber() {
       return this.phoneNumberList["0"]["userID"];
     },
@@ -210,9 +211,16 @@ export default {
     invalidPhoneNumberMessageFromDatabase() {
       return this.programData.text.default.invalid.input;
     },
+
+    /** Displays message returned from OTP service */
     willDisplayOTPMessage() {
       return this.displayOTPMessage["message"];
     },
+
+    /** Determines how the OTP message should look like.
+     * - If the message is returned with a failure status, the text is red
+     * - Otherwise, the text is green
+     */
     displayOTPMessageClass() {
       let baseStyle = "mx-auto text-base mb-1 px-6";
       return this.displayOTPMessage["status"] === "failure"
@@ -242,7 +250,7 @@ export default {
       } else event.preventDefault();
     },
 
-    /** Resets the invalid input message */
+    /** Resets the invalid phone number message */
     resetinvalidPhoneNumberMessage() {
       this.invalidPhoneNumberMessage = "";
     },

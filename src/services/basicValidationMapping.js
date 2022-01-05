@@ -5,7 +5,7 @@ function isNumeric(event) {
   return event.keyCode >= 48 && event.keyCode <= 57;
 }
 
-/** Function to check if the key press by user is a number or an alphabet.
+/** Function to check if the key pressed by user is a number or an alphabet.
  * @param {Object} event - event triggered when a character is typed
  */
 function isAlphanumeric(event) {

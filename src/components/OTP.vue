@@ -18,7 +18,7 @@
     <p
       class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold px-6"
     >
-      {{ inputBoxDisplayText }}
+      {{ inputBoxDisplayTitle }}
     </p>
 
     <!--text box to enter phone number-->
@@ -37,15 +37,15 @@
         @keypress="isValidPhoneNumber($event)"
         class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
         :class="selectInputBoxClasses"
-        @input="updatephoneNumber($event)"
+        @input="updatePhoneNumber($event)"
       />
     </div>
 
     <!-- invalid input message  -->
     <span
       class="mx-auto text-red-700 text-base mb-1 px-2"
-      v-if="isInvalidInputMessageShown"
-      >{{ invalidInputMessage }}</span
+      v-if="isinvalidPhoneNumberMessageShown"
+      >{{ invalidPhoneNumberMessage }}</span
     >
 
     <!--text box to enter OTP-->
@@ -72,8 +72,8 @@
     </button>
 
     <!-- OTP response message  -->
-    <span class="mx-auto text-red-700 text-base mb-1 px-4" v-if="displayOTPMessage">{{
-      displayOTPMessage
+    <span v-if="willDisplayOTPMessage" :class="displayOTPMessageClass">{{
+      willDisplayOTPMessage
     }}</span>
 
     <!-- submit button -->
@@ -117,8 +117,8 @@ export default {
       isOTPSent: false, // has the OTP been sent
       OTPCode: "", // string that contain the OTP code entered by the user
       isLoading: false,
-      displayOTPMessage: "", // string that contains any messages returned by the OTP service
-      invalidInputMessage: null, // whether the input being entered by the user matches the basic validation criteria
+      displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
+      invalidPhoneNumberMessage: null, // whether the input being entered by the user matches the basic validation criteria
     };
   },
 
@@ -143,7 +143,7 @@ export default {
     },
 
     /** Checks if any phoneNumber has been entered */
-    isAnyphoneNumberPresent() {
+    isAnyPhoneNumberPresent() {
       return this.phoneNumberList != undefined && this.phoneNumber != "";
     },
 
@@ -151,7 +151,7 @@ export default {
     isRequestOTPButtonDisabled() {
       return (
         this.phoneNumber == undefined ||
-        this.invalidInputMessage != "" ||
+        this.invalidPhoneNumberMessage != "" ||
         this.isOTPSent == true
       );
     },
@@ -168,16 +168,16 @@ export default {
 
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.phoneNumber.length < this.maxLengthOfId;
+      return this.phoneNumber.length < this.maxLengthOfPhoneNumber;
     },
 
     /** Whether input being typed is in the correct format */
-    isInvalidInputMessageShown() {
-      return this.invalidInputMessage != null;
+    isinvalidPhoneNumberMessageShown() {
+      return this.invalidPhoneNumberMessage != null;
     },
 
     /** Returns the heading text for the input box */
-    inputBoxDisplayText() {
+    inputBoxDisplayTitle() {
       return this.programData.text.default.display;
     },
 
@@ -197,7 +197,7 @@ export default {
     },
 
     /** Returns the maximum length of the ID */
-    maxLengthOfId() {
+    maxLengthOfPhoneNumber() {
       return this.programData.input.maxLengthOfId;
     },
 
@@ -207,8 +207,17 @@ export default {
     },
 
     /** Returns the invalid input message stored against each program */
-    invalidInputText() {
+    invalidPhoneNumberMessageFromDatabase() {
       return this.programData.text.default.invalid.input;
+    },
+    willDisplayOTPMessage() {
+      return this.displayOTPMessage["message"];
+    },
+    displayOTPMessageClass() {
+      let baseStyle = "mx-auto text-base mb-1 px-6";
+      return this.displayOTPMessage["status"] === "failure"
+        ? baseStyle + " text-red-700"
+        : baseStyle + " text-green-700";
     },
   },
   methods: {
@@ -219,7 +228,7 @@ export default {
     selectInputBoxClasses() {
       let baseStyle =
         "border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none";
-      return this.invalidInputMessage
+      return this.invalidPhoneNumberMessage
         ? baseStyle + "border-red-600 focus:border-red-600"
         : baseStyle + "pointer-events-none opacity-30";
     },
@@ -234,24 +243,24 @@ export default {
     },
 
     /** Resets the invalid input message */
-    resetInvalidInputMessage() {
-      this.invalidInputMessage = "";
+    resetinvalidPhoneNumberMessage() {
+      this.invalidPhoneNumberMessage = "";
     },
 
     /** This function is called whenever something is entered in the input box.
      * It checks if the required number of characters are being typed.
      * @param {Object} event - the event which triggered this function
      */
-    updatephoneNumber(event) {
+    updatePhoneNumber(event) {
       if (event.target.value.length == 0) {
-        this.invalidInputMessage = "";
-      } else if (event.target.value.length > this.maxLengthOfId) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
+        this.invalidPhoneNumberMessage = "";
+      } else if (event.target.value.length > this.maxLengthOfPhoneNumber) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfPhoneNumber);
         this.phoneNumber = event.target.value.toString();
-      } else if (event.target.value.length < this.maxLengthOfId) {
-        this.invalidInputMessage = this.invalidInputText;
+      } else if (event.target.value.length < this.maxLengthOfPhoneNumber) {
+        this.invalidPhoneNumberMessage = this.invalidPhoneNumberMessageFromDatabase;
       } else {
-        this.resetInvalidInputMessage();
+        this.resetinvalidPhoneNumberMessage();
       }
     },
 
@@ -261,13 +270,12 @@ export default {
      */
     async sendOTP() {
       const response = await OTPAuth.sendOTP(parseInt(this.phoneNumber));
-      if (response.status == 200) {
-        this.displayOTPMessage = mapSendStatusCodeToMessage(response.status.toString());
-        this.isOTPSent = true;
-      } else {
-        this.displayOTPMessage = mapSendStatusCodeToMessage(response.status.toString());
-        this.isOTPSent = false;
-      }
+      let responseStatusCodeAndMessage = response.data.split("|");
+      const responseStatusMessage = responseStatusCodeAndMessage[0];
+      this.displayOTPMessage = mapSendStatusCodeToMessage(responseStatusMessage.trim());
+      this.displayOTPMessage["status"] === "success"
+        ? (this.isOTPSent = true)
+        : (this.isOTPSent = false);
     },
 
     /** Function that verifies the OTP */
@@ -276,10 +284,15 @@ export default {
         parseInt(this.phoneNumber),
         parseInt(this.OTPCode)
       );
-      this.displayOTPMessage = mapVerifyStatusCodeToMessage[response.status.toString()];
-      if (response.status == 200) {
+      let responseStatusCodeAndMessage = response.data.split("|");
+      const responseStatusMessage = responseStatusCodeAndMessage[0];
+      const responseStatusCode = responseStatusCodeAndMessage[1];
+      if (responseStatusMessage.trim() === "success") {
         this.isLoading = true;
         this.authenticateAndRedirect();
+      } else {
+        this.displayOTPMessage =
+          mapVerifyStatusCodeToMessage[responseStatusCode.trim().toString()];
       }
     },
 

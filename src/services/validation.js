@@ -44,9 +44,7 @@ async function checkUserIdInFirestore(
     };
   }
 
-  if (validateCount == 0) {
-    validateCount += 1;
-  } else if (validateCount == 1) {
+  if (validateCount == 0 || validateCount == 1) {
     validateCount += 1;
   }
   return {
@@ -57,29 +55,30 @@ async function checkUserIdInFirestore(
 
 /** This function checks the data source to see which database API needs to be called.
  * @param {String} userID - current ID being validated
- * @param {Number} validateCount - indicates how many times the user has been validated
- * @param {String} dataSourceObject - contains information about where and how the data is stored.
+ * @param {String} dataSource - contains information about where and how the data is stored.
  * @param {String} authType - the authentication method the user has used
+ * @param {Number} validateCount - indicates how many times the user has been validated
  */
 export async function validateID(
   userID,
-  dataSourceObject,
+  dataSource,
   authType,
   validateCount = 0
 ) {
-  if (dataSourceObject["type"] == "Firestore") {
+  if (dataSource["type"] == "Firestore") {
     if (authType == "ID") {
       return checkUserIdInFirestore(
         userID,
         validateCount,
-        dataSourceObject["name"],
-        dataSourceObject["column"]
+        dataSource["name"],
+        dataSource["column"]
       );
-    } else if (authType == "OTP") {
+    }
+    if (authType == "OTP") {
       return checkPhoneNumberInFirestore(
         userID,
-        dataSourceObject["name"],
-        dataSourceObject["column"]
+        dataSource["name"],
+        dataSource["column"]
       );
     }
   }

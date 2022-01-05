@@ -16,7 +16,7 @@ function isAlphanumeric(event) {
   );
 }
 
-/** Mapping between basicValidationType and the basic validation logic */
+/** Mapping between basicValidationType and the validation method to use */
 export const validationTypeToFunctionMap = {
   numeric: isNumeric,
   alphanumeric: isAlphanumeric,

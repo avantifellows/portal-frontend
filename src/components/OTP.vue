@@ -38,7 +38,7 @@
         class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
         :class="selectInputBoxClasses"
         @input="updatePhoneNumber($event)"
-        :disabled="isOTPSent"
+        :disabled="isPhoneNumberNotEditable"
       />
     </div>
 
@@ -119,6 +119,7 @@ import {
 } from "@/services/OTPCodes.js";
 
 const RESEND_OTP_TIME_OUT = 60;
+
 export default {
   name: "OTP",
   props: {
@@ -295,6 +296,15 @@ export default {
         seconds = `0${seconds}`;
       }
       return `${minutes}:${seconds}`;
+    },
+
+    /** Whether the user can change the phone number.
+     * The user can't change the input either
+     * - when the OTP has been already sent
+     * - when countdown isn't finished
+     */
+    isPhoneNumberNotEditable() {
+      return this.isOTPSent || !this.isCountdownFinished;
     },
   },
   watch: {

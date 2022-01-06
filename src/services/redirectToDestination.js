@@ -33,6 +33,11 @@ export function redirectToDestination(purposeParams, userIDList, redirectID, red
             fullURL = redirectID
             break;
 
+        case 'youtube':
+            redirectURL = process.env.VUE_APP_BASE_URL_YOUTUBE;
+            fullURL = new URL(redirectURL + redirectID);
+            break;
+
         default:
             var purpose = 'Error'
             sendSQSMessage(

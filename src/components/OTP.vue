@@ -87,10 +87,7 @@
     }}</span>
 
     <!-- timer for resending OTP -->
-    <p
-      v-show="hasCountdownStarted"
-      class="text-sm sm:text-md md:text-md lg:text-l xl:text-xl mx-auto font-bold px-6"
-    >
+    <p v-show="hasCountdownStarted" class="mx-auto font-bold px-6">
       {{ resendOTPText }}
       {{ formattedResendTimer }}
     </p>
@@ -304,7 +301,7 @@ export default {
      * - when countdown isn't finished
      */
     isPhoneNumberNotEditable() {
-      return this.isOTPSent || !this.isCountdownFinished;
+      return this.isOTPSent && (!this.isCountdownFinished || this.hasCountdownStarted);
     },
   },
   watch: {

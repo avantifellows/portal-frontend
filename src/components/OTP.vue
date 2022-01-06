@@ -340,14 +340,13 @@ export default {
     updatePhoneNumber(event) {
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
+      } else if (event.target.value.length > this.maxLengthOfPhoneNumber) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfPhoneNumber);
+        this.phoneNumberList[0]["userID"] = event.target.value.toString();
       } else if (event.target.value.length < this.maxLengthOfPhoneNumber) {
         this.invalidPhoneNumberMessage = this.invalidPhoneNumberMessageFromDatabase;
       } else {
         this.resetinvalidPhoneNumberMessage();
-      }
-      if (event.target.value.length > this.maxLengthOfPhoneNumber) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfPhoneNumber);
-        this.phoneNumberList[0]["userID"] = event.target.value.toString();
       }
     },
 

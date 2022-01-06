@@ -139,7 +139,7 @@ export default {
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
       OTPResendButton: false, // whether OTP resend button should be shown
-      resendOTPTimer: 60, // seconds timer after when the resend OTP button needs to be displayed
+      resendOTPTimer: 60, // time in seconds after which the resend OTP button should be displayed
       OTPInterval: null, // to store the interval instance of the countdown timer
     };
   },

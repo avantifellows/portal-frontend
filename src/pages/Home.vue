@@ -74,10 +74,6 @@ export default {
     };
   },
   computed: {
-    /** Whether multiple ID can be entered */
-    isMultipleIDEntryAllowed() {
-      return this.redirectTo == "plio";
-    },
     /** Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
       return this.authType == "ID";

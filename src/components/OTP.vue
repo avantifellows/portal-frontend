@@ -38,13 +38,14 @@
         class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
         :class="selectInputBoxClasses"
         @input="updatePhoneNumber($event)"
+        :disabled="isPhoneNumberNotEditable"
       />
     </div>
 
     <!-- invalid input message  -->
     <span
       class="mx-auto text-red-700 text-base mb-1 px-2"
-      v-if="isinvalidPhoneNumberMessageShown"
+      v-if="isInvalidPhoneNumberMessageShown"
       >{{ invalidPhoneNumberMessage }}</span
     >
 
@@ -71,10 +72,25 @@
       {{ requestOTPButtonDisplayText }}
     </button>
 
+    <!-- button to resend OTP -->
+    <button
+      @click="sendOTP"
+      class="bg-primary hover:bg-primary-hover text-white uppercase text-lg mx-auto p-4 mt-4 disabled:opacity-50"
+      v-show="isCountdownFinished"
+    >
+      {{ resendOTPButtonText }}
+    </button>
+
     <!-- OTP response message  -->
-    <span v-if="willDisplayOTPMessage" :class="displayOTPMessageClass">{{
-      willDisplayOTPMessage
+    <span v-show="isOTPMessageDisplayed" :class="displayOTPMessageClass">{{
+      OTPResponseMessage
     }}</span>
+
+    <!-- timer for resending OTP -->
+    <p v-show="hasCountdownStarted" class="mx-auto font-bold px-6">
+      {{ resendOTPText }}
+      {{ formattedResendTimer }}
+    </p>
 
     <!-- submit button -->
     <button
@@ -99,6 +115,8 @@ import {
   mapSendStatusCodeToMessage,
 } from "@/services/OTPCodes.js";
 
+const RESEND_OTP_TIME_OUT = 60;
+
 export default {
   name: "OTP",
   props: {
@@ -119,6 +137,9 @@ export default {
       isLoading: false,
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
+      isOTPResendButtonShown: false, // whether OTP resend button should be shown
+      resendOTPTimeLimit: RESEND_OTP_TIME_OUT, // time in seconds after which the resend OTP button should be displayed
+      OTPInterval: null, // to store the interval instance of the countdown timer
     };
   },
 
@@ -159,12 +180,10 @@ export default {
 
     /**
      * Whether the submit button is disabled
-     * Returns true if any of the following conditions are met:
-     * - if 'Request OTP' button is enabled
-     * - if OTP hasn't been typed yet
+     * Returns true if OTP hasn't been typed yet
      */
     isSubmitButtonDisabled() {
-      return !(this.isRequestOTPButtonDisabled || this.OTPCode.length > 0);
+      return this.OTPCode.length === 0;
     },
 
     /** Checks if the current input entry has the required number of characters */
@@ -173,7 +192,7 @@ export default {
     },
 
     /** Whether input being typed is in the correct format */
-    isinvalidPhoneNumberMessageShown() {
+    isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
 
@@ -212,8 +231,19 @@ export default {
       return this.programData.text.default.invalid.input;
     },
 
-    /** Displays message returned from OTP service */
-    willDisplayOTPMessage() {
+    /**
+     * Whether to display the OTP response message.
+     * It will not be displayed if the resend OTP timer is finished and will be replaced by the resend OTP button
+     */
+    isOTPMessageDisplayed() {
+      if (this.resendOTPTimeLimit === 0) {
+        return false;
+      }
+      return true;
+    },
+
+    /** Extracts message returned from OTP service*/
+    OTPResponseMessage() {
       return this.displayOTPMessage["message"];
     },
 
@@ -227,6 +257,52 @@ export default {
         ? baseStyle + " text-red-700"
         : baseStyle + " text-green-700";
     },
+
+    /** Whether the timer is done */
+    isCountdownFinished() {
+      return this.resendOTPTimeLimit === 0;
+    },
+
+    /** When to start the timer */
+    hasCountdownStarted() {
+      return this.resendOTPTimeLimit !== 0 && this.isOTPSent;
+    },
+
+    /** Returns text for resend OTP button */
+    resendOTPButtonText() {
+      return this.programData.text.default.resendOTPButton;
+    },
+
+    /** Returns text for resend OTP title */
+    resendOTPText() {
+      return this.programData.text.default.resendOTPText;
+    },
+
+    /** Format for the timer */
+    formattedResendTimer() {
+      const minutes = Math.floor(this.resendOTPTimeLimit / 60);
+      let seconds = this.resendOTPTimeLimit % 60;
+      if (seconds < 10) {
+        seconds = `0${seconds}`;
+      }
+      return `${minutes}:${seconds}`;
+    },
+
+    /** Whether the user can change the phone number.
+     * The user can't change the input
+     * if the OTP has been sent and if the resend button timer hasn't started
+     */
+    isPhoneNumberNotEditable() {
+      return this.isOTPSent && this.hasCountdownStarted;
+    },
+  },
+  watch: {
+    /** Watches for the timer to finish */
+    resendOTPTimer() {
+      if (this.resendOTPTimer === 0) {
+        clearInterval(this.interval);
+      }
+    },
   },
   methods: {
     /** Determines how the input box should look.
@@ -239,6 +315,11 @@ export default {
       return this.invalidPhoneNumberMessage
         ? baseStyle + "border-red-600 focus:border-red-600"
         : baseStyle + "pointer-events-none opacity-30";
+    },
+
+    /** Starts the timer */
+    startTimer() {
+      this.OTPInterval = setInterval(() => (this.resendOTPTimeLimit -= 1), 1000);
     },
 
     /** Calls the mapping function to validate the typed character
@@ -284,6 +365,10 @@ export default {
       this.displayOTPMessage["status"] === "success"
         ? (this.isOTPSent = true)
         : (this.isOTPSent = false);
+      this.resendOTPTimeLimit = RESEND_OTP_TIME_OUT;
+      if (this.isOTPSent) {
+        this.startTimer();
+      }
     },
 
     /** Function that verifies the OTP */

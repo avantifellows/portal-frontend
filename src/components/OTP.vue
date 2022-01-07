@@ -231,7 +231,7 @@ export default {
       return this.programData.text.default.invalid.input;
     },
 
-    /** 
+    /**
      * Whether to display the OTP response message.
      * It will not be displayed if the resend OTP timer is finished and will be replaced by the resend OTP button
      */

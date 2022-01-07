@@ -180,18 +180,10 @@ export default {
 
     /**
      * Whether the submit button is disabled
-     * Returns true if any of the following conditions are met:
-     * - if 'Request OTP' button is enabled
-     * - if 'Resend OTP' button is shown
-     * and
-     * - if OTP hasn't been typed yet
-     *
+     * Returns true if OTP hasn't been typed yet
      */
     isSubmitButtonDisabled() {
-      return (
-        this.OTPCode.length === 0 &&
-        (!this.isRequestOTPButtonDisabled || this.isOTPResendButtonShown)
-      );
+      return this.OTPCode.length === 0;
     },
 
     /** Checks if the current input entry has the required number of characters */

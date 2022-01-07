@@ -288,12 +288,11 @@ export default {
     },
 
     /** Whether the user can change the phone number.
-     * The user can't change the input either
-     * - when the OTP has been already sent
-     * - when countdown isn't finished
+     * The user can't change the input
+     * if the OTP has been sent and if the resend button timer hasn't started
      */
     isPhoneNumberNotEditable() {
-      return this.isOTPSent && (!this.isCountdownFinished || this.hasCountdownStarted);
+      return this.isOTPSent && this.hasCountdownStarted;
     },
   },
   watch: {

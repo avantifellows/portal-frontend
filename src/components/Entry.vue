@@ -417,7 +417,8 @@ export default {
             this.redirectID,
             this.userIDList,
             this.authType,
-            this.program
+            this.program,
+            this.userType
           );
         }
       }

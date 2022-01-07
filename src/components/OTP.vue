@@ -140,6 +140,7 @@ export default {
       isOTPResendButtonShown: false, // whether OTP resend button should be shown
       resendOTPTimeLimit: RESEND_OTP_TIME_OUT, // time in seconds after which the resend OTP button should be displayed
       OTPInterval: null, // to store the interval instance of the countdown timer
+      userType: "", // differentiates between different kinds of users
     };
   },
 
@@ -425,7 +426,8 @@ export default {
           this.redirectID,
           this.phoneNumberList,
           this.authType,
-          this.program
+          this.program,
+          this.userType
         );
       }
     },

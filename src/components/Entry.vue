@@ -108,7 +108,8 @@ export default {
       validateCount: 0, // count the number of times the user has been validated
       invalidLoginMessage: "",
       isLoading: false,
-      invalidInputMessage: null, // message to show when the input being entered does not match the ID format
+      invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
+      userType: "", // differentiates between different kinds of users
     };
   },
 
@@ -245,6 +246,10 @@ export default {
       return this.programData.text.default.submitButton;
     },
   },
+  created() {
+    /** The user type is set as soon as component is created */
+    this.userType = this.programData.userType;
+  },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box
@@ -356,7 +361,8 @@ export default {
         this.redirectTo,
         this.redirectID,
         tempUserIDList,
-        this.authType
+        this.authType,
+        this.userType
       );
     },
 

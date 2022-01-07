@@ -231,8 +231,9 @@ export default {
       return this.programData.text.default.invalid.input;
     },
 
-    /** Whether OTP message will be displayed.
-     * Will not be displayed if the timer is finished. Will be replaced by the resend OTP button
+    /** 
+     * Whether to display the OTP response message.
+     * It will not be displayed if the resend OTP timer is finished and will be replaced by the resend OTP button
      */
     isOTPMessageDisplayed() {
       if (this.resendOTPTimeLimit === 0) {

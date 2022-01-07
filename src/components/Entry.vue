@@ -332,15 +332,14 @@ export default {
     updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
+      } else if (event.target.value.length > this.maxLengthOfId) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
+        this.userIDList[index]["userID"] = event.target.value.toString();
       } else if (event.target.value.length < this.maxLengthOfId) {
         this.invalidInputMessage = this.invalidInputText;
         this.resetInvalidLoginMessage();
       } else {
         this.resetInvalidInputMessage();
-      }
-      if (event.target.value.length > this.maxLengthOfId) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
-        this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
     /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.

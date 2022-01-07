@@ -41,6 +41,11 @@ export function redirectToDestination(
       fullURL = redirectID;
       break;
     }
+    case 'youtube': {
+      redirectURL = process.env.VUE_APP_BASE_URL_YOUTUBE;
+      fullURL = new URL(redirectURL + redirectID);
+      break;
+    }
     case "teacher-web-app": {
       finalURLQueryParams = new URLSearchParams({
         teacherID: userID,

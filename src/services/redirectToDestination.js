@@ -41,7 +41,7 @@ export function redirectToDestination(
       fullURL = redirectID;
       break;
     }
-    case 'youtube': {
+    case "youtube": {
       redirectURL = process.env.VUE_APP_BASE_URL_YOUTUBE;
       fullURL = new URL(redirectURL + redirectID);
       break;

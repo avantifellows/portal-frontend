@@ -138,7 +138,7 @@ export default {
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
       isOTPResendButtonShown: false, // whether OTP resend button should be shown
-      resendOTPTimeLimit: RESEND_OTP_TIME_OUT, // seconds timer after when the resend OTP button needs to be displayed
+      resendOTPTimeLimit: RESEND_OTP_TIME_OUT, // time in seconds after which the resend OTP button should be displayed
       OTPInterval: null, // to store the interval instance of the countdown timer
     };
   },
@@ -298,9 +298,9 @@ export default {
   },
   watch: {
     /** Watches for the timer to finish */
-    resendOTPTimeLimit: function () {
-      if (this.resendOTPTimeLimit === 0) {
-        clearInterval(this.OTPInterval);
+    resendOTPTimer() {
+      if (this.resendOTPTimer === 0) {
+        clearInterval(this.interval);
       }
     },
   },

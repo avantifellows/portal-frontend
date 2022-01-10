@@ -24,3 +24,6 @@ AWS region
 
 ## VUE_APP_AWS_SQS_URL
 Base URL for AWS SQS
+
+## VUE_APP_OTP_SERVICE
+Base URL for OTP service

@@ -11,16 +11,30 @@
       :authType="authType"
     />
   </div>
+  <!-- OTP component -->
+  <div v-else-if="isAuthTypeOTP && programData">
+    <OTP
+      :redirectTo="redirectTo"
+      :redirectID="redirectID"
+      :purpose="purpose"
+      :purposeParams="purposeParams"
+      :programData="programData"
+      :program="program"
+      :authType="authType"
+    />
+  </div>
 </template>
 
 <script>
 import Entry from "@/components/Entry.vue";
+import OTP from "@/components/OTP.vue";
 import programAPIService from "@/services/API/programData.js";
 
 export default {
   name: "Home",
   components: {
     Entry,
+    OTP,
   },
   props: {
     /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
@@ -60,13 +74,13 @@ export default {
     };
   },
   computed: {
-    /** Whether multiple ID can be entered */
-    isMultipleIDEntryAllowed() {
-      return this.redirectTo == "plio";
-    },
     /** Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
       return this.authType == "ID";
+    },
+    /** Whether authentication method chosen is OTP */
+    isAuthTypeOTP() {
+      return this.authType == "OTP";
     },
   },
   async created() {

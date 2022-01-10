@@ -38,7 +38,7 @@ jobs:
         VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_AF_API_KEY }}
         VUE_APP_BASE_URL_PLIO: 'https://staging-app.plio.in/#/af/play/'
         VUE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VUE_APP_AWS_SQS_ACCESS_KEY }}
-        VUE_APP_AWS_SECRET_KEY: ${{ secrets.VUE_APP_AWS_SQS_SECRET_ACCESS_KEY }}
+        VUE_APP_AWS_SECRET_KEY: ${{ secrets.VUE_APP_AWS_SQS_SECRET_KEY }}
         VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
         VUE_APP_OTP_SERVICE: ${{ secrets.VUE_APP_OTP_SERVICE }}
         VUE_APP_AWS_REGION: ${{ secrets.VUE_APP_AWS_REGION }}

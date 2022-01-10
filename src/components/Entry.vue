@@ -97,8 +97,8 @@ export default {
     redirectID: String,
     purpose: String,
     purposeParams: String,
-    programData: Object,
-    program: String,
+    groupData: Object,
+    group: String,
     authType: String,
   },
   data() {
@@ -114,19 +114,19 @@ export default {
   },
 
   computed: {
-    /** Returns the input mode stored against the program */
+    /** Returns the input mode stored against the group */
     inputMode() {
-      return this.programData.input.mode;
+      return this.groupData.input.mode;
     },
 
-    /** Returns the input type stored against the program */
+    /** Returns the input type stored against the group */
     inputType() {
-      return this.programData.input.type;
+      return this.groupData.input.type;
     },
 
-    /** Returns the placeholder text stored against the program */
+    /** Returns the placeholder text stored against the group */
     inputBoxPlaceholderText() {
-      return this.programData.text.default.placeholder;
+      return this.groupData.text.default.placeholder;
     },
 
     /** Returns length of the list of user IDs */
@@ -205,50 +205,50 @@ export default {
 
     /** Returns the heading text for the input box */
     inputBoxDisplayTitle() {
-      return this.programData.text.default.display;
+      return this.groupData.text.default.display;
     },
 
     /** Returns the button text for adding another input box */
     inputBoxAddButtonText() {
-      return this.programData.text.default.addButton;
+      return this.groupData.text.default.addButton;
     },
 
     /** Returns the maximum length of the ID */
     maxLengthOfId() {
-      return this.programData.input.maxLengthOfId;
+      return this.groupData.input.maxLengthOfId;
     },
 
     /** Returns the basic validation type for the input */
     basicValidationType() {
-      return this.programData.input.basicValidationType;
+      return this.groupData.input.basicValidationType;
     },
 
-    /** Returns the invalid input message stored against each program */
+    /** Returns the invalid input message stored against each group */
     invalidInputText() {
-      return this.programData.text.default.invalid.input;
+      return this.groupData.text.default.invalid.input;
     },
 
     /** Returns the maximum number of ID's a user can enter */
     maxNumberOfIds() {
-      return this.programData.maxNumberOfIds;
+      return this.groupData.maxNumberOfIds;
     },
 
-    /** Returns the invalid login message stored against each program  */
+    /** Returns the invalid login message stored against each group  */
     invalidLoginText() {
-      return this.programData.text.default.invalid.login;
+      return this.groupData.text.default.invalid.login;
     },
 
     addButtonText() {
-      return this.programData.text.default.addButton;
+      return this.groupData.text.default.addButton;
     },
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
-      return this.programData.text.default.submitButton;
+      return this.groupData.text.default.submitButton;
     },
   },
   created() {
     /** The user type is set as soon as component is created */
-    this.userType = this.programData.userType;
+    this.userType = this.groupData.userType;
   },
   methods: {
     /** Determines how the input box should look.
@@ -373,7 +373,7 @@ export default {
       this.isLoading = true;
       let userValidationResponse = await validateID(
         userID,
-        this.programData.dataSource,
+        this.groupData.dataSource,
         this.authType,
         this.validateCount
       );
@@ -407,7 +407,8 @@ export default {
             this.userIDList,
             this.redirectID,
             this.redirectTo,
-            this.authType
+            this.authType,
+            this.group
           )
         ) {
           sendSQSMessage(
@@ -417,7 +418,7 @@ export default {
             this.redirectID,
             this.userIDList,
             this.authType,
-            this.program,
+            this.group,
             this.userType
           );
         }

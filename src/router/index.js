@@ -11,7 +11,7 @@ const routes = [
       purposeParams: route.query.subPurpose,
       redirectTo: route.query.redirectTo,
       redirectID: route.query.redirectID,
-      program: route.query.program,
+      group: route.query.group,
       authType: route.query.authType,
     }),
   },

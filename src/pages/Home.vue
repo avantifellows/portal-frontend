@@ -1,25 +1,25 @@
 <template>
   <!-- Entry component -->
-  <div v-if="isAuthTypeID && programData">
+  <div v-if="isAuthTypeID && groupData">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
       :purpose="purpose"
       :purposeParams="purposeParams"
-      :programData="programData"
-      :program="program"
+      :groupData="groupData"
+      :group="group"
       :authType="authType"
     />
   </div>
   <!-- OTP component -->
-  <div v-else-if="isAuthTypeOTP && programData">
+  <div v-else-if="isAuthTypeOTP && groupData">
     <OTP
       :redirectTo="redirectTo"
       :redirectID="redirectID"
       :purpose="purpose"
       :purposeParams="purposeParams"
-      :programData="programData"
-      :program="program"
+      :groupData="groupData"
+      :group="group"
       :authType="authType"
     />
   </div>
@@ -28,7 +28,7 @@
 <script>
 import Entry from "@/components/Entry.vue";
 import OTP from "@/components/OTP.vue";
-import programAPIService from "@/services/API/programData.js";
+import groupAPIService from "@/services/API/groupData.js";
 
 export default {
   name: "Home",
@@ -57,8 +57,8 @@ export default {
       default: "",
       type: String,
     },
-    /** The program the user falls under. Eg: HaryanaStudents, DelhiStudents */
-    program: {
+    /** The group the user falls under. Eg: HaryanaStudents, DelhiStudents */
+    group: {
       default: "HaryanaStudents",
       type: String,
     },
@@ -70,7 +70,7 @@ export default {
   },
   data() {
     return {
-      programData: null,
+      groupData: null,
     };
   },
   computed: {
@@ -84,8 +84,8 @@ export default {
     },
   },
   async created() {
-    /** Program name is sent to the API to retrieve all details */
-    this.programData = await programAPIService.getProgramData(this.program);
+    /** Group name is sent to the API to retrieve all details */
+    this.groupData = await groupAPIService.getGroupData(this.group);
   },
 };
 </script>

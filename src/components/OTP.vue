@@ -124,8 +124,8 @@ export default {
     redirectID: String,
     purpose: String,
     purposeParams: String,
-    programData: Object,
-    program: String,
+    groupData: Object,
+    group: String,
     authType: String,
   },
   data() {
@@ -150,19 +150,19 @@ export default {
       return this.phoneNumberList["0"]["userID"];
     },
 
-    /** Returns the input mode stored against the program */
+    /** Returns the input mode stored against the group */
     inputMode() {
-      return this.programData.input.mode;
+      return this.groupData.input.mode;
     },
 
-    /** Returns the input type stored against the program */
+    /** Returns the input type stored against the group */
     inputType() {
-      return this.programData.input.type;
+      return this.groupData.input.type;
     },
 
-    /** Returns the placeholder text, stored against the program, for the phone number input box. */
+    /** Returns the placeholder text, stored against the group, for the phone number input box. */
     inputBoxPlaceholderText() {
-      return this.programData.text.default.placeholder;
+      return this.groupData.text.default.placeholder;
     },
 
     /** Checks if any phoneNumber has been entered */
@@ -199,37 +199,37 @@ export default {
 
     /** Returns the heading text for the input box */
     inputBoxDisplayTitle() {
-      return this.programData.text.default.display;
+      return this.groupData.text.default.display;
     },
 
     /** Returns the title text for the OTP code input box */
     enterOTPInputBoxDisplayText() {
-      return this.programData.text.default.enterOTP;
+      return this.groupData.text.default.enterOTP;
     },
 
     /** Returns the text for the Request OTP button */
     requestOTPButtonDisplayText() {
-      return this.programData.text.default.requestOTP;
+      return this.groupData.text.default.requestOTP;
     },
 
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
-      return this.programData.text.default.submitButton;
+      return this.groupData.text.default.submitButton;
     },
 
     /** Returns the maximum length of the ID */
     maxLengthOfPhoneNumber() {
-      return this.programData.input.maxLengthOfId;
+      return this.groupData.input.maxLengthOfId;
     },
 
     /** Returns the basic validation type for the input */
     basicValidationType() {
-      return this.programData.input.basicValidationType;
+      return this.groupData.input.basicValidationType;
     },
 
-    /** Returns the invalid input message stored against each program */
+    /** Returns the invalid input message stored against each group */
     invalidPhoneNumberMessageFromDatabase() {
-      return this.programData.text.default.invalid.input;
+      return this.groupData.text.default.invalid.input;
     },
 
     /**
@@ -271,12 +271,12 @@ export default {
 
     /** Returns text for resend OTP button */
     resendOTPButtonText() {
-      return this.programData.text.default.resendOTPButton;
+      return this.groupData.text.default.resendOTPButton;
     },
 
     /** Returns text for resend OTP title */
     resendOTPText() {
-      return this.programData.text.default.resendOTPText;
+      return this.groupData.text.default.resendOTPText;
     },
 
     /** Format for the timer */
@@ -396,7 +396,7 @@ export default {
       this.isLoading = true;
       this.phoneNumberList[0]["valid"] = await validateID(
         this.phoneNumber,
-        this.programData.dataSource,
+        this.groupData.dataSource,
         this.authType,
         this.validateCount
       );
@@ -414,7 +414,7 @@ export default {
           this.redirectID,
           this.redirectTo,
           this.authType,
-          this.program
+          this.group
         )
       ) {
         this.isLoading = false;
@@ -426,7 +426,7 @@ export default {
           this.redirectID,
           this.phoneNumberList,
           this.authType,
-          this.program,
+          this.group,
           this.userType
         );
       }

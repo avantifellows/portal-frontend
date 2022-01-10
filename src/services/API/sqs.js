@@ -27,7 +27,7 @@ export async function sendSQSMessage(
   redirectID,
   userIDList,
   authType,
-  programName,
+  groupName,
   userType
 ) {
   const messageBody = [
@@ -45,7 +45,7 @@ export async function sendSQSMessage(
       user: {
         values: userIDList,
       },
-      program: programName,
+      group: groupName,
       userType: userType,
     },
   ];

@@ -14,7 +14,7 @@ export function redirectToDestination(
   redirectID,
   redirectTo,
   authType,
-  program
+  group
 ) {
   let redirectURL = "";
   let fullURL = "";
@@ -49,7 +49,7 @@ export function redirectToDestination(
     case "teacher-web-app": {
       finalURLQueryParams = new URLSearchParams({
         teacherID: userID,
-        programName: program,
+        groupName: group,
       });
       fullURL = redirectID + "?" + finalURLQueryParams;
       break;

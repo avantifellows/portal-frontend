@@ -34,11 +34,15 @@ jobs:
     - name: Build
       env:
         NODE_ENV: production
-        VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_AF_API_KEY }}
+        VUE_APP_AF_API_KEY: ${{ secrets.VUE_APP_PLIO_AF_API_KEY }}
         VUE_APP_BASE_URL_PLIO: 'https://app.plio.in/#/af/play/'
         VUE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VUE_APP_AWS_SQS_ACCESS_KEY }}
         VUE_APP_AWS_SECRET_KEY: ${{ secrets.VUE_APP_AWS_SQS_SECRET_ACCESS_KEY }}
         VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
+        VUE_APP_OTP_SERVICE: ${{ secrets.VUE_APP_OTP_SERVICE }}
+        VUE_APP_AWS_REGION: ${{ secrets.VUE_APP_AWS_REGION }}
+        VUE_APP_AWS_SQS_URL: ${{ secrets.VUE_APP_AWS_SQS_URL }}
+        VUE_APP_BASE_URL_YOUTUBE: 'https://www.youtube.com/watch?v='
 
       run: npm run build
 

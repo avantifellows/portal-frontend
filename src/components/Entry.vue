@@ -15,7 +15,7 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      Enter your SRN / अपना SRN दर्ज करें
+      {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
     <div
@@ -27,14 +27,14 @@
       <div>
         <input
           v-model="input.userID"
-          type="tel"
-          inputmode="numeric"
+          :type="inputType"
+          :inputmode="inputMode"
           pattern="[0-9]*"
-          placeholder="Your SRN / आपका SRN"
+          :placeholder="inputBoxPlaceholderText"
           required
-          @keypress="isValidNumericEntry($event)"
+          @keypress="isValidEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
-          :class="calculateInputClasses(index)"
+          :class="selectInputBoxClasses(index)"
           @input="updateUserId($event, index)"
         />
       </div>
@@ -56,7 +56,7 @@
     <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
       invalidLoginMessage
     }}</span>
-    <!-- add srn button -->
+    <!-- button to add another input -->
     <div class="my-auto" v-if="isAddButtonAllowed">
       <button
         @click="addField"
@@ -68,8 +68,7 @@
         ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
-            Add another SRN <br />
-            एक और SRN दर्ज करें
+            {{ addButtonText }}
           </p>
         </div>
       </button>
@@ -80,43 +79,61 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
-      SUBMIT / जमा करें
+      {{ submitButtonDisplayText }}
     </button>
   </div>
 </template>
 
 <script>
-import { validateSRN } from "@/services/validation.js";
+import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
-
-const NUMBER_OF_INPUTS_ALLOWED = 10;
-const authType = "SRN";
+import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 
 export default {
-  name: "SRNEntry",
+  name: "Entry",
   props: {
     redirectTo: String,
     redirectID: String,
     purpose: String,
     purposeParams: String,
+    programData: Object,
+    program: String,
+    authType: String,
   },
   data() {
     return {
       userIDList: [{ userID: "", valid: false }], //array containing user-ids and a valid flag for each
-      invalidInputMessage: null, // whether the input is in correct format
       isCurrentUserValid: false, // whether the current user is valid
-      maxLengthOfSRN: 10,
       validateCount: 0, // count the number of times the user has been validated
-      invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
+      invalidLoginMessage: "",
       isLoading: false,
+      invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
+      userType: "", // differentiates between different kinds of users
     };
   },
+
   computed: {
+    /** Returns the input mode stored against the program */
+    inputMode() {
+      return this.programData.input.mode;
+    },
+
+    /** Returns the input type stored against the program */
+    inputType() {
+      return this.programData.input.type;
+    },
+
+    /** Returns the placeholder text stored against the program */
+    inputBoxPlaceholderText() {
+      return this.programData.text.default.placeholder;
+    },
+
     /** Returns length of the list of user IDs */
     numOfUserIds() {
       return this.userIDList.length;
     },
+
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
@@ -125,21 +142,24 @@ export default {
         this.userIDList[0]["userID"] != ""
       );
     },
+
     /** Whether multiple entries have been made by the user */
     hasUserEnteredMoreThanOne() {
       return !this.isMultipleIDEntryAllowed && this.numOfUserIds > 1;
     },
+
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
     isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
     },
+
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
-     * - no SRN has been typed
+     * - no ID has been entered
      * - input is invalid
-     * - SRN hasn't been completely typed
+     * - ID hasn't been completely entered
      */
     isSubmitButtonDisabled() {
       return (
@@ -148,6 +168,7 @@ export default {
         this.isCurrentEntryIncomplete
       );
     },
+
     /**
      * Checks if "+" button should be displayed. Will be activated only if:
      * - multiple entries are allowed
@@ -158,31 +179,82 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < NUMBER_OF_INPUTS_ALLOWED
+        this.numOfUserIds < this.maxNumberOfIds
       );
     },
+
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.latestEntry["userID"].length < this.maxLengthOfSRN;
+      return this.latestEntry["userID"].length < this.maxLengthOfId;
     },
+
     /** Returns the most recently entered input */
     latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
+
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
       return !this.isCurrentUserValid && this.validateCount == 1;
     },
+
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
       return this.invalidInputMessage != null;
     },
+
+    /** Returns the heading text for the input box */
+    inputBoxDisplayTitle() {
+      return this.programData.text.default.display;
+    },
+
+    /** Returns the button text for adding another input box */
+    inputBoxAddButtonText() {
+      return this.programData.text.default.addButton;
+    },
+
+    /** Returns the maximum length of the ID */
+    maxLengthOfId() {
+      return this.programData.input.maxLengthOfId;
+    },
+
+    /** Returns the basic validation type for the input */
+    basicValidationType() {
+      return this.programData.input.basicValidationType;
+    },
+
+    /** Returns the invalid input message stored against each program */
+    invalidInputText() {
+      return this.programData.text.default.invalid.input;
+    },
+
+    /** Returns the maximum number of ID's a user can enter */
+    maxNumberOfIds() {
+      return this.programData.maxNumberOfIds;
+    },
+
+    /** Returns the invalid login message stored against each program  */
+    invalidLoginText() {
+      return this.programData.text.default.invalid.login;
+    },
+
+    addButtonText() {
+      return this.programData.text.default.addButton;
+    },
+    /** Returns the text for the submit button */
+    submitButtonDisplayText() {
+      return this.programData.text.default.submitButton;
+    },
+  },
+  created() {
+    /** The user type is set as soon as component is created */
+    this.userType = this.programData.userType;
   },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box
      */
-    calculateInputClasses(index) {
+    selectInputBoxClasses(index) {
       return [
         {
           "border-red-600 focus:border-red-600":
@@ -191,12 +263,13 @@ export default {
         },
       ];
     },
-    /** Checks to see if the input character is a number. Makes use of ASCII values.
+    /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
-    isValidNumericEntry(event) {
-      if (event.keyCode >= 48 && event.keyCode <= 57) return true;
-      else event.preventDefault();
+    isValidEntry(event) {
+      if (validationTypeToFunctionMap[this.basicValidationType](event)) {
+        return true;
+      } else event.preventDefault();
     },
     /** Adds a new object to the userIDList array */
     addNewEmptyField() {
@@ -233,7 +306,7 @@ export default {
      */
     async addField() {
       const latestUserID = parseInt(this.latestEntry["userID"]);
-      await this.authenticateSRN(latestUserID);
+      await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
       }
@@ -241,6 +314,7 @@ export default {
         this.setValidFlag();
         this.addNewEmptyField();
         this.resetValidFlag();
+        this.resetInvalidLoginMessage();
         this.validateCount = 0;
       }
     },
@@ -263,15 +337,14 @@ export default {
     updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
-      } else if (event.target.value.length < this.maxLengthOfSRN) {
-        this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
+      } else if (event.target.value.length > this.maxLengthOfId) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
+        this.userIDList[index]["userID"] = event.target.value.toString();
+      } else if (event.target.value.length < this.maxLengthOfId) {
+        this.invalidInputMessage = this.invalidInputText;
         this.resetInvalidLoginMessage();
       } else {
         this.resetInvalidInputMessage();
-      }
-      if (event.target.value.length > this.maxLengthOfSRN) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
-        this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
     /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
@@ -288,21 +361,29 @@ export default {
         this.redirectTo,
         this.redirectID,
         tempUserIDList,
-        authType
+        this.authType,
+        this.userType
       );
     },
 
     /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
-    async authenticateSRN(userID) {
+    async authenticateID(userID) {
       this.isLoading = true;
-      let userValidationResponse = await validateSRN(userID, this.validateCount);
+      let userValidationResponse = await validateID(
+        userID,
+        this.programData.dataSource,
+        this.authType,
+        this.validateCount
+      );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
-      this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
       this.isLoading = false;
 
+      if (this.validateCount == 1) {
+        this.invalidLoginMessage = this.invalidLoginText;
+      }
       if (this.invalidLoginMessage != "") {
         this.resetEntry(this.numOfUserIds - 1);
       }
@@ -313,7 +394,7 @@ export default {
      */
     async authenticate() {
       let latestUserID = parseInt(this.latestEntry["userID"]);
-      await this.authenticateSRN(latestUserID);
+      await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
       }
@@ -326,7 +407,7 @@ export default {
             this.userIDList,
             this.redirectID,
             this.redirectTo,
-            authType
+            this.authType
           )
         ) {
           sendSQSMessage(
@@ -335,7 +416,9 @@ export default {
             this.redirectTo,
             this.redirectID,
             this.userIDList,
-            authType
+            this.authType,
+            this.program,
+            this.userType
           );
         }
       }

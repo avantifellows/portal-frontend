@@ -378,10 +378,7 @@ export default {
 
     /** Function that verifies the OTP */
     async verifyOTP() {
-      const response = await OTPAuth.verifyOTP(
-        parseInt(this.phoneNumber),
-        parseInt(this.OTPCode)
-      );
+      const response = await OTPAuth.verifyOTP(parseInt(this.phoneNumber), this.OTPCode);
       let responseStatusCodeAndMessage = response.data.split("|");
       const responseStatusMessage = responseStatusCodeAndMessage[0];
       const responseStatusCode = responseStatusCodeAndMessage[1];

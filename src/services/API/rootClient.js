@@ -11,7 +11,11 @@ export const client = axios.create(
   headers
 );
 
+const OTPHeaders = {
+  "x-api-key": process.env.VUE_APP_OTP_API_KEY,
+};
 /** the base URL is the OTP service URL */
-export const OTPClient = axios.create({
-  baseURL: process.env.VUE_APP_OTP_SERVICE,
-});
+export const OTPClient = axios.create(
+  { baseURL: process.env.VUE_APP_OTP_SERVICE },
+  OTPHeaders
+);

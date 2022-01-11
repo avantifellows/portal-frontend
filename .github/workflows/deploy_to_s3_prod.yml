@@ -44,6 +44,7 @@ jobs:
         VUE_APP_AWS_SQS_URL: ${{ secrets.VUE_APP_AWS_SQS_URL }}
         VUE_APP_BASE_URL_YOUTUBE: 'https://www.youtube.com/watch?v='
         VUE_APP_CHECK_USER_ENDPOINT: '/checkForUser'
+        VUE_APP_OTP_API_KEY: ${{secrets.VUE_APP_OTP_API_KEY}}
 
       run: npm run build
 

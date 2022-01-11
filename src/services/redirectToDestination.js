@@ -1,51 +1,73 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 
-/** This is function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built. 
-* @param {String} purposeparams - extracted from auth layer URL
-* @param {Array} userIDList - list of userID's wanting to go through the layer 
-* @param {String} redirectID - extracted from auth layer URL
-* @param {String} redirectTo - extracted from auth layer URL
-* @param {String} authType - extracted from auth layer URL 
-*/
+/** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
+ * @param {String} purposeParams - extracted from auth layer URL
+ * @param {Array} userIDList - list of userIDs wanting to go through the layer
+ * @param {String} redirectID - extracted from auth layer URL
+ * @param {String} redirectTo - extracted from auth layer URL
+ * @param {String} authType - extracted from auth layer URL
+ */
 
-export function redirectToDestination(purposeParams, userIDList, redirectID, redirectTo, authType){
-    var redirectURL = "";
-    var fullurl = "";
-    
-    switch(redirectTo){
-        case 'plio':    
-            var userID = userIDList[0]["userID"]
-            redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
-            var url = new URL(redirectURL + redirectID); 
-            var queryparams = new URLSearchParams({
-                                api_key: process.env.VUE_APP_AF_API_KEY,
-                                unique_id: userID,
-                                });
-            fullurl = url + "?" + queryparams;
-            break;
+export function redirectToDestination(
+  purposeParams,
+  userIDList,
+  redirectID,
+  redirectTo,
+  authType,
+  group
+) {
+  let redirectURL = "";
+  let fullURL = "";
+  let finalURLQueryParams = "";
+  let userID = userIDList[0]["userID"];
 
-        case 'meet':
-            redirectURL = process.env.VUE_APP_BASE_URL_MEET;
-            fullurl = new URL(redirectURL + redirectID);
-            break;
-        
-        case 'zoom':
-            fullurl = redirectID
-            break;
-            
-        default:
-            var purpose = 'Error'
-            sendSQSMessage(
-                purpose,
-                purposeParams,
-                redirectTo,
-                redirectID,
-                userIDList,
-                authType
-              );
-            return false
-        }
-        
-    window.open(fullurl, "_self");
-    return true
+  switch (redirectTo) {
+    case "plio": {
+      redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+      let url = new URL(redirectURL + redirectID);
+      finalURLQueryParams = new URLSearchParams({
+        api_key: process.env.VUE_APP_PLIO_AF_API_KEY,
+        unique_id: userID,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
+    case "meet": {
+      redirectURL = process.env.VUE_APP_BASE_URL_MEET;
+      fullURL = new URL(redirectURL + redirectID);
+      break;
+    }
+    case "zoom": {
+      fullURL = redirectID;
+      break;
+    }
+    case "youtube": {
+      redirectURL = process.env.VUE_APP_BASE_URL_YOUTUBE;
+      fullURL = new URL(redirectURL + redirectID);
+      break;
+    }
+    case "teacher-web-app": {
+      finalURLQueryParams = new URLSearchParams({
+        teacherID: userID,
+        groupName: group,
+      });
+      fullURL = redirectID + "?" + finalURLQueryParams;
+      break;
+    }
+    default: {
+      var purpose = "Error";
+      sendSQSMessage(
+        purpose,
+        purposeParams,
+        redirectTo,
+        redirectID,
+        userIDList,
+        authType
+      );
+      return false;
+    }
+  }
+
+  window.open(fullURL, "_self");
+  return true;
 }

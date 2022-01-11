@@ -305,6 +305,10 @@ export default {
       }
     },
   },
+  created() {
+    /** The user type is set as soon as component is created */
+    this.userType = this.groupData.userType;
+  },
   methods: {
     /** Determines how the input box should look.
      * - If an input error needs to be displayed, the box has a a red border.
@@ -419,6 +423,7 @@ export default {
       ) {
         this.isLoading = false;
         this.authenticatePhoneNumber();
+        this;
         sendSQSMessage(
           this.purpose,
           this.purposeParams,

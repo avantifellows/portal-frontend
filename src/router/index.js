@@ -1,26 +1,27 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomePage from "@/pages/Homepage.vue";
+import Home from "@/pages/Home.vue";
 
 const routes = [
-    {
-        path: "/",
-        name:"Homepage",
-        component: HomePage,
-        props: (route) => ({
-          purpose: route.query.purpose,
-          purposeParams: route.query.subPurpose,
-          redirectTo: route.query.redirectTo,
-          redirectID: route.query.redirectID
-       })
-    },
-]
+  {
+    path: "/",
+    name: "Home",
+    component: Home,
+    props: (route) => ({
+      purpose: route.query.purpose,
+      purposeParams: route.query.subPurpose,
+      redirectTo: route.query.redirectTo,
+      redirectID: route.query.redirectID,
+      group: route.query.group,
+      authType: route.query.authType,
+    }),
+  },
+];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
-    mode: 'history',
-  });
-
+  history: createWebHistory(),
+  routes,
+  mode: "history",
+});
 
 export default router;
-export {routes};
+export { routes };

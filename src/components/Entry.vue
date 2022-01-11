@@ -2,9 +2,10 @@
   <!-- loading spinner -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <inline-svg class="text-black text-4xl m-auto animate-spin h-20 w-20"
-          :src="require('@/assets/images/loading_spinner.svg')"></inline-svg>
-    
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="require('@/assets/images/loading_spinner.svg')"
+      ></inline-svg>
     </div>
   </div>
   <!-- main div -->
@@ -14,129 +15,151 @@
   >
     <!-- title -->
     <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
-      Enter your SRN / अपना SRN दर्ज करें
+      {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
     <div
       class="flex flex-row justify-center"
       v-for="(input, index) in userIDList"
-      :key="`IDInput-${index}`"
-      :class="{ 'pl-12': ifUserEnteredMoreThanOne }"
+      :key="`idInput-${index}`"
+      :class="{ 'pl-12': hasUserEnteredMoreThanOne }"
     >
       <div>
         <input
           v-model="input.userID"
-          type="tel"
-          inputmode="numeric"
+          :type="inputType"
+          :inputmode="inputMode"
           pattern="[0-9]*"
-          placeholder="Your SRN / आपका SRN"
+          :placeholder="inputBoxPlaceholderText"
           required
-          @keypress="isValidNumericEntry($event)"
+          @keypress="isValidEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
-          :class="calculateInputboxStyleClasses(index)"
-          @input="updateValue($event, index)"
+          :class="selectInputBoxClasses(index)"
+          @input="updateUserId($event, index)"
         />
       </div>
 
-      <div class="my-auto px-3" v-show="ifUserEnteredMoreThanOne">
-        <button
-          @click="removeField(index, userIDList)"
-        >
-          <inline-svg class="fill-current text-red-600 h-8 w-8"
-          :src="require('@/assets/images/remove_circle.svg')"></inline-svg>
+      <div class="my-auto px-3" v-show="hasUserEnteredMoreThanOne">
+        <button @click="deleteInputBox(index, userIDList)">
+          <inline-svg
+            class="fill-current text-red-600 h-8 w-8"
+            :src="require('@/assets/images/remove_circle.svg')"
+          ></inline-svg>
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span class="mx-auto text-red-700 text-base mb-1" v-if="invalidInputMessage">{{
+    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidInputMessageShown">{{
       invalidInputMessage
     }}</span>
     <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
       invalidLoginMessage
     }}</span>
-    <!-- add srn button -->
+    <!-- button to add another input -->
     <div class="my-auto" v-if="isAddButtonAllowed">
       <button
         @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
       >
-       <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1"
-          :src="require('@/assets/images/add_circle.svg')"></inline-svg>
+        <inline-svg
+          class="fill-current text-green-600 h-10 w-10 pr-1"
+          :src="require('@/assets/images/add_circle.svg')"
+        ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
-            Add another SRN <br />
-            एक और SRN दर्ज करें
+            {{ addButtonText }}
           </p>
         </div>
       </button>
     </div>
     <!-- submit button -->
     <button
-      @click="processForm"
+      @click="authenticate"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
     >
-      SUBMIT / जमा करें
+      {{ submitButtonDisplayText }}
     </button>
   </div>
 </template>
 
 <script>
-import { validateSRN } from "@/services/validation.js";
+import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
-
-const numberOfSRNsAllowed = 10;
-const authType = "SRN";
+import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 
 export default {
-  name: "SRNEntry",
+  name: "Entry",
   props: {
     redirectTo: String,
     redirectID: String,
     purpose: String,
     purposeParams: String,
+    groupData: Object,
+    group: String,
+    authType: String,
   },
   data() {
     return {
-      userIDList: [{ userID: "", valid: false }], //array containing user-id's and a valid flag for each
-      invalidInputMessage: null, // whether the input is in correct format
+      userIDList: [{ userID: "", valid: false }], //array containing user-ids and a valid flag for each
       isCurrentUserValid: false, // whether the current user is valid
-      maxLengthOfSRN: 10,
-      validateCount: 0, //this variable tells us how many times the user has been validated.
-      invalidLoginMessage: "Please enter correct SRN / कृपया सही SRN दर्ज करें",
+      validateCount: 0, // count the number of times the user has been validated
+      invalidLoginMessage: "",
       isLoading: false,
+      invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
+      userType: "", // differentiates between different kinds of users
     };
   },
+
   computed: {
+    /** Returns the input mode stored against the group */
+    inputMode() {
+      return this.groupData.input.mode;
+    },
+
+    /** Returns the input type stored against the group */
+    inputType() {
+      return this.groupData.input.type;
+    },
+
+    /** Returns the placeholder text stored against the group */
+    inputBoxPlaceholderText() {
+      return this.groupData.text.default.placeholder;
+    },
+
     /** Returns length of the list of user IDs */
-    userIdListLength() {
+    numOfUserIds() {
       return this.userIDList.length;
     },
+
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
         this.userIDList != undefined &&
-        this.userIdListLength > 0 &&
+        this.numOfUserIds > 0 &&
         this.userIDList[0]["userID"] != ""
       );
     },
+
     /** Whether multiple entries have been made by the user */
-    ifUserEnteredMoreThanOne() {
-      return !this.isSingleEntryOnly && this.userIdListLength > 1;
+    hasUserEnteredMoreThanOne() {
+      return !this.isMultipleIDEntryAllowed && this.numOfUserIds > 1;
     },
+
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
-    isSingleEntryOnly() {
+    isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio";
     },
+
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
-     * - no SRN has been typed
+     * - no ID has been entered
      * - input is invalid
-     * - SRN hasn't been completely typed
+     * - ID hasn't been completely entered
      */
     isSubmitButtonDisabled() {
       return (
@@ -145,6 +168,7 @@ export default {
         this.isCurrentEntryIncomplete
       );
     },
+
     /**
      * Checks if "+" button should be displayed. Will be activated only if:
      * - multiple entries are allowed
@@ -153,43 +177,99 @@ export default {
      */
     isAddButtonAllowed() {
       return (
-        !this.isSingleEntryOnly &&
+        !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.userIdListLength < numberOfSRNsAllowed
+        this.numOfUserIds < this.maxNumberOfIds
       );
     },
+
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
-      return this.latestEntry["userID"].length < this.maxLengthOfSRN;
+      return this.latestEntry["userID"].length < this.maxLengthOfId;
     },
+
     /** Returns the most recently entered input */
     latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
+
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
       return !this.isCurrentUserValid && this.validateCount == 1;
     },
+
+    /** Whether input being typed is in the correct format */
+    isInvalidInputMessageShown() {
+      return this.invalidInputMessage != null;
+    },
+
+    /** Returns the heading text for the input box */
+    inputBoxDisplayTitle() {
+      return this.groupData.text.default.display;
+    },
+
+    /** Returns the button text for adding another input box */
+    inputBoxAddButtonText() {
+      return this.groupData.text.default.addButton;
+    },
+
+    /** Returns the maximum length of the ID */
+    maxLengthOfId() {
+      return this.groupData.input.maxLengthOfId;
+    },
+
+    /** Returns the basic validation type for the input */
+    basicValidationType() {
+      return this.groupData.input.basicValidationType;
+    },
+
+    /** Returns the invalid input message stored against each group */
+    invalidInputText() {
+      return this.groupData.text.default.invalid.input;
+    },
+
+    /** Returns the maximum number of ID's a user can enter */
+    maxNumberOfIds() {
+      return this.groupData.maxNumberOfIds;
+    },
+
+    /** Returns the invalid login message stored against each group  */
+    invalidLoginText() {
+      return this.groupData.text.default.invalid.login;
+    },
+
+    addButtonText() {
+      return this.groupData.text.default.addButton;
+    },
+    /** Returns the text for the submit button */
+    submitButtonDisplayText() {
+      return this.groupData.text.default.submitButton;
+    },
+  },
+  created() {
+    /** The user type is set as soon as component is created */
+    this.userType = this.groupData.userType;
   },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box
      */
-    calculateInputboxStyleClasses(index) {
+    selectInputBoxClasses(index) {
       return [
         {
           "border-red-600 focus:border-red-600":
-            this.invalidInputMessage && index == this.userIdListLength - 1,
-          "pointer-events-none opacity-30": index < this.userIdListLength - 1,
+            this.invalidInputMessage && index == this.numOfUserIds - 1,
+          "pointer-events-none opacity-30": index < this.numOfUserIds - 1,
         },
       ];
     },
-    /** Checks to see if the input character is a number. Makes use of ASCII values.
-     * @param {Object} e - event triggered when a character is typed
+    /** Calls the mapping function to validate the typed character
+     * @param {Object} event - event triggered when a character is typed
      */
-    isValidNumericEntry(e) {
-      if (e.keyCode >= 48 && e.keyCode <= 57) return true;
-      else e.preventDefault();
+    isValidEntry(event) {
+      if (validationTypeToFunctionMap[this.basicValidationType](event)) {
+        return true;
+      } else event.preventDefault();
     },
     /** Adds a new object to the userIDList array */
     addNewEmptyField() {
@@ -225,25 +305,24 @@ export default {
      * Authenticates the most recent typed entry against the database.
      */
     async addField() {
-      const latestUserID = parseInt(this.latestEntry["userID"]);
-      if (!isNaN(latestUserID)) {
-        await this.authenticateSRN(latestUserID);
-        if (!this.isCurrentUserValid && this.validateCount == 1) {
-          this.handleIncorrectEntry(latestUserID);
-        }
-        if (this.isCurrentUserValid || this.validateCount > 1) {
-          this.setValidFlag();
-          this.addNewEmptyField();
-          this.resetValidFlag();
-          this.validateCount = 0;
-        }
+      const latestUserID = this.latestEntry["userID"];
+      await this.authenticateID(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 1) {
+        this.handleIncorrectEntry(latestUserID);
+      }
+      if (this.isCurrentUserValid || this.validateCount > 1) {
+        this.setValidFlag();
+        this.addNewEmptyField();
+        this.resetValidFlag();
+        this.resetInvalidLoginMessage();
+        this.validateCount = 0;
       }
     },
     /** This method is called whenever "-" button is clicked.
      * Removes the selected entry from the entry list and resets appropriate variables
      * @param {Number} index - index of input field to be removed
      */
-    removeField(index) {
+    deleteInputBox(index) {
       this.resetInvalidInputMessage();
       this.resetInvalidLoginMessage();
       this.validateCount = 2;
@@ -255,26 +334,25 @@ export default {
      * @param {Object} event - the event which triggered this function
      * @param {Number} index - the index of the input field
      */
-    updateValue(event, index) {
+    updateUserId(event, index) {
       if (event.target.value.length == 0) {
         this.invalidInputMessage = "";
-      } else if (event.target.value.length < this.maxLengthOfSRN) {
-        this.invalidInputMessage = "Please type 10 numbers / कृपया १० संख्या टाइप करें";
+      } else if (event.target.value.length > this.maxLengthOfId) {
+        event.target.value = event.target.value.slice(0, this.maxLengthOfId);
+        this.userIDList[index]["userID"] = event.target.value.toString();
+      } else if (event.target.value.length < this.maxLengthOfId) {
+        this.invalidInputMessage = this.invalidInputText;
         this.resetInvalidLoginMessage();
       } else {
         this.resetInvalidInputMessage();
-      }
-      if (event.target.value.length > this.maxLengthOfSRN) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfSRN);
-        this.userIDList[index]["userID"] = event.target.value.toString();
       }
     },
     /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
      * @param {String} userID - ID of the incorrect entry field
      */
     handleIncorrectEntry(userID) {
-      var purposeParams = "incorrect-entry";
-      var tempUserIDList = [
+      let purposeParams = "incorrect-entry";
+      let tempUserIDList = [
         { userID: userID.toString(), valid: this.isCurrentUserValid },
       ];
       sendSQSMessage(
@@ -283,38 +361,44 @@ export default {
         this.redirectTo,
         this.redirectID,
         tempUserIDList,
-        authType
+        this.authType,
+        this.userType
       );
     },
 
     /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
-    async authenticateSRN(userID) {
+    async authenticateID(userID) {
       this.isLoading = true;
-      let userValidationResponse = await validateSRN(userID, this.validateCount);
+      let userValidationResponse = await validateID(
+        userID,
+        this.groupData.dataSource,
+        this.authType,
+        this.validateCount
+      );
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
-      this.invalidLoginMessage = userValidationResponse.invalidLoginMessage;
       this.isLoading = false;
 
+      if (this.validateCount == 1) {
+        this.invalidLoginMessage = this.invalidLoginText;
+      }
       if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.userIdListLength - 1);
+        this.resetEntry(this.numOfUserIds - 1);
       }
     },
 
     /** Authenticates the last entry typed before the submit button is clicked.
      * Also, redirects user to the destination and sends a SQS message.
      */
-    async processForm() {
-      let latestUserID = parseInt(this.latestEntry["userID"]);
-      if (!isNaN(latestUserID)) {
-        await this.authenticateSRN(latestUserID);
-        if (!this.isCurrentUserValid && this.validateCount == 1) {
-          this.handleIncorrectEntry(latestUserID);
-        }
-        this.setValidFlag();
+    async authenticate() {
+      let latestUserID = this.latestEntry["userID"];
+      await this.authenticateID(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 1) {
+        this.handleIncorrectEntry(latestUserID);
       }
+      this.setValidFlag();
 
       if (this.isCurrentUserValid || this.validateCount > 1) {
         if (
@@ -323,7 +407,8 @@ export default {
             this.userIDList,
             this.redirectID,
             this.redirectTo,
-            authType
+            this.authType,
+            this.group
           )
         ) {
           sendSQSMessage(
@@ -332,7 +417,9 @@ export default {
             this.redirectTo,
             this.redirectID,
             this.userIDList,
-            authType
+            this.authType,
+            this.group,
+            this.userType
           );
         }
       }

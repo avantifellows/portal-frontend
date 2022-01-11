@@ -305,7 +305,7 @@ export default {
      * Authenticates the most recent typed entry against the database.
      */
     async addField() {
-      const latestUserID = parseInt(this.latestEntry["userID"]);
+      const latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
@@ -393,7 +393,7 @@ export default {
      * Also, redirects user to the destination and sends a SQS message.
      */
     async authenticate() {
-      let latestUserID = parseInt(this.latestEntry["userID"]);
+      let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);

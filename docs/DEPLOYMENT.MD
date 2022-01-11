@@ -13,7 +13,7 @@ This document covers steps on setting up this repository on various cloud hostin
    ```sh
     "deploy-staging": "vue-cli-service build --mode staging && aws --profile $YOUR_AWS_PROFILE --region $YOUR_AWS_REGION s3 sync ./dist s3://$S3_STAGING_BUCKET_NAME --delete --acl public-read"
    ```
-8. To deploy your code on to staging, use `npm run deploy-staging/yarn deploy-staging`.
+8. To deploy your code on to staging, use `npm run deploy-staging` or `yarn deploy-staging`.
 
 ### Production
 Setting up a production environment on AWS is the same as setting up a staging environment.

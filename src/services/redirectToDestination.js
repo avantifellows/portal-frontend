@@ -68,6 +68,6 @@ export function redirectToDestination(
     }
   }
 
-  window.open(fullURL);
+  window.open(fullURL, "_self");
   return true;
 }

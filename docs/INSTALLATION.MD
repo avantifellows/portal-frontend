@@ -4,7 +4,7 @@
 
 ### git-secrets
 git-secrets scans commits, commit messages, and --no-ff merges to prevent adding secrets into your git repositories.
-For installing, follow steps at https://github.com/awsla bs/git-secrets#installing-git-secrets.
+For installing, follow steps at https://github.com/awslabs/git-secrets#installing-git-secrets.
 
     ```sh
     cd auth-layer

@@ -311,8 +311,11 @@ export default {
   },
   mounted() {
     /** If user already logged in, get from store and redirect to destination */
-    this.phoneNumberList["0"]["userID"] = this.$store.getters["getUserPhoneNumber"];
-    this.authenticateAndRedirect();
+    let phoneNumber = this.$store.getters.getUserPhoneNumber;
+    if (phoneNumber) {
+      this.phoneNumberList["0"]["userID"] = phoneNumber;
+      this.authenticateAndRedirect();
+    }
   },
   methods: {
     /** Determines how the input box should look.

@@ -114,6 +114,7 @@ import {
   mapVerifyStatusCodeToMessage,
   mapSendStatusCodeToMessage,
 } from "@/services/OTPCodes.js";
+import { mapState, mapGetters } from "vuex";
 
 const RESEND_OTP_TIME_OUT = 60;
 
@@ -145,6 +146,8 @@ export default {
   },
 
   computed: {
+    ...mapState(["phoneNumber"]),
+    ...mapGetters(["getUserPhoneNumber"]),
     /** Extracts phone number from list */
     phoneNumber() {
       return this.phoneNumberList["0"]["userID"];
@@ -384,6 +387,7 @@ export default {
       const responseStatusCode = responseStatusCodeAndMessage[1];
       if (responseStatusMessage.trim() === "success") {
         this.isLoading = true;
+        this.$store.dispatch("setPhoneNumber", this.phoneNumber);
         this.authenticateAndRedirect();
       } else {
         this.displayOTPMessage =

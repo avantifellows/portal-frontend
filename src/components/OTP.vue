@@ -309,6 +309,11 @@ export default {
     /** The user type is set as soon as component is created */
     this.userType = this.groupData.userType;
   },
+  mounted() {
+    /** If user already logged in, get from store and redirect to destination */
+    this.phoneNumberList["0"]["userID"] = this.$store.getters["getUserPhoneNumber"];
+    this.authenticateAndRedirect();
+  },
   methods: {
     /** Determines how the input box should look.
      * - If an input error needs to be displayed, the box has a a red border.
@@ -384,6 +389,7 @@ export default {
       const responseStatusCode = responseStatusCodeAndMessage[1];
       if (responseStatusMessage.trim() === "success") {
         this.isLoading = true;
+        this.$store.dispatch("setPhoneNumber", this.phoneNumber);
         this.authenticateAndRedirect();
       } else {
         this.displayOTPMessage =

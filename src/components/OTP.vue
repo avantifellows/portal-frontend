@@ -149,6 +149,7 @@ export default {
     ...mapState({
       statePhoneNumber: (state) => state.phoneNumber,
     }),
+    
     /** Extracts phone number from list */
     phoneNumber() {
       return this.phoneNumberList["0"]["userID"];

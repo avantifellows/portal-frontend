@@ -9,11 +9,6 @@ export default createStore({
   state: {
     phoneNumber: null,
   },
-  getters: {
-    getUserPhoneNumber: (state) => {
-      return state.phoneNumber;
-    },
-  },
   actions: {
     setPhoneNumber({ commit }, phoneNumber) {
       commit("setPhoneNumber", phoneNumber);

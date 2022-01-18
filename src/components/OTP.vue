@@ -152,7 +152,7 @@ export default {
 
     /** Extracts phone number from list */
     phoneNumber() {
-      return this.phoneNumberList["0"]["userID"];
+      return this.phoneNumberList[0]["userID"];
     },
 
     /** Returns the input mode stored against the group */
@@ -317,7 +317,7 @@ export default {
   mounted() {
     /** If user already logged in, get from store and redirect to destination */
     if (this.statePhoneNumber) {
-      this.phoneNumberList["0"]["userID"] = this.statePhoneNumber;
+      this.phoneNumberList[0]["userID"] = this.statePhoneNumber;
       this.authenticateAndRedirect();
     }
   },

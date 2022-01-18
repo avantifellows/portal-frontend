@@ -145,8 +145,8 @@ export default {
   },
 
   computed: {
-    /** Retrieve phone number stored in vuex */
     ...mapState({
+      /** Retrieve phone number stored in vuex */
       statePhoneNumber: (state) => state.phoneNumber,
     }),
 

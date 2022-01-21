@@ -10,7 +10,7 @@ const app = createApp(App).component("inline-svg", InlineSvg).use(router);
 
 Sentry.init({
   app,
-  dsn: process.env.VUE_APP_SENTRY_DSNq,
+  dsn: process.env.VUE_APP_SENTRY_DSN,
   integrations: [
     new Integrations.BrowserTracing({
       routingInstrumentation: Sentry.vueRouterInstrumentation(router),

@@ -21,7 +21,7 @@ Sentry.init({
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
   logErrors: true,
-  environment: process.env.NODE_ENV
+  environment: process.env.NODE_ENV,
 });
 
 app.mount("#app");

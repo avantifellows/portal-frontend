@@ -8,20 +8,22 @@ import "./index.css";
 
 const app = createApp(App).component("inline-svg", InlineSvg).use(router);
 
-Sentry.init({
-  app,
-  dsn: process.env.VUE_APP_SENTRY_DSN,
-  integrations: [
-    new Integrations.BrowserTracing({
-      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-    }),
-  ],
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-  logErrors: true,
-  environment: process.env.NODE_ENV,
-});
+if (process.env.NODE_ENV === "production") {
+  Sentry.init({
+    app,
+    dsn: process.env.VUE_APP_SENTRY_DSN,
+    integrations: [
+      new Integrations.BrowserTracing({
+        routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+      }),
+    ],
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+    logErrors: true,
+    environment: process.env.NODE_ENV,
+  });
+}
 
 app.mount("#app");

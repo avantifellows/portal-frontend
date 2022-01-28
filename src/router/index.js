@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
+import Sentry from "@/pages/Sentry.vue";
 
 const routes = [
   {
@@ -14,6 +15,11 @@ const routes = [
       group: route.query.group,
       authType: route.query.authType,
     }),
+  },
+  {
+    path: "/sentry",
+    name: "Sentry",
+    component: Sentry,
   },
 ];
 

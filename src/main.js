@@ -8,7 +8,7 @@ import "./index.css";
 
 const app = createApp(App).component("inline-svg", InlineSvg).use(router);
 
-if (process.env.NODE_ENV === "production") {
+if (['staging', 'production'].includes(process.env.NODE_ENV)) {
   Sentry.init({
     app,
     dsn: process.env.VUE_APP_SENTRY_DSN,

@@ -114,7 +114,7 @@ import {
   mapVerifyStatusCodeToMessage,
   mapSendStatusCodeToMessage,
 } from "@/services/OTPCodes.js";
-
+import { mapState, mapActions } from "vuex";
 const RESEND_OTP_TIME_OUT = 60;
 
 export default {
@@ -145,9 +145,14 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      /** Retrieve phone number stored in vuex */
+      storePhoneNumber: (state) => state.phoneNumber,
+    }),
+
     /** Extracts phone number from list */
     phoneNumber() {
-      return this.phoneNumberList["0"]["userID"];
+      return this.phoneNumberList[0]["userID"];
     },
 
     /** Returns the input mode stored against the group */
@@ -309,7 +314,15 @@ export default {
     /** The user type is set as soon as component is created */
     this.userType = this.groupData.userType;
   },
+  mounted() {
+    /** If user already logged in, get from store and redirect to destination */
+    if (this.storePhoneNumber) {
+      this.phoneNumberList[0]["userID"] = this.storePhoneNumber;
+      this.authenticateAndRedirect();
+    }
+  },
   methods: {
+    ...mapActions(["setPhoneNumber"]),
     /** Determines how the input box should look.
      * - If an input error needs to be displayed, the box has a a red border.
      * - Otherwise, it has an opacity of 30.
@@ -384,6 +397,7 @@ export default {
       const responseStatusCode = responseStatusCodeAndMessage[1];
       if (responseStatusMessage.trim() === "success") {
         this.isLoading = true;
+        this.setPhoneNumber(this.phoneNumber);
         this.authenticateAndRedirect();
       } else {
         this.displayOTPMessage =

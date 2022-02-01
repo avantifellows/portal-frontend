@@ -147,7 +147,7 @@ export default {
   computed: {
     ...mapState({
       /** Retrieve phone number stored in vuex */
-      statePhoneNumber: (state) => state.phoneNumber,
+      storePhoneNumber: (state) => state.phoneNumber,
     }),
 
     /** Extracts phone number from list */
@@ -316,8 +316,8 @@ export default {
   },
   mounted() {
     /** If user already logged in, get from store and redirect to destination */
-    if (this.statePhoneNumber) {
-      this.phoneNumberList[0]["userID"] = this.statePhoneNumber;
+    if (this.storePhoneNumber) {
+      this.phoneNumberList[0]["userID"] = this.storePhoneNumber;
       this.authenticateAndRedirect();
     }
   },

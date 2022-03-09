@@ -1,6 +1,10 @@
 <template>
   <!-- Entry component -->
+  <div>
+    <LocaleSwitcher/>
+  </div>
   <div v-if="isAuthTypeID && groupData">
+    :class="{ 'opacity-20 pointer-events-none': isBackgroundDisabled }">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -26,6 +30,7 @@
 </template>
 
 <script>
+import LocaleSwitcher from "@/components/LocaleSwitcher.vue";
 import Entry from "@/components/Entry.vue";
 import OTP from "@/components/OTP.vue";
 import groupAPIService from "@/services/API/groupData.js";
@@ -33,6 +38,7 @@ import groupAPIService from "@/services/API/groupData.js";
 export default {
   name: "Home",
   components: {
+    LocaleSwitcher,
     Entry,
     OTP,
   },
@@ -71,6 +77,7 @@ export default {
   data() {
     return {
       groupData: null,
+      showLanguagePickerDialog: false,
     };
   },
   computed: {
@@ -82,10 +89,14 @@ export default {
     isAuthTypeOTP() {
       return this.authType == "OTP";
     },
+    isBackgroundDisabled() {
+      return this.showLanguagePickerDialog;
+    },
   },
   async created() {
     /** Group name is sent to the API to retrieve all details */
     this.groupData = await groupAPIService.getGroupData(this.group);
+    this.showLanguagePickerDialog = true;
   },
 };
 </script>

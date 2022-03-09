@@ -3,8 +3,8 @@
   <div>
     <LocaleSwitcher/>
   </div>
-  <div v-if="isAuthTypeID && groupData">
-    :class="{ 'opacity-20 pointer-events-none': isBackgroundDisabled }">
+  <div v-if="isAuthTypeID && groupData"
+      :class="{ 'opacity-20 pointer-events-none': isBackgroundDisabled }">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"

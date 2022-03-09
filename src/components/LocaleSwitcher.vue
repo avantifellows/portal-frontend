@@ -2,7 +2,6 @@
 <!--main div-->
     <div
       class="fixed w-full top-1/4 my-5 flex justify-center z-100"
-      v-if="showLanguagePickerDialog"
     >
       <div
         class="bg-white w-11/12 sm:w-9/12 lg:w-7/12 p-4 sm:p-10 rounded-lg border border-black"
@@ -11,8 +10,6 @@
         <div class="grid grid-cols-2 space-x-2">
           <div
             class="hover:bg-primary p-4 sm:p-8 rounded-lg border-4 group cursor-pointer"
-            @click="handleLanguage('en')"
-            data-test="languagePicker-en"
           >
             <p class="text-xl sm:text-3xl text-black text-center group-hover:text-white">
               English
@@ -20,8 +17,6 @@
           </div>
           <div
             class="hover:bg-primary p-4 sm:p-8 rounded-lg border-4 group cursor-pointer"
-            @click="handleLanguage('hi')"
-            data-test="languagePicker-hi"
           >
             <p class="text-xl sm:text-3xl text-black text-center group-hover:text-white">
               हिंदी
@@ -36,9 +31,9 @@
 <script>
 
 export default {
-  name: LocaleSwitcher,
+  name: "LocaleSwitcher",
   props: {
     isBackgroundDisabled: Boolean,
-  }
+  },
 }
 </script>

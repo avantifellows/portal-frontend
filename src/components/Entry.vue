@@ -100,6 +100,7 @@ export default {
     groupData: Object,
     group: String,
     authType: String,
+    locale: String,
   },
   data() {
     return {
@@ -126,7 +127,7 @@ export default {
 
     /** Returns the placeholder text stored against the group */
     inputBoxPlaceholderText() {
-      return this.groupData.text.default.placeholder;
+      return this.groupData.text[this.locale].placeholder;
     },
 
     /** Returns length of the list of user IDs */
@@ -205,12 +206,12 @@ export default {
 
     /** Returns the heading text for the input box */
     inputBoxDisplayTitle() {
-      return this.groupData.text.default.display;
+      return this.groupData.text[this.locale].display;
     },
 
     /** Returns the button text for adding another input box */
     inputBoxAddButtonText() {
-      return this.groupData.text.default.addButton;
+      return this.groupData.text[this.locale].addButton;
     },
 
     /** Returns the maximum length of the ID */
@@ -225,7 +226,7 @@ export default {
 
     /** Returns the invalid input message stored against each group */
     invalidInputText() {
-      return this.groupData.text.default.invalid.input;
+      return this.groupData.text[this.locale].invalid.input;
     },
 
     /** Returns the maximum number of ID's a user can enter */
@@ -235,15 +236,15 @@ export default {
 
     /** Returns the invalid login message stored against each group  */
     invalidLoginText() {
-      return this.groupData.text.default.invalid.login;
+      return this.groupData.text[this.locale].invalid.login;
     },
 
     addButtonText() {
-      return this.groupData.text.default.addButton;
+      return this.groupData.text[this.locale].addButton;
     },
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
-      return this.groupData.text.default.submitButton;
+      return this.groupData.text[this.locale].submitButton;
     },
   },
   created() {

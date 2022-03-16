@@ -1,10 +1,9 @@
 <template>
   <!-- Entry component -->
-  <div>
-    <LocaleSwitcher/>
+  <div v-if="toggle" @click="toggle = !toggle">
+    <LocaleSwitcher @languageChanged="setLocale" />
   </div>
-  <div v-if="isAuthTypeID && groupData"
-      :class="{ 'opacity-20 pointer-events-none': isBackgroundDisabled }">
+  <div v-else-if="isAuthTypeID && groupData">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -13,6 +12,7 @@
       :groupData="groupData"
       :group="group"
       :authType="authType"
+      :locale="locale"
     />
   </div>
   <!-- OTP component -->
@@ -25,6 +25,7 @@
       :groupData="groupData"
       :group="group"
       :authType="authType"
+      :locale="locale"
     />
   </div>
 </template>
@@ -77,7 +78,8 @@ export default {
   data() {
     return {
       groupData: null,
-      showLanguagePickerDialog: false,
+      toggle: true,
+      locale: "default",
     };
   },
   computed: {
@@ -89,14 +91,16 @@ export default {
     isAuthTypeOTP() {
       return this.authType == "OTP";
     },
-    isBackgroundDisabled() {
-      return this.showLanguagePickerDialog;
+  },
+  methods: {
+    setLocale(value) {
+      this.locale = value;
+      console.log(this.locale);
     },
   },
   async created() {
     /** Group name is sent to the API to retrieve all details */
     this.groupData = await groupAPIService.getGroupData(this.group);
-    this.showLanguagePickerDialog = true;
   },
 };
 </script>

@@ -127,6 +127,7 @@ export default {
     groupData: Object,
     group: String,
     authType: String,
+    locale: String,
   },
   data() {
     return {
@@ -167,7 +168,7 @@ export default {
 
     /** Returns the placeholder text, stored against the group, for the phone number input box. */
     inputBoxPlaceholderText() {
-      return this.groupData.text.default.placeholder;
+      return this.groupData.text[this.locale].placeholder;
     },
 
     /** Checks if any phoneNumber has been entered */
@@ -204,22 +205,22 @@ export default {
 
     /** Returns the heading text for the input box */
     inputBoxDisplayTitle() {
-      return this.groupData.text.default.display;
+      return this.groupData.text[this.locale].display;
     },
 
     /** Returns the title text for the OTP code input box */
     enterOTPInputBoxDisplayText() {
-      return this.groupData.text.default.enterOTP;
+      return this.groupData.text[this.locale].enterOTP;
     },
 
     /** Returns the text for the Request OTP button */
     requestOTPButtonDisplayText() {
-      return this.groupData.text.default.requestOTP;
+      return this.groupData.text[this.locale].requestOTP;
     },
 
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
-      return this.groupData.text.default.submitButton;
+      return this.groupData.text[this.locale].submitButton;
     },
 
     /** Returns the maximum length of the ID */
@@ -234,7 +235,7 @@ export default {
 
     /** Returns the invalid input message stored against each group */
     invalidPhoneNumberMessageFromDatabase() {
-      return this.groupData.text.default.invalid.input;
+      return this.groupData.text[this.locale].invalid.input;
     },
 
     /**
@@ -276,12 +277,12 @@ export default {
 
     /** Returns text for resend OTP button */
     resendOTPButtonText() {
-      return this.groupData.text.default.resendOTPButton;
+      return this.groupData.text[this.locale].resendOTPButton;
     },
 
     /** Returns text for resend OTP title */
     resendOTPText() {
-      return this.groupData.text.default.resendOTPText;
+      return this.groupData.text[this.locale].resendOTPText;
     },
 
     /** Format for the timer */

@@ -6,7 +6,12 @@ import App from "./App.vue";
 import router from "./router";
 import "./index.css";
 
-const app = createApp(App).component("inline-svg", InlineSvg).use(router);
+import InlineSvg from "vue-inline-svg";
+import store from "./store";
+const app = createApp(App)
+  .component("inline-svg", InlineSvg)
+  .use(router)
+  .use(store);
 
 if (["staging", "production"].includes(process.env.NODE_ENV)) {
   Sentry.init({

@@ -30,13 +30,23 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex";
 export default {
   name: "LocaleSwitcher",
 
   methods: {
+    ...mapMutations(["hideLanguagePickerDialog"]),
     setLocale(locale) {
       this.$emit("languageChanged", locale);
+      this.hideLanguagePickerDialog();
     },
+  },
+
+  computed: {
+    ...mapState({
+      storeLanguageSelected: (state) => state.locale,
+      visible: "showLanguagePickerDialog",
+    }),
   },
 };
 </script>

@@ -95,7 +95,6 @@ export default {
   methods: {
     setLocale(value) {
       this.locale = value;
-      console.log(this.locale);
     },
   },
   async created() {

@@ -8,6 +8,8 @@ let localStorage = new SecureLS({ isCompression: true });
 export default createStore({
   state: {
     phoneNumber: null,
+    locale: null,
+    showLanguagePickerDialog: false,
   },
   actions: {
     setPhoneNumber({ commit }, phoneNumber) {
@@ -17,6 +19,13 @@ export default createStore({
   mutations: {
     setPhoneNumber(state, phoneNumber) {
       state.phoneNumber = phoneNumber;
+    },
+    showLanguagePickerDialog(state, locale) {
+      state.showLanguagePickerDialog = true;
+      state.locale = locale;
+    },
+    hideLanguagePickerDialog(state) {
+      state.showLanguagePickerDialog = false;
     },
   },
   plugins: [

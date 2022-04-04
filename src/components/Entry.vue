@@ -4,7 +4,7 @@
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
-        :src="require('@/assets/images/loading_spinner.svg')"
+        :src="loadingSpinner"
       ></inline-svg>
     </div>
   </div>
@@ -43,7 +43,7 @@
         <button @click="deleteInputBox(index, userIDList)">
           <inline-svg
             class="fill-current text-red-600 h-8 w-8"
-            :src="require('@/assets/images/remove_circle.svg')"
+            :src="deleteSvg"
           ></inline-svg>
         </button>
       </div>
@@ -64,7 +64,7 @@
       >
         <inline-svg
           class="fill-current text-green-600 h-10 w-10 pr-1"
-          :src="require('@/assets/images/add_circle.svg')"
+          :src="addSvg"
         ></inline-svg>
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
@@ -110,6 +110,9 @@ export default {
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
       userType: "", // differentiates between different kinds of users
+      loadingSpinner: new URL('../assets/images/loading_spinner.svg', import.meta.url).href,
+      deleteSvg: new URL('../assets/images/remove_circle.svg', import.meta.url).href,
+      addSvg: new URL('../assets/images/add_circle.svg', import.meta.url).href
     };
   },
 

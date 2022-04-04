@@ -3,16 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "deploy-staging": "vue-cli-service build --mode staging && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer-staging --delete --acl public-read",
-    "deploy": "vue-cli-service build && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer --delete --acl public-read"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "vite lint",
+    "deploy-staging": "vite build --mode staging && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer-staging --delete --acl public-read",
+    "deploy": "vite build && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer --delete --acl public-read"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.30.0",
     "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
+    "buffer": "^6.0.3",
     "core-js": "^3.6.5",
     "dns": "^0.2.2",
     "postcss": "^7.0.36",
@@ -26,9 +27,8 @@
     "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "vite": "2.1.3",
+    "@vitejs/plugin-vue": "^1.6.1",
     "@vue/compiler-sfc": "^3.0.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",

@@ -1,4 +1,4 @@
-name: AF Auth Layer
+name: AF Portal
 
 on:
   pull_request:

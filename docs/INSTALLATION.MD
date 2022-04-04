@@ -16,8 +16,8 @@ For installing, follow steps at https://github.com/awslabs/git-secrets#installin
 Follow the steps below to set up the repo for development.
 1. Clone the repository and change the working directory
     ```sh
-    git clone https://github.com/avantifellows/auth-layer.git
-    cd auth-layer
+    git clone https://github.com/avantifellows/Portal.git
+    cd Portal
     ```
 
 2. Set up your `.env` file by copying `.env.example` file
@@ -36,7 +36,7 @@ npm install
 
 5. Run the app
 ```
-npm run serve
+npm run dev
 ```
 
 6. Your frontend app should be accessible at http://localhost:8080.

@@ -1,6 +1,10 @@
 <template>
+<!-- Message component -->
+<div v-if="!sessionEnabled">
+  <Message/>
+</div>
   <!-- Entry component -->
-  <div v-if="isAuthTypeID && groupData">
+  <div v-if="isAuthTypeID && groupData && sessionEnabled">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -12,7 +16,7 @@
     />
   </div>
   <!-- OTP component -->
-  <div v-else-if="isAuthTypeOTP && groupData">
+  <div v-else-if="isAuthTypeOTP && groupData && sessionEnabled">
     <OTP
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -23,18 +27,28 @@
       :authType="authType"
     />
   </div>
+  <!-- Session component -->
+  <div v-else-if="sessionData && sessionEnabled">
+    <SessionEntry
+      :sessionData="sessionData"
+    />
+  </div>
 </template>
 
 <script>
 import Entry from "@/components/Entry.vue";
 import OTP from "@/components/OTP.vue";
+import SessionEntry from "@/components/SessionEntry.vue";
 import groupAPIService from "@/services/API/groupData.js";
-
+import sessionAPIService from "@/services/API/sessionData.js";
+import Message from "@/components/Message.vue";
 export default {
   name: "Home",
   components: {
     Entry,
     OTP,
+    SessionEntry,
+    Message
   },
   props: {
     /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
@@ -67,10 +81,17 @@ export default {
       default: "ID",
       type: String,
     },
+    /** ID of session */
+    sessionId: {
+      default: "",
+      type: String
+    }
   },
   data() {
     return {
-      groupData: null,
+      groupData: null, // stores details about a group
+      sessionData: null, // stores details about a session
+      sessionEnabled: false // whether a session is enabled
     };
   },
   computed: {
@@ -84,8 +105,13 @@ export default {
     },
   },
   async created() {
-    /** Group name is sent to the API to retrieve all details */
-    this.groupData = await groupAPIService.getGroupData(this.group);
+    /** If sessionId exists in route, then retrieve session details. Otherwise, fallback is using group. */
+    if(this.sessionId === ""){
+      this.groupData = await groupAPIService.getGroupData(this.group); }
+    else{
+     this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+      (this.sessionData.enabled == "on") ? this.sessionEnabled = true : this.sessionEnabled = false;
+    }
   },
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
-<!-- Message component -->
+<!-- UserMessage component -->
 <div v-if="!sessionEnabled">
-  <Message/>
+  <UserMessage/>
 </div>
   <!-- Entry component -->
   <div v-if="isAuthTypeID && groupData && sessionEnabled">
@@ -41,14 +41,14 @@ import OTP from "@/components/OTP.vue";
 import SessionEntry from "@/components/SessionEntry.vue";
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
-import Message from "@/components/Message.vue";
+import UserMessage from "@/components/UserMessage.vue";
 export default {
   name: "Home",
   components: {
     Entry,
     OTP,
     SessionEntry,
-    Message
+    UserMessage
   },
   props: {
     /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */

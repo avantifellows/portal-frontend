@@ -1,7 +1,9 @@
 <template>
+<!-- User message -->
   <div v-if="!sessionActive">
     <UserMessage/>
   </div>
+  <!-- Entry component -->
   <div v-else-if="sessionActive && groupData">
     <Entry
       :redirectTo="getRedirectTo"
@@ -28,33 +30,43 @@ export default {
      },
      data(){
        return {
-          sessionActive : this.sessionEnabled,
-          groupData: null,
-          currentDateTime : new Date()
+          sessionActive : this.sessionEnabled, // local mutable variable
+          groupData: null, //stores details about the group
+          currentDateTime : new Date() // user's current date and time
        }
      },
      computed:{
+       /** Combines session start date and start time */
        getSessionStartDateTime(){
          return (new Date(this.sessionData.startDate + " " + this.sessionData.startTime))
        },
-       getSessionStartDateTimeInMilliseconds(){
-         return Date.parse(this.getSessionStartDateTime)
+
+       /** Parses datetime string into milliseconds */
+       getSessionDateTimeInMilliseconds(datetime){
+         return Date.parse(datetime)
        },
+
+       /** Combines session end date and end time */
        getSessionEndDateTime(){
          return (new Date(this.sessionData.startDate + " " + this.sessionData.endTime))
        },
-       getSessionEndDateTimeInMilliseconds(){
-         return Date.parse(this.getSessionEndDateTime)
-       },
+
+       /** Retrieves destination platform */
        getRedirectTo(){
          return this.sessionData.redirectPlatform
        },
+
+       /** Retrieves destination ID */
        getRedirectId(){
          return this.sessionData.redirectPlatformParams.link
        },
+
+       /** Retrieves group name */
        getGroup(){
          return this.sessionData.group
        },
+
+       /** Returns authentication method based on user's choice. For now, only ID is supported. */
        getAuthType(){
          return "ID"
        },
@@ -67,12 +79,18 @@ export default {
          }
          else return "liveclass"
        },
+
+       /** Checks if the session has begun */
         isStartDateTimeValid(){
-          return this.getSessionStartDateTimeInMilliseconds <= Date.parse(this.currentDateTime)
+          return this.getSessionDateTimeInMilliseconds(this.getSessionStartDateTime) <= Date.parse(this.currentDateTime)
         },
+
+        /** Checks if the session has ended */
         isEndDateTimeValid(){
-          return Date.parse(this.currentDateTime) <= this.getSessionEndDateTimeInMilliseconds
+          return Date.parse(this.currentDateTime) <= this.getSessionDateTimeInMilliseconds(this.getSessionEndDateTime)
         },
+
+        /** Checks if the session scheduled day matches the current day */
         isRepeatScheduleValid(){
           if(this.sessionData.repeatSchedule.type == "weekly"){
               return this.sessionData.repeatSchedule.params.includes(this.currentDateTime.getDay())
@@ -81,6 +99,7 @@ export default {
         }
      },
      async created(){
+       /** Sets the sessionActive variable based on the validity of the start time, end time and schedule */
        if(!(this.isStartDateTimeValid &&  this.isEndDateTimeValid && this.isRepeatScheduleValid))
          this.sessionActive = false;
       this.groupData = await groupAPIService.getGroupData(this.getGroup)

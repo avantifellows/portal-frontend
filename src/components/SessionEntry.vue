@@ -41,11 +41,6 @@ export default {
          return (new Date(this.sessionData.startDate + " " + this.sessionData.startTime))
        },
 
-       /** Parses datetime string into milliseconds */
-       getSessionDateTimeInMilliseconds(datetime){
-         return Date.parse(datetime)
-       },
-
        /** Combines session end date and end time */
        getSessionEndDateTime(){
          return (new Date(this.sessionData.startDate + " " + this.sessionData.endTime))
@@ -70,14 +65,15 @@ export default {
        getAuthType(){
          return "ID"
        },
+
+      /** Returns the purpose value stored in session data */
        getPurpose(){
-         return "attendance"
+         return this.sessionData.purpose
        },
+
+      /** Returns the purpose params stored in session data */
        getPurposeParams(){
-         if(this.sessionData.redirectPlatform == "plio"){
-           return "plio"
-         }
-         else return "liveclass"
+         return this.sessionData.purposeParams
        },
 
        /** Checks if the session has begun */
@@ -97,6 +93,12 @@ export default {
           }
           return false
         }
+     },
+     methods:{
+       /** Parses datetime string into milliseconds */
+       getSessionDateTimeInMilliseconds(datetime){
+         return Date.parse(JSON.parse(JSON.stringify(datetime)))
+       },
      },
      async created(){
        /** Sets the sessionActive variable based on the validity of the start time, end time and schedule */

@@ -31,6 +31,7 @@
   <div v-else-if="sessionData && sessionEnabled">
     <SessionEntry
       :sessionData="sessionData"
+      :sessionEnabled="sessionEnabled"
     />
   </div>
 </template>
@@ -91,7 +92,7 @@ export default {
     return {
       groupData: null, // stores details about a group
       sessionData: null, // stores details about a session
-      sessionEnabled: false // whether a session is enabled
+      sessionEnabled: true // whether a session is enabled
     };
   },
   computed: {

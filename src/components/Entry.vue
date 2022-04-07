@@ -109,7 +109,7 @@ export default {
       invalidLoginMessage: "",
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
-      userType: "", // differentiates between different kinds of users
+      userType: this.groupData.userType, // differentiates between different kinds of users
       loadingSpinner: new URL('../assets/images/loading_spinner.svg', import.meta.url).href,
       deleteSvg: new URL('../assets/images/remove_circle.svg', import.meta.url).href,
       addSvg: new URL('../assets/images/add_circle.svg', import.meta.url).href
@@ -248,10 +248,6 @@ export default {
     submitButtonDisplayText() {
       return this.groupData.text.default.submitButton;
     },
-  },
-  created() {
-    /** The user type is set as soon as component is created */
-    this.userType = this.groupData.userType;
   },
   methods: {
     /** Determines how the input box should look.

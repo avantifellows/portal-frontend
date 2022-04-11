@@ -31,7 +31,6 @@
   <div v-else-if="sessionData && sessionEnabled">
     <SessionEntry
       :sessionData="sessionData"
-      :sessionEnabled="sessionEnabled"
     />
   </div>
 </template>

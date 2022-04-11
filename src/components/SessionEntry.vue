@@ -25,12 +25,11 @@ export default {
   name: "SessionEntry",
   components:{UserMessage, Entry},
      props: {
-    sessionData: Object,
-    sessionEnabled: Boolean
+    sessionData: Object
      },
      data(){
        return {
-          sessionActive : this.sessionEnabled, // local mutable variable
+          sessionActive : true, // whether the timings between the session and user match
           groupData: null, //stores details about the group
           currentDateTime : new Date() // user's current date and time
        }

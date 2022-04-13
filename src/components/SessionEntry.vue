@@ -6,13 +6,13 @@
   <!-- Entry component -->
   <div v-else-if="sessionActive && groupData">
     <Entry
-      :redirectTo="getRedirectTo"
-      :redirectID="getRedirectId"
-      :purpose="getPurpose"
-      :purposeParams="getPurposeParams"
+      :redirectTo="redirectTo"
+      :redirectID="redirectId"
+      :purpose="purpose"
+      :purposeParams="purposeParams"
       :groupData="groupData"
-      :group="getGroup"
-      :authType="getAuthType"/>
+      :group="group"
+      :authType="authType"/>
   </div>
 </template>
 
@@ -36,53 +36,53 @@ export default {
      },
      computed:{
        /** Combines session start date and start time */
-       getSessionStartDateTime(){
+       sessionStartDateTime(){
          return (new Date(this.sessionData.startDate + " " + this.sessionData.startTime))
        },
 
        /** Combines session end date and end time */
-       getSessionEndDateTime(){
+       sessionEndDateTime(){
          return (new Date(this.sessionData.startDate + " " + this.sessionData.endTime))
        },
 
        /** Retrieves destination platform */
-       getRedirectTo(){
+       redirectTo(){
          return this.sessionData.redirectPlatform
        },
 
        /** Retrieves destination ID */
-       getRedirectId(){
+       redirectId(){
          return this.sessionData.redirectPlatformParams.link
        },
 
        /** Retrieves group name */
-       getGroup(){
+       group(){
          return this.sessionData.group
        },
 
        /** Returns authentication method based on user's choice. For now, only ID is supported. */
-       getAuthType(){
+       authType(){
          return "ID"
        },
 
       /** Returns the purpose value stored in session data */
-       getPurpose(){
+       purpose(){
          return this.sessionData.purpose
        },
 
       /** Returns the purpose params stored in session data */
-       getPurposeParams(){
+       purposeParams(){
          return this.sessionData.purposeParams
        },
 
        /** Checks if the session has begun */
         isStartDateTimeValid(){
-          return this.getSessionDateTimeInMilliseconds(this.getSessionStartDateTime) <= Date.parse(this.currentDateTime)
+          return this.getSessionDateTimeInMilliseconds(this.sessionStartDateTime) <= Date.parse(this.currentDateTime)
         },
 
         /** Checks if the session has ended */
         isEndDateTimeValid(){
-          return Date.parse(this.currentDateTime) <= this.getSessionDateTimeInMilliseconds(this.getSessionEndDateTime)
+          return Date.parse(this.currentDateTime) <= this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime)
         },
 
         /** Checks if the session scheduled day matches the current day */
@@ -103,7 +103,7 @@ export default {
        /** Sets the sessionActive variable based on the validity of the start time, end time and schedule */
        if(!(this.isStartDateTimeValid &&  this.isEndDateTimeValid && this.isRepeatScheduleValid))
          this.sessionActive = false;
-      this.groupData = await groupAPIService.getGroupData(this.getGroup)
+      this.groupData = await groupAPIService.getGroupData(this.group)
 
      }
 

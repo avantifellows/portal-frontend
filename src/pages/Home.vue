@@ -110,7 +110,7 @@ export default {
       this.groupData = await groupAPIService.getGroupData(this.group); }
     else{
      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
-      (this.sessionData.enabled == "on") ? this.sessionEnabled = true : this.sessionEnabled = false;
+      this.sessionEnabled = (this.sessionData.enabled == "on") ? true : false;
     }
   },
 };

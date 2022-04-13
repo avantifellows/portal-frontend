@@ -1,10 +1,11 @@
 <template>
-<!-- UserMessage component -->
+<!-- NoClassMessage component -->
 <div v-if="!sessionEnabled">
-  <UserMessage/>
+  <NoClassMessage/>
 </div>
+<div v-else>
   <!-- Entry component -->
-  <div v-if="isAuthTypeID && groupData && sessionEnabled">
+  <div v-if="isAuthTypeID && doesGroupExist">
     <Entry
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -16,7 +17,7 @@
     />
   </div>
   <!-- OTP component -->
-  <div v-else-if="isAuthTypeOTP && groupData && sessionEnabled">
+  <div v-else-if="isAuthTypeOTP && doesGroupExist">
     <OTP
       :redirectTo="redirectTo"
       :redirectID="redirectID"
@@ -28,10 +29,11 @@
     />
   </div>
   <!-- Session component -->
-  <div v-else-if="sessionData && sessionEnabled">
+  <div v-else-if="sessionData">
     <SessionEntry
       :sessionData="sessionData"
     />
+  </div>
   </div>
 </template>
 
@@ -41,14 +43,14 @@ import OTP from "@/components/OTP.vue";
 import SessionEntry from "@/components/SessionEntry.vue";
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
-import UserMessage from "@/components/UserMessage.vue";
+import NoClassMessage from "@/components/NoClassMessage.vue";
 export default {
   name: "Home",
   components: {
     Entry,
     OTP,
     SessionEntry,
-    UserMessage
+    NoClassMessage
   },
   props: {
     /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
@@ -83,7 +85,7 @@ export default {
     },
     /** ID of session */
     sessionId: {
-      default: "",
+      default: null,
       type: String
     }
   },
@@ -103,10 +105,13 @@ export default {
     isAuthTypeOTP() {
       return this.authType == "OTP";
     },
+    doesGroupExist(){
+      return this.groupData;
+    }
   },
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback is using group. */
-    if(this.sessionId === ""){
+    if(this.sessionId == null){
       this.groupData = await groupAPIService.getGroupData(this.group); }
     else{
      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);

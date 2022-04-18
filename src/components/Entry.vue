@@ -141,6 +141,10 @@ export default {
       type: String,
       default: ""
     },
+    sessionId:{
+      type: String,
+      default: ""
+    }
   },
   data() {
     return {
@@ -402,7 +406,8 @@ export default {
         this.redirectID,
         tempUserIDList,
         this.authType,
-        this.userType
+        this.userType,
+        this.sessionId
       );
     },
 
@@ -459,7 +464,8 @@ export default {
             this.userIDList,
             this.authType,
             this.group,
-            this.userType
+            this.userType,
+            this.sessionId
           );
         }
       }

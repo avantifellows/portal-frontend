@@ -15,6 +15,7 @@
     "rules": {
         "vue/multi-word-component-names": ["error", {
             "ignores": ["Home", "Entry"]
-          }]
+          }],
+          "vue/props-casing": ["camelCase"]
     }
 }

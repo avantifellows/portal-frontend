@@ -6,13 +6,14 @@
   <!-- Entry component -->
   <div v-else-if="sessionActive && groupData">
     <Entry
-      :redirect-to="redirectTo"
-      :redirect-i-d="redirectId"
+      :redirectTo="redirectTo"
+      :redirectID="redirectId"
       :purpose="purpose"
-      :purpose-params="purposeParams"
-      :group-data="groupData"
+      :purposeParams="purposeParams"
+      :groupData="groupData"
       :group="group"
-      :auth-type="authType"
+      :authType="authType"
+      :sessionId="sessionId"
     />
   </div>
 </template>
@@ -100,6 +101,10 @@ export default {
           return this.sessionData.repeatSchedule.params.includes(this.currentDateTime.getDay())
       }
       return false
+    },
+
+    sessionId(){
+      return this.sessionData.sessionId
     }
   },
   async created(){

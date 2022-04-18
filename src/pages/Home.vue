@@ -7,31 +7,31 @@
     <!-- Entry component -->
     <div v-if="isAuthTypeID && doesGroupExist">
       <Entry
-        :redirect-to="redirectTo"
-        :redirect-i-d="redirectID"
+        :redirectTo="redirectTo"
+        :redirectID="redirectID"
         :purpose="purpose"
-        :purpose-params="purposeParams"
-        :group-data="groupData"
+        :purposeParams="purposeParams"
+        :groupData="groupData"
         :group="group"
-        :auth-type="authType"
+        :authType="authType"
       />
     </div>
     <!-- OTP component -->
     <div v-else-if="isAuthTypeOTP && doesGroupExist">
       <OTP
-        :redirect-to="redirectTo"
-        :redirect-i-d="redirectID"
+        :redirectTo="redirectTo"
+        :redirectID="redirectID"
         :purpose="purpose"
-        :purpose-params="purposeParams"
-        :group-data="groupData"
+        :purposeParams="purposeParams"
+        :groupData="groupData"
         :group="group"
-        :auth-type="authType"
+        :authType="authType"
       />
     </div>
     <!-- Session component -->
     <div v-else-if="sessionData">
       <SessionEntry
-        :session-data="sessionData"
+        :sessionData="sessionData"
       />
     </div>
   </div>

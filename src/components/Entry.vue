@@ -4,7 +4,7 @@
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
-        :src="loadingSpinner"
+        :src="loadingSpinnerSvg"
       ></inline-svg>
     </div>
   </div>
@@ -89,6 +89,9 @@ import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
+import useAssets from '../assets/assets.js'
+
+const assets = useAssets();
 
 export default {
   name: "Entry",
@@ -110,9 +113,9 @@ export default {
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
       userType: "", // differentiates between different kinds of users
-      loadingSpinner: new URL('../assets/images/loading_spinner.svg', import.meta.url).href,
-      deleteSvg: new URL('../assets/images/remove_circle.svg', import.meta.url).href,
-      addSvg: new URL('../assets/images/add_circle.svg', import.meta.url).href
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
+      deleteSvg: assets.deleteSvg,
+      addSvg: assets.addSvg
     };
   },
 
@@ -248,10 +251,6 @@ export default {
     submitButtonDisplayText() {
       return this.groupData.text.default.submitButton;
     },
-  },
-  created() {
-    /** The user type is set as soon as component is created */
-    this.userType = this.groupData.userType;
   },
   methods: {
     /** Determines how the input box should look.

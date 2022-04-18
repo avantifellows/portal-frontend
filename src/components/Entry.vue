@@ -104,7 +104,7 @@ import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-import useAssets from '../assets/assets.js'
+import useAssets from '@/assets/assets.js'
 
 const assets = useAssets();
 

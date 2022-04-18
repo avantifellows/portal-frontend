@@ -111,7 +111,7 @@ export default {
     },
   },
   async created() {
-    /** If sessionId exists in route, then retrieve session details. Otherwise, fallback is using group. */
+    /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
     if (this.sessionId == null) {
       this.groupData = await groupAPIService.getGroupData(this.group);
     } else {

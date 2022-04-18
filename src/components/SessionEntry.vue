@@ -17,13 +17,13 @@
 </template>
 
 <script>
-import UserMessage from "./UserMessage.vue";
+import NoClassMessage from "./NoClassMessage.vue";
 import Entry from "./Entry.vue";
 import groupAPIService from "../services/API/groupData";
 
 export default {
   name: "SessionEntry",
-  components:{UserMessage, Entry},
+  components:{NoClassMessage, Entry},
      props: {
     sessionData: Object
      },

@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: "UserMessage",
+  name: "NoClassMessage",
   data(){
     return {
       AFLogo: new URL('/AF_favicon.png', import.meta.url).href

@@ -252,10 +252,6 @@ export default {
       return this.groupData.text.default.submitButton;
     },
   },
-  created() {
-    /** The user type is set as soon as component is created */
-    this.userType = this.groupData.userType;
-  },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box

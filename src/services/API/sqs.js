@@ -48,7 +48,7 @@ export async function sendSQSMessage(
       },
       group: groupName,
       userType: userType,
-      sessionId: sessionId
+      sessionId: sessionId,
     },
   ];
   const params = {

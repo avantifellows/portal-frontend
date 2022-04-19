@@ -102,7 +102,8 @@ export default {
       }
       return false
     },
-
+    
+    /** Retrieves session ID */
     sessionId(){
       return this.sessionData.id
     }

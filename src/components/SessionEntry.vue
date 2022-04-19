@@ -62,7 +62,7 @@ export default {
 
     /** Retrieves destination ID */
     redirectId(){
-      return this.sessionData.redirectPlatformParams.link
+      return this.sessionData.redirectPlatformParams.id
     },
 
     /** Retrieves group name */
@@ -92,6 +92,7 @@ export default {
 
     /** Checks if the session has ended */
     isEndDateTimeValid(){
+      console.log(Date.parse(this.currentDateTime), this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime))
       return Date.parse(this.currentDateTime) <= this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime)
     },
 

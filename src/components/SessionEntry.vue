@@ -21,7 +21,7 @@
 <script>
 import NoClassMessage from "./NoClassMessage.vue";
 import Entry from "./Entry.vue";
-import groupAPIService from "../services/API/groupData";
+import groupAPIService from "@/services/API/groupData";
 
 export default {
   name: "SessionEntry",

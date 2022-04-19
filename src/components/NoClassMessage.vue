@@ -8,7 +8,7 @@
         class="w-32  m-auto"
       >
       <p class="text-center text-2xl sm:text-4xl py-4 sm:py-8">
-        There is no class now. <br>Please check the timetable.
+        अभी आपकी कोई क्लास नहीं है|
       </p>
     </div>
   </div>

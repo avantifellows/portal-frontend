@@ -22,7 +22,7 @@
 import NoClassMessage from "./NoClassMessage.vue";
 import Entry from "./Entry.vue";
 import groupAPIService from "@/services/API/groupData";
-
+const EXTRA_5_MINUTES = 900000
 export default {
   name: "SessionEntry",
   components:{
@@ -41,18 +41,27 @@ export default {
     return {
       sessionActive : true, // whether the timings between the session and user match
       groupData: null, //stores details about the group
-      currentDateTime : new Date() // user's current date and time
+      currentDateTime : new Date(), // user's current date and time
+
     }
   },
   computed:{
+    /** Returns formatted local date of the user  */
+    currentDate(){
+      let year = this.currentDateTime.getFullYear().toString()
+      let month = (((this.currentDateTime.getMonth() + 1) < 9) ? '0' : '') + (this.currentDateTime.getMonth() + 1).toString()
+      let date = (((this.currentDateTime.getDate() + 1) < 9) ? '0' : '') + (this.currentDateTime.getDate()).toString()
+      return (year + '-' + month + '-' + date)
+    },
+
     /** Combines session start date and start time */
     sessionStartDateTime(){
-      return (new Date(this.sessionData.startDate + " " + this.sessionData.startTime))
+      return (this.sessionData.startDate <= this.currentDate ) && (new Date(this.currentDate + " " + this.sessionData.startTime))
     },
 
     /** Combines session end date and end time */
     sessionEndDateTime(){
-      return (new Date(this.sessionData.endDate + " " + this.sessionData.endTime))
+      return (new Date(this.currentDate + " " + this.sessionData.endTime))
     },
 
     /** Retrieves destination platform */
@@ -87,12 +96,12 @@ export default {
 
     /** Checks if the session has begun */
     isStartDateTimeValid(){
-      return this.getSessionDateTimeInMilliseconds(this.sessionStartDateTime) <= Date.parse(this.currentDateTime)
+      return this.getSessionDateTimeInMilliseconds(this.sessionStartDateTime) <= Date.parse(this.currentDateTime) + EXTRA_5_MINUTES
     },
 
     /** Checks if the session has ended */
     isEndDateTimeValid(){
-      console.log(Date.parse(this.currentDateTime), this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime))
+      console.log(this.currentDateTime, Date.parse(this.currentDateTime), this.sessionEndDateTime, this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime))
       return Date.parse(this.currentDateTime) <= this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime)
     },
 

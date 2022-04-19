@@ -28,7 +28,8 @@ export async function sendSQSMessage(
   userIDList,
   authType,
   groupName,
-  userType
+  userType,
+  sessionId
 ) {
   const messageBody = [
     {
@@ -47,6 +48,7 @@ export async function sendSQSMessage(
       },
       group: groupName,
       userType: userType,
+      sessionId: sessionId
     },
   ];
   const params = {

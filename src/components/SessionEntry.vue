@@ -52,7 +52,7 @@ export default {
 
     /** Combines session end date and end time */
     sessionEndDateTime(){
-      return (new Date(this.sessionData.startDate + " " + this.sessionData.endTime))
+      return (new Date(this.sessionData.endDate + " " + this.sessionData.endTime))
     },
 
     /** Retrieves destination platform */
@@ -104,7 +104,7 @@ export default {
     },
 
     sessionId(){
-      return this.sessionData.sessionId
+      return this.sessionData.id
     }
   },
   async created(){

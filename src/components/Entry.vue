@@ -1,11 +1,14 @@
 <template>
   <!-- loading spinner -->
-  <div v-if="isLoading" class="h-full w-full fixed z-50">
+  <div
+    v-if="isLoading"
+    class="h-full w-full fixed z-50"
+  >
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
-        :src="require('@/assets/images/loading_spinner.svg')"
-      ></inline-svg>
+        :src="loadingSpinnerSvg"
+      />
     </div>
   </div>
   <!-- main div -->
@@ -19,9 +22,9 @@
     </p>
     <!-- input options and delete options icon -->
     <div
-      class="flex flex-row justify-center"
       v-for="(input, index) in userIDList"
       :key="`idInput-${index}`"
+      class="flex flex-row justify-center"
       :class="{ 'pl-12': hasUserEnteredMoreThanOne }"
     >
       <div>
@@ -32,40 +35,52 @@
           pattern="[0-9]*"
           :placeholder="inputBoxPlaceholderText"
           required
-          @keypress="isValidEntry($event)"
           class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
           :class="selectInputBoxClasses(index)"
+          @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
-        />
+        >
       </div>
 
-      <div class="my-auto px-3" v-show="hasUserEnteredMoreThanOne">
+      <div
+        v-show="hasUserEnteredMoreThanOne"
+        class="my-auto px-3"
+      >
         <button @click="deleteInputBox(index, userIDList)">
           <inline-svg
             class="fill-current text-red-600 h-8 w-8"
-            :src="require('@/assets/images/remove_circle.svg')"
-          ></inline-svg>
+            :src="deleteSvg"
+          />
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidInputMessageShown">{{
+    <span
+      v-if="isInvalidInputMessageShown"
+      class="mx-auto text-red-700 text-base mb-1"
+    >{{
       invalidInputMessage
     }}</span>
-    <span class="mx-auto text-red-700 text-base mb-1" v-if="isInvalidLoginMessageShown">{{
+    <span
+      v-if="isInvalidLoginMessageShown"
+      class="mx-auto text-red-700 text-base mb-1"
+    >{{
       invalidLoginMessage
     }}</span>
     <!-- button to add another input -->
-    <div class="my-auto" v-if="isAddButtonAllowed">
+    <div
+      v-if="isAddButtonAllowed"
+      class="my-auto"
+    >
       <button
-        @click="addField"
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
+        @click="addField"
       >
         <inline-svg
           class="fill-current text-green-600 h-10 w-10 pr-1"
-          :src="require('@/assets/images/add_circle.svg')"
-        ></inline-svg>
+          :src="addSvg"
+        />
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             {{ addButtonText }}
@@ -75,9 +90,9 @@
     </div>
     <!-- submit button -->
     <button
-      @click="authenticate"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
+      @click="authenticate"
     >
       {{ submitButtonDisplayText }}
     </button>
@@ -89,17 +104,47 @@ import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
+import useAssets from '@/assets/assets.js'
+
+const assets = useAssets();
 
 export default {
   name: "Entry",
   props: {
-    redirectTo: String,
-    redirectID: String,
-    purpose: String,
-    purposeParams: String,
-    groupData: Object,
-    group: String,
-    authType: String,
+    redirectTo: {
+      type: String,
+      default: ""
+    },
+    redirectID:{
+      type: String,
+      default: ""
+    },
+    purpose:{
+      type: String,
+      default: ""
+    },
+    purposeParams:{
+      type: String,
+      default: ""
+    },
+    groupData:{
+      type: Object,
+      default(){
+        return {}
+      }
+    },
+    group:{
+      type: String,
+      default: ""
+    },
+    authType:{
+      type: String,
+      default: ""
+    },
+    sessionId:{
+      type: String,
+      default: ""
+    }
   },
   data() {
     return {
@@ -110,9 +155,15 @@ export default {
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
       userType: "", // differentiates between different kinds of users
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
+      deleteSvg: assets.deleteSvg,
+      addSvg: assets.addSvg
     };
   },
-
+  created() {
+    /** The user type is set as soon as component is created */
+    this.userType = this.groupData.userType;
+  },
   computed: {
     /** Returns the input mode stored against the group */
     inputMode() {
@@ -246,10 +297,6 @@ export default {
       return this.groupData.text.default.submitButton;
     },
   },
-  created() {
-    /** The user type is set as soon as component is created */
-    this.userType = this.groupData.userType;
-  },
   methods: {
     /** Determines how the input box should look.
      * @param {Number} index - index of the input box
@@ -362,7 +409,8 @@ export default {
         this.redirectID,
         tempUserIDList,
         this.authType,
-        this.userType
+        this.userType,
+        this.sessionId
       );
     },
 
@@ -419,7 +467,8 @@ export default {
             this.userIDList,
             this.authType,
             this.group,
-            this.userType
+            this.userType,
+            this.sessionId
           );
         }
       }

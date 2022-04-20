@@ -35,16 +35,18 @@ jobs:
     - name: Build
       env:
         NODE_ENV: staging
-        VUE_APP_PLIO_AF_API_KEY: ${{ secrets.VUE_APP_PLIO_AF_API_KEY }}
-        VUE_APP_BASE_URL_PLIO: 'https://staging-app.plio.in/#/af/play/'
-        VUE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VUE_APP_AWS_SQS_ACCESS_KEY }}
-        VUE_APP_AWS_SECRET_KEY: ${{ secrets.VUE_APP_AWS_SQS_SECRET_KEY }}
-        VUE_APP_BASE_URL_MEET: 'https://meet.google.com/'
-        VUE_APP_OTP_SERVICE: ${{ secrets.VUE_APP_OTP_SERVICE }}
-        VUE_APP_AWS_REGION: ${{ secrets.VUE_APP_AWS_REGION }}
-        VUE_APP_AWS_SQS_URL: ${{ secrets.VUE_APP_AWS_SQS_URL }}
-        VUE_APP_BASE_URL_YOUTUBE: 'https://www.youtube.com/watch?v='
-        VUE_APP_CHECK_USER_ENDPOINT: '/stagingCheckForUser'
+        VITE_APP_PLIO_AF_API_KEY: ${{ secrets.VITE_APP_PLIO_AF_API_KEY }}
+        VITE_APP_BASE_URL_PLIO: 'https://staging-app.plio.in/#/af/play/'
+        VITE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VITE_APP_AWS_SQS_ACCESS_KEY }}
+        VITE_APP_AWS_SECRET_KEY: ${{ secrets.VITE_APP_AWS_SQS_SECRET_KEY }}
+        VITE_APP_BASE_URL_MEET: 'https://meet.google.com/'
+        VITE_APP_OTP_SERVICE: ${{ secrets.VITE_APP_OTP_SERVICE }}
+        VITE_APP_AWS_REGION: ${{ secrets.VITE_APP_AWS_REGION }}
+        VITE_APP_AWS_SQS_URL: ${{ secrets.VITE_APP_AWS_SQS_URL }}
+        VITE_APP_BASE_URL_YOUTUBE: 'https://www.youtube.com/watch?v='
+        VITE_APP_CHECK_USER_ENDPOINT: '/checkForUser'
+        VITE_APP_GET_GROUP_ENDPOINT: '/getGroupData'
+        VITE_APP_CLOUD_FUNCTIONS_BASE_URL: 'https://us-central1-staging-portal-7df0f.cloudfunctions.net'
 
       run: npm run build
 

@@ -397,11 +397,7 @@ export default {
       const responseStatusCode = responseStatusCodeAndMessage[1];
       if (responseStatusMessage.trim() === "success") {
         this.isLoading = true;
-<<<<<<< HEAD
-        this.$store.dispatch("setPhoneNumber", this.phoneNumber);
-=======
         this.setPhoneNumber(this.phoneNumber);
->>>>>>> main
         this.authenticateAndRedirect();
       } else {
         this.displayOTPMessage =

@@ -23,17 +23,17 @@ export function redirectToDestination(
 
   switch (redirectTo) {
     case "plio": {
-      redirectURL = process.env.VUE_APP_BASE_URL_PLIO;
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
       let url = new URL(redirectURL + redirectID);
       finalURLQueryParams = new URLSearchParams({
-        api_key: process.env.VUE_APP_PLIO_AF_API_KEY,
+        api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
         unique_id: userID,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
     }
     case "meet": {
-      redirectURL = process.env.VUE_APP_BASE_URL_MEET;
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_MEET;
       fullURL = new URL(redirectURL + redirectID);
       break;
     }
@@ -42,7 +42,7 @@ export function redirectToDestination(
       break;
     }
     case "youtube": {
-      redirectURL = process.env.VUE_APP_BASE_URL_YOUTUBE;
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_YOUTUBE;
       fullURL = new URL(redirectURL + redirectID);
       break;
     }

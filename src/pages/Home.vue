@@ -1,4 +1,12 @@
 <template>
+<div v-if="isLoading">
+<div class="flex m-auto h-screen w-full h-full">
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
+    </div>
+    </div>
   <!-- NoClassMessage component -->
   <div v-if="!sessionEnabled">
     <NoClassMessage />
@@ -44,7 +52,9 @@ import SessionEntry from '@/components/SessionEntry.vue';
 import groupAPIService from '@/services/API/groupData.js';
 import sessionAPIService from '@/services/API/sessionData.js';
 import NoClassMessage from '@/components/NoClassMessage.vue';
+import useAssets from '@/assets/assets.js'
 
+const assets = useAssets();
 export default {
   name: 'Home',
   components: {
@@ -95,6 +105,8 @@ export default {
       groupData: null, // stores details about a group
       sessionData: null, // stores details about a session
       sessionEnabled: true, // whether a session is enabled
+      isLoading: true,
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
     };
   },
   computed: {
@@ -118,6 +130,7 @@ export default {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       this.sessionEnabled = (this.sessionData.enabled == 1);
     }
+    this.isLoading = false
   },
 };
 </script>

@@ -1,4 +1,13 @@
 <template>
+<div v-if="isLoading">
+<div class="flex m-auto w-full h-full">
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
+    </div>
+    </div>
+
   <!-- User message -->
   <div v-if="!sessionActive">
     <NoClassMessage />
@@ -22,6 +31,9 @@
 import NoClassMessage from "./NoClassMessage.vue";
 import Entry from "./Entry.vue";
 import groupAPIService from "@/services/API/groupData";
+import useAssets from '@/assets/assets.js'
+
+const assets = useAssets();
 const EXTRA_5_MINUTES = 900000
 export default {
   name: "SessionEntry",
@@ -42,7 +54,8 @@ export default {
       sessionActive : true, // whether the timings between the session and user match
       groupData: null, //stores details about the group
       currentDateTime : new Date(), // user's current date and time
-
+      isLoading: false,
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
     }
   },
   computed:{
@@ -101,7 +114,7 @@ export default {
 
     /** Checks if the session has ended */
     isEndDateTimeValid(){
-      console.log(this.currentDateTime, Date.parse(this.currentDateTime), this.sessionEndDateTime, this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime))
+       console.log(this.currentDateTime, Date.parse(this.currentDateTime), this.sessionEndDateTime, this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime))
       return Date.parse(this.currentDateTime) <= this.getSessionDateTimeInMilliseconds(this.sessionEndDateTime)
     },
 
@@ -122,7 +135,9 @@ export default {
     /** Sets the sessionActive variable based on the validity of the start time, end time and schedule */
     if(!(this.isStartDateTimeValid &&  this.isEndDateTimeValid && this.isRepeatScheduleValid))
       this.sessionActive = false;
-    this.groupData = await groupAPIService.getGroupData(this.group)
+    this.isLoading = true;
+    this.groupData = await groupAPIService.getGroupData(this.group);
+    this.isLoading = false;
   },
   methods: {
     /** Parses datetime string into milliseconds */

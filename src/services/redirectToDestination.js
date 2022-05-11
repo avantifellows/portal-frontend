@@ -32,6 +32,16 @@ export function redirectToDestination(
       fullURL = url + "?" + finalURLQueryParams;
       break;
     }
+    case "quiz": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
+      let url = new URL(redirectURL + redirectID);
+      finalURLQueryParams = new URLSearchParams({
+        api_key: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
+        unique_id: userID,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
     case "meet": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_MEET;
       fullURL = new URL(redirectURL + redirectID);

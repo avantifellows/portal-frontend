@@ -37,6 +37,8 @@ jobs:
         NODE_ENV: staging
         VITE_APP_PLIO_AF_API_KEY: ${{ secrets.VITE_APP_PLIO_AF_API_KEY }}
         VITE_APP_BASE_URL_PLIO: 'https://staging-app.plio.in/#/af/play/'
+        VITE_APP_QUIZ_AF_API_KEY: ${{ secrets.VITE_APP_PLIO_AF_API_KEY }}
+        VITE_APP_BASE_URL_QUIZ: 'https://staging-app.plio.in/#/af/play/'
         VITE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VITE_APP_AWS_SQS_ACCESS_KEY }}
         VITE_APP_AWS_SECRET_KEY: ${{ secrets.VITE_APP_AWS_SQS_SECRET_KEY }}
         VITE_APP_BASE_URL_MEET: 'https://meet.google.com/'

@@ -1,9 +1,6 @@
 <template>
   <!-- loading spinner -->
-  <div
-    v-if="isLoading"
-    class="h-full w-full fixed z-50"
-  >
+  <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
@@ -39,48 +36,30 @@
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
-        >
+        />
       </div>
 
-      <div
-        v-show="hasUserEnteredMoreThanOne"
-        class="my-auto px-3"
-      >
+      <div v-show="hasUserEnteredMoreThanOne" class="my-auto px-3">
         <button @click="deleteInputBox(index, userIDList)">
-          <inline-svg
-            class="fill-current text-red-600 h-8 w-8"
-            :src="deleteSvg"
-          />
+          <inline-svg class="fill-current text-red-600 h-8 w-8" :src="deleteSvg" />
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span
-      v-if="isInvalidInputMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-    >{{
+    <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <span
-      v-if="isInvalidLoginMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-    >{{
+    <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidLoginMessage
     }}</span>
     <!-- button to add another input -->
-    <div
-      v-if="isAddButtonAllowed"
-      class="my-auto"
-    >
+    <div v-if="isAddButtonAllowed" class="my-auto">
       <button
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
         @click="addField"
       >
-        <inline-svg
-          class="fill-current text-green-600 h-10 w-10 pr-1"
-          :src="addSvg"
-        />
+        <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1" :src="addSvg" />
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             {{ addButtonText }}
@@ -104,7 +83,7 @@ import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-import useAssets from '@/assets/assets.js'
+import useAssets from "@/assets/assets.js";
 
 const assets = useAssets();
 
@@ -113,38 +92,38 @@ export default {
   props: {
     redirectTo: {
       type: String,
-      default: ""
+      default: "",
     },
-    redirectID:{
+    redirectID: {
       type: String,
-      default: ""
+      default: "",
     },
-    purpose:{
+    purpose: {
       type: String,
-      default: ""
+      default: "",
     },
-    purposeParams:{
+    purposeParams: {
       type: String,
-      default: ""
+      default: "",
     },
-    groupData:{
+    groupData: {
       type: Object,
-      default(){
-        return {}
-      }
+      default() {
+        return {};
+      },
     },
-    group:{
+    group: {
       type: String,
-      default: ""
+      default: "",
     },
-    authType:{
+    authType: {
       type: String,
-      default: ""
+      default: "",
     },
-    sessionId:{
+    sessionId: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   data() {
     return {
@@ -157,7 +136,7 @@ export default {
       userType: "", // differentiates between different kinds of users
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
-      addSvg: assets.addSvg
+      addSvg: assets.addSvg,
     };
   },
   created() {
@@ -202,7 +181,7 @@ export default {
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
     isMultipleIDEntryAllowed() {
-      return this.redirectTo == "plio";
+      return this.redirectTo == "plio" || this.redirectTo == "quiz";
     },
 
     /**

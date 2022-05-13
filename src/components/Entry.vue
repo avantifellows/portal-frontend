@@ -146,18 +146,22 @@ export default {
     inputMode() {
       return this.groupData.input.mode;
     },
+
     /** Returns the input type stored against the group */
     inputType() {
       return this.groupData.input.type;
     },
+
     /** Returns the placeholder text stored against the group */
     inputBoxPlaceholderText() {
       return this.groupData.text.default.placeholder;
     },
+
     /** Returns length of the list of user IDs */
     numOfUserIds() {
       return this.userIDList.length;
     },
+
     /** Checks if any userID has been entered */
     isAnyUserIDPresent() {
       return (
@@ -166,15 +170,18 @@ export default {
         this.userIDList[0]["userID"] != ""
       );
     },
+
     /** Whether multiple entries have been made by the user */
     hasUserEnteredMoreThanOne() {
       return !this.isMultipleIDEntryAllowed && this.numOfUserIds > 1;
     },
+
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
     isMultipleIDEntryAllowed() {
       return this.redirectTo == "plio" || this.redirectTo == "quiz";
     },
+
     /**
      * Whether the submit button is disabled
      * Returns true if any of the following conditions are met:
@@ -189,6 +196,7 @@ export default {
         this.isCurrentEntryIncomplete
       );
     },
+
     /**
      * Checks if "+" button should be displayed. Will be activated only if:
      * - multiple entries are allowed
@@ -202,53 +210,66 @@ export default {
         this.numOfUserIds < this.maxNumberOfIds
       );
     },
+
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
       return this.latestEntry["userID"].length < this.maxLengthOfId;
     },
+
     /** Returns the most recently entered input */
     latestEntry() {
       return this.userIDList.slice(-1)[0];
     },
+
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
       return !this.isCurrentUserValid && this.validateCount == 1;
     },
+
     /** Whether input being typed is in the correct format */
     isInvalidInputMessageShown() {
       return this.invalidInputMessage != null;
     },
+
     /** Returns the heading text for the input box */
     inputBoxDisplayTitle() {
       return this.groupData.text.default.display;
     },
+
     /** Returns the button text for adding another input box */
     inputBoxAddButtonText() {
       return this.groupData.text.default.addButton;
     },
+
     /** Returns the maximum length of the ID */
     maxLengthOfId() {
       return this.groupData.input.maxLengthOfId;
     },
+
     /** Returns the basic validation type for the input */
     basicValidationType() {
       return this.groupData.input.basicValidationType;
     },
+
     /** Returns the invalid input message stored against each group */
     invalidInputText() {
       return this.groupData.text.default.invalid.input;
     },
+
     /** Returns the maximum number of ID's a user can enter */
     maxNumberOfIds() {
       return this.groupData.maxNumberOfIds;
     },
+
     /** Returns the invalid login message stored against each group  */
     invalidLoginText() {
       return this.groupData.text.default.invalid.login;
     },
+
     addButtonText() {
       return this.groupData.text.default.addButton;
     },
+
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
       return this.groupData.text.default.submitButton;
@@ -267,6 +288,7 @@ export default {
         },
       ];
     },
+
     /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
@@ -275,36 +297,44 @@ export default {
         return true;
       } else event.preventDefault();
     },
+
     /** Adds a new object to the userIDList array */
     addNewEmptyField() {
       this.userIDList.push({ userID: "", valid: false });
     },
+
     /** Removes an element in the array at a given index.
      * @param {Number} index - the index of the input box where "-" button is clicked
      */
     removeInputField(index) {
       this.userIDList.splice(index, 1);
     },
+
     /** Resets the invalid input message */
     resetInvalidInputMessage() {
       this.invalidInputMessage = "";
     },
+
     /** Resets the invalid login message */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
     },
+
     /** Sets the temp valid flag to false (default) for authentication of a possible next user */
     resetValidFlag() {
       this.isCurrentUserValid = false;
     },
+
     /** Sets the valid key of the latest user to the value of the temp flag. The temp flag contains the value returned by the backend */
     setValidFlag() {
       this.latestEntry["valid"] = this.isCurrentUserValid;
     },
+
     /** Resets the userID key of an element in the array at a particular index */
     resetEntry(index) {
       this.userIDList[index]["userID"] = "";
     },
+
     /** This function is called whenever the "+" button is clicked.
      * Authenticates the most recent typed entry against the database.
      */
@@ -322,6 +352,7 @@ export default {
         this.validateCount = 0;
       }
     },
+
     /** This method is called whenever "-" button is clicked.
      * Removes the selected entry from the entry list and resets appropriate variables
      * @param {Number} index - index of input field to be removed
@@ -332,6 +363,7 @@ export default {
       this.validateCount = 2;
       this.removeInputField(index);
     },
+
     /** This function is called whenever something is entered in the input box.
      * It checks if the required number of characters are being typed.
      * @param {Object} event - the event which triggered this function
@@ -350,6 +382,7 @@ export default {
         this.resetInvalidInputMessage();
       }
     },
+
     /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
      * @param {String} userID - ID of the incorrect entry field
      */
@@ -369,6 +402,7 @@ export default {
         this.sessionId
       );
     },
+
     /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
@@ -390,6 +424,7 @@ export default {
         this.resetEntry(this.numOfUserIds - 1);
       }
     },
+
     /** Authenticates the last entry typed before the submit button is clicked.
      * Also, redirects user to the destination and sends a SQS message.
      */

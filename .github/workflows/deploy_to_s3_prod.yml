@@ -37,7 +37,7 @@ jobs:
         VITE_APP_PLIO_AF_API_KEY: ${{ secrets.VITE_APP_PLIO_AF_API_KEY }}
         VITE_APP_BASE_URL_PLIO: 'https://app.plio.in/#/af/play/'
         VITE_APP_QUIZ_AF_API_KEY: ${{ secrets.VITE_APP_QUIZ_AF_API_KEY }}
-        VITE_APP_BASE_URL_QUIZ: 'https://quiz.avantifellows.org/'
+        VITE_APP_BASE_URL_QUIZ: 'https://quiz.avantifellows.org/quiz/'
         VITE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VITE_APP_AWS_SQS_ACCESS_KEY }}
         VITE_APP_AWS_SECRET_KEY: ${{ secrets.VITE_APP_AWS_SQS_SECRET_ACCESS_KEY }}
         VITE_APP_BASE_URL_MEET: 'https://meet.google.com/'

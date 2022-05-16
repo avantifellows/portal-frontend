@@ -36,8 +36,8 @@ export function redirectToDestination(
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
       let url = new URL(redirectURL + redirectID);
       finalURLQueryParams = new URLSearchParams({
-        api_key: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        user_id: userID,
+        apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
+        userId: userID,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;

@@ -6,7 +6,7 @@ This layer is being built to authenticate, authorize and keep track of the stude
 This repo contains code for the frontend of the layer written in VueJS.
 
 ## Installation
-To set up this project, visit the [installation steps](docs/INSTALLATION.md).
+To set up this project, visit the [installation steps](./docs/INSTALLATION.MD).
 
 ## Deployment
-Visit our [deployment guideline](docs/DEPLOYMENT.md) for setting up this repository on a production environment.
+Visit our [deployment guideline](./docs/DEPLOYMENT.MD) for setting up this repository on a production environment.

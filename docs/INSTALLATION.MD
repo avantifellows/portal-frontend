@@ -5,12 +5,11 @@
 ### git-secrets
 git-secrets scans commits, commit messages, and --no-ff merges to prevent adding secrets into your git repositories.
 For installing, follow steps at https://github.com/awslabs/git-secrets#installing-git-secrets.
-
-    ```sh
-    cd auth-layer
-    git secrets --install
-    git secrets --register-aws
-    ```
+```sh
+cd auth-layer
+git secrets --install
+git secrets --register-aws
+```
 
 ## Installation steps
 Follow the steps below to set up the repo for development.
@@ -27,10 +26,10 @@ Follow the steps below to set up the repo for development.
 
     For deployment these variables are stored in the Github repo environments (Settings -> Environments).
 
-3. Update environment variables in your `.env` file based on your environment. For all available settings, see our [Environment variables guide](ENV.md). You might have to get these values for `.env` from your colleagues.
+3. Update environment variables in your `.env` file based on your environment. For all available settings, see our [Environment variables guide](./ENV.MD). You might have to get these values for `.env` from your colleagues.
 
 4. Install dependencies
-```
+```sh
 npm install
 ```
 

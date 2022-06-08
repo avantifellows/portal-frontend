@@ -14,6 +14,7 @@ const routes = [
       redirectID: route.query.redirectID,
       group: route.query.group,
       authType: route.query.authType,
+      sessionId: route.query.sessionId,
     }),
   },
   {

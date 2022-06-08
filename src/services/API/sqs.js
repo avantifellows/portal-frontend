@@ -1,12 +1,12 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
-const REGION = process.env.VUE_APP_AWS_REGION;
-const QUEUEURL = process.env.VUE_APP_AWS_SQS_URL;
+const REGION = import.meta.env.VITE_APP_AWS_REGION;
+const QUEUEURL = import.meta.env.VITE_APP_AWS_SQS_URL;
 const sqsClient = new SQSClient({
   region: REGION,
   credentials: {
-    accessKeyId: process.env.VUE_APP_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.VUE_APP_AWS_SECRET_KEY,
+    accessKeyId: import.meta.env.VITE_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_APP_AWS_SECRET_KEY,
   },
 });
 
@@ -28,7 +28,8 @@ export async function sendSQSMessage(
   userIDList,
   authType,
   groupName,
-  userType
+  userType,
+  sessionId
 ) {
   const messageBody = [
     {
@@ -47,6 +48,7 @@ export async function sendSQSMessage(
       },
       group: groupName,
       userType: userType,
+      sessionId: sessionId,
     },
   ];
   const params = {

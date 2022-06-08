@@ -12,10 +12,10 @@ const app = createApp(App)
   .use(router)
   .use(store);
 
-if (["staging", "production"].includes(process.env.NODE_ENV)) {
+if (["staging", "production"].includes(import.meta.env.MODE)) {
   Sentry.init({
     app,
-    dsn: process.env.VUE_APP_SENTRY_DSN,
+    dsn: import.meta.env.VITE_APP_SENTRY_DSN,
     integrations: [
       new Integrations.BrowserTracing({
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),

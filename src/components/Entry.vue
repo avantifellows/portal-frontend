@@ -1,9 +1,6 @@
 <template>
   <!-- loading spinner -->
-  <div
-    v-if="isLoading"
-    class="h-full w-full fixed z-50"
-  >
+  <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
@@ -39,48 +36,30 @@
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
-        >
+        />
       </div>
 
-      <div
-        v-show="hasUserEnteredMoreThanOne"
-        class="my-auto px-3"
-      >
+      <div v-show="hasUserEnteredMoreThanOne" class="my-auto px-3">
         <button @click="deleteInputBox(index, userIDList)">
-          <inline-svg
-            class="fill-current text-red-600 h-8 w-8"
-            :src="deleteSvg"
-          />
+          <inline-svg class="fill-current text-red-600 h-8 w-8" :src="deleteSvg" />
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span
-      v-if="isInvalidInputMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-    >{{
+    <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <span
-      v-if="isInvalidLoginMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-    >{{
+    <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidLoginMessage
     }}</span>
     <!-- button to add another input -->
-    <div
-      v-if="isAddButtonAllowed"
-      class="my-auto"
-    >
+    <div v-if="isAddButtonAllowed" class="my-auto">
       <button
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
         @click="addField"
       >
-        <inline-svg
-          class="fill-current text-green-600 h-10 w-10 pr-1"
-          :src="addSvg"
-        />
+        <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1" :src="addSvg" />
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             {{ addButtonText }}
@@ -104,47 +83,45 @@ import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-import useAssets from '@/assets/assets.js'
-
+import useAssets from "@/assets/assets.js";
 const assets = useAssets();
-
 export default {
   name: "Entry",
   props: {
     redirectTo: {
       type: String,
-      default: ""
+      default: "",
     },
-    redirectID:{
+    redirectID: {
       type: String,
-      default: ""
+      default: "",
     },
-    purpose:{
+    purpose: {
       type: String,
-      default: ""
+      default: "",
     },
-    purposeParams:{
+    purposeParams: {
       type: String,
-      default: ""
+      default: "",
     },
-    groupData:{
+    groupData: {
       type: Object,
-      default(){
-        return {}
-      }
+      default() {
+        return {};
+      },
     },
-    group:{
+    group: {
       type: String,
-      default: ""
+      default: "",
     },
-    authType:{
+    authType: {
       type: String,
-      default: ""
+      default: "",
     },
-    sessionId:{
+    sessionId: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   data() {
     return {
@@ -157,7 +134,7 @@ export default {
       userType: "", // differentiates between different kinds of users
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
-      addSvg: assets.addSvg
+      addSvg: assets.addSvg,
     };
   },
   created() {
@@ -202,7 +179,7 @@ export default {
     /** Whether only a single entry is allowed.
      * For now, plio does not support multiple input entries */
     isMultipleIDEntryAllowed() {
-      return this.redirectTo == "plio";
+      return this.redirectTo == "plio" || this.redirectTo == "quiz";
     },
 
     /**
@@ -292,6 +269,7 @@ export default {
     addButtonText() {
       return this.groupData.text.default.addButton;
     },
+
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
       return this.groupData.text.default.submitButton;
@@ -310,6 +288,7 @@ export default {
         },
       ];
     },
+
     /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
@@ -318,36 +297,44 @@ export default {
         return true;
       } else event.preventDefault();
     },
+
     /** Adds a new object to the userIDList array */
     addNewEmptyField() {
       this.userIDList.push({ userID: "", valid: false });
     },
+
     /** Removes an element in the array at a given index.
      * @param {Number} index - the index of the input box where "-" button is clicked
      */
     removeInputField(index) {
       this.userIDList.splice(index, 1);
     },
+
     /** Resets the invalid input message */
     resetInvalidInputMessage() {
       this.invalidInputMessage = "";
     },
+
     /** Resets the invalid login message */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
     },
+
     /** Sets the temp valid flag to false (default) for authentication of a possible next user */
     resetValidFlag() {
       this.isCurrentUserValid = false;
     },
+
     /** Sets the valid key of the latest user to the value of the temp flag. The temp flag contains the value returned by the backend */
     setValidFlag() {
       this.latestEntry["valid"] = this.isCurrentUserValid;
     },
+
     /** Resets the userID key of an element in the array at a particular index */
     resetEntry(index) {
       this.userIDList[index]["userID"] = "";
     },
+
     /** This function is called whenever the "+" button is clicked.
      * Authenticates the most recent typed entry against the database.
      */
@@ -365,6 +352,7 @@ export default {
         this.validateCount = 0;
       }
     },
+
     /** This method is called whenever "-" button is clicked.
      * Removes the selected entry from the entry list and resets appropriate variables
      * @param {Number} index - index of input field to be removed
@@ -394,6 +382,7 @@ export default {
         this.resetInvalidInputMessage();
       }
     },
+
     /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
      * @param {String} userID - ID of the incorrect entry field
      */
@@ -428,7 +417,6 @@ export default {
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.isLoading = false;
-
       if (this.validateCount == 1) {
         this.invalidLoginMessage = this.invalidLoginText;
       }
@@ -447,7 +435,6 @@ export default {
         this.handleIncorrectEntry(latestUserID);
       }
       this.setValidFlag();
-
       if (this.isCurrentUserValid || this.validateCount > 1) {
         if (
           redirectToDestination(

@@ -159,8 +159,9 @@ export default {
     /** Sets the sessionActive variable based on the validity of the start time, end time and schedule */
     if (
       !(
-        (this.isStartDateTimeValid && this.isEndDateTimeValid)
-        // this.isRepeatScheduleValid
+        this.isStartDateTimeValid &&
+        this.isEndDateTimeValid &&
+        this.isRepeatScheduleValid
       )
     )
       this.sessionActive = false;

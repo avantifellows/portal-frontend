@@ -28,15 +28,15 @@
 </template>
 
 <script>
-import NoClassMessage from "./NoClassMessage.vue";
-import Entry from "./Entry.vue";
-import groupAPIService from "@/services/API/groupData";
-import useAssets from "@/assets/assets.js";
+import NoClassMessage from './NoClassMessage.vue';
+import Entry from './Entry.vue';
+import groupAPIService from '@/services/API/groupData';
+import useAssets from '@/assets/assets.js';
 
 const assets = useAssets();
 const EXTRA_5_MINUTES = 900000;
 export default {
-  name: "SessionEntry",
+  name: 'SessionEntry',
   components: {
     NoClassMessage,
     Entry,
@@ -63,31 +63,31 @@ export default {
     currentDate() {
       let year = this.currentDateTime.getFullYear().toString();
       let month =
-        (this.currentDateTime.getMonth() + 1 < 9 ? "0" : "") +
+        (this.currentDateTime.getMonth() + 1 < 9 ? '0' : '') +
         (this.currentDateTime.getMonth() + 1).toString();
       let date =
-        (this.currentDateTime.getDate() + 1 < 9 ? "0" : "") +
+        (this.currentDateTime.getDate() + 1 < 9 ? '0' : '') +
         this.currentDateTime.getDate().toString();
-      return year + "-" + month + "-" + date;
+      return year + '-' + month + '-' + date;
     },
 
     /** Combines session start date and start time */
     sessionStartDateTime() {
       return (
         this.sessionData.startDate <= this.currentDate &&
-        new Date(this.currentDate + " " + this.sessionData.startTime)
+        new Date(this.currentDate + ' ' + this.sessionData.startTime)
       );
     },
 
     /** Combines session end date and end time */
     sessionEndDateTime() {
-      if ("endDate" in this.sessionData) {
+      if ('endDate' in this.sessionData) {
         return (
           this.sessionData.endDate > this.currentDate &&
-          new Date(this.currentDate + " " + this.sessionData.endTime)
+          new Date(this.currentDate + ' ' + this.sessionData.endTime)
         );
       }
-      return new Date(this.currentDate + " " + this.sessionData.endTime);
+      return new Date(this.currentDate + ' ' + this.sessionData.endTime);
     },
 
     /** Retrieves destination platform */
@@ -107,7 +107,7 @@ export default {
 
     /** Returns authentication method based on user's choice. For now, only ID is supported. */
     authType() {
-      return "ID";
+      return 'ID';
     },
 
     /** Returns the purpose value stored in session data */
@@ -138,9 +138,8 @@ export default {
 
     /** Checks if the session scheduled day matches the current day */
     isRepeatScheduleValid() {
-      console.log("repeatSchedule" in this.sessionData);
-      if ("repeatSchedule" in this.sessionData) {
-        if (this.sessionData.repeatSchedule.type == "weekly") {
+      if ('repeatSchedule' in this.sessionData) {
+        if (this.sessionData.repeatSchedule.type == 'weekly') {
           return this.sessionData.repeatSchedule.params.includes(
             this.currentDateTime.getDay()
           );

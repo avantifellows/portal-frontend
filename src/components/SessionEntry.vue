@@ -71,7 +71,7 @@ export default {
       return year + '-' + month + '-' + date;
     },
 
-    /** Combines session start date and start time */
+    /** Checks if current date is greater than start date and combines session start date and start time */
     sessionStartDateTime() {
       return (
         this.sessionData.startDate <= this.currentDate &&
@@ -79,7 +79,7 @@ export default {
       );
     },
 
-    /** Combines session end date and end time */
+    /** Checks if current date is less than end date and combines session end date and end time */
     sessionEndDateTime() {
       if ('endDate' in this.sessionData) {
         return (

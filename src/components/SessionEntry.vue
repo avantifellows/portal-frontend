@@ -84,7 +84,7 @@ export default {
       if ("endDate" in this.sessionData) {
         return (
           this.sessionData.endDate >= this.currentDate &&
-          new Date(this.sessionData.endDate + " " + this.sessionData.endTime)
+          new Date(this.currentDate + " " + this.sessionData.endTime)
         );
       }
       return new Date(this.currentDate + " " + this.sessionData.endTime);

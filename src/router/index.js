@@ -11,6 +11,7 @@ const allowedQueryParams = [
   "redirectID",
   "group",
 ];
+
 const routes = [
   {
     path: "/",
@@ -45,6 +46,7 @@ const router = createRouter({
   mode: "history",
 });
 
+/** Check if correct query params exist */
 router.beforeEach((to) => {
   const queryParams = Object.keys(to.query);
   const validQueryParams = queryParams.every((queryParam) =>

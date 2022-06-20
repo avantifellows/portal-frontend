@@ -7,5 +7,6 @@ export default function useAssets() {
     deleteSvg: allSvgs["/src/assets/images/remove_circle.svg"].default,
     addSvg: allSvgs["/src/assets/images/add_circle.svg"].default,
     AFLogoSvg: allPngs["/src/assets/images/AF_favicon.png"].default,
+    warningSvg: allSvgs["/src/assets/images/warning.svg"].default,
   };
 }

@@ -1,7 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
 import Sentry from "@/pages/Sentry.vue";
+import Error from "@/pages/Error.vue";
 
+const allowedQueryParams = [
+  "sessionId",
+  "purpose",
+  "subPurpose",
+  "redirectTo",
+  "redirectID",
+  "group",
+];
 const routes = [
   {
     path: "/",
@@ -18,6 +27,12 @@ const routes = [
     }),
   },
   {
+    path: "/404-not-found",
+    name: "Error",
+    props: { type: "404" },
+    component: Error,
+  },
+  {
     path: "/sentry",
     name: "Sentry",
     component: Sentry,
@@ -30,5 +45,17 @@ const router = createRouter({
   mode: "history",
 });
 
+router.beforeEach((to) => {
+  const queryParams = Object.keys(to.query);
+  const validQueryParams = queryParams.every((queryParam) =>
+    allowedQueryParams.includes(queryParam)
+  );
+
+  if (!validQueryParams) {
+    return {
+      name: "Error",
+    };
+  }
+});
+
 export default router;
-export { routes };

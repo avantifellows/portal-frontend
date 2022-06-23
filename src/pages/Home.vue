@@ -108,13 +108,17 @@ export default {
     isAuthTypeID() {
       return this.authType == "ID";
     },
+
     /** Whether authentication method chosen is OTP */
     isAuthTypeOTP() {
       return this.authType == "OTP";
     },
+
+    /** Checks if group exists */
     doesGroupExist() {
       return this.groupData;
     },
+
     /** Retrieves destination platform */
     getRedirectTo() {
       return this.redirectTo == "" ? this.sessionData.redirectPlatform : this.redirectTo;
@@ -132,12 +136,12 @@ export default {
       return this.group == "" ? this.sessionData.group : this.group;
     },
 
-    /** Returns the purpose value stored in session data */
+    /** Returns the purpose value */
     getPurpose() {
       return this.purpose == "" ? this.sessionData.purpose : this.purpose;
     },
 
-    /** Returns the purpose params stored in session data */
+    /** Returns the purpose params  */
     getPurposeParams() {
       return this.purposeParams == ""
         ? this.sessionData.purposeParams

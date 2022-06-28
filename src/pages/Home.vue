@@ -133,7 +133,7 @@ export default {
 
     /** Retrieves group name */
     getGroup() {
-      return this.group == "" ? this.sessionData.group : this.group;
+      return this.sessionId == null ? this.group : this.sessionData.group;
     },
 
     /** Returns the purpose value */
@@ -154,7 +154,7 @@ export default {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       this.sessionEnabled = this.sessionData.sessionActive;
     }
-    this.groupData = await groupAPIService.getGroupData(this.group);
+    this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;
   },
 };

@@ -6,7 +6,7 @@
 
       <p class="text-2xl align-middle">Page Not Found</p>
       <p class="text-lg text-gray-500 text-center w-10/12 sm:w-1/2">
-        We are unable to find what you are looking for
+        {{ text }}
       </p>
     </div>
   </div>
@@ -22,6 +22,10 @@ export default {
     type: {
       type: String,
       default: "404",
+    },
+    text: {
+      type: String,
+      default: "URL is not correct. Please check and try again!",
     },
   },
   data() {

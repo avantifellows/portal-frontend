@@ -10,6 +10,7 @@ const allowedQueryParams = [
   "redirectTo",
   "redirectID",
   "group",
+  "redirectId",
 ];
 
 const routes = [
@@ -21,7 +22,7 @@ const routes = [
       purpose: route.query.purpose,
       purposeParams: route.query.subPurpose,
       redirectTo: route.query.redirectTo,
-      redirectId: route.query.redirectID,
+      redirectId: route.query.redirectID || route.query.redirectId,
       group: route.query.group,
       authType: route.query.authType,
       sessionId: route.query.sessionId,

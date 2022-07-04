@@ -3,7 +3,7 @@ import { sendSQSMessage } from "@/services/API/sqs";
 /** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
  * @param {String} purposeParams - extracted from auth layer URL
  * @param {Array} userIDList - list of userIDs wanting to go through the layer
- * @param {String} redirectID - extracted from auth layer URL
+ * @param {String} redirectId - extracted from auth layer URL
  * @param {String} redirectTo - extracted from auth layer URL
  * @param {String} authType - extracted from auth layer URL
  */
@@ -11,7 +11,7 @@ import { sendSQSMessage } from "@/services/API/sqs";
 export function redirectToDestination(
   purposeParams,
   userIDList,
-  redirectID,
+  redirectId,
   redirectTo,
   authType,
   group
@@ -24,7 +24,7 @@ export function redirectToDestination(
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
-      let url = new URL(redirectURL + redirectID);
+      let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
         unique_id: userID,
@@ -34,7 +34,7 @@ export function redirectToDestination(
     }
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
-      let url = new URL(redirectURL + redirectID);
+      let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         userId: userID,
@@ -44,16 +44,16 @@ export function redirectToDestination(
     }
     case "meet": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_MEET;
-      fullURL = new URL(redirectURL + redirectID);
+      fullURL = new URL(redirectURL + redirectId);
       break;
     }
     case "zoom": {
-      fullURL = redirectID;
+      fullURL = redirectId;
       break;
     }
     case "youtube": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_YOUTUBE;
-      fullURL = new URL(redirectURL + redirectID);
+      fullURL = new URL(redirectURL + redirectId);
       break;
     }
     case "teacher-web-app": {
@@ -61,7 +61,7 @@ export function redirectToDestination(
         teacherID: userID,
         groupName: group,
       });
-      fullURL = redirectID + "?" + finalURLQueryParams;
+      fullURL = redirectId + "?" + finalURLQueryParams;
       break;
     }
     default: {
@@ -70,7 +70,7 @@ export function redirectToDestination(
         purpose,
         purposeParams,
         redirectTo,
-        redirectID,
+        redirectId,
         userIDList,
         authType
       );

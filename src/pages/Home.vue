@@ -16,7 +16,7 @@
     <div v-if="isAuthTypeID && doesGroupExist">
       <Entry
         :redirectTo="redirectTo"
-        :redirectID="redirectID"
+        :redirectId="redirectId"
         :purpose="purpose"
         :purposeParams="purposeParams"
         :groupData="groupData"
@@ -28,7 +28,7 @@
     <div v-else-if="isAuthTypeOTP && doesGroupExist">
       <OTP
         :redirectTo="redirectTo"
-        :redirectID="redirectID"
+        :redirectId="redirectId"
         :purpose="purpose"
         :purposeParams="purposeParams"
         :groupData="groupData"
@@ -68,7 +68,7 @@ export default {
       type: String,
     },
     /** ID of the resource. Eg. the plioID */
-    redirectID: {
+    redirectId: {
       default: "",
       type: String,
     },

@@ -22,7 +22,7 @@ const routes = [
       purpose: route.query.purpose,
       purposeParams: route.query.subPurpose,
       redirectTo: route.query.redirectTo,
-      redirectId: route.query.redirectID || route.query.redirectId,
+      redirectId: route.query.redirectID || route.query.redirectId, // legacy URLs support redirectID, new URLs must use redirectId
       group: route.query.group,
       authType: route.query.authType,
       sessionId: route.query.sessionId,

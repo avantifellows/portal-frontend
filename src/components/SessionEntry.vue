@@ -16,7 +16,7 @@
   <div v-else-if="sessionActive && groupData">
     <Entry
       :redirectTo="redirectTo"
-      :redirectID="redirectId"
+      :redirectId="redirectId"
       :purpose="purpose"
       :purposeParams="purposeParams"
       :groupData="groupData"

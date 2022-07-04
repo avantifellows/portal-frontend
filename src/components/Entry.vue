@@ -92,7 +92,7 @@ export default {
       type: String,
       default: "",
     },
-    redirectID: {
+    redirectId: {
       type: String,
       default: "",
     },
@@ -395,7 +395,7 @@ export default {
         this.purpose,
         purposeParams,
         this.redirectTo,
-        this.redirectID,
+        this.redirectId,
         tempUserIDList,
         this.authType,
         this.userType,
@@ -440,7 +440,7 @@ export default {
           redirectToDestination(
             this.purposeParams,
             this.userIDList,
-            this.redirectID,
+            this.redirectId,
             this.redirectTo,
             this.authType,
             this.group
@@ -450,7 +450,7 @@ export default {
             this.purpose,
             this.purposeParams,
             this.redirectTo,
-            this.redirectID,
+            this.redirectId,
             this.userIDList,
             this.authType,
             this.group,

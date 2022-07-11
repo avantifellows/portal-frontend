@@ -1,0 +1,25 @@
+name: E2E
+on: [push]
+jobs:
+  cypress-run:
+    runs-on: ubuntu-20.04
+    # let's make sure our tests pass on Chrome browser
+    name: E2E on Chrome
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cypress-io/github-action@v4
+        with:
+          browser: chrome
+          spec: cypress/e2e/end-to-end.cy.js
+
+  firefox:
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:node12.16.1-chrome80-ff73
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cypress-io/github-action@v4
+        with:
+          browser: firefox
+          spec: cypress/e2e/end-to-end.cy.js

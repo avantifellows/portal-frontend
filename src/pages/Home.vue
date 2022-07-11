@@ -154,7 +154,8 @@ export default {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       this.sessionEnabled = this.sessionData.sessionActive;
     }
-    this.groupData = await groupAPIService.getGroupData(this.getGroup);
+    if (this.sessionEnabled)
+      this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;
   },
 };

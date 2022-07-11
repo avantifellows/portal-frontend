@@ -20,24 +20,3 @@ jobs:
         with:
           browser: chrome
           spec: cypress/e2e/end-to-end.cy.js
-
-  firefox:
-    runs-on: ubuntu-latest
-    container:
-      image: cypress/browsers:node12.16.1-chrome80-ff73
-      options: --user root
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install required dependencies
-        run: apt-get -y install libgbm1
-
-      - name: Install
-        run: npm install
-
-      - name: Cypress
-        uses: cypress-io/github-action@v4
-        with:
-          browser: firefox
-          spec: cypress/e2e/end-to-end.cy.js

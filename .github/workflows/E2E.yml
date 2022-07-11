@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install required dependencies
-        run: apt-get install libgbm1
+        run: apt-get -y install libgbm1
 
       - name: Install
         run: npm install

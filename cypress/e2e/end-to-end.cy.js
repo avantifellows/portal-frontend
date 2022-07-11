@@ -2,8 +2,10 @@ import sessionIds from "../fixtures/sessionIds.json";
 
 let sessionOutput;
 
+/** The whole workflow runs for each session given in the fixture. */
 describe("Display screen", () => {
   sessionIds.forEach((sessionId) => {
+    // before each test, session details are retrieved and if session is active, group details are retrieved.
     beforeEach(() => {
       cy.request({
         method: "POST",

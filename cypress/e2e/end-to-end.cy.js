@@ -39,6 +39,7 @@ describe("Display screen", () => {
       });
     });
 
+    // visited the URL with each session ID and asserts the displayed screen.
     it("visits each URL", () => {
       cy.visit(
         "https://staging-auth.avantifellows.org/?sessionId=" + sessionId

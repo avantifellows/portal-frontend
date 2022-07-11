@@ -5,7 +5,7 @@ on:
     branches: ["main"]
 
 jobs:
-  chrome:
+  chrome desktop:
     runs-on: ubuntu-20.04
 
     steps:
@@ -19,4 +19,21 @@ jobs:
         uses: cypress-io/github-action@v4
         with:
           browser: chrome
+          spec: cypress/e2e/end-to-end.cy.js
+
+  chrome mobile:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install
+        run: npm install
+
+      - name: Cypress
+        uses: cypress-io/github-action@v4
+        with:
+          browser: chrome
+          config: "viewportWidth=375,viewportHeight=667"
           spec: cypress/e2e/end-to-end.cy.js

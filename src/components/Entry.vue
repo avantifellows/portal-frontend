@@ -14,7 +14,10 @@
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
-    <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
+    <p
+      class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold"
+      data-cy="displayTitle"
+    >
       {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
@@ -36,6 +39,7 @@
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
+          data-cy="inputBox"
         />
       </div>
 
@@ -72,6 +76,7 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
+      data-cy="submitButton"
     >
       {{ submitButtonDisplayText }}
     </button>

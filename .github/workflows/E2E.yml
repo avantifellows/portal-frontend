@@ -30,12 +30,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install sudo
-        run: apt update && apt install sudo
-
-      - name: Install required packages
-        run: sudo apt-get install libgbm1
-
       - name: Install
         run: npm install
 

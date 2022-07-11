@@ -5,7 +5,7 @@ on:
     branches: ["main"]
 
 jobs:
-  chrome desktop:
+  chrome-desktop:
     runs-on: ubuntu-20.04
 
     steps:
@@ -21,7 +21,7 @@ jobs:
           browser: chrome
           spec: cypress/e2e/end-to-end.cy.js
 
-  chrome mobile:
+  chrome-mobile:
     runs-on: ubuntu-20.04
 
     steps:

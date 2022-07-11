@@ -1,7 +1,7 @@
 name: E2E
 on: [push]
 jobs:
- chrome:
+  chrome:
     runs-on: ubuntu-20.04
 
     steps:

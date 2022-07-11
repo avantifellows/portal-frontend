@@ -1,5 +1,9 @@
 name: E2E
-on: [push]
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
 jobs:
   chrome:
     runs-on: ubuntu-20.04
@@ -27,7 +31,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install required packages
-        run: sudo apt-get install libgbm1
+        run: npm install libgbm1
 
       - name: Install
         run: npm install

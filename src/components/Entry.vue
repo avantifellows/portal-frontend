@@ -39,7 +39,6 @@
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
-          data-cy="inputBox"
         />
       </div>
 
@@ -76,7 +75,6 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
-      data-cy="submitButton"
     >
       {{ submitButtonDisplayText }}
     </button>

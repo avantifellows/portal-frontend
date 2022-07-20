@@ -14,24 +14,28 @@
   <div v-else>
     <!-- Entry component -->
     <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
-      <Entry <<<<<<< HEAD :redirectTo="redirectTo" :redirectId="redirectId"
-      :purpose="purpose" :purposeParams="purposeParams" =======
-      :redirectTo="getRedirectTo" :redirectID="getRedirectID" :purpose="getPurpose"
-      :purposeParams="getPurposeParams" >>>>>>> main :groupData="groupData"
-      :group="getGroup" :authType="authType" :sessionId="sessionId" />
+      <Entry
+        :redirectTo="redirectTo"
+        :redirectId="redirectId"
+        :purpose="purpose"
+        :purposeParams="purposeParams"
+        :groupData="groupData"
+        :group="getGroup"
+        :authType="authType"
+        :sessionId="sessionId"
+      />
     </div>
     <!-- OTP component -->
     <div v-else-if="isAuthTypeOTP && doesGroupExist && sessionEnabled">
-      <OTP <<<<<<< HEAD :redirectTo="redirectTo" :redirectId="redirectId"
-      :purpose="purpose" :purposeParams="purposeParams" =======
-      :redirectTo="getRedirectTo" :redirectID="getRedirectID" :purpose="getPurpose"
-      :purposeParams="getPurposeParams" >>>>>>> main :groupData="groupData"
-      :group="getGroup" :authType="authType" <<<<<<< HEAD />
-    </div>
-    <!-- Session component -->
-    <div v-else-if="sessionData">
-      <SessionEntry :sessionData="sessionData" />
-      ======= :sessionId="sessionId" /> >>>>>>> main
+      <OTP
+        :redirectTo="redirectTo"
+        :redirectId="redirectId"
+        :purpose="purpose"
+        :purposeParams="purposeParams"
+        :groupData="groupData"
+        :group="getGroup"
+        :authType="authType"
+      />
     </div>
   </div>
 </template>

@@ -13,32 +13,25 @@
   </div>
   <div v-else>
     <!-- Entry component -->
-    <div v-if="isAuthTypeID && doesGroupExist">
-      <Entry
-        :redirectTo="redirectTo"
-        :redirectId="redirectId"
-        :purpose="purpose"
-        :purposeParams="purposeParams"
-        :groupData="groupData"
-        :group="group"
-        :authType="authType"
-      />
+    <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
+      <Entry <<<<<<< HEAD :redirectTo="redirectTo" :redirectId="redirectId"
+      :purpose="purpose" :purposeParams="purposeParams" =======
+      :redirectTo="getRedirectTo" :redirectID="getRedirectID" :purpose="getPurpose"
+      :purposeParams="getPurposeParams" >>>>>>> main :groupData="groupData"
+      :group="getGroup" :authType="authType" :sessionId="sessionId" />
     </div>
     <!-- OTP component -->
-    <div v-else-if="isAuthTypeOTP && doesGroupExist">
-      <OTP
-        :redirectTo="redirectTo"
-        :redirectId="redirectId"
-        :purpose="purpose"
-        :purposeParams="purposeParams"
-        :groupData="groupData"
-        :group="group"
-        :authType="authType"
-      />
+    <div v-else-if="isAuthTypeOTP && doesGroupExist && sessionEnabled">
+      <OTP <<<<<<< HEAD :redirectTo="redirectTo" :redirectId="redirectId"
+      :purpose="purpose" :purposeParams="purposeParams" =======
+      :redirectTo="getRedirectTo" :redirectID="getRedirectID" :purpose="getPurpose"
+      :purposeParams="getPurposeParams" >>>>>>> main :groupData="groupData"
+      :group="getGroup" :authType="authType" <<<<<<< HEAD />
     </div>
     <!-- Session component -->
     <div v-else-if="sessionData">
       <SessionEntry :sessionData="sessionData" />
+      ======= :sessionId="sessionId" /> >>>>>>> main
     </div>
   </div>
 </template>
@@ -46,7 +39,6 @@
 <script>
 import Entry from "@/components/Entry.vue";
 import OTP from "@/components/OTP.vue";
-import SessionEntry from "@/components/SessionEntry.vue";
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
@@ -58,7 +50,6 @@ export default {
   components: {
     Entry,
     OTP,
-    SessionEntry,
     NoClassMessage,
   },
   props: {
@@ -112,22 +103,54 @@ export default {
     isAuthTypeID() {
       return this.authType == "ID";
     },
+
     /** Whether authentication method chosen is OTP */
     isAuthTypeOTP() {
       return this.authType == "OTP";
     },
+
+    /** Checks if group exists */
     doesGroupExist() {
       return this.groupData;
+    },
+
+    /** Retrieves destination platform */
+    getRedirectTo() {
+      return this.redirectTo == "" ? this.sessionData.redirectPlatform : this.redirectTo;
+    },
+
+    /** Retrieves destination ID */
+    getRedirectID() {
+      return this.redirectID == ""
+        ? this.sessionData.redirectPlatformParams.id
+        : this.redirectID;
+    },
+
+    /** Retrieves group name */
+    getGroup() {
+      return this.sessionId == null ? this.group : this.sessionData.group;
+    },
+
+    /** Returns the purpose value */
+    getPurpose() {
+      return this.purpose == "" ? this.sessionData.purpose : this.purpose;
+    },
+
+    /** Returns the purpose params  */
+    getPurposeParams() {
+      return this.purposeParams == ""
+        ? this.sessionData.purposeParams
+        : this.purposeParams;
     },
   },
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
-    if (this.sessionId == null) {
-      this.groupData = await groupAPIService.getGroupData(this.group);
-    } else {
+    if (this.sessionId != null) {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
-      this.sessionEnabled = this.sessionData.enabled == 1;
+      this.sessionEnabled = this.sessionData.sessionActive;
     }
+    if (this.sessionEnabled)
+      this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;
   },
 };

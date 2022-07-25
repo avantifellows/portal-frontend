@@ -3,6 +3,7 @@ import Home from "@/pages/Home.vue";
 import Sentry from "@/pages/Sentry.vue";
 import Error from "@/pages/Error.vue";
 
+// legacy URLs support redirectID, new URLs must use redirectId
 const allowedQueryParams = [
   "sessionId",
   "purpose",

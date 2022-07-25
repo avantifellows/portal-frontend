@@ -153,6 +153,13 @@ export default {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       this.sessionEnabled = this.sessionData.sessionActive;
     }
+    if (this.sessionId == null || Object.keys(this.sessionData).length === 0) {
+      this.$router.push({
+        name: "Error",
+        params: { text: "Session ID does not exist. Please try again!" },
+      });
+    }
+
     if (this.sessionEnabled)
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;

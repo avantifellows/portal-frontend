@@ -15,10 +15,10 @@
     <!-- Entry component -->
     <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
       <Entry
-        :redirectTo="redirectTo"
-        :redirectId="redirectId"
-        :purpose="purpose"
-        :purposeParams="purposeParams"
+        :redirectTo="getRedirectTo"
+        :redirectId="getRedirectId"
+        :purpose="getPurpose"
+        :purposeParams="getPurposeParams"
         :groupData="groupData"
         :group="getGroup"
         :authType="authType"
@@ -151,8 +151,18 @@ export default {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
     if (this.sessionId != null) {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
-      this.sessionEnabled = this.sessionData.sessionActive;
+
+      console.log(this.sessionData);
+      if (this.sessionData === {} || this.sessionId == null) {
+        this.$router.push({
+          name: "Error",
+          component: Error,
+          props: true,
+          params: { text: "Session ID does not exist" },
+        });
+      }
     }
+    this.sessionEnabled = this.sessionData.sessionActive;
     if (this.sessionEnabled)
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;

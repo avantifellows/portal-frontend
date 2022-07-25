@@ -124,10 +124,10 @@ export default {
     },
 
     /** Retrieves destination ID */
-    getRedirectID() {
-      return this.redirectID == ""
+    getRedirectId() {
+      return this.redirectId == ""
         ? this.sessionData.redirectPlatformParams.id
-        : this.redirectID;
+        : this.redirectId;
     },
 
     /** Retrieves group name */

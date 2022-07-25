@@ -15,10 +15,10 @@
     <!-- Entry component -->
     <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
       <Entry
-        :redirectTo="getRedirectTo"
-        :redirectID="getRedirectID"
-        :purpose="getPurpose"
-        :purposeParams="getPurposeParams"
+        :redirectTo="redirectTo"
+        :redirectId="redirectId"
+        :purpose="purpose"
+        :purposeParams="purposeParams"
         :groupData="groupData"
         :group="getGroup"
         :authType="authType"
@@ -28,14 +28,13 @@
     <!-- OTP component -->
     <div v-else-if="isAuthTypeOTP && doesGroupExist && sessionEnabled">
       <OTP
-        :redirectTo="getRedirectTo"
-        :redirectID="getRedirectID"
-        :purpose="getPurpose"
-        :purposeParams="getPurposeParams"
+        :redirectTo="redirectTo"
+        :redirectId="redirectId"
+        :purpose="purpose"
+        :purposeParams="purposeParams"
         :groupData="groupData"
         :group="getGroup"
         :authType="authType"
-        :sessionId="sessionId"
       />
     </div>
   </div>
@@ -64,7 +63,7 @@ export default {
       type: String,
     },
     /** ID of the resource. Eg. the plioID */
-    redirectID: {
+    redirectId: {
       default: "",
       type: String,
     },

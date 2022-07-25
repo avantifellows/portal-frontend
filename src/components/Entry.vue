@@ -36,6 +36,7 @@
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
+          data-cy="inputBox"
         />
       </div>
 
@@ -72,6 +73,7 @@
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
+      data-cy="submitButton"
     >
       {{ submitButtonDisplayText }}
     </button>
@@ -92,7 +94,7 @@ export default {
       type: String,
       default: "",
     },
-    redirectID: {
+    redirectId: {
       type: String,
       default: "",
     },
@@ -395,7 +397,7 @@ export default {
         this.purpose,
         purposeParams,
         this.redirectTo,
-        this.redirectID,
+        this.redirectId,
         tempUserIDList,
         this.authType,
         this.userType,
@@ -440,7 +442,7 @@ export default {
           redirectToDestination(
             this.purposeParams,
             this.userIDList,
-            this.redirectID,
+            this.redirectId,
             this.redirectTo,
             this.authType,
             this.group
@@ -450,7 +452,7 @@ export default {
             this.purpose,
             this.purposeParams,
             this.redirectTo,
-            this.redirectID,
+            this.redirectId,
             this.userIDList,
             this.authType,
             this.group,

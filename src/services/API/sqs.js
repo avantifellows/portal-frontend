@@ -14,7 +14,7 @@ const sqsClient = new SQSClient({
  * @param {String} purpose
  * @param {String} purposeParams
  * @param {String} redirectTo
- * @param {String} redirectID
+ * @param {String} redirectId
  * @param {Array} userIDList - list of users wanting to go through the layer
  * @param {String} authType
  * Everything, except the userIDList, is extracted from the auth layer URL
@@ -24,7 +24,7 @@ export async function sendSQSMessage(
   purpose,
   purposeParams,
   redirectTo,
-  redirectID,
+  redirectId,
   userIDList,
   authType,
   groupName,
@@ -39,7 +39,7 @@ export async function sendSQSMessage(
         subType: purposeParams,
         params: {
           platform: redirectTo,
-          id: redirectID,
+          id: redirectId,
         },
       },
       authType: authType,

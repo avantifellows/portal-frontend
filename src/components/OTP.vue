@@ -121,7 +121,7 @@ export default {
   name: "OTP",
   props: {
     redirectTo: String,
-    redirectID: String,
+    redirectId: String,
     purpose: String,
     purposeParams: String,
     groupData: Object,
@@ -426,7 +426,7 @@ export default {
         redirectToDestination(
           this.purposeParams,
           this.phoneNumberList,
-          this.redirectID,
+          this.redirectId,
           this.redirectTo,
           this.authType,
           this.group
@@ -439,7 +439,7 @@ export default {
           this.purpose,
           this.purposeParams,
           this.redirectTo,
-          this.redirectID,
+          this.redirectId,
           this.phoneNumberList,
           this.authType,
           this.group,

@@ -49,18 +49,18 @@ const router = createRouter({
   mode: "history",
 });
 
-/** Check if correct query params exist */
-router.beforeEach((to) => {
-  const queryParams = Object.keys(to.query);
-  const validQueryParams = queryParams.every((queryParam) =>
-    allowedQueryParams.includes(queryParam)
-  );
+// /** Check if correct query params exist */
+// router.beforeEach((to) => {
+//   const queryParams = Object.keys(to.query);
+//   const validQueryParams = queryParams.every((queryParam) =>
+//     allowedQueryParams.includes(queryParam)
+//   );
 
-  if (!validQueryParams) {
-    return {
-      name: "Error",
-    };
-  }
-});
+//   if (!validQueryParams) {
+//     return {
+//       name: "Error",
+//     };
+//   }
+// });
 
 export default router;

@@ -37,6 +37,8 @@
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
           data-cy="inputBox"
+          ondrop="return false"
+          onpaste="return false"
         />
       </div>
 

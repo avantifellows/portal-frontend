@@ -34,7 +34,7 @@ const routes = [
   {
     path: "/404-not-found",
     name: "Error",
-    props: { type: "404" },
+    props: true,
     component: Error,
   },
   {

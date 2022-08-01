@@ -151,8 +151,16 @@ export default {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
     if (this.sessionId != null) {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+      // Session ID does not exist
+      if (Object.keys(this.sessionData).length == 0) {
+        this.$router.push({
+          name: "Error",
+          params: { text: "Please check Session ID" },
+        });
+      }
       this.sessionEnabled = this.sessionData.sessionActive;
     }
+
     if (this.sessionEnabled)
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;

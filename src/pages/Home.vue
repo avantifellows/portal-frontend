@@ -7,35 +7,37 @@
       />
     </div>
   </div>
-  <!-- NoClassMessage component -->
-  <div v-if="!sessionEnabled">
-    <NoClassMessage />
-  </div>
   <div v-else>
-    <!-- Entry component -->
-    <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
-      <Entry
-        :redirectTo="getRedirectTo"
-        :redirectId="getRedirectId"
-        :purpose="getPurpose"
-        :purposeParams="getPurposeParams"
-        :groupData="groupData"
-        :group="getGroup"
-        :authType="authType"
-        :sessionId="sessionId"
-      />
+    <!-- NoClassMessage component -->
+    <div v-if="!sessionEnabled">
+      <NoClassMessage />
     </div>
-    <!-- OTP component -->
-    <div v-else-if="isAuthTypeOTP && doesGroupExist && sessionEnabled">
-      <OTP
-        :redirectTo="redirectTo"
-        :redirectId="redirectId"
-        :purpose="purpose"
-        :purposeParams="purposeParams"
-        :groupData="groupData"
-        :group="getGroup"
-        :authType="authType"
-      />
+    <div v-else>
+      <!-- Entry component -->
+      <div v-if="isAuthTypeID && doesGroupExist">
+        <Entry
+          :redirectTo="getRedirectTo"
+          :redirectId="getRedirectId"
+          :purpose="getPurpose"
+          :purposeParams="getPurposeParams"
+          :groupData="groupData"
+          :group="getGroup"
+          :authType="authType"
+          :sessionId="sessionId"
+        />
+      </div>
+      <!-- OTP component -->
+      <div v-else-if="isAuthTypeOTP && doesGroupExist">
+        <OTP
+          :redirectTo="redirectTo"
+          :redirectId="redirectId"
+          :purpose="purpose"
+          :purposeParams="purposeParams"
+          :groupData="groupData"
+          :group="getGroup"
+          :authType="authType"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -97,7 +99,7 @@ export default {
     return {
       groupData: null, // stores details about a group
       sessionData: null, // stores details about a session
-      sessionEnabled: true, // whether a session is enabled
+      sessionEnabled: false, // whether a session is enabled
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
     };

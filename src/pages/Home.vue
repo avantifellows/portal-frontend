@@ -155,7 +155,10 @@ export default {
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
           name: "Error",
-          params: { text: "Please check Session ID" },
+          params: {
+            text:
+              "There is no session scheduled with this ID. Please contact your Program Manager.",
+          },
         });
       }
       this.sessionEnabled = this.sessionData.sessionActive;

@@ -13,7 +13,7 @@
   </div>
   <div v-else>
     <!-- Entry component -->
-    <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
+    <div v-if="isAuthTypeID && doesGroupExist">
       <Entry
         :redirectTo="getRedirectTo"
         :redirectId="getRedirectId"
@@ -26,7 +26,7 @@
       />
     </div>
     <!-- OTP component -->
-    <div v-else-if="isAuthTypeOTP && doesGroupExist && sessionEnabled">
+    <div v-else-if="isAuthTypeOTP && doesGroupExist">
       <OTP
         :redirectTo="redirectTo"
         :redirectId="redirectId"

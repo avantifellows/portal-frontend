@@ -13,7 +13,7 @@
   </div>
   <div v-else>
     <!-- Entry component -->
-    <div v-if="isAuthTypeID && doesGroupExist && sessionEnabled">
+    <div v-if="isAuthTypeID && doesGroupExist">
       <Entry
         :redirectTo="getRedirectTo"
         :redirectId="getRedirectId"
@@ -26,7 +26,7 @@
       />
     </div>
     <!-- OTP component -->
-    <div v-else-if="isAuthTypeOTP && doesGroupExist && sessionEnabled">
+    <div v-else-if="isAuthTypeOTP && doesGroupExist">
       <OTP
         :redirectTo="redirectTo"
         :redirectId="redirectId"
@@ -151,8 +151,19 @@ export default {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
     if (this.sessionId != null) {
       this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+      // Session ID does not exist
+      if (Object.keys(this.sessionData).length == 0) {
+        this.$router.push({
+          name: "Error",
+          params: {
+            text:
+              "There is no session scheduled with this ID. Please contact your Program Manager.",
+          },
+        });
+      }
       this.sessionEnabled = this.sessionData.sessionActive;
     }
+
     if (this.sessionEnabled)
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
     this.isLoading = false;

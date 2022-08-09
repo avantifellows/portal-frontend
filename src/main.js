@@ -26,7 +26,7 @@ if (["staging", "production"].includes(import.meta.env.MODE)) {
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
     logErrors: true,
-    environment: process.env.NODE_ENV,
+    environment: import.meta.env.MODE,
   });
 }
 

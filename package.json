@@ -12,8 +12,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.30.0",
-    "@sentry/tracing": "^6.16.1",
-    "@sentry/vue": "^6.16.1",
     "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
     "buffer": "^6.0.3",
@@ -27,7 +25,8 @@
     "vue-inline-svg": "^3.1.0",
     "vue-router": "^4.0.10",
     "vuex": "^4.0.2",
-    "vuex-persistedstate": "^4.1.0"
+    "vuex-persistedstate": "^4.1.0",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.6.1",

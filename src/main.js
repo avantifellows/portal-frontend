@@ -6,11 +6,14 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import "./index.css";
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 const app = createApp(App)
   .component("inline-svg", InlineSvg)
   .use(router)
-  .use(store);
+  .use(store)
+  .use(Toast);
 
 if (["staging", "production"].includes(import.meta.env.MODE)) {
   Sentry.init({

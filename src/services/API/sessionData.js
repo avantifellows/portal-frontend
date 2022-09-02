@@ -15,6 +15,9 @@ export default {
         .post(getSessionDataEndpoint, JSON.stringify(params))
         .then((response) => {
           resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
         });
     });
   },

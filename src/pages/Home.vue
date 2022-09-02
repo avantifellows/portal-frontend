@@ -50,7 +50,6 @@ import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
 
 const assets = useAssets();
-
 export default {
   name: "Home",
   components: {
@@ -164,7 +163,7 @@ export default {
           },
         });
       }
-      console.log(this.sessionData.error);
+      // SessionAPI returns an error
       if (this.sessionData.error) {
         this.toast.error("Network Error, please try again!", {
           position: "top-center",
@@ -183,6 +182,7 @@ export default {
       if (this.sessionEnabled)
         this.groupData = await groupAPIService.getGroupData(this.getGroup);
       if (!this.sessionData.error && this.groupData.error) {
+        // GroupAPI returns an error
         this.toast.error("Network Error, please try again!", {
           position: "top-center",
           timeout: false,

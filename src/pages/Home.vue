@@ -163,6 +163,7 @@ export default {
           },
         });
       }
+
       // SessionAPI returns an error
       if (this.sessionData.error) {
         this.toast.error("Network Error, please try again!", {
@@ -174,9 +175,9 @@ export default {
         });
       } else {
         this.toast.clear();
-        this.sessionEnabled = this.sessionData.sessionActive
-          ? this.sessionData.sessionActive
-          : this.sessionEnabled;
+        if ("sessionActive" in this.sessionData) {
+          this.sessionEnabled = this.sessionData.sessionActive;
+        }
       }
 
       if (this.sessionEnabled)

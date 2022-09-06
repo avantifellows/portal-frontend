@@ -182,7 +182,7 @@ export default {
 
       if (this.sessionEnabled)
         this.groupData = await groupAPIService.getGroupData(this.getGroup);
-      if (!this.sessionData.error && this.groupData.error) {
+      if (!this.sessionData.error && this.groupData && this.groupData.error) {
         // GroupAPI returns an error
         this.toast.error("Network Error, please try again!", {
           position: "top-center",

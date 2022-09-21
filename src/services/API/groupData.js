@@ -18,6 +18,7 @@ export default {
         })
         .catch((error) => {
           resolve({ error: error });
+          throw new Error("Group API returned an error:", error);
         });
     });
   },

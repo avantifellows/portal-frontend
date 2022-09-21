@@ -157,7 +157,7 @@ export default {
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
           name: "Error",
-          state: {
+          params: {
             text:
               "There is no session scheduled with this ID. Please contact your Program Manager.",
           },

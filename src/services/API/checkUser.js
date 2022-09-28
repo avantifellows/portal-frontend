@@ -19,6 +19,10 @@ export default {
         .post(checkUserEndpoint, JSON.stringify(params))
         .then((response) => {
           resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
         });
     });
   },

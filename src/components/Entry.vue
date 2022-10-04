@@ -126,6 +126,10 @@ export default {
       type: String,
       default: "",
     },
+    userData: {
+      type: Object,
+      default: {},
+    },
   },
   data() {
     return {
@@ -459,7 +463,8 @@ export default {
             this.authType,
             this.group,
             this.userType,
-            this.sessionId
+            this.sessionId,
+            this.userData
           );
         }
       }

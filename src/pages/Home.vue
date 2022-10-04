@@ -23,6 +23,7 @@
         :group="getGroup"
         :authType="authType"
         :sessionId="sessionId"
+        :userData="getUserData"
       />
     </div>
     <!-- OTP component -->
@@ -102,6 +103,7 @@ export default {
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
+      userData: {},
     };
   },
   computed: {
@@ -147,6 +149,9 @@ export default {
       return this.purposeParams == ""
         ? this.sessionData.purposeParams
         : this.purposeParams;
+    },
+    getUserData() {
+      return { userIp: this.sessionData.userIp };
     },
   },
   async created() {

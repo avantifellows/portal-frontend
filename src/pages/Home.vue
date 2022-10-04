@@ -47,6 +47,7 @@ import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import useAssets from "@/assets/assets.js";
+import { useToast } from "vue-toastification";
 
 const assets = useAssets();
 export default {
@@ -100,6 +101,7 @@ export default {
       sessionEnabled: true, // whether a session is enabled
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
+      toast: useToast(),
     };
   },
   computed: {
@@ -161,11 +163,35 @@ export default {
           },
         });
       }
-      this.sessionEnabled = this.sessionData.sessionActive;
-    }
 
-    if (this.sessionEnabled)
-      this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      // SessionAPI returns an error
+      if (this.sessionData.error) {
+        this.toast.error("Network Error, please try again!", {
+          position: "top-center",
+          timeout: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+        });
+      } else {
+        this.toast.clear();
+        if ("sessionActive" in this.sessionData) {
+          this.sessionEnabled = this.sessionData.sessionActive;
+        }
+      }
+      if (this.sessionEnabled)
+        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      if (!this.sessionData.error && this.groupData && this.groupData.error) {
+        // GroupAPI returns an error
+        this.toast.error("Network Error, please try again!", {
+          position: "top-center",
+          timeout: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+        });
+      }
+    }
     this.isLoading = false;
   },
 };

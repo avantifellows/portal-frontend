@@ -36,7 +36,15 @@ async function checkUserIdInFirestore(
     collectionName,
     columnName
   );
-
+  if (isCurrentUserValid.error) {
+    this.toast.error("Network Error, please try again!", {
+      position: "top-center",
+      timeout: false,
+      closeOnClick: false,
+      draggable: false,
+      closeButton: false,
+    });
+  }
   if (isCurrentUserValid) {
     return {
       isCurrentUserValid: isCurrentUserValid,

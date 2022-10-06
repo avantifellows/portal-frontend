@@ -179,7 +179,7 @@ export default {
           this.sessionEnabled = this.sessionData.sessionActive;
         }
       }
-      if ((!this.sessionData.error && this.sessionEnabled) || this.sessionId == null)
+      if (!this.sessionData.error && this.sessionEnabled)
         this.groupData = await groupAPIService.getGroupData(this.getGroup);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {
         // GroupAPI returns an error

@@ -179,9 +179,21 @@ export default {
           this.sessionEnabled = this.sessionData.sessionActive;
         }
       }
-      if (this.sessionEnabled)
+      if ((!this.sessionData.error && this.sessionEnabled) || this.sessionId == null)
         this.groupData = await groupAPIService.getGroupData(this.getGroup);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {
+        // GroupAPI returns an error
+        this.toast.error("Network Error, please try again!", {
+          position: "top-center",
+          timeout: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+        });
+      }
+    } else {
+      this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      if (this.groupData && this.groupData.error) {
         // GroupAPI returns an error
         this.toast.error("Network Error, please try again!", {
           position: "top-center",

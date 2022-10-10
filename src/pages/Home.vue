@@ -23,7 +23,7 @@
         :group="getGroup"
         :authType="authType"
         :sessionId="sessionId"
-        :userData="getUserData"
+        :userNetworkData="getUserNetworkData"
       />
     </div>
     <!-- OTP component -->
@@ -103,7 +103,7 @@ export default {
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
-      userData: {},
+      userNetworkData: {}, // contains network data of the user
     };
   },
   computed: {
@@ -150,7 +150,9 @@ export default {
         ? this.sessionData.purposeParams
         : this.purposeParams;
     },
-    getUserData() {
+
+    /** Returns object containing network data about the user */
+    getUserNetworkData() {
       return { userIp: this.sessionData.userIp };
     },
   },

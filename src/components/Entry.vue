@@ -126,7 +126,7 @@ export default {
       type: String,
       default: "",
     },
-    userData: {
+    userNetworkData: {
       type: Object,
       default: {},
     },
@@ -464,7 +464,7 @@ export default {
             this.group,
             this.userType,
             this.sessionId,
-            this.userData
+            this.userNetworkData
           );
         }
       }

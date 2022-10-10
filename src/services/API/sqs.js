@@ -30,7 +30,7 @@ export async function sendSQSMessage(
   groupName,
   userType,
   sessionId,
-  userData
+  userNetworkData
 ) {
   const messageBody = [
     {
@@ -50,7 +50,7 @@ export async function sendSQSMessage(
       group: groupName,
       userType: userType,
       sessionId: sessionId,
-      userData: userData,
+      userNetworkData: userNetworkData,
     },
   ];
   const params = {

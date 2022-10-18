@@ -126,9 +126,9 @@ export default {
       type: String,
       default: "",
     },
-    userNetworkData: {
-      type: Object,
-      default: {},
+    userIpAddress: {
+      type: String,
+      default: "",
     },
   },
   data() {
@@ -464,7 +464,7 @@ export default {
             this.group,
             this.userType,
             this.sessionId,
-            this.userNetworkData
+            this.userIpAddress
           );
         }
       }

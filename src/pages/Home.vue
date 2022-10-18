@@ -153,7 +153,7 @@ export default {
 
     /** Returns IP address of user */
     getUserIpAddress() {
-      return { userIp: this.sessionData.userIp };
+      return this.sessionData.userIp;
     },
   },
   async created() {

@@ -103,7 +103,7 @@ export default {
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
-      getUserIpAddress: "", // contains network data of the user
+      getUserIpAddress: "", // contains IP address of the user
     };
   },
   computed: {

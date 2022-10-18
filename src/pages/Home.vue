@@ -102,8 +102,7 @@ export default {
       sessionEnabled: true, // whether a session is enabled
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
-      toast: useToast(),
-      getUserIpAddress: "", // contains IP address of the user
+      toast: useToast()
     };
   },
   computed: {

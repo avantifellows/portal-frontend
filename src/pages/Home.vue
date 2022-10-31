@@ -102,7 +102,7 @@ export default {
       sessionEnabled: true, // whether a session is enabled
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
-      toast: useToast()
+      toast: useToast(),
     };
   },
   computed: {
@@ -152,7 +152,7 @@ export default {
 
     /** Returns IP address of user */
     getUserIpAddress() {
-      return this.sessionData.userIp;
+      return this.sessionData ? this.sessionData.userIp : "";
     },
   },
   async created() {

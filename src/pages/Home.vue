@@ -154,7 +154,7 @@ export default {
 
     /** Apart from ID, are any extra inputs being validated. */
     isExtraInputValidationsRequired() {
-      return this.sessionData ? this.sessionData.extraInputValidation : false;
+      return this.getAuthType.split(",").length > 1;
     },
 
     /** Returns the auth methods used by each group */

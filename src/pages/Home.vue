@@ -24,6 +24,7 @@
         :authType="authType"
         :sessionId="sessionId"
         :userIpAddress="getUserIpAddress"
+        :extraInputValidation="isExtraInputValidationsRequired"
       />
     </div>
     <!-- OTP component -->
@@ -35,7 +36,7 @@
         :purposeParams="purposeParams"
         :groupData="groupData"
         :group="getGroup"
-        :authType="authType"
+        :authType="getAuthType"
       />
     </div>
   </div>
@@ -84,11 +85,7 @@ export default {
       default: "HaryanaStudents",
       type: String,
     },
-    /** The authentication method used by the user */
-    authType: {
-      default: "ID",
-      type: String,
-    },
+
     /** ID of session */
     sessionId: {
       default: null,
@@ -108,7 +105,7 @@ export default {
   computed: {
     /** Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
-      return this.authType == "ID";
+      return this.getAuthType.includes("ID");
     },
 
     /** Whether authentication method chosen is OTP */
@@ -153,6 +150,16 @@ export default {
     /** Returns IP address of user */
     getUserIpAddress() {
       return this.sessionData ? this.sessionData.userIp : "";
+    },
+
+    /** Apart from ID, are any extra inputs being validated. */
+    isExtraInputValidationsRequired() {
+      return this.sessionData ? this.sessionData.extraInputValidation : false;
+    },
+
+    /** Returns the auth methods used by each group */
+    getAuthType() {
+      return this.groupData ? this.groupData.authType : "ID";
     },
   },
   async created() {

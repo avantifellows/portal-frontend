@@ -10,11 +10,13 @@
   </div>
   <!-- main div -->
   <div
-    class="flex flex-col my-auto h-full py-32 space-y-6"
+    class="flex flex-col my-auto h-full pt-32 pb-10 space-y-6"
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
-    <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
+    <p
+      class="w-3/4 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+    >
       {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
@@ -32,7 +34,7 @@
           pattern="[0-9]*"
           :placeholder="inputBoxPlaceholderText"
           required
-          class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
+          class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
@@ -70,6 +72,39 @@
         </div>
       </button>
     </div>
+    <div
+      v-show="isExtraInputValidationRequired"
+      class="flex flex-col pt-10 md:pt-14 pb-10"
+    >
+      <div>
+        <p
+          class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+        >
+          Enter your birthdate / अपना जन्म दिनांक डालें
+        </p>
+      </div>
+      <div class="pt-5 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
+        <template v-for="(item, index) in itemList" :key="index">
+          <div class="flex flex-col md:w-1/6">
+            <label
+              :for="item.id"
+              class="text-xl sm:text-2xl md:text-2xl mx-auto font-bold p-2"
+              >{{ item.text }}</label
+            >
+            <select
+              :id="item.id"
+              class="border-2 rounded-md p-3 md:p-4 border-gray-500 focus:border-gray-800 focus:outline-none"
+              v-model="birthdate[item.id]"
+            >
+              <option value="month" disabled selected>{{ item.text }}</option>
+              <template v-for="(value, index) in item.valuesList" :key="index">
+                <option>{{ value }}</option>
+              </template>
+            </select>
+          </div>
+        </template>
+      </div>
+    </div>
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
@@ -79,6 +114,11 @@
     >
       {{ submitButtonDisplayText }}
     </button>
+    <a
+      v-show="isExtraInputValidationRequired"
+      class="mx-auto pt-7 text-sm underline text-red-800"
+      >If you are a new student, click here to register</a
+    >
   </div>
 </template>
 
@@ -130,6 +170,10 @@ export default {
       type: String,
       default: "",
     },
+    extraInputValidation: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -143,6 +187,24 @@ export default {
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
+      birthdate: { month: "", day: "", year: "" },
+      itemList: [
+        {
+          id: "month",
+          text: "Month",
+          valuesList: Array.from({ length: 12 }, (_, i) => i + 1),
+        },
+        {
+          id: "day",
+          text: "Day",
+          valuesList: Array.from({ length: 31 }, (_, i) => i + 1),
+        },
+        {
+          id: "year",
+          text: "Year",
+          valuesList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
+        },
+      ],
     };
   },
   created() {
@@ -150,6 +212,9 @@ export default {
     this.userType = this.groupData.userType;
   },
   computed: {
+    isExtraInputValidationRequired() {
+      return this.authType.split(",").length > 1;
+    },
     /** Returns the input mode stored against the group */
     inputMode() {
       return this.groupData.input.mode;
@@ -201,7 +266,8 @@ export default {
       return (
         !this.isAnyUserIDPresent ||
         this.invalidInputMessage != "" ||
-        this.isCurrentEntryIncomplete
+        this.isCurrentEntryIncomplete ||
+        this.isBirthDateEntryIncomplete
       );
     },
 
@@ -216,6 +282,15 @@ export default {
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
         this.numOfUserIds < this.maxNumberOfIds
+      );
+    },
+
+    /** Checks if entire birth date is entered */
+    isBirthDateEntryIncomplete() {
+      return (
+        this.birthdate.month == "" ||
+        this.birthdate.day == "" ||
+        this.birthdate.year == ""
       );
     },
 
@@ -296,7 +371,6 @@ export default {
         },
       ];
     },
-
     /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
@@ -416,12 +490,16 @@ export default {
      */
     async authenticateID(userID) {
       this.isLoading = true;
+
       let userValidationResponse = await validateID(
         userID,
         this.groupData.dataSource,
         this.authType,
-        this.validateCount
+        this.validateCount,
+        this.birthdate,
+        this.isExtraInputValidationRequired
       );
+
       this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
       this.validateCount = userValidationResponse.validateCount;
       this.isLoading = false;

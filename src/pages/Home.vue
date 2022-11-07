@@ -21,7 +21,7 @@
         :purposeParams="getPurposeParams"
         :groupData="groupData"
         :group="getGroup"
-        :authType="authType"
+        :authType="getAuthType"
         :sessionId="sessionId"
         :userIpAddress="getUserIpAddress"
         :extraInputValidation="isExtraInputValidationsRequired"
@@ -110,7 +110,7 @@ export default {
 
     /** Whether authentication method chosen is OTP */
     isAuthTypeOTP() {
-      return this.authType == "OTP";
+      return this.getAuthType.includes("OTP");
     },
 
     /** Checks if group exists */
@@ -159,7 +159,7 @@ export default {
 
     /** Returns the auth methods used by each group */
     getAuthType() {
-      return this.groupData ? this.groupData.authType : "ID";
+      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
     },
   },
   async created() {

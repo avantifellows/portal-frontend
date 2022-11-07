@@ -1,5 +1,25 @@
 import firebaseAPI from "@/services/API/checkUser.js";
 
+/** This function validates a birthdate against Firestore.
+ * firebaseAPI service returns a boolean value, indicating whether the birthdate is valid or not.
+ * @param {String} birthdate - birthdate being validated
+ * @param {String} collectionName - firestore collection against which the birthdate needs to be validated
+ * @param {String} columnName - name of the column which contains the birthdate
+ */
+async function checkBirthdateInFirestore(
+  birthdate,
+  userID,
+  collectionName,
+  columnName
+) {
+  return await firebaseAPI.doesBirthdateMatch(
+    birthdate,
+    userID,
+    collectionName,
+    columnName
+  );
+}
+
 /** This function validates a phone number against Firestore.
  * firebaseAPI service is used to validate and it returns a boolean value, indicating whether the user is valid or not.
  * @param {String} phoneNumber - phone number being validated
@@ -29,7 +49,8 @@ async function checkUserIdInFirestore(
   userID,
   validateCount,
   collectionName,
-  columnName
+  columnName,
+  isExtraInputValidationRequired
 ) {
   let isCurrentUserValid = await firebaseAPI.checkUserExists(
     userID,
@@ -52,7 +73,10 @@ async function checkUserIdInFirestore(
     };
   }
 
-  if (validateCount == 0 || validateCount == 1) {
+  if (
+    (validateCount == 0 || validateCount == 1) &&
+    !isExtraInputValidationRequired
+  ) {
     validateCount += 1;
   }
   return {
@@ -66,28 +90,51 @@ async function checkUserIdInFirestore(
  * @param {String} dataSource - contains information about where and how the data is stored.
  * @param {String} authType - the authentication method the user has used
  * @param {Number} validateCount - indicates how many times the user has been validated
+ * @param {Object} birthdate - contains the month, day and year
+ * @param {Boolean} isExtraInputValidationRequired - indicates if there are any extra fields being validated
  */
 export async function validateID(
   userID,
   dataSource,
   authType,
-  validateCount = 0
+  validateCount = 0,
+  birthdate,
+  isExtraInputValidationRequired
 ) {
   if (dataSource["type"] == "Firestore") {
-    if (authType == "ID") {
-      return checkUserIdInFirestore(
-        userID,
-        validateCount,
-        dataSource["name"],
-        dataSource["column"]
+    if (isExtraInputValidationRequired) {
+      return (
+        checkBirthdateInFirestore(
+          birthdate,
+          userID,
+          dataSource["name"],
+          "date_of_birth"
+        ) &&
+        checkUserIdInFirestore(
+          userID,
+          validateCount,
+          dataSource["name"],
+          dataSource["column"],
+          isExtraInputValidationRequired
+        )
       );
-    }
-    if (authType == "OTP") {
-      return checkPhoneNumberInFirestore(
-        userID,
-        dataSource["name"],
-        dataSource["column"]
-      );
+    } else {
+      if (authType.includes("ID")) {
+        return checkUserIdInFirestore(
+          userID,
+          validateCount,
+          dataSource["name"],
+          dataSource["column"],
+          isExtraInputValidationRequired
+        );
+      }
+      if (authType.includes("OTP")) {
+        return checkPhoneNumberInFirestore(
+          userID,
+          dataSource["name"],
+          dataSource["column"]
+        );
+      }
     }
   }
 }

@@ -27,7 +27,6 @@ const routes = [
       // legacy URLs support redirectID, new URLs must use redirectId
       redirectId: route.query.redirectID || route.query.redirectId,
       group: route.query.group,
-      authType: route.query.authType,
       sessionId: route.query.sessionId,
     }),
   },

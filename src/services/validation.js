@@ -1,4 +1,4 @@
-import firebaseAPI from "@/services/API/checkUser.js";
+import firebaseAPI from "@/services/API/user.js";
 
 /** This function validates a birthdate against Firestore.
  * firebaseAPI service returns a boolean value, indicating whether the birthdate is valid or not.

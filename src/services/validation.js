@@ -66,23 +66,24 @@ async function checkUserIdInFirestore(
       closeButton: false,
     });
   }
-  if (isCurrentUserValid) {
+  if (!isExtraInputValidationRequired) {
+    if (isCurrentUserValid) {
+      return {
+        isCurrentUserValid: isCurrentUserValid,
+        validateCount: validateCount,
+      };
+    }
+
+    if (validateCount == 0 || validateCount == 1) {
+      validateCount += 1;
+    }
     return {
       isCurrentUserValid: isCurrentUserValid,
       validateCount: validateCount,
     };
+  } else {
+    return isCurrentUserValid;
   }
-
-  if (
-    (validateCount == 0 || validateCount == 1) &&
-    !isExtraInputValidationRequired
-  ) {
-    validateCount += 1;
-  }
-  return {
-    isCurrentUserValid: isCurrentUserValid,
-    validateCount: validateCount,
-  };
 }
 
 /** This function checks the data source to see which database API needs to be called.
@@ -103,21 +104,21 @@ export async function validateID(
 ) {
   if (dataSource["type"] == "Firestore") {
     if (isExtraInputValidationRequired) {
-      return (
-        checkBirthdateInFirestore(
-          birthdate,
-          userID,
-          dataSource["name"],
-          "date_of_birth"
-        ) &&
-        checkUserIdInFirestore(
-          userID,
-          validateCount,
-          dataSource["name"],
-          dataSource["column"],
-          isExtraInputValidationRequired
-        )
+      let isBirthdateValid = await checkBirthdateInFirestore(
+        birthdate,
+        userID,
+        dataSource["name"],
+        "date_of_birth"
       );
+      let isIdValid = await checkUserIdInFirestore(
+        userID,
+        validateCount,
+        dataSource["name"],
+        dataSource["column"],
+        isExtraInputValidationRequired
+      );
+
+      return isBirthdateValid && isIdValid;
     } else {
       if (authType.includes("ID")) {
         return checkUserIdInFirestore(

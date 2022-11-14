@@ -55,9 +55,9 @@
     <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
+    <!-- <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidLoginMessage
-    }}</span>
+    }}</span> -->
     <!-- button to add another input -->
     <div v-if="isAddButtonAllowed" class="my-auto">
       <button
@@ -95,7 +95,7 @@
             <FormKit
               type="select"
               name="month"
-              v-model="month"
+              v-model="dateOfBirth.month"
               placeholder="Month"
               :options="monthList"
               validation="required"
@@ -103,7 +103,7 @@
             <FormKit
               type="select"
               name="day"
-              v-model="day"
+              v-model="dateOfBirth.day"
               placeholder="Day"
               :options="dayList"
               validation="required"
@@ -111,7 +111,7 @@
             <FormKit
               type="select"
               name="year"
-              v-model="year"
+              v-model="dateOfBirth.year"
               placeholder="Year"
               :options="yearList"
               validation="required"
@@ -120,6 +120,11 @@
         </FormKit>
       </div>
     </div>
+    <span
+      v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidLoginMessage }}</span
+    >
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
@@ -206,10 +211,7 @@ export default {
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
       extraInputFields: [],
-      dateOfBirth: "",
-      month: "",
-      day: "",
-      year: "",
+      dateOfBirth: { month: "", day: "", year: "" },
       monthList: Array.from({ length: 12 }, (_, i) => i + 1),
       dayList: Array.from({ length: 31 }, (_, i) => i + 1),
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
@@ -313,7 +315,10 @@ export default {
 
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
-      return !this.isCurrentUserValid && this.validateCount == 1;
+      return (
+        (!this.isCurrentUserValid && this.validateCount == 1) ||
+        (!this.isCurrentUserValid && this.validateCount == 0)
+      );
     },
 
     /** Whether input being typed is in the correct format */
@@ -507,15 +512,19 @@ export default {
         this.dateOfBirth,
         this.isExtraInputValidationRequired
       );
-
-      this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
-      this.validateCount = userValidationResponse.validateCount;
-      this.isLoading = false;
-      if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.invalidLoginText;
-      }
-      if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.numOfUserIds - 1);
+      if (this.isExtraInputValidationRequired) {
+        this.isCurrentUserValid = userValidationResponse;
+        this.isLoading = false;
+      } else {
+        this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
+        this.validateCount = userValidationResponse.validateCount;
+        this.isLoading = false;
+        if (this.validateCount == 1) {
+          this.invalidLoginMessage = this.invalidLoginText;
+        }
+        if (this.invalidLoginMessage != "") {
+          this.resetEntry(this.numOfUserIds - 1);
+        }
       }
     },
 
@@ -525,6 +534,9 @@ export default {
     async authenticate() {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 0) {
+        this.invalidLoginMessage = "Wrong Credentials! Please try again!";
+      }
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
       }

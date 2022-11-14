@@ -2,9 +2,27 @@ import { client } from "@/services/API/rootClient.js";
 import {
   checkUserEndpoint,
   checkBirthdateEndpoint,
+  studentSignupEndpoint,
 } from "@/services/API/endpoints.js";
 
+/**
+ * Creates a new student
+ * @param {Object} formData - contains data filled in the form by user
+ */
 export default {
+  studentSignup(formData) {
+    return new Promise((resolve) => {
+      client
+        .post(studentSignupEndpoint, JSON.stringify(formData))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
+        });
+    });
+  },
   /**
    * Validates that the ID exists
    * @param {String} userID - the id that needs to be validated
@@ -17,6 +35,7 @@ export default {
       collectionName: collectionName,
       columnName: columnName,
     };
+
     return new Promise((resolve) => {
       client
         .post(checkUserEndpoint, JSON.stringify(params))

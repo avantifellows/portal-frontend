@@ -8,9 +8,14 @@
       />
     </div>
   </div>
+  <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+    <template v-for="(image, index) in getGroupImages" :key="index">
+      <img :src="image" />
+    </template>
+  </div>
   <!-- main div -->
   <div
-    class="flex flex-col my-auto h-full pt-32 pb-10 space-y-6"
+    class="flex flex-col my-auto h-full pt-28 pb-10 space-y-6"
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
@@ -55,9 +60,9 @@
     <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
+    <!-- <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidLoginMessage
-    }}</span>
+    }}</span> -->
     <!-- button to add another input -->
     <div v-if="isAddButtonAllowed" class="my-auto">
       <button
@@ -86,7 +91,7 @@
             <FormKit
               type="select"
               name="month"
-              v-model="month"
+              v-model="dateOfBirth.month"
               placeholder="Month"
               :options="monthList"
               validation="required"
@@ -94,7 +99,7 @@
             <FormKit
               type="select"
               name="day"
-              v-model="day"
+              v-model="dateOfBirth.day"
               placeholder="Day"
               :options="dayList"
               validation="required"
@@ -102,7 +107,7 @@
             <FormKit
               type="select"
               name="year"
-              v-model="year"
+              v-model="dateOfBirth.year"
               placeholder="Year"
               :options="yearList"
               validation="required"
@@ -111,6 +116,11 @@
         </FormKit>
       </div>
     </div>
+    <span
+      v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidLoginMessage }}</span
+    >
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
@@ -197,10 +207,7 @@ export default {
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
       extraInputFields: [],
-      dateOfBirth: "",
-      month: "",
-      day: "",
-      year: "",
+      dateOfBirth: { month: "", day: "", year: "" },
       monthList: Array.from({ length: 12 }, (_, i) => i + 1),
       dayList: Array.from({ length: 31 }, (_, i) => i + 1),
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
@@ -212,6 +219,9 @@ export default {
     this.$store.dispatch("setGroupData", this.groupData);
   },
   computed: {
+    getGroupImages() {
+      return this.groupData.images;
+    },
     /** Returns if more than one input needs to be validated */
     isExtraInputValidationRequired() {
       return this.authType.split(",").length > 1;
@@ -289,7 +299,11 @@ export default {
 
     /** Checks if entire birth date is entered */
     isBirthDateEntryIncomplete() {
-      return this.month == "" || this.day == "" || this.year == "";
+      return (
+        this.dateOfBirth.month == "" ||
+        this.dateOfBirth.day == "" ||
+        this.dateOfBirth.year == ""
+      );
     },
 
     /** Checks if the current input entry has the required number of characters */
@@ -304,7 +318,10 @@ export default {
 
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
-      return !this.isCurrentUserValid && this.validateCount == 1;
+      return (
+        (!this.isCurrentUserValid && this.validateCount == 1) ||
+        (!this.isCurrentUserValid && this.validateCount == 0)
+      );
     },
 
     /** Whether input being typed is in the correct format */
@@ -498,15 +515,19 @@ export default {
         this.dateOfBirth,
         this.isExtraInputValidationRequired
       );
-
-      this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
-      this.validateCount = userValidationResponse.validateCount;
-      this.isLoading = false;
-      if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.invalidLoginText;
-      }
-      if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.numOfUserIds - 1);
+      if (this.isExtraInputValidationRequired) {
+        this.isCurrentUserValid = userValidationResponse;
+        this.isLoading = false;
+      } else {
+        this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
+        this.validateCount = userValidationResponse.validateCount;
+        this.isLoading = false;
+        if (this.validateCount == 1) {
+          this.invalidLoginMessage = this.invalidLoginText;
+        }
+        if (this.invalidLoginMessage != "") {
+          this.resetEntry(this.numOfUserIds - 1);
+        }
       }
     },
 
@@ -516,6 +537,9 @@ export default {
     async authenticate() {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 0) {
+        this.invalidLoginMessage = "Wrong Credentials! Please try again!";
+      }
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);
       }

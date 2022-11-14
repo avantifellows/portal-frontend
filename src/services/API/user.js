@@ -35,6 +35,7 @@ export default {
       collectionName: collectionName,
       columnName: columnName,
     };
+
     return new Promise((resolve) => {
       client
         .post(checkUserEndpoint, JSON.stringify(params))

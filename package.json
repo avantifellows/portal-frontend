@@ -12,31 +12,33 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.30.0",
+    "@formkit/themes": "^1.0.0-beta.11",
+    "@formkit/vue": "^1.0.0-beta.11",
     "@sentry/tracing": "^6.16.1",
     "@sentry/vue": "^6.16.1",
-    "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
     "buffer": "^6.0.3",
     "core-js": "^3.6.5",
     "dns": "^0.2.2",
-    "postcss": "^7.0.36",
     "pre-commit": "^1.2.2",
     "secure-ls": "^1.2.6",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.7",
     "vue": "^3.0.0",
     "vue-inline-svg": "^3.1.0",
     "vue-router": "^4.0.10",
+    "vue-toastification": "^2.0.0-rc.5",
     "vuex": "^4.0.2",
-    "vuex-persistedstate": "^4.1.0",
-    "vue-toastification": "^2.0.0-rc.5"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.6.1",
     "@vue/compiler-sfc": "^3.0.0",
+    "autoprefixer": "^10.4.13",
     "eslint": "^8.13.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.6.0",
+    "postcss": "^8.4.18",
     "prettier": "^2.6.2",
+    "tailwindcss": "^3.2.2",
     "vite": "2.5.10"
   },
   "browserslist": [

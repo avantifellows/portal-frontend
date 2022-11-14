@@ -86,7 +86,16 @@
         </p>
       </div>
       <div class="pt-7 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
-        <FormKit type="group" v-model="dateOfBirth" name="dob">
+        <FormKit
+          type="group"
+          v-model="dateOfBirth"
+          name="dob"
+          :config="{
+            classes: {
+              wrapper: 'border-2 rounded-md  border-gray-500',
+            },
+          }"
+        >
           <div class="flex flex-row space-x-9">
             <FormKit
               type="select"

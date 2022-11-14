@@ -8,12 +8,15 @@ import store from "./store";
 import "./index.css";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import { plugin, defaultConfig } from "@formkit/vue";
+import "@formkit/themes/genesis";
 
 const app = createApp(App)
   .component("inline-svg", InlineSvg)
   .use(router)
   .use(store)
-  .use(Toast);
+  .use(Toast)
+  .use(plugin, defaultConfig);
 
 if (["staging", "production"].includes(import.meta.env.MODE)) {
   Sentry.init({

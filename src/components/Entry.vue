@@ -308,7 +308,11 @@ export default {
 
     /** Checks if entire birth date is entered */
     isBirthDateEntryIncomplete() {
-      return this.month == "" || this.day == "" || this.year == "";
+      return (
+        this.dateOfBirth.month == "" ||
+        this.dateOfBirth.day == "" ||
+        this.dateOfBirth.year == ""
+      );
     },
 
     /** Checks if the current input entry has the required number of characters */

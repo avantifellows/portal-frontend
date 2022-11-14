@@ -1,7 +1,7 @@
 import { client } from "@/services/API/rootClient.js";
 import {
   checkUserEndpoint,
-  checkBirthdateEndpoint
+  checkBirthdateEndpoint,
 } from "@/services/API/endpoints.js";
 
 /**

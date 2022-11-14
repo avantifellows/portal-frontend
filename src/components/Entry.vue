@@ -8,9 +8,14 @@
       />
     </div>
   </div>
+  <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+    <template v-for="(image, index) in getGroupImages" :key="index">
+      <img :src="image" />
+    </template>
+  </div>
   <!-- main div -->
   <div
-    class="flex flex-col my-auto h-full pt-32 pb-10 space-y-6"
+    class="flex flex-col my-auto h-full pt-28 pb-10 space-y-6"
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
@@ -214,6 +219,9 @@ export default {
     this.$store.dispatch("setGroupData", this.groupData);
   },
   computed: {
+    getGroupImages() {
+      return this.groupData.images;
+    },
     /** Returns if more than one input needs to be validated */
     isExtraInputValidationRequired() {
       return this.authType.split(",").length > 1;

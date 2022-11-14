@@ -1,17 +1,23 @@
 <template>
   <div class="h-full">
     <!-- Header -->
-    <div class="flex w-full justify-center bg-white p-4">
-      <!-- <img src="../assets/images/jnvEnableLogo.png" /> -->
+    <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+      <template v-for="(image, index) in getGroupImages" :key="index">
+        <img :src="image" />
+      </template>
     </div>
-    <div class="flex flex-col items-center justify-center p-10">
+    <div class="flex flex-col items-center justify-center p-10" v-if="!formSubmitted">
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
         PORTAL - SIGN UP
       </p>
 
-      <FormKit type="form" :config="{ validationVisibility: 'submit' }">
+      <FormKit
+        type="form"
+        :config="{ validationVisibility: 'submit' }"
+        @submit="submitForm"
+      >
         <FormKit
           type="text"
           label="*Name"
@@ -200,12 +206,26 @@
         />
       </FormKit>
     </div>
+    <div
+      v-if="formSubmitted"
+      class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
+    >
+      <p>
+        Your Student ID is <b>{{ studentId }}</b>
+      </p>
+      <p>Please note this down. Use this to sign-in going forward.</p>
+      <button
+        class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
+      >
+        Take Test
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
-
+import UserAPI from "@/services/API/user.js";
 export default {
   name: "Signup",
   data() {
@@ -223,6 +243,8 @@ export default {
       monthList: Array.from({ length: 12 }, (_, i) => i + 1),
       dayList: Array.from({ length: 31 }, (_, i) => i + 1),
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
+      formSubmitted: false,
+      studentId: "",
     };
   },
 
@@ -240,17 +262,16 @@ export default {
         return ["PCB", "PCMB"];
       }
     },
+    getGroupImages() {
+      return this.$store.state.groupData.images;
+    },
   },
-  // methods: {
-  //   async submitForm() {
-  //     // check if good submission
-  //     await FormDataAPI.submitFormData(formData);
-  //     router.push({
-  //       name: "Player",
-  //       params: { quizId: quizId.value },
-  //       query: { userId: userId.value, apiKey: "6qOO8UdF1EGxLgzwIbQN" },
-  //     });
-  //   },
-  // },
+  methods: {
+    async submitForm(formData) {
+      this.formSubmitted = true;
+
+      this.studentId = await UserAPI.studentSignup(formData);
+    },
+  },
 };
 </script>

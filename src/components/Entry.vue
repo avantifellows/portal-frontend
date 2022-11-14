@@ -72,10 +72,7 @@
         </div>
       </button>
     </div>
-    <div
-      v-show="isExtraInputValidationRequired"
-      class="flex flex-col pt-10 md:pt-14 pb-10"
-    >
+    <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-10 pb-6">
       <div>
         <p
           class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
@@ -83,42 +80,62 @@
           Enter your birthdate / अपना जन्म दिनांक डालें
         </p>
       </div>
-      <div class="pt-5 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
-        <template v-for="(item, index) in itemList" :key="index">
-          <div class="flex flex-col md:w-1/6">
-            <label
-              :for="item.id"
-              class="text-xl sm:text-2xl md:text-2xl mx-auto font-bold p-2"
-              >{{ item.text }}</label
-            >
-            <select
-              :id="item.id"
-              class="border-2 rounded-md p-3 md:p-4 border-gray-500 focus:border-gray-800 focus:outline-none"
-              v-model="birthdate[item.id]"
-            >
-              <option value="month" disabled selected>{{ item.text }}</option>
-              <template v-for="(value, index) in item.valuesList" :key="index">
-                <option>{{ value }}</option>
-              </template>
-            </select>
+      <div class="pt-7 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
+        <FormKit
+          type="group"
+          v-model="dateOfBirth"
+          name="dob"
+          :config="{
+            classes: {
+              wrapper: 'border-2 rounded-md  border-gray-500',
+            },
+          }"
+        >
+          <div class="flex flex-row space-x-9">
+            <FormKit
+              type="select"
+              name="month"
+              v-model="month"
+              placeholder="Month"
+              :options="monthList"
+              validation="required"
+            />
+            <FormKit
+              type="select"
+              name="day"
+              v-model="day"
+              placeholder="Day"
+              :options="dayList"
+              validation="required"
+            />
+            <FormKit
+              type="select"
+              name="year"
+              v-model="year"
+              placeholder="Year"
+              :options="yearList"
+              validation="required"
+            />
           </div>
-        </template>
+        </FormKit>
       </div>
     </div>
     <!-- submit button -->
     <button
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
       data-cy="submitButton"
     >
       {{ submitButtonDisplayText }}
     </button>
-    <a
+    <button
       v-show="isExtraInputValidationRequired"
       class="mx-auto pt-7 text-sm underline text-red-800"
-      >If you are a new student, click here to register</a
+      @click="redirectToSignup"
     >
+      If you are a new student, click here to register
+    </button>
   </div>
 </template>
 
@@ -128,6 +145,7 @@ import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
+
 const assets = useAssets();
 export default {
   name: "Entry",
@@ -187,34 +205,27 @@ export default {
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
-      birthdate: { month: "", day: "", year: "" },
-      itemList: [
-        {
-          id: "month",
-          text: "Month",
-          valuesList: Array.from({ length: 12 }, (_, i) => i + 1),
-        },
-        {
-          id: "day",
-          text: "Day",
-          valuesList: Array.from({ length: 31 }, (_, i) => i + 1),
-        },
-        {
-          id: "year",
-          text: "Year",
-          valuesList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
-        },
-      ],
+      extraInputFields: [],
+      dateOfBirth: "",
+      month: "",
+      day: "",
+      year: "",
+      monthList: Array.from({ length: 12 }, (_, i) => i + 1),
+      dayList: Array.from({ length: 31 }, (_, i) => i + 1),
+      yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
     };
   },
   created() {
     /** The user type is set as soon as component is created */
     this.userType = this.groupData.userType;
+    this.$store.dispatch("setGroupData", this.groupData);
   },
   computed: {
+    /** Returns if more than one input needs to be validated */
     isExtraInputValidationRequired() {
       return this.authType.split(",").length > 1;
     },
+
     /** Returns the input mode stored against the group */
     inputMode() {
       return this.groupData.input.mode;
@@ -287,11 +298,7 @@ export default {
 
     /** Checks if entire birth date is entered */
     isBirthDateEntryIncomplete() {
-      return (
-        this.birthdate.month == "" ||
-        this.birthdate.day == "" ||
-        this.birthdate.year == ""
-      );
+      return this.month == "" || this.day == "" || this.year == "";
     },
 
     /** Checks if the current input entry has the required number of characters */
@@ -371,6 +378,7 @@ export default {
         },
       ];
     },
+
     /** Calls the mapping function to validate the typed character
      * @param {Object} event - event triggered when a character is typed
      */
@@ -496,7 +504,7 @@ export default {
         this.groupData.dataSource,
         this.authType,
         this.validateCount,
-        this.birthdate,
+        this.dateOfBirth,
         this.isExtraInputValidationRequired
       );
 
@@ -546,6 +554,17 @@ export default {
           );
         }
       }
+    },
+    /**
+     * Redirects to Sign up Component
+     */
+    redirectToSignup() {
+      this.$router.push({
+        name: "Signup",
+        state: {
+          groupData: { ...this.groupData },
+        },
+      });
     },
   },
 };

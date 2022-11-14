@@ -2,8 +2,13 @@ import { client } from "@/services/API/rootClient.js";
 import {
   checkUserEndpoint,
   checkBirthdateEndpoint,
+  studentSignupEndpoint,
 } from "@/services/API/endpoints.js";
 
+/**
+ * Creates a new student
+ * @param {Object} formData - contains data filled in the form by user
+ */
 export default {
   studentSignup(formData) {
     return new Promise((resolve) => {

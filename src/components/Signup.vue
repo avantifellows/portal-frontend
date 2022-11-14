@@ -1,6 +1,5 @@
 <template>
   <div class="h-full">
-    <!-- Header -->
     <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
       <template v-for="(image, index) in getGroupImages" :key="index">
         <img :src="image" />
@@ -249,12 +248,15 @@ export default {
   },
 
   computed: {
+    // Returns the corresponding states for a region
     stateList() {
       return regionState[this.region];
     },
+    // Returns the corresponding JNVs for a state
     jnvList() {
       return jnvState[this.stateName];
     },
+    // Returns the corresponding streams for a selected course
     streamList() {
       if (this.course == "JEE") {
         return ["PCM", "PCMB"];
@@ -262,15 +264,17 @@ export default {
         return ["PCB", "PCMB"];
       }
     },
+    // Returns the images stored against a group
     getGroupImages() {
       return this.$store.state.groupData.images;
     },
   },
   methods: {
+    // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
       this.formSubmitted = true;
-
-      this.studentId = await UserAPI.studentSignup(formData);
+      let createdStudent = await UserAPI.studentSignup(formData);
+      this.studentId = createdStudent.studentId ? createdStudent.studentId : "";
     },
   },
 };

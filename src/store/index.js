@@ -8,15 +8,22 @@ let localStorage = new SecureLS({ isCompression: true });
 export default createStore({
   state: {
     phoneNumber: null,
+    groupData: {},
   },
   actions: {
     setPhoneNumber({ commit }, phoneNumber) {
       commit("setPhoneNumber", phoneNumber);
     },
+    setGroupData({ commit }, groupData) {
+      commit("setGroupData", groupData);
+    },
   },
   mutations: {
     setPhoneNumber(state, phoneNumber) {
       state.phoneNumber = phoneNumber;
+    },
+    setGroupData(state, groupData) {
+      state.groupData = Object.assign({}, groupData);
     },
   },
   plugins: [

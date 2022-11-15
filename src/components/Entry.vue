@@ -126,10 +126,10 @@
       </div>
     </div>
     <span
+      v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
-      class="mx-auto text-red-700 text-base mb-1"
-      >{{ invalidLoginMessage }}</span
-    >
+      class="mx-auto text-red-700 text-base mb-1 text-center text-xs md:text-sm"
+    ></span>
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
@@ -547,7 +547,8 @@ export default {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 0) {
-        this.invalidLoginMessage = "Wrong Credentials! Please try again!";
+        this.invalidLoginMessage =
+          "Student ID/Birthdate entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);

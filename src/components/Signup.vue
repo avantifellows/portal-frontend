@@ -283,12 +283,12 @@ export default {
     },
     redirect() {
       redirectToDestination(
-        this.$store.sessionData.purposeParams,
+        this.$store.state.sessionData.purposeParams,
         this.studentId,
-        this.$store.sessionData.redirectPlatformParams.id,
-        this.$store.sessionData.redirectPlatform,
-        this.$store.groupData.authType,
-        this.$store.sessionData.group
+        this.$store.state.sessionData.redirectPlatformParams.id,
+        this.$store.state.sessionData.redirectPlatform,
+        this.$store.state.groupData.authType,
+        this.$store.state.sessionData.group
       );
     },
   },

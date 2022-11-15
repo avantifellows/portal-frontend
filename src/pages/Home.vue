@@ -189,6 +189,7 @@ export default {
         });
       } else {
         this.toast.clear();
+        this.$store.dispatch("setSessionData", this.sessionData);
         if ("sessionActive" in this.sessionData) {
           this.sessionEnabled = this.sessionData.sessionActive;
         }
@@ -206,7 +207,6 @@ export default {
         });
       }
     } else {
-      this.$store.dispatch("setSessionData", this.sessionData);
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
       if (this.groupData && this.groupData.error) {
         // GroupAPI returns an error

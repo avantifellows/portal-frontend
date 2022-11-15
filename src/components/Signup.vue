@@ -215,6 +215,7 @@
       </p>
       <p>Please note this down. Use this to sign-in going forward.</p>
       <button
+        @click="redirect"
         class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
       >
         Take Test
@@ -226,6 +227,8 @@
 <script>
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
 import UserAPI from "@/services/API/user.js";
+import { redirectToDestination } from "@/services/redirectToDestination.js";
+
 export default {
   name: "Signup",
   data() {
@@ -277,6 +280,16 @@ export default {
       let createdStudentId = await UserAPI.studentSignup(formData);
 
       this.studentId = createdStudentId ? createdStudentId : "";
+    },
+    redirect() {
+      redirectToDestination(
+        this.purposeParams,
+        this.userIDList,
+        this.redirectId,
+        this.redirectTo,
+        this.authType,
+        this.group
+      );
     },
   },
 };

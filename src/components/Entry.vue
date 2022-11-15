@@ -8,14 +8,14 @@
       />
     </div>
   </div>
-  <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
   </div>
   <!-- main div -->
   <div
-    class="flex flex-col my-auto h-full pt-28 pb-10 space-y-6"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
@@ -77,7 +77,7 @@
         </div>
       </button>
     </div>
-    <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-10 pb-6">
+    <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-4">
       <div>
         <p
           class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
@@ -85,9 +85,18 @@
           Enter your birthdate
         </p>
       </div>
-      <div class="pt-7 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
-        <FormKit type="group" v-model="dateOfBirth" name="dob">
-          <div class="flex flex-row space-x-9">
+      <div class="pt-4 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
+        <FormKit
+          type="group"
+          v-model="dateOfBirth"
+          name="dob"
+          :config="{
+            classes: {
+              wrapper: 'border-2 rounded-md  border-gray-500',
+            },
+          }"
+        >
+          <div class="flex flex-row space-x-3">
             <FormKit
               type="select"
               name="month"
@@ -132,7 +141,7 @@
     </button>
     <button
       v-show="isExtraInputValidationRequired"
-      class="mx-auto pt-7 text-sm underline text-red-800"
+      class="mx-auto pt-2 text-sm underline text-red-800"
       @click="redirectToSignup"
     >
       If you are a new student, click here to register

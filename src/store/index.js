@@ -9,6 +9,7 @@ export default createStore({
   state: {
     phoneNumber: null,
     groupData: {},
+    sessionData: {},
   },
   actions: {
     setPhoneNumber({ commit }, phoneNumber) {
@@ -17,6 +18,9 @@ export default createStore({
     setGroupData({ commit }, groupData) {
       commit("setGroupData", groupData);
     },
+    setSessionData({ commit }, sessionData) {
+      commit("setSessionData", sessionData);
+    },
   },
   mutations: {
     setPhoneNumber(state, phoneNumber) {
@@ -24,6 +28,9 @@ export default createStore({
     },
     setGroupData(state, groupData) {
       state.groupData = Object.assign({}, groupData);
+    },
+    setSessionData(state, sessionData) {
+      state.sessionData = Object.assign({}, sessionData);
     },
   },
   plugins: [

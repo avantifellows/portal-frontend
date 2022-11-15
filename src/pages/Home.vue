@@ -102,6 +102,7 @@ export default {
       toast: useToast(),
     };
   },
+
   computed: {
     /** Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
@@ -205,6 +206,7 @@ export default {
         });
       }
     } else {
+      this.$store.dispatch("setSessionData", this.sessionData);
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
       if (this.groupData && this.groupData.error) {
         // GroupAPI returns an error

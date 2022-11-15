@@ -82,7 +82,7 @@
         <p
           class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
         >
-          Enter your birthdate / अपना जन्म दिनांक डालें
+          Enter your birthdate
         </p>
       </div>
       <div class="pt-7 flex mx-auto justify-evenly w-5/6 lg:w-1/2">

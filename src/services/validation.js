@@ -108,7 +108,7 @@ export async function validateID(
         birthdate,
         userID,
         dataSource["name"],
-        "date_of_birth"
+        dataSource["column"]
       );
       let isIdValid = await checkUserIdInFirestore(
         userID,

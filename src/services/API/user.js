@@ -60,7 +60,7 @@ export default {
       userID: userID,
       collectionName: collectionName,
       columnName: columnName,
-      birthdate: birthdate,
+      dob: birthdate,
     };
 
     return new Promise((resolve) => {

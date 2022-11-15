@@ -114,6 +114,7 @@
             'Patna',
             'Pune',
             'Shillong',
+            'Avanti',
           ]"
           validation="required"
           name="region"
@@ -273,8 +274,9 @@ export default {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
       this.formSubmitted = true;
-      let createdStudent = await UserAPI.studentSignup(formData);
-      this.studentId = createdStudent.studentId ? createdStudent.studentId : "";
+      let createdStudentId = await UserAPI.studentSignup(formData);
+
+      this.studentId = createdStudentId ? createdStudentId : "";
     },
   },
 };

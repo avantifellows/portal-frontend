@@ -1,4 +1,5 @@
 export const regionState = {
+  Avanti: ["Avanti"],
   Bhopal: ["Chhattisgarh", "Madhya Pradesh", "Orissa"],
   Lucknow: ["Uttarakhand", "Uttar Pradesh"],
   Chandigarh: [
@@ -39,6 +40,7 @@ export const regionState = {
 };
 
 export const jnvState = {
+  Avanti: ["JNV Avanti"],
   Chhattisgarh: [
     "JNV DANTEWADA",
     "JNV DHAMTARI",

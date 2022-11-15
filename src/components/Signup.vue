@@ -287,7 +287,7 @@ export default {
         this.studentId,
         this.$store.sessionData.redirectPlatformParams.id,
         this.$store.sessionData.redirectPlatform,
-        this.authType,
+        this.$store.groupData.authType,
         this.$store.sessionData.group
       );
     },

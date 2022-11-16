@@ -154,13 +154,21 @@ export default {
       return this.sessionData ? this.sessionData.userIp : "";
     },
 
+    getLengthOfAuthType() {
+      return this.getAuthType.split(",").length;
+    },
     areAuthTypesValid() {
-      this.getAuthType.split(",").every((authType) => validAuthTypes.includes(authType));
+      let validCount = 0;
+      this.getAuthType.split(",").every((authType) => {
+        validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
+        return validCount;
+      });
+      return validCount == this.getLengthOfAuthType;
     },
 
     /** Apart from ID, are any extra inputs being validated. */
     isExtraInputValidationsRequired() {
-      return this.getAuthType.split(",").length > 1 && this.areAuthTypesValid;
+      return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
     },
 
     /** Returns the auth methods used by each group */

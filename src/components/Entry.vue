@@ -200,7 +200,7 @@ export default {
       type: String,
       default: "",
     },
-    extraInputValidation: {
+    isExtraInputValidationRequired: {
       type: Boolean,
       default: false,
     },
@@ -232,10 +232,6 @@ export default {
   computed: {
     getGroupImages() {
       return this.groupData.images;
-    },
-    /** Returns if more than one input needs to be validated */
-    isExtraInputValidationRequired() {
-      return this.authType.split(",").length > 1;
     },
 
     /** Returns the input mode stored against the group */

@@ -60,9 +60,11 @@
     <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <!-- <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
-      invalidLoginMessage
-    }}</span> -->
+    <span
+      v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidLoginMessage }}</span
+    >
     <!-- button to add another input -->
     <div v-if="isAddButtonAllowed" class="my-auto">
       <button
@@ -308,11 +310,11 @@ export default {
 
     /** Checks if entire birth date is entered */
     isBirthDateEntryIncomplete() {
-      return (
-        this.dateOfBirth.month == "" ||
-        this.dateOfBirth.day == "" ||
-        this.dateOfBirth.year == ""
-      );
+      return this.isExtraInputValidationRequired
+        ? this.dateOfBirth.month == "" ||
+            this.dateOfBirth.day == "" ||
+            this.dateOfBirth.year == ""
+        : false;
     },
 
     /** Checks if the current input entry has the required number of characters */
@@ -329,7 +331,9 @@ export default {
     isInvalidLoginMessageShown() {
       return (
         (!this.isCurrentUserValid && this.validateCount == 1) ||
-        (!this.isCurrentUserValid && this.validateCount == 0)
+        (!this.isCurrentUserValid &&
+          this.validateCount == 0 &&
+          this.isExtraInputValidationRequired)
       );
     },
 
@@ -524,6 +528,7 @@ export default {
         this.dateOfBirth,
         this.isExtraInputValidationRequired
       );
+      console.log(userValidationResponse);
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;
         this.isLoading = false;

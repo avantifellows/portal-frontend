@@ -199,7 +199,7 @@
         <FormKit
           type="tel"
           label="*Family Income per Annum"
-          validation="required|number|length:1,10"
+          validation="required|matches:/^[0-9]{10}$/"
           validation-visibility="live"
           name="family_income"
           help="Please enter your family income per annum (year) in digits. Example: 100000"

@@ -206,7 +206,7 @@
         <FormKit
           type="tel"
           label="*Family Income per Annum"
-          validation="number|required|matches:/^[0-9]{,10}$/"
+          validation="required|number"
           validation-visibility="live"
           name="family_income"
           help="Please enter your family income per annum (year) in digits. Example: 100000"
@@ -262,7 +262,11 @@ export default {
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
     };
   },
-
+  created() {
+    if (this.$store.state.sessionData.sessionId == null) {
+      this.$router.push({ name: "Error" });
+    }
+  },
   computed: {
     // Returns the corresponding states for a region
     stateList() {

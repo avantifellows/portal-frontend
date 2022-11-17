@@ -110,15 +110,15 @@ export async function validateID(
         dataSource["name"],
         dataSource["column"]
       );
-      let isIdValid = await checkUserIdInFirestore(
-        userID,
-        validateCount,
-        dataSource["name"],
-        dataSource["column"],
-        isExtraInputValidationRequired
-      );
+      // let isIdValid = await checkUserIdInFirestore(
+      //   userID,
+      //   validateCount,
+      //   dataSource["name"],
+      //   dataSource["column"],
+      //   isExtraInputValidationRequired
+      // );
 
-      return isBirthdateValid && isIdValid;
+      return isBirthdateValid;
     } else {
       if (authType.includes("ID")) {
         return checkUserIdInFirestore(

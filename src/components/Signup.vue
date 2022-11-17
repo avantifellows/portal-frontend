@@ -17,7 +17,7 @@
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
-        PORTAL - SIGN UP
+        JNV ENABLE REGISTRATION
       </p>
 
       <FormKit
@@ -206,7 +206,7 @@
         <FormKit
           type="tel"
           label="*Family Income per Annum"
-          validation="required|number"
+          validation="required|number|matches:/[1-9]\d*$/"
           validation-visibility="live"
           name="family_income"
           help="Please enter your family income per annum (year) in digits. Example: 100000"
@@ -298,6 +298,14 @@ export default {
       this.formSubmitted = true;
       this.isLoading = true;
       let createdStudentId = await UserAPI.studentSignup(formData);
+      if (createdStudentId == "") {
+        this.$router.push({
+          name: "Error",
+          state: {
+            text: "Student ID could not be created. Please contact your program manager.",
+          },
+        });
+      }
       this.isLoading = false;
       this.studentId = createdStudentId ? createdStudentId : "";
     },

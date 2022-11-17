@@ -213,7 +213,7 @@ export default {
       invalidLoginMessage: "",
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
-      userType: "", // differentiates between different kinds of users
+      userType: this.$store.state.groupData.userType, // differentiates between different kinds of users
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
@@ -225,8 +225,7 @@ export default {
     };
   },
   created() {
-    /** The user type is set as soon as component is created */
-    this.userType = this.groupData.userType;
+    // Adding group data to the store
     this.$store.dispatch("setGroupData", this.groupData);
   },
   computed: {
@@ -448,9 +447,6 @@ export default {
     async addField() {
       const latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
-      if (!this.isCurrentUserValid && this.validateCount == 1) {
-        this.handleIncorrectEntry(latestUserID);
-      }
       if (this.isCurrentUserValid || this.validateCount > 1) {
         this.setValidFlag();
         this.addNewEmptyField();
@@ -490,26 +486,6 @@ export default {
       }
     },
 
-    /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
-     * @param {String} userID - ID of the incorrect entry field
-     */
-    handleIncorrectEntry(userID) {
-      let purposeParams = "incorrect-entry";
-      let tempUserIDList = [
-        { userID: userID.toString(), valid: this.isCurrentUserValid },
-      ];
-      sendSQSMessage(
-        this.purpose,
-        purposeParams,
-        this.redirectTo,
-        this.redirectId,
-        tempUserIDList,
-        this.authType,
-        this.userType,
-        this.sessionId
-      );
-    },
-
     /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
@@ -524,7 +500,6 @@ export default {
         this.dateOfBirth,
         this.isExtraInputValidationRequired
       );
-      console.log(userValidationResponse);
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;
         this.isLoading = false;
@@ -550,9 +525,6 @@ export default {
       if (!this.isCurrentUserValid && this.validateCount == 0) {
         this.invalidLoginMessage =
           "Student ID/Birthdate entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
-      }
-      if (!this.isCurrentUserValid && this.validateCount == 1) {
-        this.handleIncorrectEntry(latestUserID);
       }
       this.setValidFlag();
       if (this.isCurrentUserValid || this.validateCount > 1) {
@@ -587,9 +559,6 @@ export default {
     redirectToSignup() {
       this.$router.push({
         name: "Signup",
-        state: {
-          groupData: { ...this.groupData },
-        },
       });
     },
   },

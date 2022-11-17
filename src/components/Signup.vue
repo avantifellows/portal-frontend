@@ -298,6 +298,14 @@ export default {
       this.formSubmitted = true;
       this.isLoading = true;
       let createdStudentId = await UserAPI.studentSignup(formData);
+      if (createdStudentId == "") {
+        this.$router.push({
+          name: "Error",
+          state: {
+            text: "Student ID could not be created. Please contact your program manager.",
+          },
+        });
+      }
       this.isLoading = false;
       this.studentId = createdStudentId ? createdStudentId : "";
     },

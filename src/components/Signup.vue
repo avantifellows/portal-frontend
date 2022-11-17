@@ -17,7 +17,7 @@
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
-        PORTAL - SIGN UP
+        JNV ENABLE REGISTRATION
       </p>
 
       <FormKit
@@ -31,7 +31,7 @@
           validation="required|alpha_spaces|length:3,40"
           v-model="studentName"
           validation-visibility="live"
-          name="first_name"
+          name="name"
           help="Enter your full name. Example: Karn Mathur"
         />
         <FormKit
@@ -152,7 +152,7 @@
           placeholder="Select your JNV's name"
           :options="jnvList || []"
           validation="required"
-          name="school_name"
+          name="school"
           help="Please select your JNV's name. Example: JNV Bidar"
         />
         <FormKit

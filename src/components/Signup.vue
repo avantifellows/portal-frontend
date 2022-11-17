@@ -1,5 +1,13 @@
 <template>
-  <div class="h-full">
+  <div v-if="isLoading" class="h-full w-full fixed z-50">
+    <div class="flex mx-auto w-full h-full">
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
+    </div>
+  </div>
+  <div class="h-full" :class="{ 'opacity-20': isLoading }">
     <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
       <template v-for="(image, index) in getGroupImages" :key="index">
         <img :src="image" />
@@ -114,7 +122,6 @@
             'Patna',
             'Pune',
             'Shillong',
-            'Avanti',
           ]"
           validation="required"
           name="region"
@@ -199,7 +206,7 @@
         <FormKit
           type="tel"
           label="*Family Income per Annum"
-          validation="required|matches:/^[0-9]{10}$/"
+          validation="number|required|matches:/^[0-9]{,10}$/"
           validation-visibility="live"
           name="family_income"
           help="Please enter your family income per annum (year) in digits. Example: 100000"
@@ -216,6 +223,7 @@
       <p>Please note this down. Use this to sign-in going forward.</p>
       <button
         @click="redirect"
+        :disabled="isTakeTestDisabled"
         class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
       >
         Take Test
@@ -228,7 +236,9 @@
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
 import UserAPI from "@/services/API/user.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
+import useAssets from "@/assets/assets.js";
 
+const assets = useAssets();
 export default {
   name: "Signup",
   data() {
@@ -248,6 +258,8 @@ export default {
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
       formSubmitted: false,
       studentId: "",
+      isLoading: false,
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
     };
   },
 
@@ -272,24 +284,43 @@ export default {
     getGroupImages() {
       return this.$store.state.groupData.images;
     },
+    isTakeTestDisabled() {
+      return this.studentId == "";
+    },
   },
   methods: {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
       this.formSubmitted = true;
+      this.isLoading = true;
       let createdStudentId = await UserAPI.studentSignup(formData);
-
+      this.isLoading = false;
       this.studentId = createdStudentId ? createdStudentId : "";
     },
     redirect() {
-      redirectToDestination(
-        this.$store.state.sessionData.purposeParams,
-        this.studentId,
-        this.$store.state.sessionData.redirectPlatformParams.id,
-        this.$store.state.sessionData.redirectPlatform,
-        this.$store.state.groupData.authType,
-        this.$store.state.sessionData.group
-      );
+      if (
+        redirectToDestination(
+          this.$store.state.sessionData.purposeParams,
+          this.studentId.toString(),
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.groupData.authType,
+          this.$store.state.sessionData.group
+        )
+      ) {
+        sendSQSMessage(
+          this.$store.state.sessionData.purpose,
+          this.$store.state.sessionData.purposeParams,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.studentId,
+          this.$store.state.groupData.authType,
+          this.$store.state.sessionData.group,
+          this.$store.state.groupData.userType,
+          this.$store.state.sessionData.sessionId,
+          this.$store.state.sessionData.userIpAddress
+        );
+      }
     },
   },
 };

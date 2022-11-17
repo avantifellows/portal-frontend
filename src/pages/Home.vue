@@ -203,6 +203,7 @@ export default {
       } else {
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
+        this.$store.dispatch("setSessionId", this.sessionId);
         if ("sessionActive" in this.sessionData) {
           this.sessionEnabled = this.sessionData.sessionActive;
         }

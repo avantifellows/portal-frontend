@@ -21,6 +21,9 @@ export default createStore({
     setSessionData({ commit }, sessionData) {
       commit("setSessionData", sessionData);
     },
+    setSessionId({ commit }, sessionId) {
+      commit("setSessionId", sessionId);
+    },
   },
   mutations: {
     setPhoneNumber(state, phoneNumber) {
@@ -31,6 +34,9 @@ export default createStore({
     },
     setSessionData(state, sessionData) {
       state.sessionData = Object.assign({}, sessionData);
+    },
+    setSessionId(state, sessionId) {
+      state.sessionData.sessionId = sessionId;
     },
   },
   plugins: [

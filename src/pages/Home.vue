@@ -24,7 +24,7 @@
         :authType="getAuthType"
         :sessionId="sessionId"
         :userIpAddress="getUserIpAddress"
-        :extraInputValidation="isExtraInputValidationsRequired"
+        :isExtraInputValidationRequired="isExtraInputValidationsRequired"
       />
     </div>
     <!-- OTP component -->
@@ -52,6 +52,7 @@ import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
 
 const assets = useAssets();
+const validAuthTypes = ["DOB", "ID"];
 export default {
   name: "Home",
   components: {
@@ -102,6 +103,7 @@ export default {
       toast: useToast(),
     };
   },
+
   computed: {
     /** Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
@@ -152,9 +154,21 @@ export default {
       return this.sessionData ? this.sessionData.userIp : "";
     },
 
+    getLengthOfAuthType() {
+      return this.getAuthType.split(",").length;
+    },
+    areAuthTypesValid() {
+      let validCount = 0;
+      this.getAuthType.split(",").every((authType) => {
+        validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
+        return validCount;
+      });
+      return validCount == this.getLengthOfAuthType;
+    },
+
     /** Apart from ID, are any extra inputs being validated. */
     isExtraInputValidationsRequired() {
-      return this.getAuthType.split(",").length > 1;
+      return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
     },
 
     /** Returns the auth methods used by each group */
@@ -188,6 +202,8 @@ export default {
         });
       } else {
         this.toast.clear();
+        this.$store.dispatch("setSessionData", this.sessionData);
+        this.$store.dispatch("setSessionId", this.sessionId);
         if ("sessionActive" in this.sessionData) {
           this.sessionEnabled = this.sessionData.sessionActive;
         }

@@ -2,6 +2,7 @@ import { client } from "@/services/API/rootClient.js";
 import {
   checkUserEndpoint,
   checkBirthdateEndpoint,
+  studentSignupEndpoint,
 } from "@/services/API/endpoints.js";
 
 /**
@@ -59,7 +60,7 @@ export default {
       userID: userID,
       collectionName: collectionName,
       columnName: columnName,
-      birthdate: birthdate,
+      dob: birthdate,
     };
 
     return new Promise((resolve) => {

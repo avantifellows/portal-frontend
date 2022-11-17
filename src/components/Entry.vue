@@ -8,14 +8,14 @@
       />
     </div>
   </div>
-  <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
   </div>
   <!-- main div -->
   <div
-    class="flex flex-col my-auto h-full pt-28 pb-10 space-y-6"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
@@ -60,9 +60,11 @@
     <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <!-- <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
-      invalidLoginMessage
-    }}</span> -->
+    <span
+      v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidLoginMessage }}</span
+    >
     <!-- button to add another input -->
     <div v-if="isAddButtonAllowed" class="my-auto">
       <button
@@ -77,7 +79,7 @@
         </div>
       </button>
     </div>
-    <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-10 pb-6">
+    <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-4">
       <div>
         <p
           class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
@@ -85,7 +87,7 @@
           Enter your birthdate
         </p>
       </div>
-      <div class="pt-7 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
+      <div class="pt-4 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
         <FormKit
           type="group"
           v-model="dateOfBirth"
@@ -96,7 +98,7 @@
             },
           }"
         >
-          <div class="flex flex-row space-x-9">
+          <div class="flex flex-row space-x-3">
             <FormKit
               type="select"
               name="month"
@@ -126,10 +128,10 @@
       </div>
     </div>
     <span
+      v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
-      class="mx-auto text-red-700 text-base mb-1"
-      >{{ invalidLoginMessage }}</span
-    >
+      class="mx-auto text-red-700 text-base mb-1 text-center text-xs md:text-sm"
+    ></span>
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
@@ -141,7 +143,7 @@
     </button>
     <button
       v-show="isExtraInputValidationRequired"
-      class="mx-auto pt-7 text-sm underline text-red-800"
+      class="mx-auto pt-2 text-sm underline text-red-800"
       @click="redirectToSignup"
     >
       If you are a new student, click here to register
@@ -198,7 +200,7 @@ export default {
       type: String,
       default: "",
     },
-    extraInputValidation: {
+    isExtraInputValidationRequired: {
       type: Boolean,
       default: false,
     },
@@ -230,10 +232,6 @@ export default {
   computed: {
     getGroupImages() {
       return this.groupData.images;
-    },
-    /** Returns if more than one input needs to be validated */
-    isExtraInputValidationRequired() {
-      return this.authType.split(",").length > 1;
     },
 
     /** Returns the input mode stored against the group */
@@ -308,11 +306,11 @@ export default {
 
     /** Checks if entire birth date is entered */
     isBirthDateEntryIncomplete() {
-      return (
-        this.dateOfBirth.month == "" ||
-        this.dateOfBirth.day == "" ||
-        this.dateOfBirth.year == ""
-      );
+      return this.isExtraInputValidationRequired
+        ? this.dateOfBirth.month == "" ||
+            this.dateOfBirth.day == "" ||
+            this.dateOfBirth.year == ""
+        : false;
     },
 
     /** Checks if the current input entry has the required number of characters */
@@ -329,7 +327,9 @@ export default {
     isInvalidLoginMessageShown() {
       return (
         (!this.isCurrentUserValid && this.validateCount == 1) ||
-        (!this.isCurrentUserValid && this.validateCount == 0)
+        (!this.isCurrentUserValid &&
+          this.validateCount == 0 &&
+          this.isExtraInputValidationRequired)
       );
     },
 
@@ -524,6 +524,7 @@ export default {
         this.dateOfBirth,
         this.isExtraInputValidationRequired
       );
+      console.log(userValidationResponse);
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;
         this.isLoading = false;
@@ -547,7 +548,8 @@ export default {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 0) {
-        this.invalidLoginMessage = "Wrong Credentials! Please try again!";
+        this.invalidLoginMessage =
+          "Student ID/Birthdate entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       if (!this.isCurrentUserValid && this.validateCount == 1) {
         this.handleIncorrectEntry(latestUserID);

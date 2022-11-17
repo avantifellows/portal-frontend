@@ -4,3 +4,4 @@ export const sendOTPEndpoint = "/sendotp";
 export const verifyOTPEndpoint = "/verifyotp";
 export const getSessionDataEndpoint = "/getSessionData";
 export const checkBirthdateEndpoint = "/checkBirthdate";
+export const studentSignupEndpoint = "/studentSignup";

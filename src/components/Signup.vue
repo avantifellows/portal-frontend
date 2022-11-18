@@ -263,6 +263,7 @@
 <script>
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
 import UserAPI from "@/services/API/user.js";
+import { sendSQSMessage } from "@/services/API/sqs";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import useAssets from "@/assets/assets.js";
 
@@ -353,12 +354,12 @@ export default {
           this.$store.state.sessionData.purposeParams,
           this.$store.state.sessionData.redirectPlatform,
           this.$store.state.sessionData.redirectPlatformParams.id,
-          this.studentId,
+          this.studentId.toString(),
           this.$store.state.groupData.authType,
           this.$store.state.sessionData.group,
           this.$store.state.groupData.userType,
           this.$store.state.sessionData.sessionId,
-          this.$store.state.sessionData.userIpAddress
+          this.$store.state.sessionData.userIp
         );
       }
     },

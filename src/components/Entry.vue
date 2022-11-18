@@ -8,13 +8,20 @@
       />
     </div>
   </div>
+  <div class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+    <template v-for="(image, index) in getGroupImages" :key="index">
+      <img :src="image" />
+    </template>
+  </div>
   <!-- main div -->
   <div
-    class="flex flex-col my-auto h-full py-32 space-y-6"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
     :class="{ 'opacity-20 pointer-events-none': isLoading }"
   >
     <!-- title -->
-    <p class="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl mx-auto font-bold">
+    <p
+      class="w-3/4 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+    >
       {{ inputBoxDisplayTitle }}
     </p>
     <!-- input options and delete options icon -->
@@ -32,7 +39,7 @@
           pattern="[0-9]*"
           :placeholder="inputBoxPlaceholderText"
           required
-          class="border-2 rounded-sm p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
+          class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none"
           :class="selectInputBoxClasses(index)"
           @keypress="isValidEntry($event)"
           @input="updateUserId($event, index)"
@@ -53,9 +60,11 @@
     <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
       invalidInputMessage
     }}</span>
-    <span v-if="isInvalidLoginMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
-      invalidLoginMessage
-    }}</span>
+    <span
+      v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidLoginMessage }}</span
+    >
     <!-- button to add another input -->
     <div v-if="isAddButtonAllowed" class="my-auto">
       <button
@@ -70,14 +79,74 @@
         </div>
       </button>
     </div>
+    <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-4">
+      <div>
+        <p
+          class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+        >
+          Enter your birthdate
+        </p>
+      </div>
+      <div class="pt-4 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
+        <FormKit
+          type="group"
+          v-model="dateOfBirth"
+          name="dob"
+          :config="{
+            classes: {
+              wrapper: 'border-2 rounded-md  border-gray-500',
+            },
+          }"
+        >
+          <div class="flex flex-row space-x-3">
+            <FormKit
+              type="select"
+              name="month"
+              v-model="dateOfBirth.month"
+              placeholder="Month"
+              :options="monthList"
+              validation="required"
+            />
+            <FormKit
+              type="select"
+              name="day"
+              v-model="dateOfBirth.day"
+              placeholder="Day"
+              :options="dayList"
+              validation="required"
+            />
+            <FormKit
+              type="select"
+              name="year"
+              v-model="dateOfBirth.year"
+              placeholder="Year"
+              :options="yearList"
+              validation="required"
+            />
+          </div>
+        </FormKit>
+      </div>
+    </div>
+    <span
+      v-html="invalidLoginMessage"
+      v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
+      class="mx-auto text-red-700 text-base mb-1 text-center text-xs md:text-sm"
+    ></span>
     <!-- submit button -->
     <button
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 mt-4 rounded disabled:opacity-50 btn"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
       data-cy="submitButton"
     >
       {{ submitButtonDisplayText }}
+    </button>
+    <button
+      v-show="isExtraInputValidationRequired"
+      class="mx-auto pt-2 text-sm underline text-red-800"
+      @click="redirectToSignup"
+    >
+      If you are a new student, click here to register
     </button>
   </div>
 </template>
@@ -88,6 +157,7 @@ import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
+
 const assets = useAssets();
 export default {
   name: "Entry",
@@ -130,6 +200,10 @@ export default {
       type: String,
       default: "",
     },
+    isExtraInputValidationRequired: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -139,17 +213,26 @@ export default {
       invalidLoginMessage: "",
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
-      userType: "", // differentiates between different kinds of users
+      userType: this.$store.state.groupData.userType, // differentiates between different kinds of users
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
+      extraInputFields: [],
+      dateOfBirth: { month: "", day: "", year: "" },
+      monthList: Array.from({ length: 12 }, (_, i) => i + 1),
+      dayList: Array.from({ length: 31 }, (_, i) => i + 1),
+      yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
     };
   },
   created() {
-    /** The user type is set as soon as component is created */
-    this.userType = this.groupData.userType;
+    // Adding group data to the store
+    this.$store.dispatch("setGroupData", this.groupData);
   },
   computed: {
+    getGroupImages() {
+      return this.groupData.images;
+    },
+
     /** Returns the input mode stored against the group */
     inputMode() {
       return this.groupData.input.mode;
@@ -201,7 +284,8 @@ export default {
       return (
         !this.isAnyUserIDPresent ||
         this.invalidInputMessage != "" ||
-        this.isCurrentEntryIncomplete
+        this.isCurrentEntryIncomplete ||
+        this.isBirthDateEntryIncomplete
       );
     },
 
@@ -219,6 +303,15 @@ export default {
       );
     },
 
+    /** Checks if entire birth date is entered */
+    isBirthDateEntryIncomplete() {
+      return this.isExtraInputValidationRequired
+        ? this.dateOfBirth.month == "" ||
+            this.dateOfBirth.day == "" ||
+            this.dateOfBirth.year == ""
+        : false;
+    },
+
     /** Checks if the current input entry has the required number of characters */
     isCurrentEntryIncomplete() {
       return this.latestEntry["userID"].length < this.maxLengthOfId;
@@ -231,7 +324,12 @@ export default {
 
     /** Whether the current typed ID is valid */
     isInvalidLoginMessageShown() {
-      return !this.isCurrentUserValid && this.validateCount == 1;
+      return (
+        (!this.isCurrentUserValid && this.validateCount == 1) ||
+        (!this.isCurrentUserValid &&
+          this.validateCount == 0 &&
+          this.isExtraInputValidationRequired)
+      );
     },
 
     /** Whether input being typed is in the correct format */
@@ -349,9 +447,6 @@ export default {
     async addField() {
       const latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
-      if (!this.isCurrentUserValid && this.validateCount == 1) {
-        this.handleIncorrectEntry(latestUserID);
-      }
       if (this.isCurrentUserValid || this.validateCount > 1) {
         this.setValidFlag();
         this.addNewEmptyField();
@@ -391,45 +486,33 @@ export default {
       }
     },
 
-    /** This function handles all invalid/incorrect entries. An SQS message is sent to the queue in AWS.
-     * @param {String} userID - ID of the incorrect entry field
-     */
-    handleIncorrectEntry(userID) {
-      let purposeParams = "incorrect-entry";
-      let tempUserIDList = [
-        { userID: userID.toString(), valid: this.isCurrentUserValid },
-      ];
-      sendSQSMessage(
-        this.purpose,
-        purposeParams,
-        this.redirectTo,
-        this.redirectId,
-        tempUserIDList,
-        this.authType,
-        this.userType,
-        this.sessionId
-      );
-    },
-
     /** This method is called whenever "+" button is clicked. It authenticates the most recent typed ID.
      * @param {String} userID - most recent ID
      */
     async authenticateID(userID) {
       this.isLoading = true;
+
       let userValidationResponse = await validateID(
         userID,
         this.groupData.dataSource,
         this.authType,
-        this.validateCount
+        this.validateCount,
+        this.dateOfBirth,
+        this.isExtraInputValidationRequired
       );
-      this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
-      this.validateCount = userValidationResponse.validateCount;
-      this.isLoading = false;
-      if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.invalidLoginText;
-      }
-      if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.numOfUserIds - 1);
+      if (this.isExtraInputValidationRequired) {
+        this.isCurrentUserValid = userValidationResponse;
+        this.isLoading = false;
+      } else {
+        this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
+        this.validateCount = userValidationResponse.validateCount;
+        this.isLoading = false;
+        if (this.validateCount == 1) {
+          this.invalidLoginMessage = this.invalidLoginText;
+        }
+        if (this.invalidLoginMessage != "") {
+          this.resetEntry(this.numOfUserIds - 1);
+        }
       }
     },
 
@@ -439,8 +522,9 @@ export default {
     async authenticate() {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
-      if (!this.isCurrentUserValid && this.validateCount == 1) {
-        this.handleIncorrectEntry(latestUserID);
+      if (!this.isCurrentUserValid && this.validateCount == 0) {
+        this.invalidLoginMessage =
+          "Student ID/Birthdate entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       this.setValidFlag();
       if (this.isCurrentUserValid || this.validateCount > 1) {
@@ -468,6 +552,14 @@ export default {
           );
         }
       }
+    },
+    /**
+     * Redirects to Sign up Component
+     */
+    redirectToSignup() {
+      this.$router.push({
+        name: "Signup",
+      });
     },
   },
 };

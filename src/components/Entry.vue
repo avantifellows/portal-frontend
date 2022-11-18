@@ -546,7 +546,7 @@ export default {
             this.userIDList,
             this.authType,
             this.group,
-            this.userType,
+            this.$store.state.groupData.userType,
             this.sessionId,
             this.userIpAddress
           );

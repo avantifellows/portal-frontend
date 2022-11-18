@@ -53,6 +53,7 @@ import { useToast } from "vue-toastification";
 
 const assets = useAssets();
 const validAuthTypes = ["DOB", "ID"];
+
 export default {
   name: "Home",
   components: {
@@ -66,21 +67,25 @@ export default {
       default: "",
       type: String,
     },
+
     /** ID of the resource. Eg. the plioID */
     redirectId: {
       default: "",
       type: String,
     },
+
     /** General category of why the data is being captured. Eg: attendance */
     purpose: {
       default: "",
       type: String,
     },
+
     /** Subcategory of the purpose. Eg: plio -> means the attendance is for a plio link */
     purposeParams: {
       default: "",
       type: String,
     },
+
     /** The group the user falls under. Eg: HaryanaStudents, DelhiStudents */
     group: {
       default: "HaryanaStudents",
@@ -154,9 +159,12 @@ export default {
       return this.sessionData ? this.sessionData.userIp : "";
     },
 
+    /** Returns how many authentication methods should be used */
     getLengthOfAuthType() {
       return this.getAuthType.split(",").length;
     },
+
+    /** Checks if the authentication methods mentioned are valid */
     areAuthTypesValid() {
       let validCount = 0;
       this.getAuthType.split(",").every((authType) => {

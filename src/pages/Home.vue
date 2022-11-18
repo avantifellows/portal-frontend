@@ -21,9 +21,10 @@
         :purposeParams="getPurposeParams"
         :groupData="groupData"
         :group="getGroup"
-        :authType="authType"
+        :authType="getAuthType"
         :sessionId="sessionId"
         :userIpAddress="getUserIpAddress"
+        :isExtraInputValidationRequired="isExtraInputValidationsRequired"
       />
     </div>
     <!-- OTP component -->
@@ -35,7 +36,7 @@
         :purposeParams="purposeParams"
         :groupData="groupData"
         :group="getGroup"
-        :authType="authType"
+        :authType="getAuthType"
       />
     </div>
   </div>
@@ -51,6 +52,8 @@ import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
 
 const assets = useAssets();
+const validAuthTypes = ["DOB", "ID"];
+
 export default {
   name: "Home",
   components: {
@@ -64,31 +67,31 @@ export default {
       default: "",
       type: String,
     },
+
     /** ID of the resource. Eg. the plioID */
     redirectId: {
       default: "",
       type: String,
     },
+
     /** General category of why the data is being captured. Eg: attendance */
     purpose: {
       default: "",
       type: String,
     },
+
     /** Subcategory of the purpose. Eg: plio -> means the attendance is for a plio link */
     purposeParams: {
       default: "",
       type: String,
     },
+
     /** The group the user falls under. Eg: HaryanaStudents, DelhiStudents */
     group: {
       default: "HaryanaStudents",
       type: String,
     },
-    /** The authentication method used by the user */
-    authType: {
-      default: "ID",
-      type: String,
-    },
+
     /** ID of session */
     sessionId: {
       default: null,
@@ -105,15 +108,16 @@ export default {
       toast: useToast(),
     };
   },
+
   computed: {
     /** Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
-      return this.authType == "ID";
+      return this.getAuthType.includes("ID");
     },
 
     /** Whether authentication method chosen is OTP */
     isAuthTypeOTP() {
-      return this.authType == "OTP";
+      return this.getAuthType.includes("OTP");
     },
 
     /** Checks if group exists */
@@ -154,6 +158,31 @@ export default {
     getUserIpAddress() {
       return this.sessionData ? this.sessionData.userIp : "";
     },
+
+    /** Returns how many authentication methods should be used */
+    getLengthOfAuthType() {
+      return this.getAuthType.split(",").length;
+    },
+
+    /** Checks if the authentication methods mentioned are valid */
+    areAuthTypesValid() {
+      let validCount = 0;
+      this.getAuthType.split(",").every((authType) => {
+        validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
+        return validCount;
+      });
+      return validCount == this.getLengthOfAuthType;
+    },
+
+    /** Apart from ID, are any extra inputs being validated. */
+    isExtraInputValidationsRequired() {
+      return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
+    },
+
+    /** Returns the auth methods used by each group */
+    getAuthType() {
+      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
+    },
   },
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
@@ -181,6 +210,8 @@ export default {
         });
       } else {
         this.toast.clear();
+        this.$store.dispatch("setSessionData", this.sessionData);
+        this.$store.dispatch("setSessionId", this.sessionId);
         if ("sessionActive" in this.sessionData) {
           this.sessionEnabled = this.sessionData.sessionActive;
         }

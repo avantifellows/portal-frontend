@@ -19,7 +19,8 @@ export function redirectToDestination(
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
-  let userID = userIDList[0]["userID"];
+  let userID =
+    typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
 
   switch (redirectTo) {
     case "plio": {

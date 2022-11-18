@@ -110,13 +110,6 @@ export async function validateID(
         dataSource["name"],
         dataSource["column"]
       );
-      // let isIdValid = await checkUserIdInFirestore(
-      //   userID,
-      //   validateCount,
-      //   dataSource["name"],
-      //   dataSource["column"],
-      //   isExtraInputValidationRequired
-      // );
 
       return isBirthdateValid;
     } else {

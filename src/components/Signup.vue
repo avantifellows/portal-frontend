@@ -13,39 +13,44 @@
         <img :src="image" />
       </template>
     </div>
-    <div
-      class="box-border bg-gray-100 rounded-lg p-6 mt-5 text-sm lg:text-md mx-auto w-11/12"
-    >
-      <p class="font-bold underline">PLEASE READ THE FOLLOWING INSTRUCTIONS CAREFULLY</p>
-      <ul class="list-decimal p-3">
-        <li>Please fill the form correctly and submit to access the test.</li>
-        <li>Please select your course and grade correctly to access the right test.</li>
-        <li>
-          Test Details:
-          <ul class="list-disc">
-            <li>Class 11 JEE: 120 minutes, 30 questions (120 marks)</li>
-            <li>Class 12 JEE: 180 minutes, 75 questions (300 marks)</li>
-            <li>Class 11 NEET: 120 minutes, 30 questions (120 marks)</li>
-            <li>Class 12 NEET: 180 minutes, 180 questions (720 marks)</li>
-          </ul>
-        </li>
-        <li>Scoring Pattern -- Correct Answer: +4, Wrong Answer: -1, Skipped: 0</li>
-        <li class="text-red-600">
-          During the test, to confirm your answer please click
-          <b>SAVE & NEXT</b>. Your response to a question will not be considered incase
-          you fail to save your answer.
-        </li>
-        <li>
-          Only press <b>END TEST</b> once you have completed and reviewed your answers.
-          You will not be able to change your responses once you click on <b>END TEST</b>
-        </li>
-      </ul>
-    </div>
+    <template v-if="!isPurposeRegistration">
+      <div
+        class="box-border bg-gray-100 rounded-lg p-6 mt-5 text-sm lg:text-md mx-auto w-11/12"
+      >
+        <p class="font-bold underline">
+          PLEASE READ THE FOLLOWING INSTRUCTIONS CAREFULLY
+        </p>
+        <ul class="list-decimal p-3">
+          <li>Please fill the form correctly and submit to access the test.</li>
+          <li>Please select your course and grade correctly to access the right test.</li>
+          <li>
+            Test Details:
+            <ul class="list-disc">
+              <li>Class 11 JEE: 120 minutes, 30 questions (120 marks)</li>
+              <li>Class 12 JEE: 180 minutes, 75 questions (300 marks)</li>
+              <li>Class 11 NEET: 120 minutes, 30 questions (120 marks)</li>
+              <li>Class 12 NEET: 180 minutes, 180 questions (720 marks)</li>
+            </ul>
+          </li>
+          <li>Scoring Pattern -- Correct Answer: +4, Wrong Answer: -1, Skipped: 0</li>
+          <li class="text-red-600">
+            During the test, to confirm your answer please click
+            <b>SAVE & NEXT</b>. Your response to a question will not be considered incase
+            you fail to save your answer.
+          </li>
+          <li>
+            Only press <b>END TEST</b> once you have completed and reviewed your answers.
+            You will not be able to change your responses once you click on
+            <b>END TEST</b>
+          </li>
+        </ul>
+      </div>
+    </template>
     <div class="flex flex-col items-center justify-center p-10" v-if="!formSubmitted">
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
-        JNV ENABLE REGISTRATION
+        {{ this.$store.state.groupData.signUpFormTitle }}
       </p>
 
       <FormKit
@@ -250,6 +255,7 @@
       </p>
       <p>Please note this down. Use this to sign-in going forward.</p>
       <button
+        v-if="!isPurposeRegistration"
         @click="redirect"
         :disabled="isTakeTestDisabled"
         class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
@@ -320,6 +326,9 @@ export default {
     isTakeTestDisabled() {
       return this.studentId == "";
     },
+    isPurposeRegistration() {
+      return this.$store.state.sessionData.purpose == "registration";
+    },
   },
   methods: {
     // Called after form is submitted, returns API response containing generated ID
@@ -337,6 +346,20 @@ export default {
       }
       this.isLoading = false;
       this.studentId = createdStudentId ? createdStudentId : "";
+      if (this.isPurposeRegistration()) {
+        sendSQSMessage(
+          this.$store.state.sessionData.purpose,
+          this.$store.state.sessionData.purposeParams,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.studentId.toString(),
+          this.$store.state.groupData.authType,
+          this.$store.state.sessionData.group,
+          this.$store.state.groupData.userType,
+          this.$store.state.sessionData.sessionId,
+          this.$store.state.sessionData.userIp
+        );
+      }
     },
     redirect() {
       if (

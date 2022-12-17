@@ -224,7 +224,6 @@ export default {
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
     };
   },
-  created() {},
   computed: {
     getGroupImages() {
       return this.groupData.images;

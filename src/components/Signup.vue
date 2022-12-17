@@ -346,7 +346,7 @@ export default {
       }
       this.isLoading = false;
       this.studentId = createdStudentId ? createdStudentId : "";
-      if (this.isPurposeRegistration()) {
+      if (this.isPurposeRegistration) {
         sendSQSMessage(
           this.$store.state.sessionData.purpose,
           this.$store.state.sessionData.purposeParams,

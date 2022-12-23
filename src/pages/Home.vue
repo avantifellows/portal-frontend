@@ -7,37 +7,42 @@
       />
     </div>
   </div>
-  <!-- NoClassMessage component -->
-  <div v-if="!sessionEnabled">
-    <NoClassMessage />
+  <div v-if="isPurposeRegistration">
+    <Signup />
   </div>
   <div v-else>
-    <!-- Entry component -->
-    <div v-if="isAuthTypeID && doesGroupExist">
-      <Entry
-        :redirectTo="getRedirectTo"
-        :redirectId="getRedirectId"
-        :purpose="getPurpose"
-        :purposeParams="getPurposeParams"
-        :groupData="groupData"
-        :group="getGroup"
-        :authType="getAuthType"
-        :sessionId="sessionId"
-        :userIpAddress="getUserIpAddress"
-        :isExtraInputValidationRequired="isExtraInputValidationsRequired"
-      />
+    <!-- NoClassMessage component -->
+    <div v-if="!sessionEnabled">
+      <NoClassMessage />
     </div>
-    <!-- OTP component -->
-    <div v-else-if="isAuthTypeOTP && doesGroupExist">
-      <OTP
-        :redirectTo="redirectTo"
-        :redirectId="redirectId"
-        :purpose="purpose"
-        :purposeParams="purposeParams"
-        :groupData="groupData"
-        :group="getGroup"
-        :authType="getAuthType"
-      />
+    <div v-else>
+      <!-- Entry component -->
+      <div v-if="isAuthTypeID && doesGroupExist">
+        <Entry
+          :redirectTo="getRedirectTo"
+          :redirectId="getRedirectId"
+          :purpose="getPurpose"
+          :purposeParams="getPurposeParams"
+          :groupData="groupData"
+          :group="getGroup"
+          :authType="getAuthType"
+          :sessionId="sessionId"
+          :userIpAddress="getUserIpAddress"
+          :isExtraInputValidationRequired="isExtraInputValidationsRequired"
+        />
+      </div>
+      <!-- OTP component -->
+      <div v-else-if="isAuthTypeOTP && doesGroupExist">
+        <OTP
+          :redirectTo="redirectTo"
+          :redirectId="redirectId"
+          :purpose="purpose"
+          :purposeParams="purposeParams"
+          :groupData="groupData"
+          :group="getGroup"
+          :authType="getAuthType"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +50,7 @@
 <script>
 import Entry from "@/components/Entry.vue";
 import OTP from "@/components/OTP.vue";
+import Signup from "@/components/Signup.vue";
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
@@ -60,6 +66,7 @@ export default {
     Entry,
     OTP,
     NoClassMessage,
+    Signup,
   },
   props: {
     /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
@@ -183,6 +190,10 @@ export default {
     getAuthType() {
       return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
     },
+
+    isPurposeRegistration() {
+      return this.sessionData ? this.getPurpose == "registration" : false;
+    },
   },
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
@@ -218,6 +229,7 @@ export default {
       }
       if (!this.sessionData.error && this.sessionEnabled)
         this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      this.$store.dispatch("setGroupData", this.groupData);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {
         // GroupAPI returns an error
         this.toast.error("Network Error, please try again!", {
@@ -230,6 +242,7 @@ export default {
       }
     } else {
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      this.$store.dispatch("setGroupData", this.groupData);
       if (this.groupData && this.groupData.error) {
         // GroupAPI returns an error
         this.toast.error("Network Error, please try again!", {

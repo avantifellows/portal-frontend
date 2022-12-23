@@ -225,6 +225,7 @@ export default {
     };
   },
   computed: {
+    /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
       return this.groupData.enableRegistration;
     },

@@ -142,7 +142,7 @@
       {{ submitButtonDisplayText }}
     </button>
     <button
-      v-show="isExtraInputValidationRequired"
+      v-show="isExtraInputValidationRequire && isRegistrationEnabled"
       class="mx-auto pt-2 text-sm underline text-red-800"
       @click="redirectToSignup"
     >
@@ -225,6 +225,9 @@ export default {
     };
   },
   computed: {
+    isRegistrationEnabled() {
+      return this.groupData.enableRegistration;
+    },
     getGroupImages() {
       return this.groupData.images;
     },

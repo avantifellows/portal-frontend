@@ -224,10 +224,6 @@ export default {
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
     };
   },
-  created() {
-    // Adding group data to the store
-    this.$store.dispatch("setGroupData", this.groupData);
-  },
   computed: {
     getGroupImages() {
       return this.groupData.images;

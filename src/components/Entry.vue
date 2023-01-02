@@ -142,7 +142,7 @@
       {{ submitButtonDisplayText }}
     </button>
     <button
-      v-show="isExtraInputValidationRequire && isRegistrationEnabled"
+      v-show="isExtraInputValidationRequired && isRegistrationEnabled"
       class="mx-auto pt-2 text-sm underline text-red-800"
       @click="redirectToSignup"
     >

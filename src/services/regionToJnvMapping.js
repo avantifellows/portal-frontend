@@ -492,6 +492,7 @@ export const jnvState = {
     "JNV Aurangabad",
     "JNV Washim",
     "JNV Yavatmal",
+    "SEED",
   ],
   Bihar: [
     "JNV Aurangabad",

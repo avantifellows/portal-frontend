@@ -108,22 +108,22 @@
             />
           </div>
         </FormKit>
-        <FormKit
-          type="text"
-          label="*Father's Name"
-          validation="required|alpha_spaces|length:3,40"
-          name="father_name"
-          validation-visibility="live"
-          help="Enter your father's full name."
-        />
-        <FormKit
-          type="text"
-          label="*Mother's Name"
-          validation="required|alpha_spaces|length:3,40"
-          name="mother_name"
-          validation-visibility="live"
-          help="Enter your mother's full name."
-        />
+        <template v-if="isLongForm"
+          ><FormKit
+            type="text"
+            label="*Father's Name"
+            validation="required|alpha_spaces|length:3,40"
+            name="father_name"
+            validation-visibility="live"
+            help="Enter your father's full name." />
+          <FormKit
+            type="text"
+            label="*Mother's Name"
+            validation="required|alpha_spaces|length:3,40"
+            name="mother_name"
+            validation-visibility="live"
+            help="Enter your mother's full name."
+        /></template>
         <FormKit
           type="select"
           label="*Category"
@@ -188,25 +188,25 @@
           name="school"
           help="Please select your JNV's name. Example: JNV Bidar"
         />
-        <FormKit
-          type="select"
-          label="*Course"
-          placeholder="Which course?"
-          :options="['JEE', 'NEET']"
-          validation="required"
-          v-model="course"
-          name="course"
-          help="Please select your course: JEE or NEET"
-        />
-        <FormKit
-          type="select"
-          label="*Stream"
-          placeholder="Select your stream"
-          :options="streamList"
-          validation="required"
-          name="stream"
-          help="Please select your stream. Example: PCM (Physics, Chemistry, Math)"
-        />
+        <template v-if="isLongForm"
+          ><FormKit
+            type="select"
+            label="*Course"
+            placeholder="Which course?"
+            :options="['JEE', 'NEET']"
+            validation="required"
+            v-model="course"
+            name="course"
+            help="Please select your course: JEE or NEET" />
+          <FormKit
+            type="select"
+            label="*Stream"
+            placeholder="Select your stream"
+            :options="streamList"
+            validation="required"
+            name="stream"
+            help="Please select your stream. Example: PCM (Physics, Chemistry, Math)"
+        /></template>
         <FormKit
           type="select"
           label="*Grade"
@@ -235,15 +235,48 @@
           name="number"
           help="Please enter a valid mobile number. Example: 9848022335"
         />
+        <template v-if="!isLongForm">
+          <FormKit
+            type="tel"
+            label="*Alternate Phone Number (Whatsapp)"
+            validation="required|matches:/^[0-9]{10}$/"
+            validation-visibility="live"
+            v-model="alternatePhoneNumber"
+            name="alternate_number"
+            help="Please enter a valid mobile number. Example: 9848022335"
+          />
+          <FormKit
+            type="select"
+            label="*Aspiring Stream post 10th"
+            placeholder="Select your stream"
+            :options="['Humanity', 'Commerce', 'Science']"
+            validation="required"
+            name="stream"
+            v-model="stream"
+            help="Please select your stream. Example: PCM (Physics, Chemistry, Math)"
+          />
+          <template v-if="isStreamScience">
+            <FormKit
+              type="select"
+              label="*Aspiring field"
+              placeholder="Select your field"
+              :options="['Engineering', 'Medical', 'Agriculture', 'NDA', 'Other']"
+              validation="required"
+              name="field"
+              help="Please select your field"
+            />
+          </template>
+        </template>
 
-        <FormKit
-          type="tel"
-          label="*Family Income per Annum"
-          validation="required|number|matches:/[1-9]\d*$/"
-          validation-visibility="live"
-          name="family_income"
-          help="Please enter your family income per annum (year) in digits. Example: 100000"
-        />
+        <template v-if="isLongForm"
+          ><FormKit
+            type="tel"
+            label="*Family Income per Annum"
+            validation="required|number|matches:/[1-9]\d*$/"
+            validation-visibility="live"
+            name="family_income"
+            help="Please enter your family income per annum (year) in digits. Example: 100000"
+        /></template>
       </FormKit>
     </div>
     <div
@@ -284,10 +317,12 @@ export default {
       stateName: "",
       studentName: "",
       phoneNumber: "",
+      alternatePhoneNumber: "",
       dateOfBirth: "",
       month: "",
       day: "",
       year: "",
+      stream: "",
       monthList: Array.from({ length: 12 }, (_, i) => i + 1),
       dayList: Array.from({ length: 31 }, (_, i) => i + 1),
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
@@ -303,6 +338,12 @@ export default {
     }
   },
   computed: {
+    isLongForm() {
+      return this.$store.state.sessionData.isLongForm;
+    },
+    isStreamScience() {
+      return this.stream == "Science";
+    },
     // Returns the corresponding states for a region
     stateList() {
       return regionState[this.region];

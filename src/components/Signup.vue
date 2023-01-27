@@ -211,7 +211,7 @@
           type="select"
           label="*Grade"
           placeholder="Select your grade"
-          :options="['11', '12']"
+          :options="['10', '11', '12']"
           v-model="grade"
           validation="required"
           name="grade"

@@ -390,39 +390,45 @@ export default {
       return this.studentId == "";
     },
     isPurposeRegistration() {
-      return this.$store.state.sessionData.purpose == "registration";
+      return (
+        this.$store.state.sessionData.purpose == "registration" &&
+        this.$store.state.sessionData.sessionId != "JNV10_Form"
+      );
     },
   },
   methods: {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
-      this.formSubmitted = true;
-      this.isLoading = true;
-      let createdStudentId = await UserAPI.studentSignup(formData);
-      if (createdStudentId == "") {
-        this.$router.push({
-          name: "Error",
-          state: {
-            text: "Student ID could not be created. Please contact your program manager.",
-          },
-        });
-      }
-      this.isLoading = false;
-      this.studentId = createdStudentId ? createdStudentId : "";
-      if (this.isPurposeRegistration) {
-        sendSQSMessage(
-          this.$store.state.sessionData.purpose,
-          this.$store.state.sessionData.purposeParams,
-          this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.sessionData.redirectPlatformParams.id,
-          this.studentId.toString(),
-          this.$store.state.groupData.authType,
-          this.$store.state.sessionData.group,
-          this.$store.state.groupData.userType,
-          this.$store.state.sessionData.sessionId,
-          this.$store.state.sessionData.userIp
-        );
-      }
+      if (formData.name.trim().length > 0) {
+        this.formSubmitted = true;
+        this.isLoading = true;
+        let createdStudentId = await UserAPI.studentSignup(formData);
+        if (createdStudentId == "") {
+          this.$router.push({
+            name: "Error",
+            state: {
+              text:
+                "Student ID could not be created. Please contact your program manager.",
+            },
+          });
+        }
+        this.isLoading = false;
+        this.studentId = createdStudentId ? createdStudentId : "";
+        if (this.isPurposeRegistration) {
+          sendSQSMessage(
+            this.$store.state.sessionData.purpose,
+            this.$store.state.sessionData.purposeParams,
+            this.$store.state.sessionData.redirectPlatform,
+            this.$store.state.sessionData.redirectPlatformParams.id,
+            this.studentId.toString(),
+            this.$store.state.groupData.authType,
+            this.$store.state.sessionData.group,
+            this.$store.state.groupData.userType,
+            this.$store.state.sessionData.sessionId,
+            this.$store.state.sessionData.userIp
+          );
+        }
+      } else this.studentName = "";
     },
     redirect() {
       if (

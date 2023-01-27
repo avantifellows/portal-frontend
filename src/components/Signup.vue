@@ -25,12 +25,21 @@
           <li>Please select your course and grade correctly to access the right test.</li>
           <li>
             Test Details:
-            <ul class="list-disc">
-              <li>Class 11 JEE: 120 minutes, 30 questions (120 marks)</li>
-              <li>Class 12 JEE: 180 minutes, 75 questions (300 marks)</li>
-              <li>Class 11 NEET: 120 minutes, 30 questions (120 marks)</li>
-              <li>Class 12 NEET: 180 minutes, 180 questions (720 marks)</li>
-            </ul>
+            <template v-if="isPurposeRegistration">
+              <ul class="list-disc">
+                <li>Class 11 JEE: 120 minutes, 30 questions (120 marks)</li>
+                <li>Class 12 JEE: 180 minutes, 75 questions (300 marks)</li>
+                <li>Class 11 NEET: 120 minutes, 30 questions (120 marks)</li>
+                <li>Class 12 NEET: 180 minutes, 180 questions (720 marks)</li>
+              </ul>
+            </template>
+            <template v-else>
+              <ul class="list-disc">
+                <li>Maths : 35 Questions (max marks possible : 140)</li>
+                <li>Science: 35 Questions (max marks possible : 140)</li>
+                <li>Aptitude: 30 Questions (max marks possible : 120)</li>
+              </ul>
+            </template>
           </li>
           <li>Scoring Pattern -- Correct Answer: +4, Wrong Answer: -1, Skipped: 0</li>
           <li class="text-red-600">
@@ -347,6 +356,7 @@ export default {
     };
   },
   created() {
+    console.log(this.$store.state.sessionData);
     if (this.$store.state.sessionData.sessionId == null) {
       this.$router.push({ name: "Error" });
     }

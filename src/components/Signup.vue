@@ -211,7 +211,7 @@
           type="select"
           label="*Grade"
           placeholder="Select your grade"
-          :options="['10', '11', '12']"
+          :options="grades"
           v-model="grade"
           validation="required"
           name="grade"
@@ -262,9 +262,21 @@
               placeholder="Select your field"
               :options="['Engineering', 'Medical', 'Agriculture', 'NDA', 'Other']"
               validation="required"
+              v-model="field"
               name="field"
               help="Please select your field"
             />
+            <template v-if="isFieldOther">
+              <FormKit
+                type="text"
+                label="*Other field"
+                validation="required|alpha_spaces|length:3,40"
+                v-model="subField"
+                validation-visibility="live"
+                name="sub_field"
+                help="Mention field"
+              />
+            </template>
           </template>
         </template>
 
@@ -323,6 +335,8 @@ export default {
       day: "",
       year: "",
       stream: "",
+      field: "",
+      subField: "",
       monthList: Array.from({ length: 12 }, (_, i) => i + 1),
       dayList: Array.from({ length: 31 }, (_, i) => i + 1),
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
@@ -338,6 +352,14 @@ export default {
     }
   },
   computed: {
+    isFieldOther() {
+      return this.field == "Other";
+    },
+    grades() {
+      return this.$store.state.sessionData.sessionId == "JNV10_Form"
+        ? ["10"]
+        : ["11", "12"];
+    },
     isLongForm() {
       return this.$store.state.sessionData.isLongForm;
     },

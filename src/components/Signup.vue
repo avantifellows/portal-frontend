@@ -25,12 +25,21 @@
           <li>Please select your course and grade correctly to access the right test.</li>
           <li>
             Test Details:
-            <ul class="list-disc">
-              <li>Class 11 JEE: 120 minutes, 30 questions (120 marks)</li>
-              <li>Class 12 JEE: 180 minutes, 75 questions (300 marks)</li>
-              <li>Class 11 NEET: 120 minutes, 30 questions (120 marks)</li>
-              <li>Class 12 NEET: 180 minutes, 180 questions (720 marks)</li>
-            </ul>
+            <template v-if="isPurposeRegistration">
+              <ul class="list-disc">
+                <li>Class 11 JEE: 120 minutes, 30 questions (120 marks)</li>
+                <li>Class 12 JEE: 180 minutes, 75 questions (300 marks)</li>
+                <li>Class 11 NEET: 120 minutes, 30 questions (120 marks)</li>
+                <li>Class 12 NEET: 180 minutes, 180 questions (720 marks)</li>
+              </ul>
+            </template>
+            <template v-else>
+              <ul class="list-disc">
+                <li>Maths : 35 Questions (max marks possible : 140)</li>
+                <li>Science: 35 Questions (max marks possible : 140)</li>
+                <li>Aptitude: 30 Questions (max marks possible : 120)</li>
+              </ul>
+            </template>
           </li>
           <li>Scoring Pattern -- Correct Answer: +4, Wrong Answer: -1, Skipped: 0</li>
           <li class="text-red-600">
@@ -108,22 +117,22 @@
             />
           </div>
         </FormKit>
-        <FormKit
-          type="text"
-          label="*Father's Name"
-          validation="required|alpha_spaces|length:3,40"
-          name="father_name"
-          validation-visibility="live"
-          help="Enter your father's full name."
-        />
-        <FormKit
-          type="text"
-          label="*Mother's Name"
-          validation="required|alpha_spaces|length:3,40"
-          name="mother_name"
-          validation-visibility="live"
-          help="Enter your mother's full name."
-        />
+        <template v-if="isLongForm"
+          ><FormKit
+            type="text"
+            label="*Father's Name"
+            validation="required|alpha_spaces|length:3,40"
+            name="father_name"
+            validation-visibility="live"
+            help="Enter your father's full name." />
+          <FormKit
+            type="text"
+            label="*Mother's Name"
+            validation="required|alpha_spaces|length:3,40"
+            name="mother_name"
+            validation-visibility="live"
+            help="Enter your mother's full name."
+        /></template>
         <FormKit
           type="select"
           label="*Category"
@@ -188,30 +197,30 @@
           name="school"
           help="Please select your JNV's name. Example: JNV Bidar"
         />
-        <FormKit
-          type="select"
-          label="*Course"
-          placeholder="Which course?"
-          :options="['JEE', 'NEET']"
-          validation="required"
-          v-model="course"
-          name="course"
-          help="Please select your course: JEE or NEET"
-        />
-        <FormKit
-          type="select"
-          label="*Stream"
-          placeholder="Select your stream"
-          :options="streamList"
-          validation="required"
-          name="stream"
-          help="Please select your stream. Example: PCM (Physics, Chemistry, Math)"
-        />
+        <template v-if="isLongForm"
+          ><FormKit
+            type="select"
+            label="*Course"
+            placeholder="Which course?"
+            :options="['JEE', 'NEET']"
+            validation="required"
+            v-model="course"
+            name="course"
+            help="Please select your course: JEE or NEET" />
+          <FormKit
+            type="select"
+            label="*Stream"
+            placeholder="Select your stream"
+            :options="streamList"
+            validation="required"
+            name="stream"
+            help="Please select your stream. Example: PCM (Physics, Chemistry, Math)"
+        /></template>
         <FormKit
           type="select"
           label="*Grade"
           placeholder="Select your grade"
-          :options="['11', '12']"
+          :options="grades"
           v-model="grade"
           validation="required"
           name="grade"
@@ -235,15 +244,60 @@
           name="number"
           help="Please enter a valid mobile number. Example: 9848022335"
         />
+        <template v-if="!isLongForm">
+          <FormKit
+            type="tel"
+            label="*Alternate Phone Number (Whatsapp)"
+            validation="required|matches:/^[0-9]{10}$/"
+            validation-visibility="live"
+            v-model="alternatePhoneNumber"
+            name="alternate_number"
+            help="Please enter a valid mobile number. Example: 9848022335"
+          />
+          <FormKit
+            type="select"
+            label="*Aspiring Stream post 10th"
+            placeholder="Select your stream"
+            :options="['Humanity', 'Commerce', 'Science']"
+            validation="required"
+            name="stream"
+            v-model="stream"
+            help="Please select your stream. Example: PCM (Physics, Chemistry, Math)"
+          />
+          <template v-if="isStreamScience">
+            <FormKit
+              type="select"
+              label="*Aspiring field"
+              placeholder="Select your field"
+              :options="['Engineering', 'Medical', 'Agriculture', 'NDA', 'Other']"
+              validation="required"
+              v-model="field"
+              name="field"
+              help="Please select your field"
+            />
+            <template v-if="isFieldOther">
+              <FormKit
+                type="text"
+                label="*Other field"
+                validation="required|alpha_spaces|length:3,40"
+                v-model="subField"
+                validation-visibility="live"
+                name="sub_field"
+                help="Mention field"
+              />
+            </template>
+          </template>
+        </template>
 
-        <FormKit
-          type="tel"
-          label="*Family Income per Annum"
-          validation="required|number|matches:/[1-9]\d*$/"
-          validation-visibility="live"
-          name="family_income"
-          help="Please enter your family income per annum (year) in digits. Example: 100000"
-        />
+        <template v-if="isLongForm"
+          ><FormKit
+            type="tel"
+            label="*Family Income per Annum"
+            validation="required|number|matches:/[1-9]\d*$/"
+            validation-visibility="live"
+            name="family_income"
+            help="Please enter your family income per annum (year) in digits. Example: 100000"
+        /></template>
       </FormKit>
     </div>
     <div
@@ -284,10 +338,14 @@ export default {
       stateName: "",
       studentName: "",
       phoneNumber: "",
+      alternatePhoneNumber: "",
       dateOfBirth: "",
       month: "",
       day: "",
       year: "",
+      stream: "",
+      field: "",
+      subField: "",
       monthList: Array.from({ length: 12 }, (_, i) => i + 1),
       dayList: Array.from({ length: 31 }, (_, i) => i + 1),
       yearList: Array.from({ length: 30 }, (_, i) => i + 1989).reverse(),
@@ -298,11 +356,26 @@ export default {
     };
   },
   created() {
+    console.log(this.$store.state.sessionData);
     if (this.$store.state.sessionData.sessionId == null) {
       this.$router.push({ name: "Error" });
     }
   },
   computed: {
+    isFieldOther() {
+      return this.field == "Other";
+    },
+    grades() {
+      return this.$store.state.sessionData.sessionId == "JNV10_Form"
+        ? ["10"]
+        : ["11", "12"];
+    },
+    isLongForm() {
+      return this.$store.state.sessionData.isLongForm;
+    },
+    isStreamScience() {
+      return this.stream == "Science";
+    },
     // Returns the corresponding states for a region
     stateList() {
       return regionState[this.region];
@@ -327,39 +400,45 @@ export default {
       return this.studentId == "";
     },
     isPurposeRegistration() {
-      return this.$store.state.sessionData.purpose == "registration";
+      return (
+        this.$store.state.sessionData.purpose == "registration" &&
+        this.$store.state.sessionData.sessionId != "JNV10_Form"
+      );
     },
   },
   methods: {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
-      this.formSubmitted = true;
-      this.isLoading = true;
-      let createdStudentId = await UserAPI.studentSignup(formData);
-      if (createdStudentId == "") {
-        this.$router.push({
-          name: "Error",
-          state: {
-            text: "Student ID could not be created. Please contact your program manager.",
-          },
-        });
-      }
-      this.isLoading = false;
-      this.studentId = createdStudentId ? createdStudentId : "";
-      if (this.isPurposeRegistration) {
-        sendSQSMessage(
-          this.$store.state.sessionData.purpose,
-          this.$store.state.sessionData.purposeParams,
-          this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.sessionData.redirectPlatformParams.id,
-          this.studentId.toString(),
-          this.$store.state.groupData.authType,
-          this.$store.state.sessionData.group,
-          this.$store.state.groupData.userType,
-          this.$store.state.sessionData.sessionId,
-          this.$store.state.sessionData.userIp
-        );
-      }
+      if (formData.name.trim().length > 0) {
+        this.formSubmitted = true;
+        this.isLoading = true;
+        let createdStudentId = await UserAPI.studentSignup(formData);
+        if (createdStudentId == "") {
+          this.$router.push({
+            name: "Error",
+            state: {
+              text:
+                "Student ID could not be created. Please contact your program manager.",
+            },
+          });
+        }
+        this.isLoading = false;
+        this.studentId = createdStudentId ? createdStudentId : "";
+        if (this.isPurposeRegistration) {
+          sendSQSMessage(
+            this.$store.state.sessionData.purpose,
+            this.$store.state.sessionData.purposeParams,
+            this.$store.state.sessionData.redirectPlatform,
+            this.$store.state.sessionData.redirectPlatformParams.id,
+            this.studentId.toString(),
+            this.$store.state.groupData.authType,
+            this.$store.state.sessionData.group,
+            this.$store.state.groupData.userType,
+            this.$store.state.sessionData.sessionId,
+            this.$store.state.sessionData.userIp
+          );
+        }
+      } else this.studentName = "";
     },
     redirect() {
       if (

@@ -8,7 +8,7 @@ import { sendSQSMessage } from "@/services/API/sqs";
  * @param {String} authType - extracted from auth layer URL
  */
 
-export function redirectToDestination(
+export async function redirectToDestination(
   purposeParams,
   userIDList,
   redirectId,
@@ -22,25 +22,43 @@ export function redirectToDestination(
   let userID =
     typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
 
+  const response = await fetch(`${import.meta.env.VITE_APP_AUTH_API_URL}/create-access-token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      user: {
+        id: userID,
+        data: {
+          purposeParams,
+          redirectId,
+          redirectTo,
+          authType,
+          group
+        }
+      }
+    })
+  });
+  const json = await response.json();
+
+  if (!json.message) {
+    var purpose = "Error";
+    sendSQSMessage(purpose, purposeParams, redirectTo, redirected, userIDList, authType);
+    return false;
+  }
+
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
       let url = new URL(redirectURL + redirectId);
-      finalURLQueryParams = new URLSearchParams({
-        api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
-        unique_id: userID,
-      });
-      fullURL = url + "?" + finalURLQueryParams;
+      fullURL = url + "?token=" + json.access_token;
       break;
     }
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
       let url = new URL(redirectURL + redirectId);
-      finalURLQueryParams = new URLSearchParams({
-        apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userID,
-      });
-      fullURL = url + "?" + finalURLQueryParams;
+      fullURL = url + "?token=" + json.access_token;
       break;
     }
     case "meet": {

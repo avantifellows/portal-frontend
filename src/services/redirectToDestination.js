@@ -54,7 +54,8 @@ export async function redirectToDestination(
       redirected,
       userIDList,
       authType
-    ); return false;
+    );
+    return false;
   }
 
   switch (redirectTo) {

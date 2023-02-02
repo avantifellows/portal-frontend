@@ -22,30 +22,39 @@ export async function redirectToDestination(
   let userID =
     typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
 
-  const response = await fetch(`${import.meta.env.VITE_APP_AUTH_API_URL}/create-access-token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      user: {
-        id: userID,
-        data: {
-          purposeParams,
-          redirectId,
-          redirectTo,
-          authType,
-          group
-        }
-      }
-    })
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_APP_AUTH_API_URL}/create-access-token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: {
+          id: userID,
+          data: {
+            purposeParams,
+            redirectId,
+            redirectTo,
+            authType,
+            group,
+          },
+        },
+      }),
+    }
+  );
   const json = await response.json();
 
   if (!json.message) {
     var purpose = "Error";
-    sendSQSMessage(purpose, purposeParams, redirectTo, redirected, userIDList, authType);
-    return false;
+    sendSQSMessage(
+      purpose,
+      purposeParams,
+      redirectTo,
+      redirected,
+      userIDList,
+      authType
+    ); return false;
   }
 
   switch (redirectTo) {
@@ -76,11 +85,7 @@ export async function redirectToDestination(
       break;
     }
     case "teacher-web-app": {
-      finalURLQueryParams = new URLSearchParams({
-        teacherID: userID,
-        groupName: group,
-      });
-      fullURL = redirectId + "?" + finalURLQueryParams;
+      fullURL = redirectId + "?token=" + json.access_token;
       break;
     }
     default: {

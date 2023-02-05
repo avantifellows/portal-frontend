@@ -1,4 +1,5 @@
 import { sendSQSMessage } from "@/services/API/sqs";
+import { createAccessTokenEndpoint } from "./API/endpoints";
 
 /** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
  * @param {String} purposeParams - extracted from auth layer URL
@@ -22,53 +23,37 @@ export async function redirectToDestination(
   let userID =
     typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
 
-  const response = await fetch(
-    `${import.meta.env.VITE_APP_AUTH_API_URL}/create-access-token`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user: {
-          id: userID,
-          data: {
-            purposeParams,
-            redirectId,
-            redirectTo,
-            authType,
-            group,
-          },
-        },
-      }),
-    }
-  );
-  const json = await response.json();
-
-  if (!json.message) {
-    var purpose = "Error";
-    sendSQSMessage(
-      purpose,
-      purposeParams,
-      redirectTo,
-      redirected,
-      userIDList,
-      authType
-    );
-    return false;
-  }
-
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
       let url = new URL(redirectURL + redirectId);
-      fullURL = url + "?token=" + json.access_token;
+
+      // send API call to the portal backend
+      const response = await fetch(createAccessTokenEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userID, apiKey }),
+      });
+
+      if (response.ok) {
+        fullURL = url;
+      } else {
+        var purpose = "Error";
+        sendSQSMessage(purpose, purposeParams, redirectTo, redirectId, userIDList, authType);
+        return false;
+      }
       break;
     }
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
       let url = new URL(redirectURL + redirectId);
-      fullURL = url + "?token=" + json.access_token;
+      finalURLQueryParams = new URLSearchParams({
+        apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
+        userId: userID,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
       break;
     }
     case "meet": {
@@ -86,7 +71,11 @@ export async function redirectToDestination(
       break;
     }
     case "teacher-web-app": {
-      fullURL = redirectId + "?token=" + json.access_token;
+      finalURLQueryParams = new URLSearchParams({
+        teacherID: userID,
+        groupName: group,
+      });
+      fullURL = redirectId + "?" + finalURLQueryParams;
       break;
     }
     default: {

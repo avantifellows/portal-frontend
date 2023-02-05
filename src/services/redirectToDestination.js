@@ -41,7 +41,14 @@ export async function redirectToDestination(
         fullURL = url;
       } else {
         var purpose = "Error";
-        sendSQSMessage(purpose, purposeParams, redirectTo, redirectId, userIDList, authType);
+        sendSQSMessage(
+          purpose,
+          purposeParams,
+          redirectTo,
+          redirectId,
+          userIDList,
+          authType
+        );
         return false;
       }
       break;

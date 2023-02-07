@@ -27,8 +27,16 @@ export async function redirectToDestination(
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
       let url = new URL(redirectURL + redirectId);
-
-      // send API call to the portal backend
+      finalURLQueryParams = new URLSearchParams({
+        api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
+        unique_id: userID,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
+    case "quiz": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
+      let url = new URL(redirectURL + redirectId);
       const response = await fetch(createAccessTokenEndpoint, {
         method: "POST",
         headers: {
@@ -53,16 +61,6 @@ export async function redirectToDestination(
       }
       break;
     }
-    case "quiz": {
-      redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
-      let url = new URL(redirectURL + redirectId);
-      finalURLQueryParams = new URLSearchParams({
-        apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userID,
-      });
-      fullURL = url + "?" + finalURLQueryParams;
-      break;
-    }
     case "meet": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_MEET;
       fullURL = new URL(redirectURL + redirectId);
@@ -85,6 +83,9 @@ export async function redirectToDestination(
       fullURL = redirectId + "?" + finalURLQueryParams;
       break;
     }
+    case "reporting-engine": {
+
+    }
     default: {
       var purpose = "Error";
       sendSQSMessage(
@@ -99,6 +100,6 @@ export async function redirectToDestination(
     }
   }
 
-  window.open(fullURL, "_self");
+  window.open(fullURL);
   return true;
 }

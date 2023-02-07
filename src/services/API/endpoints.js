@@ -6,4 +6,5 @@ export const getSessionDataEndpoint = "/getSessionData";
 export const checkBirthdateEndpoint = "/checkBirthdate";
 export const studentSignupEndpoint = "/studentSignup";
 export const createAccessTokenEndpoint =
-  "http://127.0.0.1:8000/auth/create-access-token";
+  "http://portal-backend-staging.avantifellows.org/auth/create-access-token";
+

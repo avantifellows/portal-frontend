@@ -36,13 +36,15 @@ export async function redirectToDestination(
     }
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
+      const apiKey = import.meta.env.VITE_APP_QUIZ_AF_API_KEY;
+      const unique_id = userID;
       let url = new URL(redirectURL + redirectId);
       const response = await fetch(createAccessTokenEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userID, apiKey }),
+        body: JSON.stringify({ unique_id, apiKey }),
       });
 
       if (response.ok) {

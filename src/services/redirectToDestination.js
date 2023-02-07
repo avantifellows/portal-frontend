@@ -44,7 +44,13 @@ export async function redirectToDestination(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ unique_id, apiKey }),
+        body: JSON.stringify({
+          "is_user_valid": true,
+          "id": unique_id,
+          data: {
+            "apiKey": apiKey
+          }
+        }),
       });
 
       if (response.ok) {

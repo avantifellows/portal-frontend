@@ -10,12 +10,11 @@
         v-model="phoneNumber"
         type="tel"
         inputmode="numeric"
-        pattern="[0-9]*"
         placeholder="Your Phone Number / अपना फोन नंबर"
         required
         class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2"
         :class="selectInputBoxClasses()"
-        @keypress="$emit('valid-entry', $event)"
+        @keypress="isValidPhoneNumberEntry($event)"
         @input="updatePhoneNumber($event)"
         ondrop="return false"
         onpaste="return false"
@@ -60,6 +59,7 @@ export default {
     },
     // Updates phone number based on user entry
     updatePhoneNumber(event) {
+      console.log(event.target.value);
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
       } else if (event.target.value.length > 10) {
@@ -70,6 +70,22 @@ export default {
         this.$emit("reset-invalid-login-message");
       } else {
         this.invalidPhoneNumberMessage = "";
+      }
+    },
+    isValidPhoneNumberEntry(event) {
+      // format -> (0|91)?[6-9][0-9]{9}
+      if (this.phoneNumber.length < 1) {
+        if (
+          !(
+            event.key == "6" ||
+            event.key == "7" ||
+            event.key == "8" ||
+            event.key == "9"
+          )
+        )
+          event.preventDefault();
+      } else {
+        this.$emit("valid-entry", event);
       }
     },
   },

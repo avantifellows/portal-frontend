@@ -332,7 +332,8 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < this.maxNumberOfIds
+        this.numOfUserIds < this.maxNumberOfIds &&
+        !this.isExtraInputValidationRequired
       );
     },
 
@@ -541,12 +542,12 @@ export default {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = userValidationResponse.validateCount;
         this.isLoading = false;
-        if (this.validateCount == 1) {
-          this.invalidLoginMessage = this.invalidLoginText;
-        }
-        if (this.invalidLoginMessage != "") {
-          this.resetEntry(this.numOfUserIds - 1);
-        }
+      }
+      if (this.validateCount == 1) {
+        this.invalidLoginMessage = this.invalidLoginText;
+      }
+      if (this.invalidLoginMessage != "") {
+        this.resetEntry(this.numOfUserIds - 1);
       }
     },
 
@@ -583,7 +584,7 @@ export default {
             this.$store.state.groupData.userType,
             this.sessionId,
             this.userIpAddress,
-            isExtraInputValidationRequired && isInputPhoneNumber
+            this.isExtraInputValidationRequired && this.isInputPhoneNumber
               ? this.$refs.phoneNumberEntry.phoneNumber
               : ""
           );

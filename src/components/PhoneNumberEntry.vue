@@ -38,7 +38,7 @@ export default {
     };
   },
   computed: {
-    // Returns if message for an invalid phone number needs to be shown
+    /** Returns if message for an invalid phone number needs to be shown */
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
@@ -53,13 +53,12 @@ export default {
         },
       ];
     },
-    // Returns if the phone number entry is not complete
+    /** Returns if the phone number entry is not complete */
     isPhoneNumberNotComplete() {
       return this.phoneNumber.length < 10;
     },
-    // Updates phone number based on user entry
+    /** Updates phone number based on user entry */
     updatePhoneNumber(event) {
-      console.log(event.target.value);
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
       } else if (event.target.value.length > 10) {
@@ -72,8 +71,8 @@ export default {
         this.invalidPhoneNumberMessage = "";
       }
     },
+    /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
     isValidPhoneNumberEntry(event) {
-      // format -> (0|91)?[6-9][0-9]{9}
       if (this.phoneNumber.length < 1) {
         if (
           !(

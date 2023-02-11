@@ -542,12 +542,13 @@ export default {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = userValidationResponse.validateCount;
         this.isLoading = false;
-      }
-      if (this.validateCount == 1) {
-        this.invalidLoginMessage = this.invalidLoginText;
-      }
-      if (this.invalidLoginMessage != "") {
-        this.resetEntry(this.numOfUserIds - 1);
+
+        if (this.validateCount == 1) {
+          this.invalidLoginMessage = this.invalidLoginText;
+        }
+        if (this.invalidLoginMessage != "") {
+          this.resetEntry(this.numOfUserIds - 1);
+        }
       }
     },
 

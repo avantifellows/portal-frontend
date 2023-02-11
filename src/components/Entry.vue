@@ -138,6 +138,7 @@
           </FormKit>
         </div>
       </div>
+      <!-- Phone number entry -->
       <div v-show="isInputPhoneNumber">
         <PhoneNumberEntry
           @validEntry="isValidEntry"
@@ -178,7 +179,6 @@ import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
-import { mapState } from "vuex";
 
 const assets = useAssets();
 export default {
@@ -248,13 +248,11 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      /** Retrieve phone number stored in vuex */
-      storePhoneNumber: (state) => state.phoneNumber,
-    }),
+    /** Returns if the authentication type includes date of birth */
     isInputDateOfBirth() {
       return this.authType.includes("DOB");
     },
+    /** Returns if the authentication type includes phone number */
     isInputPhoneNumber() {
       return this.authType.includes("PH");
     },
@@ -319,7 +317,8 @@ export default {
         this.invalidInputMessage != "" ||
         this.isCurrentEntryIncomplete ||
         this.isBirthDateEntryIncomplete ||
-        this.$refs.phoneNumberEntry.isPhoneNumberComplete()
+        (this.isInputPhoneNumber &&
+          this.$refs.phoneNumberEntry.isPhoneNumberNotComplete())
       );
     },
 
@@ -583,7 +582,10 @@ export default {
             this.group,
             this.$store.state.groupData.userType,
             this.sessionId,
-            this.userIpAddress
+            this.userIpAddress,
+            isExtraInputValidationRequired && isInputPhoneNumber
+              ? this.$refs.phoneNumberEntry.phoneNumber
+              : ""
           );
         }
       }

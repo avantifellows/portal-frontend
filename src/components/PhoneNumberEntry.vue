@@ -29,7 +29,6 @@
   </div>
 </template>
 <script>
-import { mapActions } from "vuex";
 export default {
   name: "PhoneNumberEntry",
   emits: ["valid-entry", "reset-invalid-login-message"],
@@ -40,12 +39,12 @@ export default {
     };
   },
   computed: {
+    // Returns if message for an invalid phone number needs to be shown
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
   },
   methods: {
-    ...mapActions(["setPhoneNumber"]),
     /** Determines how the input box should look.
      */
     selectInputBoxClasses() {
@@ -55,10 +54,11 @@ export default {
         },
       ];
     },
-    isPhoneNumberComplete() {
-      console.log(this.phoneNumber, this.phoneNumber.length);
+    // Returns if the phone number entry is not complete
+    isPhoneNumberNotComplete() {
       return this.phoneNumber.length < 10;
     },
+    // Updates phone number based on user entry
     updatePhoneNumber(event) {
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";

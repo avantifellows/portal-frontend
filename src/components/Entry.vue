@@ -8,7 +8,9 @@
       />
     </div>
   </div>
-  <div class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
@@ -51,15 +53,20 @@
 
       <div v-show="hasUserEnteredMoreThanOne" class="my-auto px-3">
         <button @click="deleteInputBox(index, userIDList)">
-          <inline-svg class="fill-current text-red-600 h-8 w-8" :src="deleteSvg" />
+          <inline-svg
+            class="fill-current text-red-600 h-8 w-8"
+            :src="deleteSvg"
+          />
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
-      invalidInputMessage
-    }}</span>
+    <span
+      v-if="isInvalidInputMessageShown"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidInputMessage }}</span
+    >
     <span
       v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
       class="mx-auto text-red-700 text-base mb-1"
@@ -71,7 +78,10 @@
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
         @click="addField"
       >
-        <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1" :src="addSvg" />
+        <inline-svg
+          class="fill-current text-green-600 h-10 w-10 pr-1"
+          :src="addSvg"
+        />
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             {{ addButtonText }}
@@ -80,53 +90,64 @@
       </button>
     </div>
     <div v-show="isExtraInputValidationRequired" class="flex flex-col pt-4">
-      <div>
-        <p
-          class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
-        >
-          Enter your birthdate
-        </p>
+      <div v-show="isInputDateOfBirth">
+        <div>
+          <p
+            class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+          >
+            Enter your birthdate
+          </p>
+        </div>
+        <div class="pt-4 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
+          <FormKit
+            type="group"
+            v-model="dateOfBirth"
+            name="dob"
+            :config="{
+              classes: {
+                wrapper: 'border-2 rounded-md  border-gray-500',
+              },
+            }"
+          >
+            <div class="flex flex-row space-x-3">
+              <FormKit
+                type="select"
+                name="month"
+                v-model="dateOfBirth.month"
+                placeholder="Month"
+                :options="monthList"
+                validation="required"
+              />
+              <FormKit
+                type="select"
+                name="day"
+                v-model="dateOfBirth.day"
+                placeholder="Day"
+                :options="dayList"
+                validation="required"
+              />
+              <FormKit
+                type="select"
+                name="year"
+                v-model="dateOfBirth.year"
+                placeholder="Year"
+                :options="yearList"
+                validation="required"
+              />
+            </div>
+          </FormKit>
+        </div>
       </div>
-      <div class="pt-4 flex mx-auto justify-evenly w-5/6 lg:w-1/2">
-        <FormKit
-          type="group"
-          v-model="dateOfBirth"
-          name="dob"
-          :config="{
-            classes: {
-              wrapper: 'border-2 rounded-md  border-gray-500',
-            },
-          }"
-        >
-          <div class="flex flex-row space-x-3">
-            <FormKit
-              type="select"
-              name="month"
-              v-model="dateOfBirth.month"
-              placeholder="Month"
-              :options="monthList"
-              validation="required"
-            />
-            <FormKit
-              type="select"
-              name="day"
-              v-model="dateOfBirth.day"
-              placeholder="Day"
-              :options="dayList"
-              validation="required"
-            />
-            <FormKit
-              type="select"
-              name="year"
-              v-model="dateOfBirth.year"
-              placeholder="Year"
-              :options="yearList"
-              validation="required"
-            />
-          </div>
-        </FormKit>
+      <!-- Phone number entry -->
+      <div v-show="isInputPhoneNumber">
+        <PhoneNumberEntry
+          @validEntry="isValidEntry"
+          @resetInvalidLoginMessage="resetInvalidLoginMessage"
+          ref="phoneNumberEntry"
+        />
       </div>
     </div>
+
     <span
       v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
@@ -157,10 +178,12 @@ import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
+import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 
 const assets = useAssets();
 export default {
   name: "Entry",
+  components: { PhoneNumberEntry },
   props: {
     redirectTo: {
       type: String,
@@ -225,6 +248,14 @@ export default {
     };
   },
   computed: {
+    /** Returns if the authentication type includes date of birth */
+    isInputDateOfBirth() {
+      return this.authType.includes("DOB");
+    },
+    /** Returns if the authentication type includes phone number */
+    isInputPhoneNumber() {
+      return this.authType.includes("PH");
+    },
     /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
       return this.groupData.enableRegistration;
@@ -285,7 +316,9 @@ export default {
         !this.isAnyUserIDPresent ||
         this.invalidInputMessage != "" ||
         this.isCurrentEntryIncomplete ||
-        this.isBirthDateEntryIncomplete
+        this.isBirthDateEntryIncomplete ||
+        (this.isInputPhoneNumber &&
+          this.$refs.phoneNumberEntry.isPhoneNumberNotComplete())
       );
     },
 
@@ -299,13 +332,14 @@ export default {
       return (
         !this.isMultipleIDEntryAllowed &&
         !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < this.maxNumberOfIds
+        this.numOfUserIds < this.maxNumberOfIds &&
+        !this.isExtraInputValidationRequired
       );
     },
 
     /** Checks if entire birth date is entered */
     isBirthDateEntryIncomplete() {
-      return this.isExtraInputValidationRequired
+      return this.isExtraInputValidationRequired && this.isInputDateOfBirth
         ? this.dateOfBirth.month == "" ||
             this.dateOfBirth.day == "" ||
             this.dateOfBirth.year == ""
@@ -502,11 +536,13 @@ export default {
       );
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;
+        this.validateCount = 2;
         this.isLoading = false;
       } else {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = userValidationResponse.validateCount;
         this.isLoading = false;
+
         if (this.validateCount == 1) {
           this.invalidLoginMessage = this.invalidLoginText;
         }
@@ -524,7 +560,7 @@ export default {
       await this.authenticateID(latestUserID);
       if (!this.isCurrentUserValid && this.validateCount == 0) {
         this.invalidLoginMessage =
-          "Student ID/Birthdate entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
+          "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       this.setValidFlag();
       if (this.isCurrentUserValid || this.validateCount > 1) {
@@ -548,7 +584,10 @@ export default {
             this.group,
             this.$store.state.groupData.userType,
             this.sessionId,
-            this.userIpAddress
+            this.userIpAddress,
+            this.isExtraInputValidationRequired && this.isInputPhoneNumber
+              ? this.$refs.phoneNumberEntry.phoneNumber
+              : ""
           );
         }
       }

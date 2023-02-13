@@ -48,8 +48,8 @@ export async function redirectToDestination(
           is_user_valid: true,
           id: unique_id,
           data: {
-            apiKey: apiKey
-          }
+            apiKey: apiKey,
+          },
         }),
       });
 

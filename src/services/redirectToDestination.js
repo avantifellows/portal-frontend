@@ -45,10 +45,10 @@ export async function redirectToDestination(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          "is_user_valid": true,
-          "id": unique_id,
+          is_user_valid: true,
+          id: unique_id,
           data: {
-            "apiKey": apiKey
+            apiKey: apiKey
           }
         }),
       });
@@ -91,9 +91,6 @@ export async function redirectToDestination(
       fullURL = redirectId + "?" + finalURLQueryParams;
       break;
     }
-    case "reporting-engine": {
-
-    }
     default: {
       var purpose = "Error";
       sendSQSMessage(
@@ -108,6 +105,6 @@ export async function redirectToDestination(
     }
   }
 
-  window.open(fullURL);
+  window.open(fullURL, "_self");
   return true;
 }

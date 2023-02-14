@@ -1,5 +1,5 @@
 import { sendSQSMessage } from "@/services/API/sqs";
-import { createAccessTokenEndpoint } from "./API/endpoints";
+import { setToken } from "./API/setToken";
 
 /** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
  * @param {String} purposeParams - extracted from auth layer URL
@@ -39,20 +39,7 @@ export async function redirectToDestination(
       const apiKey = import.meta.env.VITE_APP_QUIZ_AF_API_KEY;
       const unique_id = userID;
       let url = new URL(redirectURL + redirectId);
-      const response = await fetch(createAccessTokenEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          is_user_valid: true,
-          id: unique_id,
-          data: {
-            apiKey: apiKey,
-          },
-        }),
-      });
-
+      const response = await setToken(apiKey, unique_id);
       if (response.ok) {
         fullURL = url;
       } else {

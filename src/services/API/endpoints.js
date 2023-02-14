@@ -6,5 +6,4 @@ export const getSessionDataEndpoint = "/getSessionData";
 export const checkBirthdateEndpoint = "/checkBirthdate";
 export const studentSignupEndpoint = "/studentSignup";
 export const createAccessTokenEndpoint =
-  "http://portal-backend-staging.avantifellows.org/auth/create-access-token";
-
+  import.meta.env.VITE_APP_PORTAL_BACKEND + "/create-access-token";

@@ -94,16 +94,6 @@
     subject"
     />
   </FormKit>
-  <!-- <template v-if="formSubmitted">
-    <button
-      v-if="!isPurposeRegistration"
-      @click="redirect"
-      :disabled="isTakeTestDisabled"
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
-    >
-      Take Test
-    </button>
-  </template> -->
 </template>
 <script>
 export default {
@@ -185,6 +175,7 @@ export default {
     };
   },
   methods: {
+    /** After click, calls the parent method */
     submitForm(formData) {
       this.$emit("submit-form", formData);
     },

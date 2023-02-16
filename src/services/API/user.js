@@ -7,7 +7,7 @@ import {
 } from "@/services/API/endpoints.js";
 
 /**
- * Creates a new student
+ * Creates a new user
  * @param {Object} formData - contains data filled in the form by user
  */
 export default {

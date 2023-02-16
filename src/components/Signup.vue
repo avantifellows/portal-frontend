@@ -291,10 +291,12 @@
       v-if="formSubmitted"
       class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
     >
-      <p>
-        Your Student ID is <b>{{ studentId }}</b>
-      </p>
-      <p>Please note this down. Use this to sign-in going forward.</p>
+      <template v-if="!isNotStudentRegistration">
+        <p>
+          Your Student ID is <b>{{ studentId }}</b>
+        </p>
+        <p>Please note this down. Use this to sign-in going forward.</p>
+      </template>
       <button
         v-if="!isPurposeRegistration"
         @click="redirect"
@@ -390,7 +392,7 @@ export default {
       return this.$store.state.groupData.images;
     },
     isTakeTestDisabled() {
-      return this.studentId == "" || this.userId == "";
+      return this.studentId == "" && this.userId == "";
     },
     isPurposeRegistration() {
       return (
@@ -406,8 +408,11 @@ export default {
       if (formData.name.trim().length > 0) {
         this.formSubmitted = true;
         this.isLoading = true;
-        if (isNotStudentRegistration) {
-          userId = await UserAPI.userSignUp(formData);
+        if (this.isNotStudentRegistration) {
+          let userId = await UserAPI.userSignup(formData);
+          this.userId = userId;
+
+          this.isLoading = false;
         } else {
           let createdStudentId = await UserAPI.studentSignup(formData);
           if (createdStudentId == "") {

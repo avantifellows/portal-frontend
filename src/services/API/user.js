@@ -16,7 +16,7 @@ export default {
       client
         .post(userSignupEndpoint, JSON.stringify(formData))
         .then((response) => {
-          resolve(response.data);
+          resolve(response.data.toString());
         })
         .catch((error) => {
           resolve({ error: error });

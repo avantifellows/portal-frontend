@@ -297,6 +297,7 @@
         </p>
         <p>Please note this down. Use this to sign-in going forward.</p>
       </template>
+
       <button
         v-if="!isPurposeRegistration"
         @click="redirect"
@@ -442,35 +443,36 @@ export default {
         }
       } else this.studentName = "";
     },
-  },
-  redirect() {
-    if (
-      redirectToDestination(
-        this.$store.state.sessionData.purposeParams,
-        this.isNotStudentRegistration
-          ? this.userId.toString()
-          : this.studentId.toString(),
-        this.$store.state.sessionData.redirectPlatformParams.id,
-        this.$store.state.sessionData.redirectPlatform,
-        this.$store.state.groupData.authType,
-        this.$store.state.sessionData.group
-      )
-    ) {
-      sendSQSMessage(
-        this.$store.state.sessionData.purpose,
-        this.$store.state.sessionData.purposeParams,
-        this.$store.state.sessionData.redirectPlatform,
-        this.$store.state.sessionData.redirectPlatformParams.id,
-        this.isNotStudentRegistration
-          ? this.userId.toString()
-          : this.studentId.toString(),
-        this.$store.state.groupData.authType,
-        this.$store.state.sessionData.group,
-        this.$store.state.groupData.userType,
-        this.$store.state.sessionData.sessionId,
-        this.$store.state.sessionData.userIp
-      );
-    }
+
+    redirect() {
+      if (
+        redirectToDestination(
+          this.$store.state.sessionData.purposeParams,
+          this.isNotStudentRegistration
+            ? this.userId.toString()
+            : this.studentId.toString(),
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.groupData.authType,
+          this.$store.state.sessionData.group
+        )
+      ) {
+        sendSQSMessage(
+          this.$store.state.sessionData.purpose,
+          this.$store.state.sessionData.purposeParams,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.isNotStudentRegistration
+            ? this.userId.toString()
+            : this.studentId.toString(),
+          this.$store.state.groupData.authType,
+          this.$store.state.sessionData.group,
+          this.$store.state.groupData.userType,
+          this.$store.state.sessionData.sessionId,
+          this.$store.state.sessionData.userIp
+        );
+      }
+    },
   },
 };
 </script>

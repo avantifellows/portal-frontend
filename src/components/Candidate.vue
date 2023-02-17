@@ -161,7 +161,6 @@ export default {
         "Electrical and Electronice Engineering",
         "Electronics and Communication Engineering",
         "Engineering Design",
-        "Mathematics",
         "Mechanical Engineering",
         "Metallurgical and Materials Engineering",
         "Ocean Engineering",

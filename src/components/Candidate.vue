@@ -38,7 +38,7 @@
       :options="[
         'NIT Warangal',
         'NIT Rourkela',
-        'NITK Surathkal,',
+        'NITK Surathkal',
         'Central University of Karnataka',
       ]"
       validation="required"

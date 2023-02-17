@@ -355,7 +355,7 @@ export default {
   },
   computed: {
     isNotStudentRegistration() {
-      return this.$store.state.sessionData.group == "Users";
+      return this.$store.state.sessionData.group == "Candidates";
     },
     isFieldOther() {
       return this.field == "Other";
@@ -398,7 +398,7 @@ export default {
       return (
         this.$store.state.sessionData.purpose == "registration" &&
         this.$store.state.sessionData.sessionId != "JNV10_Form" &&
-        this.$store.state.sessionData.group != "Users"
+        this.$store.state.sessionData.group != "Candidates"
       );
     },
   },
@@ -447,7 +447,9 @@ export default {
     if (
       redirectToDestination(
         this.$store.state.sessionData.purposeParams,
-        this.studentId.toString(),
+        this.isNotStudentRegistration
+          ? this.userId.toString()
+          : this.studentId.toString(),
         this.$store.state.sessionData.redirectPlatformParams.id,
         this.$store.state.sessionData.redirectPlatform,
         this.$store.state.groupData.authType,
@@ -459,7 +461,9 @@ export default {
         this.$store.state.sessionData.purposeParams,
         this.$store.state.sessionData.redirectPlatform,
         this.$store.state.sessionData.redirectPlatformParams.id,
-        this.studentId.toString(),
+        this.isNotStudentRegistration
+          ? this.userId.toString()
+          : this.studentId.toString(),
         this.$store.state.groupData.authType,
         this.$store.state.sessionData.group,
         this.$store.state.groupData.userType,

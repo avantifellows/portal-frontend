@@ -47,13 +47,16 @@
     </p>
     <ul class="list-decimal p-3">
       <li>
-        The number of questions and the test duration will appear on your screen
-        before starting the test.
+        The total number of questions you can attempt will appear on your screen before starting the test. 
       </li>
-      <li>Each question has four options, out of which only one is correct.</li>
+      <li>You will receive information on duration of the test from Avanti Fellow's team before the test. 
+      There will also be a timing running once you start the test.</li>
       <li>
-        Each question carries 2 marks. 1 mark will be deducted for each wrong
-        answer.
+        Each question has four options, out of which only one is correct.
+      </li>
+      <li>
+      Each question carries 2 marks. 1 mark will be deducted for each wrong answer. 
+      No marks will be awarded if a question is not attempted.
       </li>
     </ul>
   </template>

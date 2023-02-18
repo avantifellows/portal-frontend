@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-node_modules
-=======
 .DS_Store
 node_modules
 /dist
@@ -32,4 +29,3 @@ package-lock.json
 
 # testing
 /coverage
->>>>>>> 671a01aac5de5cf017fc0550fd5a31f9c15de13c

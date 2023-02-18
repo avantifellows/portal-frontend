@@ -3,13 +3,32 @@ import {
   checkUserEndpoint,
   checkBirthdateEndpoint,
   studentSignupEndpoint,
+  userSignupEndpoint,
 } from "@/services/API/endpoints.js";
 
 /**
- * Creates a new student
+ * Creates a new user
  * @param {Object} formData - contains data filled in the form by user
  */
 export default {
+  userSignup(formData) {
+    return new Promise((resolve) => {
+      client
+        .post(userSignupEndpoint, JSON.stringify(formData))
+        .then((response) => {
+          resolve(response.data.toString());
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
+        });
+    });
+  },
+
+  /**
+   * Creates a new student
+   * @param {Object} formData - contains data filled in the form by user
+   */
   studentSignup(formData) {
     return new Promise((resolve) => {
       client

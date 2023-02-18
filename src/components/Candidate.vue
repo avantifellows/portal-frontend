@@ -38,7 +38,7 @@
       :options="[
         'NIT Warangal',
         'NIT Rourkela',
-        'NITK Surathkal,',
+        'NITK Surathkal',
         'Central University of Karnataka',
       ]"
       validation="required"
@@ -161,7 +161,6 @@ export default {
         "Electrical and Electronice Engineering",
         "Electronics and Communication Engineering",
         "Engineering Design",
-        "Mathematics",
         "Mechanical Engineering",
         "Metallurgical and Materials Engineering",
         "Ocean Engineering",

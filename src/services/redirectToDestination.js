@@ -40,7 +40,7 @@ export async function redirectToDestination(
       const userId = userID;
       let url = new URL(redirectURL + redirectId);
       const response = await setToken(apiKey, userId);
-      if (response.ok) {
+      if (response.status == 200) {
         fullURL = url;
       } else {
         var purpose = "Error";

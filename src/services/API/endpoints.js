@@ -5,5 +5,4 @@ export const verifyOTPEndpoint = "/verifyotp";
 export const getSessionDataEndpoint = "/getSessionData";
 export const checkBirthdateEndpoint = "/checkBirthdate";
 export const studentSignupEndpoint = "/studentSignup";
-export const createAccessTokenEndpoint =
-  import.meta.env.VITE_APP_PORTAL_BACKEND + "/create-access-token";
+export const createAccessTokenEndpoint = "/create-access-token";

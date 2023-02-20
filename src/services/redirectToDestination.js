@@ -37,9 +37,9 @@ export async function redirectToDestination(
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
       const apiKey = import.meta.env.VITE_APP_QUIZ_AF_API_KEY;
-      const unique_id = userID;
+      const userId = userID;
       let url = new URL(redirectURL + redirectId);
-      const response = await setToken(apiKey, unique_id);
+      const response = await setToken(apiKey, userId);
       if (response.ok) {
         fullURL = url;
       } else {
@@ -92,6 +92,6 @@ export async function redirectToDestination(
     }
   }
 
-  window.open(fullURL, "_self");
+  window.open(fullURL);
   return true;
 }

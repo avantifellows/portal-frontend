@@ -6,3 +6,4 @@ export const getSessionDataEndpoint = "/getSessionData";
 export const checkBirthdateEndpoint = "/checkBirthdate";
 export const studentSignupEndpoint = "/studentSignup";
 export const createAccessTokenEndpoint = "/create-access-token";
+export const userSignupEndpoint = "/userSignup";

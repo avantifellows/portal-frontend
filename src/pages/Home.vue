@@ -58,7 +58,7 @@ import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
 
 const assets = useAssets();
-const validAuthTypes = ["DOB", "ID"];
+const validAuthTypes = ["DOB", "ID", "PH"];
 
 export default {
   name: "Home",
@@ -134,7 +134,9 @@ export default {
 
     /** Retrieves destination platform */
     getRedirectTo() {
-      return this.redirectTo == "" ? this.sessionData.redirectPlatform : this.redirectTo;
+      return this.redirectTo == ""
+        ? this.sessionData.redirectPlatform
+        : this.redirectTo;
     },
 
     /** Retrieves destination ID */
@@ -188,7 +190,9 @@ export default {
 
     /** Returns the auth methods used by each group */
     getAuthType() {
-      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
+      return this.groupData && this.groupData.authType
+        ? this.groupData.authType
+        : "ID";
     },
 
     isPurposeRegistration() {
@@ -204,8 +208,7 @@ export default {
         this.$router.push({
           name: "Error",
           params: {
-            text:
-              "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }

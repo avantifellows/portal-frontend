@@ -134,9 +134,7 @@ export default {
 
     /** Retrieves destination platform */
     getRedirectTo() {
-      return this.redirectTo == ""
-        ? this.sessionData.redirectPlatform
-        : this.redirectTo;
+      return this.redirectTo == "" ? this.sessionData.redirectPlatform : this.redirectTo;
     },
 
     /** Retrieves destination ID */
@@ -190,9 +188,7 @@ export default {
 
     /** Returns the auth methods used by each group */
     getAuthType() {
-      return this.groupData && this.groupData.authType
-        ? this.groupData.authType
-        : "ID";
+      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
     },
 
     isPurposeRegistration() {
@@ -208,7 +204,8 @@ export default {
         this.$router.push({
           name: "Error",
           params: {
-            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text:
+              "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }
@@ -230,8 +227,13 @@ export default {
           this.sessionEnabled = this.sessionData.sessionActive;
         }
       }
-      if (!this.sessionData.error && this.sessionEnabled)
-        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      if (!this.sessionData.error && this.sessionEnabled) {
+        console.log(this.sessionData);
+        let group = await sessionAPIService.getGroupId(this.sessionData.id);
+        console.log(group);
+        this.groupData = await groupAPIService.getGroupData(group.group_id);
+        console.log(this.groupData);
+      }
       this.$store.dispatch("setGroupData", this.groupData);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {
         // GroupAPI returns an error

@@ -1,5 +1,4 @@
 import { client } from "@/services/API/rootClient.js";
-import { getSessionDataEndpoint } from "@/services/API/endpoints.js";
 
 export default {
   /**
@@ -8,11 +7,30 @@ export default {
    */
   getSessionData(sessionId) {
     const params = {
-      sessionId: sessionId,
+      session_id: sessionId,
     };
     return new Promise((resolve) => {
       client
-        .post(getSessionDataEndpoint, JSON.stringify(params))
+        .get("/session", { params })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("Session API returned an error:", error);
+        });
+    });
+  },
+
+  /**
+   * Retrieves group ID associated with a session
+   * @param {String} sessionId - the ID of the session whose group ID needs to be returned
+   */
+
+  getGroupId(sessionId) {
+    return new Promise((resolve) => {
+      client
+        .get(`/session-group/${sessionId}`)
         .then((response) => {
           resolve(response.data);
         })

@@ -228,11 +228,8 @@ export default {
         }
       }
       if (!this.sessionData.error && this.sessionEnabled) {
-        console.log(this.sessionData);
-        let group = await sessionAPIService.getGroupId(this.sessionData.id);
-        console.log(group);
-        this.groupData = await groupAPIService.getGroupData(group.group_id);
-        console.log(this.groupData);
+        let groupSessionMapping = await sessionAPIService.getGroupId(this.sessionData.id);
+        this.groupData = await groupAPIService.getGroupData(groupSessionMapping.group_id);
       }
       this.$store.dispatch("setGroupData", this.groupData);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {

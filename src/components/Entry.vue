@@ -175,10 +175,10 @@
 <script>
 import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
-import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
+import userAPI from "@/services/API/user.js";
 
 const assets = useAssets();
 export default {
@@ -252,31 +252,36 @@ export default {
     isInputDateOfBirth() {
       return this.authType.includes("DOB");
     },
+
     /** Returns if the authentication type includes phone number */
     isInputPhoneNumber() {
       return this.authType.includes("PH");
     },
+
     /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
       return this.groupData.enableRegistration;
     },
+
+    /** Returns images associated to a group */
     getGroupImages() {
-      return this.groupData.images;
+      return this.groupData.group_input_schema.images;
     },
 
     /** Returns the input mode stored against the group */
     inputMode() {
-      return this.groupData.input.mode;
+      return this.groupData.group_input_schema.mode;
     },
 
     /** Returns the input type stored against the group */
     inputType() {
-      return this.groupData.input.type;
+      return this.groupData.group_input_schema.type;
     },
 
-    /** Returns the placeholder text stored against the group */
+    /** Returns the placeholder text stored against the group for the language selected*/
     inputBoxPlaceholderText() {
-      return this.groupData.text.default.placeholder;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .placeholder;
     },
 
     /** Returns length of the list of user IDs */
@@ -373,46 +378,52 @@ export default {
 
     /** Returns the heading text for the input box */
     inputBoxDisplayTitle() {
-      return this.groupData.text.default.display;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .display;
     },
 
     /** Returns the button text for adding another input box */
     inputBoxAddButtonText() {
-      return this.groupData.text.default.addButton;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .addButton;
     },
 
     /** Returns the maximum length of the ID */
     maxLengthOfId() {
-      return this.groupData.input.maxLengthOfId;
+      return this.groupData.group_input_schema.maxLengthOfId;
     },
 
     /** Returns the basic validation type for the input */
     basicValidationType() {
-      return this.groupData.input.basicValidationType;
+      return this.groupData.group_input_schema.basicValidationType;
     },
 
     /** Returns the invalid input message stored against each group */
     invalidInputText() {
-      return this.groupData.text.default.invalid.input;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .invalid.input;
     },
 
     /** Returns the maximum number of ID's a user can enter */
     maxNumberOfIds() {
-      return this.groupData.maxNumberOfIds;
+      return this.groupData.group_input_schema.maxNumberOfIds;
     },
 
     /** Returns the invalid login message stored against each group  */
     invalidLoginText() {
-      return this.groupData.text.default.invalid.login;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .invalid.login;
     },
 
     addButtonText() {
-      return this.groupData.text.default.addButton;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .addButton;
     },
 
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
-      return this.groupData.text.default.submitButton;
+      return this.groupData.group_locale_data[this.groupData.group_locale]
+        .submitButton;
     },
   },
   methods: {
@@ -525,7 +536,6 @@ export default {
      */
     async authenticateID(userID) {
       this.isLoading = true;
-
       let userValidationResponse = await validateID(
         userID,
         this.groupData.dataSource,
@@ -574,20 +584,9 @@ export default {
             this.group
           )
         ) {
-          sendSQSMessage(
-            this.purpose,
-            this.purposeParams,
-            this.redirectTo,
-            this.redirectId,
+          userAPI.userActivity(
             this.userIDList,
-            this.authType,
-            this.group,
-            this.$store.state.groupData.userType,
-            this.sessionId,
-            this.userIpAddress,
-            this.isExtraInputValidationRequired && this.isInputPhoneNumber
-              ? this.$refs.phoneNumberEntry.phoneNumber
-              : ""
+            this.$store.state.sessionData.id
           );
         }
       }

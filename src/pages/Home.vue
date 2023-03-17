@@ -134,19 +134,21 @@ export default {
 
     /** Retrieves destination platform */
     getRedirectTo() {
-      return this.redirectTo == "" ? this.sessionData.redirectPlatform : this.redirectTo;
+      return this.redirectTo == ""
+        ? this.sessionData.platform
+        : this.redirectTo;
     },
 
     /** Retrieves destination ID */
     getRedirectId() {
       return this.redirectId == ""
-        ? this.sessionData.redirectPlatformParams.id
+        ? this.sessionData.platform_id
         : this.redirectId;
     },
 
     /** Retrieves group name */
     getGroup() {
-      return this.sessionId == null ? this.group : this.sessionData.group;
+      return this.sessionId == null ? this.group : this.groupData.name;
     },
 
     /** Returns the purpose value */
@@ -188,7 +190,9 @@ export default {
 
     /** Returns the auth methods used by each group */
     getAuthType() {
-      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
+      return this.groupData && this.groupData.authType
+        ? this.groupData.authType
+        : "ID";
     },
 
     isPurposeRegistration() {
@@ -198,14 +202,15 @@ export default {
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */
     if (this.sessionId != null) {
-      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+      this.sessionData = await sessionAPIService.getSessionOccurrenceData(
+        this.sessionId
+      );
       // Session ID does not exist
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
           name: "Error",
           params: {
-            text:
-              "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }
@@ -223,13 +228,17 @@ export default {
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
         this.$store.dispatch("setSessionId", this.sessionId);
-        if ("sessionActive" in this.sessionData) {
-          this.sessionEnabled = this.sessionData.sessionActive;
+        if (!this.sessionData["is_session_open"]) {
+          this.sessionEnabled = this.sessionData["is_session_open"];
         }
       }
       if (!this.sessionData.error && this.sessionEnabled) {
-        let groupSessionMapping = await sessionAPIService.getGroupId(this.sessionData.id);
-        this.groupData = await groupAPIService.getGroupData(groupSessionMapping.group_id);
+        let groupSessionMapping = await sessionAPIService.getGroupId(
+          this.sessionData.id
+        );
+        this.groupData = await groupAPIService.getGroupData(
+          groupSessionMapping.group_id
+        );
       }
       this.$store.dispatch("setGroupData", this.groupData);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {
@@ -245,6 +254,7 @@ export default {
     } else {
       this.groupData = await groupAPIService.getGroupData(this.getGroup);
       this.$store.dispatch("setGroupData", this.groupData);
+
       if (this.groupData && this.groupData.error) {
         // GroupAPI returns an error
         this.toast.error("Network Error, please try again!", {

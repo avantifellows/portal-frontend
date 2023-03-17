@@ -1,4 +1,4 @@
-import firebaseAPI from "@/services/API/user.js";
+import userAPI from "@/services/API/user.js";
 
 /** This function validates a birthdate against Firestore.
  * firebaseAPI service returns a boolean value, indicating whether the birthdate is valid or not.
@@ -45,18 +45,12 @@ async function checkPhoneNumberInFirestore(
  * @param {String} collectionName - firestore collection against which the ID needs to be validated
  * @param {String} columnName - name of the column which contains the ID
  */
-async function checkUserIdInFirestore(
+async function checkUserIDInDB(
   userID,
   validateCount,
-  collectionName,
-  columnName,
   isExtraInputValidationRequired
 ) {
-  let isCurrentUserValid = await firebaseAPI.checkUserExists(
-    userID,
-    collectionName,
-    columnName
-  );
+  let isCurrentUserValid = await userAPI.checkStudentExists(userID);
   if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
       position: "top-center",
@@ -102,33 +96,29 @@ export async function validateID(
   birthdate,
   isExtraInputValidationRequired
 ) {
-  if (dataSource["type"] == "Firestore") {
-    if (isExtraInputValidationRequired) {
-      let isBirthdateValid = await checkBirthdateInFirestore(
-        birthdate,
+  if (isExtraInputValidationRequired) {
+    let isBirthdateValid = await checkBirthdateInFirestore(
+      birthdate,
+      userID,
+      dataSource["name"],
+      dataSource["column"]
+    );
+
+    return isBirthdateValid;
+  } else {
+    if (authType.includes("ID")) {
+      return checkUserIDInDB(
+        userID,
+        validateCount,
+        isExtraInputValidationRequired
+      );
+    }
+    if (authType.includes("OTP")) {
+      return checkPhoneNumberInFirestore(
         userID,
         dataSource["name"],
         dataSource["column"]
       );
-
-      return isBirthdateValid;
-    } else {
-      if (authType.includes("ID")) {
-        return checkUserIdInFirestore(
-          userID,
-          validateCount,
-          dataSource["name"],
-          dataSource["column"],
-          isExtraInputValidationRequired
-        );
-      }
-      if (authType.includes("OTP")) {
-        return checkPhoneNumberInFirestore(
-          userID,
-          dataSource["name"],
-          dataSource["column"]
-        );
-      }
     }
   }
 }

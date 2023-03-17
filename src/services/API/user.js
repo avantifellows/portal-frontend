@@ -1,6 +1,5 @@
 import { client } from "@/services/API/rootClient.js";
 import {
-  checkUserEndpoint,
   checkBirthdateEndpoint,
   studentSignupEndpoint,
   userSignupEndpoint,
@@ -48,23 +47,45 @@ export default {
    * @param {String} collectionName - firestore collection against which the ID needs to be validated
    * @param {String} columnName - name of the column which contains the ID
    */
-  checkUserExists(userID, collectionName, columnName) {
+  checkStudentExists(userID) {
     const params = {
-      userID: userID,
-      collectionName: collectionName,
-      columnName: columnName,
+      student_id: userID,
     };
 
     return new Promise((resolve) => {
       client
-        .post(checkUserEndpoint, JSON.stringify(params))
+        .get("/student/verify", { params: params })
         .then((response) => {
           resolve(response.data);
         })
         .catch((error) => {
-          resolve({ error: error });
-          throw new Error("User API returned an error:", error);
+          if (error.response.status == 404) resolve(false);
+          else {
+            resolve({ error: error });
+            throw new Error("User API returned an error:", error);
+          }
         });
+    });
+  },
+  userActivity(userIDList, sessionId) {
+    userIDList.forEach((user) => {
+      const params = {
+        user_id: user.userID,
+        session_occurrence_id: sessionId,
+        is_user_valid: user.valid,
+      };
+      return new Promise((resolve) => {
+        client
+          .post("/user-session", params)
+          .then((response) => {
+            resolve(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            resolve({ error: error });
+            throw new Error("User API returned an error:", error);
+          });
+      });
     });
   },
   /**

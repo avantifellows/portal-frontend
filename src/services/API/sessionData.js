@@ -1,7 +1,5 @@
 import { client } from "@/services/API/rootClient.js";
 
-console.log(client)
-
 export default {
   /**
    * Retrieves details about a particular session occurrence

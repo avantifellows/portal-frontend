@@ -1,18 +1,17 @@
 import { client } from "@/services/API/rootClient.js";
-import { getGroupDataEndpoint } from "@/services/API/endpoints.js";
 
 export default {
   /**
    * Retrieves details about a particular group
-   * @param {String} groupName - the name of the group whose data needs to be retrieved
+   * @param {String} groupId - the ID of the group whose data needs to be retrieved
    */
-  getGroupData(groupName) {
+  getGroupData(groupId) {
     const params = {
-      group: groupName,
+      id: groupId,
     };
     return new Promise((resolve) => {
       client
-        .post(getGroupDataEndpoint, JSON.stringify(params))
+        .get("/group", { params })
         .then((response) => {
           resolve(response.data);
         })

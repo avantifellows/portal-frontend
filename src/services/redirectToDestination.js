@@ -1,5 +1,4 @@
 import { sendSQSMessage } from "@/services/API/sqs";
-import { setToken } from "./API/setToken";
 
 /** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
  * @param {String} purposeParams - extracted from auth layer URL
@@ -9,7 +8,7 @@ import { setToken } from "./API/setToken";
  * @param {String} authType - extracted from auth layer URL
  */
 
-export async function redirectToDestination(
+export function redirectToDestination(
   purposeParams,
   userIDList,
   redirectId,
@@ -36,24 +35,12 @@ export async function redirectToDestination(
     }
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
-      const apiKey = import.meta.env.VITE_APP_QUIZ_AF_API_KEY;
-      const userId = userID;
       let url = new URL(redirectURL + redirectId);
-      const response = await setToken(apiKey, userId);
-      if (response.status == 200) {
-        fullURL = url;
-      } else {
-        var purpose = "Error";
-        sendSQSMessage(
-          purpose,
-          purposeParams,
-          redirectTo,
-          redirectId,
-          userIDList,
-          authType
-        );
-        return false;
-      }
+      finalURLQueryParams = new URLSearchParams({
+        apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
+        userId: userID,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
       break;
     }
     case "meet": {
@@ -92,6 +79,6 @@ export async function redirectToDestination(
     }
   }
 
-  window.open(fullURL, "_self");
+  window.open(fullURL);
   return true;
 }

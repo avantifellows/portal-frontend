@@ -35,7 +35,6 @@ export async function sendSQSMessage(
 ) {
   const messageBody = [
     {
-      dateTime: new Date(),
       purpose: {
         type: purpose,
         subType: purposeParams,

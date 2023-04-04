@@ -312,8 +312,7 @@
 
 <script>
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
-import UserAPI from "@/services/API/user.js";
-import { sendSQSMessage } from "@/services/API/sqs";
+import userAPI from "@/services/API/user.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import useAssets from "@/assets/assets.js";
 import InstructionsMapping from "@/components/InstructionsMapping.vue";
@@ -410,12 +409,12 @@ export default {
         this.formSubmitted = true;
         this.isLoading = true;
         if (this.isNotStudentRegistration) {
-          let userId = await UserAPI.userSignup(formData);
+          let userId = await userAPI.userSignup(formData);
           this.userId = userId;
 
           this.isLoading = false;
         } else {
-          let createdStudentId = await UserAPI.studentSignup(formData);
+          let createdStudentId = await userAPI.studentSignup(formData);
           if (createdStudentId == "") {
             this.$router.push({
               name: "Error",
@@ -427,17 +426,9 @@ export default {
           this.isLoading = false;
           this.studentId = createdStudentId ? createdStudentId : "";
           if (this.isPurposeRegistration) {
-            sendSQSMessage(
-              this.$store.state.sessionData.purpose,
-              this.$store.state.sessionData.purposeParams,
-              this.$store.state.sessionData.redirectPlatform,
-              this.$store.state.sessionData.redirectPlatformParams.id,
+            userAPI.postUserActivity(
               this.studentId.toString(),
-              this.$store.state.groupData.authType,
-              this.$store.state.sessionData.group,
-              this.$store.state.groupData.userType,
-              this.$store.state.sessionData.sessionId,
-              this.$store.state.sessionData.userIp
+              this.$store.state.sessionData.id
             );
           }
         }
@@ -457,19 +448,11 @@ export default {
           this.$store.state.sessionData.group
         )
       ) {
-        sendSQSMessage(
-          this.$store.state.sessionData.purpose,
-          this.$store.state.sessionData.purposeParams,
-          this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.sessionData.redirectPlatformParams.id,
+        userAPI.postUserActivity(
           this.isNotStudentRegistration
             ? this.userId.toString()
             : this.studentId.toString(),
-          this.$store.state.groupData.authType,
-          this.$store.state.sessionData.group,
-          this.$store.state.groupData.userType,
-          this.$store.state.sessionData.sessionId,
-          this.$store.state.sessionData.userIp
+          this.$store.state.sessionData.id
         );
       }
     },

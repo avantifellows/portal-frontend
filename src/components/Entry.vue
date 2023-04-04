@@ -538,7 +538,6 @@ export default {
       this.isLoading = true;
       let userValidationResponse = await validateID(
         userID,
-        this.groupData.dataSource,
         this.authType,
         this.validateCount,
         this.dateOfBirth,
@@ -584,7 +583,7 @@ export default {
             this.group
           )
         ) {
-          userAPI.userActivity(
+          userAPI.postUserActivity(
             this.userIDList,
             this.$store.state.sessionData.id
           );

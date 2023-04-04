@@ -2,6 +2,10 @@ import { client } from "./rootClient";
 import { createAccessTokenEndpoint } from "@/services/API/endpoints.js";
 
 export default {
+  /**
+   * Generates JWT tokens for authentication
+   * @param {Array} userIdList - the ID of the user for who token needs to be generated
+   */
   createAccessToken(userIdList) {
     return new Promise((resolve) => {
       client

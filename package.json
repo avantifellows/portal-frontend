@@ -11,7 +11,6 @@
     "deploy": "vite build && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer --delete --acl public-read"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.30.0",
     "@formkit/themes": "^1.0.0-beta.11",
     "@formkit/vue": "^1.0.0-beta.11",
     "@sentry/tracing": "^6.16.1",

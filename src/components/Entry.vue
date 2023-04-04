@@ -179,6 +179,7 @@ import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.j
 import useAssets from "@/assets/assets.js";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 import userAPI from "@/services/API/user.js";
+import authAPI from "@/services/API/auth.js";
 
 const assets = useAssets();
 export default {
@@ -572,22 +573,21 @@ export default {
           "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       this.setValidFlag();
-      if (this.isCurrentUserValid || this.validateCount > 1) {
-        if (
-          redirectToDestination(
-            this.purposeParams,
-            this.userIDList,
-            this.redirectId,
-            this.redirectTo,
-            this.authType,
-            this.group
-          )
-        ) {
-          userAPI.postUserActivity(
-            this.userIDList,
-            this.$store.state.sessionData.id
-          );
-        }
+      authAPI.createAccessToken(this.userIdList);
+      if (
+        redirectToDestination(
+          this.purposeParams,
+          this.userIDList,
+          this.redirectId,
+          this.redirectTo,
+          this.authType,
+          this.group
+        )
+      ) {
+        userAPI.postUserActivity(
+          this.userIDList,
+          this.$store.state.sessionData.id
+        );
       }
     },
     /**

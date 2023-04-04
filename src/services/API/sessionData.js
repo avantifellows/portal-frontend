@@ -37,7 +37,7 @@ export default {
   getGroupId(sessionId) {
     return new Promise((resolve) => {
       client
-        .get(`getSessionGroupIdEndpoint/${sessionId}`)
+        .get(getSessionGroupIdEndpoint/`${sessionId}`)
         .then((response) => {
           resolve(response.data);
         })

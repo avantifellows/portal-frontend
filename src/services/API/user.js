@@ -25,6 +25,11 @@ export default {
         });
     });
   },
+  /**
+   * Posts data about activity of the user with Portal
+   * @param {Array} userIDList - the IDs of the users
+   * @param {String} sessionId - ID of the session being interacted with
+   */
   postUserActivity(userIDList, sessionId) {
     userIDList.forEach((user) => {
       const params = {

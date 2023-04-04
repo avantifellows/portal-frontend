@@ -1,11 +1,9 @@
 import userAPI from "@/services/API/user.js";
 
-/** This function validates an entry against Firestore.
- * firebaseAPI service is used to validate and it returns a boolean value, indicating whether the user is valid or not.
+/** This function validates an entry with the database
  * @param {String} userID - current ID being validated
  * @param {Number} validateCount - indicates how many times the user has been validated
- * @param {String} collectionName - firestore collection against which the ID needs to be validated
- * @param {String} columnName - name of the column which contains the ID
+ * @param {String} isExtraInputValidationRequired - indicates if there are any extra fields being validated
  */
 async function checkUserIDInDB(
   userID,

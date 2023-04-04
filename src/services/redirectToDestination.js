@@ -1,5 +1,3 @@
-import { sendSQSMessage } from "@/services/API/sqs";
-
 /** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
  * @param {String} purposeParams - extracted from auth layer URL
  * @param {Array} userIDList - list of userIDs wanting to go through the layer
@@ -66,15 +64,7 @@ export function redirectToDestination(
       break;
     }
     default: {
-      var purpose = "Error";
-      sendSQSMessage(
-        purpose,
-        purposeParams,
-        redirectTo,
-        redirectId,
-        userIDList,
-        authType
-      );
+      // TODO: need to add logging
       return false;
     }
   }

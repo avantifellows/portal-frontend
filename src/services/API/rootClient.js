@@ -1,6 +1,5 @@
 import axios from "axios";
 
-console.log(import.meta.env.VITE_APP_PORTAL_BACKEND);
 /** the base URL is the deployed cloud function URL */
 export const client = axios.create({
   baseURL: import.meta.env.VITE_APP_PORTAL_BACKEND,

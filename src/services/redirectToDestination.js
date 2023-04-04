@@ -21,7 +21,7 @@ export function redirectToDestination(
   let finalURLQueryParams = "";
   let userID =
     typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
-
+  console.log(redirectTo);
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;

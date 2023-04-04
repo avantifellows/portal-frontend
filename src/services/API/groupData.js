@@ -1,4 +1,5 @@
 import { client } from "@/services/API/rootClient.js";
+import { getGroupEndpoint } from "@/services/API/endpoints.js";
 
 export default {
   /**
@@ -11,7 +12,7 @@ export default {
     };
     return new Promise((resolve) => {
       client
-        .get("/group", { params })
+        .get(getGroupEndpoint, { params })
         .then((response) => {
           resolve(response.data);
         })

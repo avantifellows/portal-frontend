@@ -1,4 +1,8 @@
 import { client } from "@/services/API/rootClient.js";
+import {
+  getSessionOccurrenceDataEndpoint,
+  getSessionGroupIdEndpoint,
+} from "@/services/API/endpoints.js";
 
 export default {
   /**
@@ -11,7 +15,7 @@ export default {
     };
     return new Promise((resolve) => {
       client
-        .get("/session-occurrence", { params })
+        .get(getSessionOccurrenceDataEndpoint, { params })
         .then((response) => {
           resolve(response.data);
         })
@@ -33,7 +37,7 @@ export default {
   getGroupId(sessionId) {
     return new Promise((resolve) => {
       client
-        .get(`/session-group/${sessionId}`)
+        .get(`getSessionGroupIdEndpoint/${sessionId}`)
         .then((response) => {
           resolve(response.data);
         })

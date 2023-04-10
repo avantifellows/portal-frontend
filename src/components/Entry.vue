@@ -573,21 +573,23 @@ export default {
           "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       this.setValidFlag();
-      authAPI.createAccessToken(this.userIdList);
-      if (
-        redirectToDestination(
-          this.purposeParams,
-          this.userIDList,
-          this.redirectId,
-          this.redirectTo,
-          this.authType,
-          this.group
-        )
-      ) {
-        userAPI.postUserActivity(
-          this.userIDList,
-          this.$store.state.sessionData.id
-        );
+      if (this.isCurrentUserValid || this.validateCount > 1) {
+        authAPI.createAccessToken(this.userIDList);
+        if (
+          redirectToDestination(
+            this.purposeParams,
+            this.userIDList,
+            this.redirectId,
+            this.redirectTo,
+            this.authType,
+            this.group
+          )
+        ) {
+          userAPI.postUserActivity(
+            this.userIDList,
+            this.$store.state.sessionData.id
+          );
+        }
       }
     },
     /**

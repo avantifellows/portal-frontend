@@ -1,5 +1,5 @@
 export const regionState = {
-  Bhopal: ["Chhattisgarh", "Madhya Pradesh", "Orissa"],
+  Bhopal: ["Chhattisgarh", "Madhya Pradesh", "Odisha"],
   Lucknow: ["Uttarakhand", "Uttar Pradesh"],
   Chandigarh: [
     "Chandigarh",

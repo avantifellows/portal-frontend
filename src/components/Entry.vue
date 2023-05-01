@@ -227,6 +227,12 @@ export default {
       type: Boolean,
       default: false,
     },
+    sessionData: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
   },
   data() {
     return {
@@ -258,7 +264,7 @@ export default {
     },
     /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
-      return this.groupData.enableRegistration;
+      return this.sessionData.enableRegistration;
     },
     getGroupImages() {
       return this.groupData.images;
@@ -587,7 +593,8 @@ export default {
             this.userIpAddress,
             this.isExtraInputValidationRequired && this.isInputPhoneNumber
               ? this.$refs.phoneNumberEntry.phoneNumber
-              : ""
+              : "",
+            this.$store.state.sessionData.batch
           );
         }
       }

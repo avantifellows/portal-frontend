@@ -17,6 +17,12 @@ const sqsClient = new SQSClient({
  * @param {String} redirectId
  * @param {Array} userIDList - list of users wanting to go through the layer
  * @param {String} authType
+ * @param {String} groupName
+ * @param {String} userType
+ * @param {String} sessionId
+ * @param {String} userIpAddress
+ * @param {String} phoneNumber
+ * @param {String} batch
  * Everything, except the userIDList, is extracted from the auth layer URL
  */
 
@@ -31,7 +37,8 @@ export async function sendSQSMessage(
   userType,
   sessionId,
   userIpAddress,
-  phoneNumber
+  phoneNumber,
+  batch
 ) {
   const messageBody = [
     {
@@ -52,6 +59,7 @@ export async function sendSQSMessage(
       sessionId: sessionId,
       userIpAddress: userIpAddress,
       phoneNumber: phoneNumber,
+      batch: batch,
     },
   ];
   const params = {

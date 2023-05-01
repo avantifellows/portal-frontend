@@ -258,7 +258,7 @@ export default {
     },
     /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
-      return this.sessionData.enableRegistration;
+      return this.groupData.enableRegistration;
     },
     getGroupImages() {
       return this.groupData.images;

@@ -227,12 +227,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    sessionData: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
   },
   data() {
     return {

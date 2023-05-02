@@ -587,7 +587,8 @@ export default {
             this.userIpAddress,
             this.isExtraInputValidationRequired && this.isInputPhoneNumber
               ? this.$refs.phoneNumberEntry.phoneNumber
-              : ""
+              : "",
+            this.$store.state.sessionData.batch
           );
         }
       }

@@ -528,7 +528,6 @@ export default {
 
       let userValidationResponse = await validateID(
         userID,
-        this.groupData.dataSource,
         this.authType,
         this.validateCount,
         this.dateOfBirth,

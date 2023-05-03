@@ -1,62 +1,16 @@
-import firebaseAPI from "@/services/API/user.js";
+import userAPI from "@/services/API/user.js";
 
-/** This function validates a birthdate against Firestore.
- * firebaseAPI service returns a boolean value, indicating whether the birthdate is valid or not.
- * @param {String} birthdate - birthdate being validated
- * @param {String} collectionName - firestore collection against which the birthdate needs to be validated
- * @param {String} columnName - name of the column which contains the birthdate
- */
-async function checkBirthdateInFirestore(
-  birthdate,
-  userID,
-  collectionName,
-  columnName
-) {
-  return await firebaseAPI.doesBirthdateMatch(
-    birthdate,
-    userID,
-    collectionName,
-    columnName
-  );
-}
-
-/** This function validates a phone number against Firestore.
- * firebaseAPI service is used to validate and it returns a boolean value, indicating whether the user is valid or not.
- * @param {String} phoneNumber - phone number being validated
- * @param {String} collectionName - firestore collection against which the ID needs to be validated
- * @param {String} columnName - name of the column which contains the ID
- */
-async function checkPhoneNumberInFirestore(
-  phoneNumber,
-  collectionName,
-  columnName
-) {
-  return await firebaseAPI.checkUserExists(
-    phoneNumber,
-    collectionName,
-    columnName
-  );
-}
-
-/** This function validates an entry against Firestore.
- * firebaseAPI service is used to validate and it returns a boolean value, indicating whether the user is valid or not.
+/** This function validates an entry with the database
  * @param {String} userID - current ID being validated
  * @param {Number} validateCount - indicates how many times the user has been validated
- * @param {String} collectionName - firestore collection against which the ID needs to be validated
- * @param {String} columnName - name of the column which contains the ID
+ * @param {String} isExtraInputValidationRequired - indicates if there are any extra fields being validated
  */
-async function checkUserIdInFirestore(
+async function checkUserIDInDB(
   userID,
   validateCount,
-  collectionName,
-  columnName,
   isExtraInputValidationRequired
 ) {
-  let isCurrentUserValid = await firebaseAPI.checkUserExists(
-    userID,
-    collectionName,
-    columnName
-  );
+  let isCurrentUserValid = await userAPI.verifyStudent({ student_id: userID });
   if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
       position: "top-center",
@@ -88,7 +42,6 @@ async function checkUserIdInFirestore(
 
 /** This function checks the data source to see which database API needs to be called.
  * @param {String} userID - current ID being validated
- * @param {String} dataSource - contains information about where and how the data is stored.
  * @param {String} authType - the authentication method the user has used
  * @param {Number} validateCount - indicates how many times the user has been validated
  * @param {Object} birthdate - contains the month, day and year
@@ -96,39 +49,29 @@ async function checkUserIdInFirestore(
  */
 export async function validateID(
   userID,
-  dataSource,
   authType,
   validateCount = 0,
   birthdate,
   isExtraInputValidationRequired
 ) {
-  if (dataSource["type"] == "Firestore") {
+  if (authType.includes("ID")) {
+    let userValidationResponse = checkUserIDInDB(
+      userID,
+      validateCount,
+      isExtraInputValidationRequired
+    );
     if (isExtraInputValidationRequired) {
-      let isBirthdateValid = await checkBirthdateInFirestore(
-        birthdate,
-        userID,
-        dataSource["name"],
-        dataSource["column"]
-      );
-
-      return isBirthdateValid;
-    } else {
-      if (authType.includes("ID")) {
-        return checkUserIdInFirestore(
-          userID,
-          validateCount,
-          dataSource["name"],
-          dataSource["column"],
-          isExtraInputValidationRequired
-        );
-      }
-      if (authType.includes("OTP")) {
-        return checkPhoneNumberInFirestore(
-          userID,
-          dataSource["name"],
-          dataSource["column"]
-        );
+      if (authType.includes("DOB")) {
+        var isBirthdateValid = await userAPI.verifyStudent({
+          birthdate: birthdate,
+        });
       }
     }
+    return userValidationResponse || isBirthdateValid;
+  }
+  if (authType.includes("OTP")) {
+    return userAPI.verifyStudent({
+      phone_number: userID,
+    });
   }
 }

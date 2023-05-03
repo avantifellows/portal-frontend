@@ -63,6 +63,7 @@ export async function validateID(
     if (isExtraInputValidationRequired) {
       if (authType.includes("DOB")) {
         var isBirthdateValid = await userAPI.verifyStudent({
+          student_id: userID,
           birthdate: birthdate,
         });
       }

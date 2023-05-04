@@ -46,7 +46,6 @@ export default {
    * @param {String} userID - the id that needs to be validated
    */
   verifyStudent(studentData) {
-    console.log(newClient);
     return new Promise((resolve) => {
       newClient
         .get(verifyStudentEndpoint, { params: studentData })

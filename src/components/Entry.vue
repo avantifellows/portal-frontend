@@ -525,7 +525,6 @@ export default {
      */
     async authenticateID(userID) {
       this.isLoading = true;
-      console.log("why aren't you working!");
       let userValidationResponse = await validateID(
         userID,
         this.authType,

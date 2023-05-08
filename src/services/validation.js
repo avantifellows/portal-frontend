@@ -73,10 +73,20 @@ export async function validateID(
             student_id: userID,
             birth_date: dob,
           });
+          return userValidationResponse && isBirthdateValid;
+        }
+        if (authType.includes("PH")) {
+          console.log(authType);
+          var isPhoneNumberValid = await userAPI.verifyStudent({
+            student_id: userID,
+            phone_number: phone_number,
+          });
+          console.log(isPhoneNumberValid);
+          return userValidationResponse && isPhoneNumberValid;
         }
       }
+      return userValidationResponse;
     }
-    return userValidationResponse || isBirthdateValid;
   }
   if (authType.includes("OTP")) {
     return userAPI.verifyStudent({

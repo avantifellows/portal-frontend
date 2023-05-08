@@ -52,7 +52,8 @@ export async function validateID(
   authType,
   validateCount = 0,
   birthdate,
-  isExtraInputValidationRequired
+  isExtraInputValidationRequired,
+  phoneNumber
 ) {
   if (authType.includes("ID")) {
     let userValidationResponse = await checkUserIDInDB(
@@ -79,14 +80,14 @@ export async function validateID(
           console.log(authType);
           var isPhoneNumberValid = await userAPI.verifyStudent({
             student_id: userID,
-            phone_number: phone_number,
+            phone_number: phoneNumber,
           });
           console.log(isPhoneNumberValid);
           return userValidationResponse && isPhoneNumberValid;
         }
       }
-      return userValidationResponse;
     }
+    return userValidationResponse;
   }
   if (authType.includes("OTP")) {
     return userAPI.verifyStudent({

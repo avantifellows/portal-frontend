@@ -530,7 +530,8 @@ export default {
         this.authType,
         this.validateCount,
         this.dateOfBirth,
-        this.isExtraInputValidationRequired
+        this.isExtraInputValidationRequired,
+        this.$refs.phoneNumberEntry.phoneNumber
       );
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;

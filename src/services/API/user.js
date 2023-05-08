@@ -53,9 +53,8 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.status == 404) resolve(false);
+          if (error.response.status == 404) resolve(false);
           else {
-            resolve({ error: error });
             throw new Error("User API returned an error:", error);
           }
         });

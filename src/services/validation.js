@@ -55,17 +55,25 @@ export async function validateID(
   isExtraInputValidationRequired
 ) {
   if (authType.includes("ID")) {
-    let userValidationResponse = checkUserIDInDB(
+    let userValidationResponse = await checkUserIDInDB(
       userID,
       validateCount,
       isExtraInputValidationRequired
     );
     if (isExtraInputValidationRequired) {
-      if (authType.includes("DOB")) {
-        var isBirthdateValid = await userAPI.verifyStudent({
-          student_id: userID,
-          birthdate: birthdate,
-        });
+      if (userValidationResponse) {
+        if (authType.includes("DOB")) {
+          let dob =
+            (birthdate.day < 10 ? "0" + birthdate.day : birthdate.day) +
+            "-" +
+            (birthdate.month < 10 ? "0" + birthdate.month : birthdate.month) +
+            "-" +
+            birthdate.year;
+          var isBirthdateValid = await userAPI.verifyStudent({
+            student_id: userID,
+            birth_date: dob,
+          });
+        }
       }
     }
     return userValidationResponse || isBirthdateValid;

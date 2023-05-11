@@ -77,7 +77,6 @@ export async function validateID(
           return userValidationResponse && isBirthdateValid;
         }
         if (authType.includes("PH")) {
-          console.log(authType);
           var isPhoneNumberValid = await userAPI.verifyStudent({
             student_id: userID,
             phone_number: phoneNumber,

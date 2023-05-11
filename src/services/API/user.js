@@ -1,4 +1,4 @@
-import { client, newClient } from "@/services/API/rootClient.js";
+import { client, dbClient } from "@/services/API/rootClient.js";
 import {
   studentSignupEndpoint,
   userSignupEndpoint,
@@ -47,7 +47,7 @@ export default {
    */
   verifyStudent(studentData) {
     return new Promise((resolve) => {
-      newClient
+      dbClient
         .get(verifyStudentEndpoint, { params: studentData })
         .then((response) => {
           resolve(response.data);

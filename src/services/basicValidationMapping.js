@@ -16,10 +16,21 @@ function isAlphanumeric(event) {
   );
 }
 
+/** Function to check if the key pressed by user is an alphabet.
+ * @param {Object} event - event triggered when a character is typed
+ */
+function isText(event) {
+  return (
+    (event.keyCode >= 65 && event.keyCode <= 90) ||
+    (event.keyCode >= 97 && event.keyCode <= 122)
+  );
+}
+
 /** Mapping between basicValidationType and the validation method to use */
 export const validationTypeToFunctionMap = {
   numeric: isNumeric,
   alphanumeric: isAlphanumeric,
+  text: isText,
   undefined: function () {
     return false;
   },

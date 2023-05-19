@@ -8,7 +8,7 @@
     <div class="flex flex-row justify-center">
       <FormKit
         type="date"
-        name="birthdate"
+        :name="dbKey"
         :validation="[
           isRequired ? ['required'] : [],
           ['date_after', '1990'],
@@ -34,7 +34,7 @@ export default {
       default: false,
     },
 
-    key: {
+    dbKey: {
       type: String,
       default: "",
     },
@@ -43,6 +43,11 @@ export default {
     return {
       date: "",
     };
+  },
+  computed: {
+    isDateEntryCompleteAndValid() {
+      return this.isRequired ? this.date != "" : true;
+    },
   },
 };
 </script>

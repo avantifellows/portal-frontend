@@ -1,72 +1,33 @@
 <template>
   <div v-if="isLoading">
-    <div class="flex m-auto h-screen w-full h-full">
+    <div class="flex m-auto h-screen w-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
         :src="loadingSpinnerSvg"
       />
     </div>
   </div>
-  <div v-if="isPurposeRegistration">
-    <Signup />
-  </div>
-  <div v-else>
-    <!-- NoClassMessage component -->
-    <div v-if="!sessionEnabled">
-      <NoClassMessage />
-    </div>
-    <div v-else>
-      <!-- Entry component -->
-      <div v-if="isAuthTypeID && doesGroupExist">
-        <Entry
-          :redirectTo="getRedirectTo"
-          :redirectId="getRedirectId"
-          :purpose="getPurpose"
-          :purposeParams="getPurposeParams"
-          :groupData="groupData"
-          :group="getGroup"
-          :authType="getAuthType"
-          :sessionId="sessionId"
-          :userIpAddress="getUserIpAddress"
-          :isExtraInputValidationRequired="isExtraInputValidationsRequired"
-        />
-      </div>
-      <!-- OTP component -->
-      <div v-else-if="isAuthTypeOTP && doesGroupExist">
-        <OTP
-          :redirectTo="redirectTo"
-          :redirectId="redirectId"
-          :purpose="purpose"
-          :purposeParams="purposeParams"
-          :groupData="groupData"
-          :group="getGroup"
-          :authType="getAuthType"
-        />
-      </div>
-    </div>
-  </div>
+
+  <SignIn v-if="isSessionTypeSignIn && doesGroupExist" />
 </template>
 
 <script>
-import Entry from "@/components/Entry.vue";
-import OTP from "@/components/OTP.vue";
 import Signup from "@/components/Signup.vue";
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
+import SignIn from "@/pages/Signin.vue";
 
 const assets = useAssets();
-const validAuthTypes = ["DOB", "ID", "PH"];
 
 export default {
   name: "Home",
   components: {
-    Entry,
-    OTP,
     NoClassMessage,
     Signup,
+    SignIn,
   },
   props: {
     /** The resource we are redirecting to. Eg. redirectTo = plio tells us that we are redirecting to a plio. */
@@ -117,14 +78,8 @@ export default {
   },
 
   computed: {
-    /** Whether authentication method chosen is an ID entry */
-    isAuthTypeID() {
-      return this.getAuthType.includes("ID");
-    },
-
-    /** Whether authentication method chosen is OTP */
-    isAuthTypeOTP() {
-      return this.getAuthType.includes("OTP");
+    isSessionTypeSignIn() {
+      return this.sessionData && this.sessionData.type == "sign-in";
     },
 
     /** Checks if group exists */
@@ -151,53 +106,39 @@ export default {
       return this.sessionId == null ? this.group : this.sessionData.group;
     },
 
-    /** Returns the purpose value */
-    getPurpose() {
-      return this.purpose == "" ? this.sessionData.purpose : this.purpose;
-    },
+    // /** Returns the purpose value */
+    // getPurpose() {
+    //   return this.purpose == "" ? this.sessionData.purpose : this.purpose;
+    // },
 
-    /** Returns the purpose params  */
-    getPurposeParams() {
-      return this.purposeParams == ""
-        ? this.sessionData.purposeParams
-        : this.purposeParams;
-    },
+    // /** Returns the purpose params  */
+    // getPurposeParams() {
+    //   return this.purposeParams == ""
+    //     ? this.sessionData.purposeParams
+    //     : this.purposeParams;
+    // },
 
-    /** Returns IP address of user */
-    getUserIpAddress() {
-      return this.sessionData ? this.sessionData.userIp : "";
-    },
+    // /** Returns IP address of user */
+    // getUserIpAddress() {
+    //   return this.sessionData ? this.sessionData.userIp : "";
+    // },
 
-    /** Returns how many authentication methods should be used */
-    getLengthOfAuthType() {
-      return this.getAuthType.split(",").length;
-    },
+    // /** Checks if the authentication methods mentioned are valid */
+    // areAuthTypesValid() {
+    //   let validCount = 0;
+    //   this.getAuthType.split(",").every((authType) => {
+    //     validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
+    //     return validCount;
+    //   });
+    //   return validCount == this.getLengthOfAuthType;
+    // },
 
-    /** Checks if the authentication methods mentioned are valid */
-    areAuthTypesValid() {
-      let validCount = 0;
-      this.getAuthType.split(",").every((authType) => {
-        validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
-        return validCount;
-      });
-      return validCount == this.getLengthOfAuthType;
-    },
-
-    /** Apart from ID, are any extra inputs being validated. */
-    isExtraInputValidationsRequired() {
-      return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
-    },
-
-    /** Returns the auth methods used by each group */
-    getAuthType() {
-      return this.groupData && this.groupData.authType
-        ? this.groupData.authType
-        : "ID";
-    },
-
-    isPurposeRegistration() {
-      return this.sessionData ? this.getPurpose == "registration" : false;
-    },
+    // /** Returns the auth methods used by each group */
+    // getAuthType() {
+    //   return this.groupData && this.groupData.authType
+    //     ? this.groupData.authType
+    //     : "ID";
+    // },
   },
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */

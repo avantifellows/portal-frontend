@@ -50,7 +50,7 @@ export default {
       type: Number,
       default: 1,
     },
-    key: {
+    dbKey: {
       type: String,
       default: "",
     },
@@ -65,6 +65,11 @@ export default {
     /** Returns if message for an invalid number entry needs to be shown */
     isInvalidNumberEntryMessageShown() {
       return this.invalidNumberEntryMessage != null;
+    },
+    isNumberEntryCompleteAndValid() {
+      return this.isRequired
+        ? this.number != "" && this.invalidNumberEntryMessage == ""
+        : this.invalidNumberEntryMessage == "";
     },
   },
   methods: {

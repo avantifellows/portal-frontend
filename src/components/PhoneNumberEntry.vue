@@ -3,19 +3,19 @@
     <p
       class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
     >
-      Enter your phone number / अपना फोन नंबर डालें
+      {{ label }}
     </p>
     <div class="flex flex-row justify-center">
       <input
         v-model="phoneNumber"
         type="tel"
         inputmode="numeric"
-        placeholder="Your Phone Number / अपना फोन नंबर"
-        required
+        :placeholder="placeholder"
+        :required="isRequired"
         class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2"
         :class="selectInputBoxClasses()"
         @keypress="isValidPhoneNumberEntry($event)"
-        @input="updatePhoneNumber($event)"
+        @input="updatePhoneNumberEntry($event)"
         ondrop="return false"
         onpaste="return false"
       />
@@ -28,9 +28,29 @@
   </div>
 </template>
 <script>
+import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
+
 export default {
   name: "PhoneNumberEntry",
   emits: ["valid-entry", "reset-invalid-login-message"],
+  props: {
+    label: {
+      type: String,
+      default: "",
+    },
+    placeholder: {
+      type: String,
+      defult: "",
+    },
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
+    key: {
+      type: String,
+      default: "",
+    },
+  },
   data() {
     return {
       phoneNumber: "",
@@ -41,6 +61,16 @@ export default {
     /** Returns if message for an invalid phone number needs to be shown */
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
+    },
+    isPhoneNumberEntryCompleteAndValid() {
+      console.log(
+        this.isRequired,
+        this.phoneNumber != "",
+        this.invalidPhoneNumberMessage == ""
+      );
+      return this.isRequired
+        ? this.phoneNumber != "" && this.invalidPhoneNumberMessage == ""
+        : this.invalidPhoneNumberMessage == "";
     },
   },
   methods: {
@@ -53,12 +83,9 @@ export default {
         },
       ];
     },
-    /** Returns if the phone number entry is not complete */
-    isPhoneNumberNotComplete() {
-      return this.phoneNumber.length < 10;
-    },
+
     /** Updates phone number based on user entry */
-    updatePhoneNumber(event) {
+    updatePhoneNumberEntry(event) {
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
       } else if (event.target.value.length > 10) {
@@ -84,7 +111,9 @@ export default {
         )
           event.preventDefault();
       } else {
-        this.$emit("valid-entry", event);
+        if (validationTypeToFunctionMap["numeric"](event)) {
+          return true;
+        } else event.preventDefault();
       }
     },
   },

@@ -83,6 +83,7 @@ import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 import { authToInputParameters } from "../services/authToInputParameters";
 import { validateUser } from "../services/validation.js";
 import { redirectToDestination } from "../services/redirectToDestination";
+import { sendSQSMessage } from "@/services/API/sqs";
 
 const assets = useAssets();
 export default {
@@ -109,25 +110,47 @@ export default {
     this.mounted = true;
   },
   computed: {
+    /** returns an array of auth types for a session */
     getAuthTypes() {
       return this.$store.state.sessionData.authType;
     },
+
+    /** returns images to be displayed for a group */
     getGroupImages() {
       return this.$store.state.groupData.images;
     },
+
+    /** whether to show an invalid login message */
     isInvalidLoginMessageShown() {
       return this.invalidLoginMessage != "";
     },
+
+    /** returns if the current session is using number entry */
+    checkEntryTypeIsNumber() {
+      return Object.keys(this.numberEntryParameters).length != 0;
+    },
+
+    /** returns if the current session is using date entry */
+    checkEntryTypeIsDate() {
+      return Object.keys(this.dateEntryParameters).length != 0;
+    },
+
+    /** returns if the current session is using phone number entry */
+    checkEntryTypeIsPhoneNumber() {
+      return Object.keys(this.phoneNumberEntryParameters).length != 0;
+    },
+
+    /** whether submit button is disabled */
     isSubmitButtonDisabled() {
       if (this.mounted) {
         return !(
-          (Object.keys(this.numberEntryParameters).length != 0
+          (this.checkEntryTypeIsNumber
             ? this.$refs.numberEntry["0"].isNumberEntryCompleteAndValid
             : true) &&
-          (Object.keys(this.dateEntryParameters).length != 0
+          (this.checkEntryTypeIsDate
             ? this.$refs.dateEntry["0"].isDateEntryCompleteAndValid
             : true) &&
-          (Object.keys(this.phoneNumberEntryParameters).length != 0
+          (this.checkEntryTypeIsPhoneNumber
             ? this.$refs.phoneNumberEntry["0"]
                 .isPhoneNumberEntryCompleteAndValid
             : true)
@@ -137,6 +160,7 @@ export default {
     },
   },
   methods: {
+    /** given an authentication type, it finds a corresponding entry component */
     findEntryType(authType) {
       return Object.keys(authToInputParameters).find((key) => {
         if (Object.values(authToInputParameters[key]).includes(authType)) {
@@ -144,6 +168,8 @@ export default {
         }
       });
     },
+
+    /** given an authentication type, it returns UI parameters stored against a group */
     getUIParameters(authType) {
       let UIParameters;
       Object.keys(this.$store.state.groupData).find((key) => {
@@ -153,6 +179,8 @@ export default {
       });
       return UIParameters;
     },
+
+    /** given an auth type, returns if the auth type is using number entry */
     isEntryNumber(authType) {
       if (this.findEntryType(authType) == "number") {
         this.numberEntryParameters = this.getUIParameters(authType);
@@ -160,6 +188,8 @@ export default {
       }
       return false;
     },
+
+    /** given an auth type, returns if the auth type is using phone number entry */
     isEntryPhoneNumber(authType) {
       if (this.findEntryType(authType) == "phoneNumber") {
         this.phoneNumberEntryParameters = this.getUIParameters(authType);
@@ -167,6 +197,8 @@ export default {
       }
       return false;
     },
+
+    /** given an auth type, returns if the auth type is using date entry */
     isEntryDate(authType) {
       if (this.findEntryType(authType) == "date") {
         this.dateEntryParameters = this.getUIParameters(authType);
@@ -174,6 +206,8 @@ export default {
       }
       return false;
     },
+
+    /** authenticates the user */
     async authenticate() {
       let isUserValid = await validateUser(
         this.getAuthTypes,
@@ -208,11 +242,15 @@ export default {
         }
       }
     },
+
+    /** redirects to sign up */
     redirectToSignUp() {
       this.$router.push({
         name: "Signup",
       });
     },
+
+    /** stores user information based on the value entered by user */
     updateUserInformation(value, dbKey) {
       this.userInformation[dbKey] = value;
     },

@@ -106,39 +106,17 @@ export default {
       return this.sessionId == null ? this.group : this.sessionData.group;
     },
 
-    // /** Returns the purpose value */
-    // getPurpose() {
-    //   return this.purpose == "" ? this.sessionData.purpose : this.purpose;
-    // },
+    /** Returns the purpose value */
+    getPurpose() {
+      return this.purpose == "" ? this.sessionData.purpose : this.purpose;
+    },
 
-    // /** Returns the purpose params  */
-    // getPurposeParams() {
-    //   return this.purposeParams == ""
-    //     ? this.sessionData.purposeParams
-    //     : this.purposeParams;
-    // },
-
-    // /** Returns IP address of user */
-    // getUserIpAddress() {
-    //   return this.sessionData ? this.sessionData.userIp : "";
-    // },
-
-    // /** Checks if the authentication methods mentioned are valid */
-    // areAuthTypesValid() {
-    //   let validCount = 0;
-    //   this.getAuthType.split(",").every((authType) => {
-    //     validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
-    //     return validCount;
-    //   });
-    //   return validCount == this.getLengthOfAuthType;
-    // },
-
-    // /** Returns the auth methods used by each group */
-    // getAuthType() {
-    //   return this.groupData && this.groupData.authType
-    //     ? this.groupData.authType
-    //     : "ID";
-    // },
+    /** Returns the purpose params  */
+    getPurposeParams() {
+      return this.purposeParams == ""
+        ? this.sessionData.purposeParams
+        : this.purposeParams;
+    },
   },
   async created() {
     /** If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data. */

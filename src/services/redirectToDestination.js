@@ -10,17 +10,14 @@ import { sendSQSMessage } from "@/services/API/sqs";
 
 export function redirectToDestination(
   purposeParams,
-  userIDList,
+  userId,
   redirectId,
   redirectTo,
-  authType,
   group
 ) {
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
-  let userID =
-    typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
 
   switch (redirectTo) {
     case "plio": {
@@ -28,7 +25,7 @@ export function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
-        unique_id: userID,
+        unique_id: userId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -38,7 +35,7 @@ export function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userID,
+        userId: userId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -59,7 +56,7 @@ export function redirectToDestination(
     }
     case "teacher-web-app": {
       finalURLQueryParams = new URLSearchParams({
-        teacherID: userID,
+        teacherID: userId,
         groupName: group,
       });
       fullURL = redirectId + "?" + finalURLQueryParams;
@@ -67,14 +64,7 @@ export function redirectToDestination(
     }
     default: {
       var purpose = "Error";
-      sendSQSMessage(
-        purpose,
-        purposeParams,
-        redirectTo,
-        redirectId,
-        userIDList,
-        authType
-      );
+      sendSQSMessage(purpose, purposeParams, redirectTo, redirectId, userId);
       return false;
     }
   }

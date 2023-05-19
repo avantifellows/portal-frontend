@@ -82,6 +82,7 @@ import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 import { authToInputParameters } from "../services/authToInputParameters";
 import { validateUser } from "../services/validation.js";
+import { redirectToDestination } from "../services/redirectToDestination";
 
 const assets = useAssets();
 export default {
@@ -182,31 +183,26 @@ export default {
         this.invalidLoginMessage =
           "Student ID entered is incorrect. Please try again!";
       } else {
-        console.log("here");
         if (
           redirectToDestination(
-            this.purposeParams,
-            this.userIDList,
-            this.redirectId,
-            this.redirectTo,
-            this.authType,
-            this.group
+            this.$store.state.sessionData.purposeParams,
+            this.userInformation["student_id"],
+            this.$store.state.sessionData.redirectPlatformParams.id,
+            this.$store.state.sessionData.redirectPlatform,
+            this.$store.state.groupData.userType
           )
         ) {
           sendSQSMessage(
-            this.purpose,
-            this.purposeParams,
-            this.redirectTo,
-            this.redirectId,
-            this.userIDList,
-            this.authType,
-            this.group,
+            this.$store.state.sessionData.purpose,
+            this.$store.state.sessionData.purposeParams,
+            this.$store.state.sessionData.redirectPlatform,
+            this.$store.state.sessionData.redirectPlatformParams.id,
+            this.userInformation,
+            this.getAuthTypes,
+            this.this.$store.state.sessionData.group,
             this.$store.state.groupData.userType,
-            this.sessionId,
-            this.userIpAddress,
-            this.isExtraInputValidationRequired && this.isInputPhoneNumber
-              ? this.$refs.phoneNumberEntry.phoneNumber
-              : "",
+            this.$store.state.sessionData.sessionId,
+            this.$store.state.sessionData.userIpAddress,
             this.$store.state.sessionData.batch
           );
         }

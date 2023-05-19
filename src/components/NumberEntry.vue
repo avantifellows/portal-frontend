@@ -32,7 +32,7 @@ import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.j
 
 export default {
   name: "NumberEntry",
-  emits: ["valid-entry"],
+  emits: ["update-number"],
   props: {
     label: {
       type: String,
@@ -93,6 +93,7 @@ export default {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
+        this.$emit("update-number", this.number, this.dbKey);
       }
     },
     /** Checks for valid input of number */

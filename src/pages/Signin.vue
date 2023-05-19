@@ -27,6 +27,7 @@
         :isRequired="numberEntryParameters.required"
         :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
         :dbKey="numberEntryParameters.key"
+        @updateNumber="updateUserInformation"
       />
       <PhoneNumberEntry
         v-if="isEntryPhoneNumber(authType)"
@@ -35,6 +36,7 @@
         :placeholder="phoneNumberEntryParameters.placeholder"
         :isRequired="phoneNumberEntryParameters.required"
         :dbKey="phoneNumberEntryParameters.key"
+        @updatePhoneNumber="updateUserInformation"
       />
       <Datepicker
         v-if="isEntryDate(authType)"
@@ -42,6 +44,7 @@
         :label="dateEntryParameters.label"
         :isRequired="dateEntryParameters.required"
         :dbKey="dateEntryParameters.key"
+        @updateDate="updateUserInformation"
       />
     </div>
 
@@ -78,6 +81,7 @@ import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 import { authToInputParameters } from "../services/authToInputParameters";
+import { validateUser } from "../services/validation.js";
 
 const assets = useAssets();
 export default {
@@ -96,6 +100,7 @@ export default {
       numberEntryParameters: {},
       phoneNumberEntryParameters: {},
       dateEntryParameters: {},
+      userInformation: {},
     };
   },
 
@@ -115,16 +120,16 @@ export default {
     isSubmitButtonDisabled() {
       if (this.mounted) {
         return !(
-          (this.numberEntryParameters.length != 0
+          (Object.keys(this.numberEntryParameters).length != 0
             ? this.$refs.numberEntry["0"].isNumberEntryCompleteAndValid
-            : false) &&
-          (this.dateEntryParameters.length != 0
+            : true) &&
+          (Object.keys(this.dateEntryParameters).length != 0
             ? this.$refs.dateEntry["0"].isDateEntryCompleteAndValid
-            : false) &&
-          (this.phoneNumberEntryParameters.length != 0
+            : true) &&
+          (Object.keys(this.phoneNumberEntryParameters).length != 0
             ? this.$refs.phoneNumberEntry["0"]
                 .isPhoneNumberEntryCompleteAndValid
-            : false)
+            : true)
         );
       }
       return true;
@@ -168,10 +173,52 @@ export default {
       }
       return false;
     },
+    async authenticate() {
+      let isUserValid = await validateUser(
+        this.getAuthTypes,
+        this.userInformation
+      );
+      if (!isUserValid) {
+        this.invalidLoginMessage =
+          "Student ID entered is incorrect. Please try again!";
+      } else {
+        console.log("here");
+        if (
+          redirectToDestination(
+            this.purposeParams,
+            this.userIDList,
+            this.redirectId,
+            this.redirectTo,
+            this.authType,
+            this.group
+          )
+        ) {
+          sendSQSMessage(
+            this.purpose,
+            this.purposeParams,
+            this.redirectTo,
+            this.redirectId,
+            this.userIDList,
+            this.authType,
+            this.group,
+            this.$store.state.groupData.userType,
+            this.sessionId,
+            this.userIpAddress,
+            this.isExtraInputValidationRequired && this.isInputPhoneNumber
+              ? this.$refs.phoneNumberEntry.phoneNumber
+              : "",
+            this.$store.state.sessionData.batch
+          );
+        }
+      }
+    },
     redirectToSignUp() {
       this.$router.push({
         name: "Signup",
       });
+    },
+    updateUserInformation(value, dbKey) {
+      this.userInformation[dbKey] = value;
     },
   },
 };

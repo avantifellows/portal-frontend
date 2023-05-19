@@ -32,7 +32,7 @@ import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.j
 
 export default {
   name: "PhoneNumberEntry",
-  emits: ["valid-entry", "reset-invalid-login-message"],
+  emits: ["update-phone-number"],
   props: {
     label: {
       type: String,
@@ -93,9 +93,9 @@ export default {
         this.phoneNumber = event.target.value.toString();
       } else if (event.target.value.length < 10) {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
-        this.$emit("reset-invalid-login-message");
       } else {
         this.invalidPhoneNumberMessage = "";
+        this.$emit("update-phone-number", this.number, this.dbKey);
       }
     },
     /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/

@@ -9,16 +9,17 @@
   </div>
 
   <SignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+  <SignUp v-if="isSessionTypeSignUp && doesGroupExist" />
 </template>
 
 <script>
-import Signup from "@/components/Signup.vue";
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
 import SignIn from "@/pages/Signin.vue";
+import SignUp from "@/pages/Signup.vue";
 
 const assets = useAssets();
 
@@ -26,7 +27,7 @@ export default {
   name: "Home",
   components: {
     NoClassMessage,
-    Signup,
+    SignUp,
     SignIn,
   },
   props: {
@@ -80,6 +81,9 @@ export default {
   computed: {
     isSessionTypeSignIn() {
       return this.sessionData && this.sessionData.type == "sign-in";
+    },
+    isSessionTypeSignUp() {
+      return this.sessionData && this.sessionData.type == "sign-up";
     },
 
     /** Checks if group exists */

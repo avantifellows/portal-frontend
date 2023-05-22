@@ -32,7 +32,7 @@ import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.j
 
 export default {
   name: "TextEntry",
-  emits: ["valid-entry"],
+  emits: ["update"],
   props: {
     label: {
       type: String,
@@ -46,7 +46,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    key: {
+    dbKey: {
       type: String,
       default: "",
     },
@@ -77,7 +77,11 @@ export default {
     updateTextEntry(event) {
       if (event.target.value.length == 0) {
         this.invalidTextEntryMessage = "";
-      } else this.text = event.target.value.toString();
+      } else {
+        this.text = event.target.value.toString();
+        console.log(this.dbKey);
+        this.$emit("update", this.text, this.dbKey);
+      }
     },
     /** Checks for valid input of text */
     isValidTextEntry(event) {

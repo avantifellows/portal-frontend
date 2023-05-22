@@ -25,10 +25,9 @@
   </div>
 </template>
 <script>
-import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-
 export default {
   name: "Dropdown",
+  emits: ["update"],
   props: {
     label: {
       type: String,
@@ -64,6 +63,11 @@ export default {
       value: "",
       invalidEntryMessage: "",
     };
+  },
+  watch: {
+    value(newValue, oldValue) {
+      this.$emit("update", this.value, this.dbKey);
+    },
   },
   computed: {
     /** Returns if message for an invalid text entry needs to be shown */

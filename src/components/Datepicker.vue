@@ -23,6 +23,7 @@
 <script>
 export default {
   name: "Datepicker",
+  emits: ["update"],
   props: {
     label: {
       type: String,
@@ -43,6 +44,11 @@ export default {
     return {
       date: "",
     };
+  },
+  watch: {
+    date(newValue, oldValue) {
+      this.$emit("update", this.date, this.dbKey);
+    },
   },
   computed: {
     isDateEntryCompleteAndValid() {

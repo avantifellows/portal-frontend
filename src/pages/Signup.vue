@@ -16,7 +16,10 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
+  <div
+    v-if="!formSubmitted"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
+  >
     <p
       class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
     >
@@ -39,17 +42,38 @@
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
-      data-cy="submitButton"
-      :disabled="isSubmitButtonDisabled"
-      @click="authenticate"
+      :disabled="isSignUpButtonDisabled"
+      @click="signUp"
     >
       SIGN UP
+    </button>
+  </div>
+  <div
+    v-if="formSubmitted"
+    class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
+  >
+    <template v-if="this.$store.state.sessionData.idGeneration">
+      <p>
+        Your Student ID is <b>{{ studentId }}</b>
+      </p>
+      <p>Please note this down. Use this to sign-in going forward.</p>
+    </template>
+
+    <button
+      v-if="this.$store.state.sessionData.redirection"
+      @click="redirect"
+      :disabled="isRedirectionButtonDisabled"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
+    >
+      Done
     </button>
   </div>
 </template>
 <script>
 import formData from "../components/formData.json";
 import { typeToInputParameters } from "../services/authToInputParameters";
+import { redirectToDestination } from "../services/redirectToDestination";
+import UserAPI from "@/services/API/user.js";
 
 export default {
   name: "SignUp",
@@ -57,8 +81,10 @@ export default {
     return {
       isLoading: false,
       userData: {},
+      formSubmitted: false,
     };
   },
+
   computed: {
     /** returns images to be displayed for a group */
     getGroupImages() {
@@ -75,19 +101,64 @@ export default {
         };
       });
     },
-    /** whether submit button is disabled */
-    isSubmitButtonDisabled() {
-      return !Object.keys(formData.fields).every((field) => {
-        formData.fields[field].key in this.userData;
+    doesUserDataIsComplete() {
+      Object.keys(formData.fields).every((field) => {
+        this.userData.hasOwnProperty(formData.fields[field].key);
       });
-
-      //return true;
+    },
+    /** whether submit button is disabled */
+    isSignUpButtonDisabled() {
+      if (this.doesUserDataIsComplete) return false;
+      else return true;
     },
   },
   methods: {
     updateUserData(value, key) {
       this.userData[key] = value;
+    },
+    async signUp() {
       console.log(this.userData);
+      this.formSubmitted = true;
+      this.isLoading = true;
+
+      let createdUserId = await UserAPI.userSignup(this.userData);
+
+      if (userId == "") {
+        this.$router.push({
+          name: "Error",
+          state: {
+            text: "ID could not be created. Please contact your program manager.",
+          },
+        });
+      }
+      this.isLoading = false;
+      this.userData["user_id"] = createdUserId ? createdUserId : "";
+    },
+
+    redirect() {
+      if (
+        redirectToDestination(
+          this.$store.state.sessionData.purposeParams,
+          this.userData["user_id"],
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.groupData.userType
+        )
+      ) {
+        sendSQSMessage(
+          this.$store.state.sessionData.purpose,
+          this.$store.state.sessionData.purposeParams,
+          this.$store.state.sessionData.redirectPlatform,
+          this.$store.state.sessionData.redirectPlatformParams.id,
+          this.userData,
+          this.getAuthTypes,
+          this.this.$store.state.sessionData.group,
+          this.$store.state.groupData.userType,
+          this.$store.state.sessionData.sessionId,
+          this.$store.state.sessionData.userIpAddress,
+          this.$store.state.sessionData.batch
+        );
+      }
     },
   },
 };

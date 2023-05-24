@@ -79,7 +79,6 @@ export default {
         this.invalidTextEntryMessage = "";
       } else {
         this.text = event.target.value.toString();
-        console.log(this.dbKey);
         this.$emit("update", this.text, this.dbKey);
       }
     },

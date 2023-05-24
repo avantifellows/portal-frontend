@@ -10,10 +10,10 @@ import {
  * @param {Object} formData - contains data filled in the form by user
  */
 export default {
-  userSignup(formData) {
+  userSignup(formData, idGeneration) {
     return new Promise((resolve) => {
       client
-        .post(userSignupEndpoint, JSON.stringify(formData))
+        .post(userSignupEndpoint, JSON.stringify(formData, idGeneration))
         .then((response) => {
           resolve(response.data.toString());
         })

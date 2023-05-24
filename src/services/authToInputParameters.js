@@ -17,5 +17,5 @@ export const typeToInputParameters = {
   dropdown: Dropdown,
   date: Datepicker,
   phone: PhoneNumberEntry,
-  uplaod: Upload,
+  upload: Upload,
 };

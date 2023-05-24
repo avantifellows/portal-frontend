@@ -52,15 +52,15 @@
     v-if="formSubmitted"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
   >
-    <template v-if="this.$store.state.sessionData.idGeneration">
+    <template v-if="idGeneration">
       <p>
-        Your Student ID is <b>{{ studentId }}</b>
+        Your ID is <b>{{ studentId }}</b>
       </p>
       <p>Please note this down. Use this to sign-in going forward.</p>
     </template>
 
     <button
-      v-if="this.$store.state.sessionData.redirection"
+      v-if="redirection"
       @click="redirect"
       :disabled="isRedirectionButtonDisabled"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
@@ -90,9 +90,11 @@ export default {
     getGroupImages() {
       return this.$store.state.groupData.images;
     },
+    /** returns title for the form */
     formTitle() {
       return formData.title;
     },
+    /** returns all fields to be displayed in the form */
     formFields() {
       return formData.fields.map((field) => {
         return {
@@ -101,6 +103,7 @@ export default {
         };
       });
     },
+    /** checks if user data has all the fields required */
     doesUserDataIsComplete() {
       Object.keys(formData.fields).every((field) => {
         this.userData.hasOwnProperty(formData.fields[field].key);
@@ -111,17 +114,33 @@ export default {
       if (this.doesUserDataIsComplete) return false;
       else return true;
     },
+    /** whether redirection button is disabled */
+    isRedirectionButtonDisabled() {
+      return this.userData["user_id"] == "";
+    },
+    /** returns if ID needs to be generated */
+    idGeneration() {
+      return this.$store.state.sessionData.idGeneration;
+    },
+    /** returns if redirection is necessary */
+    redirection() {
+      return this.$store.state.sessionData.redirection;
+    },
   },
   methods: {
+    /** updates user data based on user input */
     updateUserData(value, key) {
       this.userData[key] = value;
     },
+    /** creates user ID based on information */
     async signUp() {
-      console.log(this.userData);
       this.formSubmitted = true;
       this.isLoading = true;
 
-      let createdUserId = await UserAPI.userSignup(this.userData);
+      let createdUserId = await UserAPI.userSignup(
+        this.userData,
+        this.$store.state.sessionData.idGeneration
+      );
 
       if (userId == "") {
         this.$router.push({
@@ -134,7 +153,7 @@ export default {
       this.isLoading = false;
       this.userData["user_id"] = createdUserId ? createdUserId : "";
     },
-
+    /** redirects to destination */
     redirect() {
       if (
         redirectToDestination(

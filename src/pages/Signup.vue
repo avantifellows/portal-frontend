@@ -42,7 +42,7 @@
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
-      :disabled="isSignUpButtonDisabled"
+      :disabled="signUpDisabled"
       @click="signUp"
     >
       SIGN UP
@@ -82,9 +82,18 @@ export default {
       isLoading: false,
       userData: {},
       formSubmitted: false,
+      signUpDisabled: true,
     };
   },
-
+  watch: {
+    userData: {
+      handler() {
+        console.log(this.userData);
+        this.isUserDataIsComplete();
+      },
+      deep: true,
+    },
+  },
   computed: {
     /** returns images to be displayed for a group */
     getGroupImages() {
@@ -103,17 +112,7 @@ export default {
         };
       });
     },
-    /** checks if user data has all the fields required */
-    doesUserDataIsComplete() {
-      Object.keys(formData.fields).every((field) => {
-        this.userData.hasOwnProperty(formData.fields[field].key);
-      });
-    },
-    /** whether submit button is disabled */
-    isSignUpButtonDisabled() {
-      if (this.doesUserDataIsComplete) return false;
-      else return true;
-    },
+
     /** whether redirection button is disabled */
     isRedirectionButtonDisabled() {
       return this.userData["user_id"] == "";
@@ -128,6 +127,23 @@ export default {
     },
   },
   methods: {
+    /** checks if user data has all the fields required */
+    isUserDataIsComplete() {
+      let isUserDataComplete = true;
+      Object.keys(formData.fields).forEach((field) => {
+        if (
+          !this.userData.hasOwnProperty(formData.fields[field].key) ||
+          this.userData[formData.fields[field].key] == ""
+        ) {
+          isUserDataComplete = false;
+        }
+      });
+
+      return isUserDataComplete
+        ? (this.signUpDisabled = false)
+        : (this.signUpDisabled = true);
+    },
+
     /** updates user data based on user input */
     updateUserData(value, key) {
       this.userData[key] = value;

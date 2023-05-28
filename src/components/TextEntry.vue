@@ -79,8 +79,8 @@ export default {
         this.invalidTextEntryMessage = "";
       } else {
         this.text = event.target.value.toString();
-        this.$emit("update", this.text, this.dbKey);
       }
+      this.$emit("update", this.text, this.dbKey);
     },
     /** Checks for valid input of text */
     isValidTextEntry(event) {

@@ -93,8 +93,8 @@ export default {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
-        this.$emit("update", this.number, this.dbKey);
       }
+      this.$emit("update", this.number, this.dbKey);
     },
     /** Checks for valid input of number */
     isValidNumberEntry(event) {

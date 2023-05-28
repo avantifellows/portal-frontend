@@ -90,8 +90,8 @@ export default {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
       } else {
         this.invalidPhoneNumberMessage = "";
-        this.$emit("update", this.number, this.dbKey);
       }
+      this.$emit("update", this.number, this.dbKey);
     },
     /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
     isValidPhoneNumberEntry(event) {

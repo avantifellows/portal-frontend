@@ -9,3 +9,7 @@ export const client = axios.create({
 export const OTPClient = axios.create({
   baseURL: import.meta.env.VITE_APP_OTP_SERVICE,
 });
+
+export const dbClient = axios.create({
+  baseURL: import.meta.env.VITE_APP_PORTAL_BACKEND,
+});

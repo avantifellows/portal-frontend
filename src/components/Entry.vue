@@ -525,14 +525,13 @@ export default {
      */
     async authenticateID(userID) {
       this.isLoading = true;
-
       let userValidationResponse = await validateID(
         userID,
-        this.groupData.dataSource,
         this.authType,
         this.validateCount,
         this.dateOfBirth,
-        this.isExtraInputValidationRequired
+        this.isExtraInputValidationRequired,
+        this.$refs.phoneNumberEntry.phoneNumber
       );
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;

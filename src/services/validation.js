@@ -65,23 +65,23 @@ export async function validateID(
       if (userValidationResponse) {
         if (authType.includes("DOB")) {
           let dob =
-            (birthdate.day < 10 ? "0" + birthdate.day : birthdate.day) +
+            birthdate.year +
             "-" +
             (birthdate.month < 10 ? "0" + birthdate.month : birthdate.month) +
             "-" +
-            birthdate.year;
+            (birthdate.day < 10 ? "0" + birthdate.day : birthdate.day);
+
           var isBirthdateValid = await userAPI.verifyStudent({
             student_id: userID,
-            birth_date: dob,
+            date_of_birth: dob,
           });
           return userValidationResponse && isBirthdateValid;
         }
         if (authType.includes("PH")) {
           var isPhoneNumberValid = await userAPI.verifyStudent({
             student_id: userID,
-            phone_number: phoneNumber,
+            phone: phoneNumber,
           });
-          console.log(isPhoneNumberValid);
           return userValidationResponse && isPhoneNumberValid;
         }
       }

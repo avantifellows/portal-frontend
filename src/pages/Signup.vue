@@ -34,9 +34,10 @@
       :isRequired="formField.isRequired"
       :dbKey="formField.key"
       :placeholder="formField.placeholder"
-      :options="formField.options"
+      :options="getOptions(formField)"
       :multiple="formField.multiple"
       :maxLengthOfEntry="formField.maxLengthOfEntry"
+      :helpText="formField.helpText"
       @update="updateUserData"
     />
     <!-- submit button -->
@@ -127,6 +128,14 @@ export default {
     },
   },
   methods: {
+    getOptions(field) {
+      if (field.dependant) {
+        if (this.userData[field.dependantField])
+          return field.dependantFieldMapping[
+            this.userData[field.dependantField]
+          ];
+      } else return field.options;
+    },
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;

@@ -12,9 +12,9 @@
         :placeholder="placeholder"
         :options="options"
         :validation="[isRequired ? ['required'] : []]"
-        validation-visibility="live"
-        :multiple="multiple"
+        validation-visibility="dirty"
         :name="dbKey"
+        :help="helpText"
       />
     </div>
     <span
@@ -52,10 +52,6 @@ export default {
     dbKey: {
       type: String,
       default: "",
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
     },
   },
   data() {

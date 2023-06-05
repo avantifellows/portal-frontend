@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.30.0",
-    "@formkit/themes": "^1.0.0-beta.11",
     "@formkit/vue": "^1.0.0-beta.11",
     "@sentry/tracing": "^6.16.1",
     "@sentry/vue": "^6.16.1",

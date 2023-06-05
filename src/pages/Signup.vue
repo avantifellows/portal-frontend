@@ -21,25 +21,28 @@
     class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
   >
     <p
-      class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
+      class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5 uppercase"
     >
       {{ formTitle }}
     </p>
 
-    <component
-      v-for="(formField, index) in formFields"
-      :key="index"
-      :is="formField.component"
-      :label="formField.label"
-      :isRequired="formField.isRequired"
-      :dbKey="formField.key"
-      :placeholder="formField.placeholder"
-      :options="getOptions(formField)"
-      :multiple="formField.multiple"
-      :maxLengthOfEntry="formField.maxLengthOfEntry"
-      :helpText="formField.helpText"
-      @update="updateUserData"
-    />
+    <div class="w-1/2 mx-auto">
+      <component
+        class="mx-auto w-1/4 my-4"
+        v-for="(formField, index) in formFields"
+        :key="index"
+        :is="formField.component"
+        :label="formField.label"
+        :isRequired="formField.isRequired"
+        :dbKey="formField.key"
+        :placeholder="formField.placeholder"
+        :options="getOptions(formField)"
+        :multiple="formField.multiple"
+        :maxLengthOfEntry="formField.maxLengthOfEntry"
+        :helpText="formField.helpText"
+        @update="updateUserData"
+      />
+    </div>
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"

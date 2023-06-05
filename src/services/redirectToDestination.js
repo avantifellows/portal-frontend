@@ -43,6 +43,11 @@ export function redirectToDestination(
       fullURL = url + "?" + finalURLQueryParams;
       break;
     }
+    case "report": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_REPORTING;
+      fullURL = redirectURL + "/" + redirectId + "/" + userID;
+      break;
+    }
     case "meet": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_MEET;
       fullURL = new URL(redirectURL + redirectId);

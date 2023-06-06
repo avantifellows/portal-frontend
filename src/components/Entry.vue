@@ -362,7 +362,8 @@ export default {
         (!this.isCurrentUserValid && this.validateCount == 1) ||
         (!this.isCurrentUserValid &&
           this.validateCount == 0 &&
-          this.isExtraInputValidationRequired)
+          this.isExtraInputValidationRequired) ||
+        this.group == "Candidates"
       );
     },
 
@@ -531,7 +532,8 @@ export default {
         this.validateCount,
         this.dateOfBirth,
         this.isExtraInputValidationRequired,
-        this.$refs.phoneNumberEntry.phoneNumber
+        this.$refs.phoneNumberEntry.phoneNumber,
+        this.group
       );
       if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse;
@@ -557,9 +559,14 @@ export default {
     async authenticate() {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
+
       if (!this.isCurrentUserValid && this.validateCount == 0) {
+        console.log(this.isCurrentUserValid, this.validateCount);
+
         this.invalidLoginMessage =
-          "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
+          this.group == "Candidates"
+            ? "Phone Number is incorrect!"
+            : "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       this.setValidFlag();
       if (this.isCurrentUserValid || this.validateCount > 1) {

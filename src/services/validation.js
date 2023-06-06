@@ -53,44 +53,54 @@ export async function validateID(
   validateCount = 0,
   birthdate,
   isExtraInputValidationRequired,
-  phoneNumber
+  phoneNumber,
+  group
 ) {
-  if (authType.includes("ID")) {
-    let userValidationResponse = await checkUserIDInDB(
-      userID,
-      validateCount,
-      isExtraInputValidationRequired
-    );
-    if (isExtraInputValidationRequired) {
-      if (userValidationResponse) {
-        if (authType.includes("DOB")) {
-          let dob =
-            birthdate.year +
-            "-" +
-            (birthdate.month < 10 ? "0" + birthdate.month : birthdate.month) +
-            "-" +
-            (birthdate.day < 10 ? "0" + birthdate.day : birthdate.day);
+  if (group == "Candidates") {
+    let isCurrentUserValid = await userAPI.verifyUser(userID);
+    return {
+      isCurrentUserValid: isCurrentUserValid,
+      validateCount: 0,
+    };
+  }
+  {
+    if (authType.includes("ID")) {
+      let userValidationResponse = await checkUserIDInDB(
+        userID,
+        validateCount,
+        isExtraInputValidationRequired
+      );
+      if (isExtraInputValidationRequired) {
+        if (userValidationResponse) {
+          if (authType.includes("DOB")) {
+            let dob =
+              birthdate.year +
+              "-" +
+              (birthdate.month < 10 ? "0" + birthdate.month : birthdate.month) +
+              "-" +
+              (birthdate.day < 10 ? "0" + birthdate.day : birthdate.day);
 
-          var isBirthdateValid = await userAPI.verifyStudent({
-            student_id: userID,
-            date_of_birth: dob,
-          });
-          return userValidationResponse && isBirthdateValid;
-        }
-        if (authType.includes("PH")) {
-          var isPhoneNumberValid = await userAPI.verifyStudent({
-            student_id: userID,
-            phone: phoneNumber,
-          });
-          return userValidationResponse && isPhoneNumberValid;
+            var isBirthdateValid = await userAPI.verifyStudent({
+              student_id: userID,
+              date_of_birth: dob,
+            });
+            return userValidationResponse && isBirthdateValid;
+          }
+          if (authType.includes("PH")) {
+            var isPhoneNumberValid = await userAPI.verifyStudent({
+              student_id: userID,
+              phone: phoneNumber,
+            });
+            return userValidationResponse && isPhoneNumberValid;
+          }
         }
       }
+      return userValidationResponse;
     }
-    return userValidationResponse;
-  }
-  if (authType.includes("OTP")) {
-    return userAPI.verifyStudent({
-      phone_number: userID,
-    });
+    if (authType.includes("OTP")) {
+      return userAPI.verifyStudent({
+        phone_number: userID,
+      });
+    }
   }
 }

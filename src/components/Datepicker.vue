@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
+      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
     >
       {{ label }}
     </p>
@@ -19,9 +19,9 @@
         :classes="{
           outer: 'py-2 min-w-full',
           inner: 'p-4 border-2 rounded-md border-gray-500 ',
-          input: 'mx-auto  focus:border-gray-800 focus:outline-none ',
+          input: 'mx-auto focus:border-gray-800 focus:outline-none ',
           help: 'text-xs text-gray-400 pt-2',
-          message: 'mx-auto text-red-700 text-base mb-1',
+          message: 'mx-auto text-red-700 text-xs mb-1',
         }"
       />
     </div>

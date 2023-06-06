@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
+      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
     >
       {{ label }}
     </p>
@@ -91,7 +91,8 @@ export default {
       } else {
         this.invalidPhoneNumberMessage = "";
       }
-      this.$emit("update", this.number, this.dbKey);
+
+      this.$emit("update", this.phoneNumber, this.dbKey);
     },
     /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
     isValidPhoneNumberEntry(event) {

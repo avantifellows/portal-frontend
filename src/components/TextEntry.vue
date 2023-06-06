@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
+      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
     >
       {{ label }}
     </p>

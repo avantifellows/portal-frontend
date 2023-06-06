@@ -12,14 +12,22 @@ import {
 export default {
   userSignup(formData, idGeneration) {
     return new Promise((resolve) => {
-      client
-        .post(userSignupEndpoint, JSON.stringify(formData, idGeneration))
+      dbClient
+        .post(
+          userSignupEndpoint,
+          JSON.stringify({
+            form_data: formData,
+            id_generation: idGeneration,
+            user_type: "student",
+          })
+        )
         .then((response) => {
           resolve(response.data.toString());
         })
         .catch((error) => {
+          console.log(error);
           resolve({ error: error });
-          throw new Error("User API returned an error:", error);
+          throw new Error(error);
         });
     });
   },

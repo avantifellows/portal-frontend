@@ -561,8 +561,6 @@ export default {
       await this.authenticateID(latestUserID);
 
       if (!this.isCurrentUserValid && this.validateCount == 0) {
-        console.log(this.isCurrentUserValid, this.validateCount);
-
         this.invalidLoginMessage =
           this.group == "Candidates"
             ? "Phone Number is incorrect!"

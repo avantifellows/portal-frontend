@@ -49,6 +49,7 @@ jobs:
           VITE_APP_GET_GROUP_ENDPOINT: "/getGroupData"
           VITE_APP_CLOUD_FUNCTIONS_BASE_URL: "https://asia-south1-avantifellows.cloudfunctions.net"
           VITE_APP_PORTAL_BACKEND: "https://9nqmv8p8k2.execute-api.ap-south-1.amazonaws.com/"
+          VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL: "https://reports.avantifellows.org/student_quiz_report"
 
         run: npm run build
 

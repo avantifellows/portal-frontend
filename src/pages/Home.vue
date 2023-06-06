@@ -7,7 +7,9 @@
       />
     </div>
   </div>
-
+  <div v-if="!sessionEnabled">
+    <NoClassMessage />
+  </div>
   <SignIn v-if="isSessionTypeSignIn && doesGroupExist" />
 </template>
 

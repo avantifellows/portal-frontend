@@ -58,7 +58,10 @@ export default {
     };
   },
   computed: {
-    /** Returns if message for an invalid phone number needs to be shown */
+    /**
+     * Checks if the invalid phone number entry message is shown.
+     * @returns {boolean} True if the invalid number entry message is not null, false otherwise.
+     */
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
@@ -69,7 +72,9 @@ export default {
     },
   },
   methods: {
-    /** Determines how the input box should look.
+    /**
+     * Generates the CSS classes for the input box based on the state of the phone number entry.
+     * @returns {string[]} An array of CSS classes.
      */
     selectInputBoxClasses() {
       return [
@@ -79,7 +84,10 @@ export default {
       ];
     },
 
-    /** Updates phone number based on user entry */
+    /**
+     * Updates the phone number value based on user entry
+     * @param {Event} event - The input event.
+     */
     updatePhoneNumberEntry(event) {
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
@@ -93,7 +101,12 @@ export default {
         this.$emit("update", this.number, this.dbKey);
       }
     },
-    /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
+
+    /**
+     * Checks if the phone number entry is valid
+     * @param {Event} event - The input event.
+     * @returns {boolean} True if the phone number entry is valid, prevent user entry otherwise.
+     */
     isValidPhoneNumberEntry(event) {
       if (this.phoneNumber.length < 1) {
         if (

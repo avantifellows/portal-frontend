@@ -15,7 +15,8 @@
           ['date_before', '2020'],
         ]"
         v-model="date"
-        validation-visibility="live"
+        validation-visibility="dirty"
+        :help="helpText"
       />
     </div>
   </div>
@@ -29,13 +30,15 @@ export default {
       type: String,
       default: "",
     },
-
     isRequired: {
       type: Boolean,
       default: false,
     },
-
     dbKey: {
+      type: String,
+      default: "",
+    },
+    helpText: {
       type: String,
       default: "",
     },
@@ -46,13 +49,11 @@ export default {
     };
   },
   watch: {
-    date(newValue, oldValue) {
+    /**
+     * Emits 'update' event whenever the date value is changed
+     */
+    date() {
       this.$emit("update", this.date, this.dbKey);
-    },
-  },
-  computed: {
-    isDateEntryCompleteAndValid() {
-      return this.isRequired ? this.date != "" : true;
     },
   },
 };

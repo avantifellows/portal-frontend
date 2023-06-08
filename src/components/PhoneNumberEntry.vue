@@ -65,7 +65,12 @@ export default {
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
-    isPhoneNumberEntryCompleteAndValid() {
+
+    /**
+     * Checks if the phone number entry is valid.
+     * @returns {boolean} True if the phone number entry is valid, or if it is not required. False otherwise.
+     */
+    isPhoneNumberEntryValid() {
       return this.isRequired
         ? this.phoneNumber != "" && this.invalidPhoneNumberMessage == ""
         : this.invalidPhoneNumberMessage == "";
@@ -98,7 +103,7 @@ export default {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
       } else {
         this.invalidPhoneNumberMessage = "";
-        this.$emit("update", this.number, this.dbKey);
+        this.$emit("update", this.phoneNumber, this.dbKey);
       }
     },
 

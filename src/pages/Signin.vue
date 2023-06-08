@@ -16,7 +16,7 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
+  <div class="flex flex-col my-auto h-full py-10 space-y-4">
     <!-- different input components -->
     <div v-for="(authType, index) in getAuthTypes" :key="`id-${index}`">
       <NumberEntry
@@ -27,7 +27,7 @@
         :isRequired="numberEntryParameters.required"
         :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
         :dbKey="numberEntryParameters.key"
-        @updateNumber="updateUserInformation"
+        @update="updateUserInformation"
       />
       <PhoneNumberEntry
         v-if="isEntryPhoneNumber(authType)"
@@ -36,7 +36,7 @@
         :placeholder="phoneNumberEntryParameters.placeholder"
         :isRequired="phoneNumberEntryParameters.required"
         :dbKey="phoneNumberEntryParameters.key"
-        @updatePhoneNumber="updateUserInformation"
+        @update="updateUserInformation"
       />
       <Datepicker
         v-if="isEntryDate(authType)"
@@ -44,7 +44,7 @@
         :label="dateEntryParameters.label"
         :isRequired="dateEntryParameters.required"
         :dbKey="dateEntryParameters.key"
-        @updateDate="updateUserInformation"
+        @update="updateUserInformation"
       />
     </div>
 
@@ -166,14 +166,13 @@ export default {
       if (this.mounted) {
         return !(
           (this.checkEntryTypeIsNumber
-            ? this.$refs.numberEntry["0"].isNumberEntryCompleteAndValid
+            ? this.$refs.numberEntry["0"].isNumberEntryValid
             : true) &&
           (this.checkEntryTypeIsDate
-            ? this.$refs.dateEntry["0"].isDateEntryCompleteAndValid
+            ? this.$refs.dateEntry["0"].isDateEntryValid
             : true) &&
           (this.checkEntryTypeIsPhoneNumber
-            ? this.$refs.phoneNumberEntry["0"]
-                .isPhoneNumberEntryCompleteAndValid
+            ? this.$refs.phoneNumberEntry["0"].isPhoneNumberEntryValid
             : true)
         );
       }
@@ -258,8 +257,7 @@ export default {
         this.userInformation
       );
       if (!isUserValid) {
-        this.invalidLoginMessage =
-          "Student ID entered is incorrect. Please try again!";
+        this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
       } else {
         if (
           redirectToDestination(

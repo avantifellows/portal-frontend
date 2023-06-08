@@ -254,10 +254,18 @@ export default {
     async authenticate() {
       let isUserValid = await validateUser(
         this.getAuthTypes,
-        this.userInformation
+        this.userInformation,
+        this.$store.state.groupData.userType
       );
-      if (!isUserValid) {
+
+      if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
+      } else if (!isUserValid.isDateOfBirthValid) {
+        this.invalidLoginMessage =
+          "Date of birth entered is incorrect. Please try again!";
+      } else if (!isUserValid.isPhoneNumberValid) {
+        this.invalidLoginMessage =
+          "Phone number entered is incorrect. Please try again!";
       } else {
         if (
           redirectToDestination(

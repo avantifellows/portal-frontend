@@ -80,12 +80,13 @@ import useAssets from "@/assets/assets.js";
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
-import { authToInputParameters } from "../services/authToInputParameters";
-import { validateUser } from "../services/validation.js";
-import { redirectToDestination } from "../services/redirectToDestination";
+import { authToInputParameters } from "@/services/authToInputParameters";
+import { validateUser } from "@/services/validation.js";
+import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 
 const assets = useAssets();
+
 export default {
   name: "SignIn",
   components: {
@@ -97,50 +98,70 @@ export default {
     return {
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
-      invalidLoginMessage: "",
+      invalidLoginMessage: "", // message to display when login is invalid
       mounted: false,
-      numberEntryParameters: {},
-      phoneNumberEntryParameters: {},
-      dateEntryParameters: {},
-      userInformation: {},
+      numberEntryParameters: {}, // stores UI parameters for number entry component
+      phoneNumberEntryParameters: {}, // stores UI parameters for phone number entry component
+      dateEntryParameters: {}, // stores UI parameters for date entry component
+      userInformation: {}, // stores data about the user
     };
   },
-
   mounted() {
     this.mounted = true;
   },
   computed: {
-    /** returns an array of auth types for a session */
+    /**
+     * Retrieves the authentication types.
+     * @returns {string[]} An array of authentication types.
+     */
     getAuthTypes() {
       return this.$store.state.sessionData.authType;
     },
 
-    /** returns images to be displayed for a group */
+    /**
+     * Retrieves the group images.
+     * @returns {string[]} An array of group images.
+     */
     getGroupImages() {
       return this.$store.state.groupData.images;
     },
 
-    /** whether to show an invalid login message */
+    /**
+     * Checks if the invalid login message is shown.
+     * @returns {boolean} True if the invalid login message is not empty, false otherwise.
+     */
     isInvalidLoginMessageShown() {
       return this.invalidLoginMessage != "";
     },
 
-    /** returns if the current session is using number entry */
+    /**
+     * Checks if the entry type is a number.
+     * @returns {boolean} True if the entry type is a number, false otherwise.
+     */
     checkEntryTypeIsNumber() {
       return Object.keys(this.numberEntryParameters).length != 0;
     },
 
-    /** returns if the current session is using date entry */
+    /**
+     * Checks if the entry type is a date.
+     * @returns {boolean} True if the entry type is a date, false otherwise.
+     */
     checkEntryTypeIsDate() {
       return Object.keys(this.dateEntryParameters).length != 0;
     },
 
-    /** returns if the current session is using phone number entry */
+    /**
+     * Checks if the entry type is a phone number.
+     * @returns {boolean} True if the entry type is a phone number, false otherwise.
+     */
     checkEntryTypeIsPhoneNumber() {
       return Object.keys(this.phoneNumberEntryParameters).length != 0;
     },
 
-    /** whether submit button is disabled */
+    /**
+     * Checks if the submit button is disabled.
+     * @returns {boolean} True if the submit button is disabled, false otherwise.
+     * */
     isSubmitButtonDisabled() {
       if (this.mounted) {
         return !(
@@ -160,7 +181,11 @@ export default {
     },
   },
   methods: {
-    /** given an authentication type, it finds a corresponding entry component */
+    /**
+     * Finds the entry type based on the provided authentication type.
+     * @param {string} authType - The authentication type.
+     * @returns {string|undefined} The entry type corresponding to the authentication type, or undefined if not found.
+     */
     findEntryType(authType) {
       return Object.keys(authToInputParameters).find((key) => {
         if (Object.values(authToInputParameters[key]).includes(authType)) {
@@ -169,7 +194,11 @@ export default {
       });
     },
 
-    /** given an authentication type, it returns UI parameters stored against a group */
+    /**
+     * Retrieves the UI parameters for the given authentication type.
+     * @param {string} authType - The authentication type.
+     * @returns {object|undefined} The UI parameters corresponding to the authentication type, or undefined if not found.
+     */
     getUIParameters(authType) {
       let UIParameters;
       Object.keys(this.$store.state.groupData).find((key) => {
@@ -180,7 +209,11 @@ export default {
       return UIParameters;
     },
 
-    /** given an auth type, returns if the auth type is using number entry */
+    /**
+     * Checks if the entry type for the given authentication type is "number".
+     * @param {string} authType - The authentication type.
+     * @returns {boolean} True if the entry type is "number", false otherwise.
+     */
     isEntryNumber(authType) {
       if (this.findEntryType(authType) == "number") {
         this.numberEntryParameters = this.getUIParameters(authType);
@@ -189,7 +222,11 @@ export default {
       return false;
     },
 
-    /** given an auth type, returns if the auth type is using phone number entry */
+    /**
+     * Checks if the entry type for the given authentication type is "phoneNumber".
+     * @param {string} authType - The authentication type.
+     * @returns {boolean} True if the entry type is "phoneNumber", false otherwise.
+     */
     isEntryPhoneNumber(authType) {
       if (this.findEntryType(authType) == "phoneNumber") {
         this.phoneNumberEntryParameters = this.getUIParameters(authType);
@@ -198,7 +235,11 @@ export default {
       return false;
     },
 
-    /** given an auth type, returns if the auth type is using date entry */
+    /**
+     * Checks if the entry type for the given authentication type is "date".
+     * @param {string} authType - The authentication type.
+     * @returns {boolean} True if the entry type is "date", false otherwise.
+     */
     isEntryDate(authType) {
       if (this.findEntryType(authType) == "date") {
         this.dateEntryParameters = this.getUIParameters(authType);
@@ -207,7 +248,10 @@ export default {
       return false;
     },
 
-    /** authenticates the user */
+    /**
+     * Performs authentication by validating the user and redirecting user only if valid.
+     * @returns {Promise<void>} A Promise that resolves once the authentication process is complete.
+     */
     async authenticate() {
       let isUserValid = await validateUser(
         this.getAuthTypes,
@@ -243,14 +287,20 @@ export default {
       }
     },
 
-    /** redirects to sign up */
+    /**
+     * Redirects the user to the sign-up page.
+     */
     redirectToSignUp() {
       this.$router.push({
         name: "Signup",
       });
     },
 
-    /** stores user information based on the value entered by user */
+    /**
+     * Updates the user information object with the provided value for the specified database key.
+     * @param {string} value - The value to update.
+     * @param {string} dbKey - The key corresponding to the user information field in the database.
+     */
     updateUserInformation(value, dbKey) {
       this.userInformation[dbKey] = value;
     },

@@ -16,14 +16,13 @@
         ]"
         v-model="date"
         validation-visibility="dirty"
+        :help="helpText"
         :classes="{
           outer: 'py-2 min-w-full',
           inner: 'p-4 border-2 rounded-md border-gray-500 ',
           input: 'mx-auto focus:border-gray-800 focus:outline-none ',
           help: 'text-xs text-gray-400 pt-2',
           message: 'mx-auto text-red-700 text-xs mb-1',
-        :help="helpText"
-
         }"
       />
     </div>

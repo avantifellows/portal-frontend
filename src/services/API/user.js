@@ -4,6 +4,7 @@ import {
   userSignupEndpoint,
   verifyStudentEndpoint,
 } from "@/services/API/endpoints.js";
+import { checkForUserEndpoint } from "./endpoints";
 
 /**
  * Creates a new user
@@ -65,6 +66,25 @@ export default {
           else {
             throw new Error("User API returned an error:", error);
           }
+        });
+    });
+  },
+
+  verifyUser(userId) {
+    const params = {
+      userID: userId,
+      collectionName: "Candidates",
+      columnName: "phone_number",
+    };
+    return new Promise((resolve) => {
+      client
+        .post(checkForUserEndpoint, JSON.stringify(params))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
         });
     });
   },

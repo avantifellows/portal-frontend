@@ -58,13 +58,18 @@ export default {
     };
   },
   computed: {
-    /** Returns if message for an invalid text entry needs to be shown */
+    /**
+     * Checks if the invalid text entry message is shown.
+     * @returns {boolean} True if the invalid text entry message is not null, false otherwise.
+     */
     isInvalidTextEntryMessageShown() {
       return this.invalidTextEntryMessage != null;
     },
   },
   methods: {
-    /** Determines how the input box should look.
+    /**
+     * Generates the CSS classes for the input box based on the state of the text entry.
+     * @returns {string[]} An array of CSS classes.
      */
     selectInputBoxClasses() {
       return [
@@ -73,7 +78,11 @@ export default {
         },
       ];
     },
-    /** Updates text based on user entry */
+
+    /**
+     * Updates the text value based on user entry
+     * @param {Event} event - The input event.
+     */
     updateTextEntry(event) {
       if (event.target.value.length == 0) {
         this.invalidTextEntryMessage = "";
@@ -82,7 +91,12 @@ export default {
       }
       this.$emit("update", this.text, this.dbKey);
     },
-    /** Checks for valid input of text */
+
+    /**
+     * Checks if the text entry is valid
+     * @param {Event} event - The input event.
+     * @returns {boolean} True if the text entry is valid, prevent user entry otherwise.
+     */
     isValidTextEntry(event) {
       if (validationTypeToFunctionMap["text"](event)) {
         return true;

@@ -5,7 +5,7 @@
     >
       {{ label }}
     </p>
-    <div class="flex flex-row justify-center">
+    <div class="flex flex-row justify-center mt-2">
       <FormKit
         type="date"
         :name="dbKey"
@@ -22,6 +22,8 @@
           input: 'mx-auto focus:border-gray-800 focus:outline-none ',
           help: 'text-xs text-gray-400 pt-2',
           message: 'mx-auto text-red-700 text-xs mb-1',
+        :help="helpText"
+
         }"
       />
     </div>
@@ -36,13 +38,15 @@ export default {
       type: String,
       default: "",
     },
-
     isRequired: {
       type: Boolean,
       default: false,
     },
-
     dbKey: {
+      type: String,
+      default: "",
+    },
+    helpText: {
       type: String,
       default: "",
     },
@@ -53,12 +57,19 @@ export default {
     };
   },
   watch: {
-    date(newValue, oldValue) {
+    /**
+     * Emits 'update' event whenever the date value is changed
+     */
+    date() {
       this.$emit("update", this.date, this.dbKey);
     },
   },
   computed: {
-    isDateEntryCompleteAndValid() {
+    /**
+     * Checks if the number entry is valid.
+     * @returns {boolean} True if the number entry is valid, or if it is not required. False otherwise.
+     */
+    isDateEntryValid() {
       return this.isRequired ? this.date != "" : true;
     },
   },

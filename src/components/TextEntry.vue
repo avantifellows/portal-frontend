@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
     >
       {{ label }}
     </p>
@@ -12,7 +12,7 @@
         inputmode="text"
         :placeholder="placeholder"
         :required="isRequired"
-        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2"
+        class="border-2 min-w-full rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none my-2"
         :class="selectInputBoxClasses()"
         @keypress="isValidTextEntry($event)"
         @input="updateTextEntry($event)"
@@ -32,7 +32,7 @@ import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.j
 
 export default {
   name: "TextEntry",
-  emits: ["valid-entry"],
+  emits: ["update"],
   props: {
     label: {
       type: String,
@@ -46,7 +46,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    key: {
+    dbKey: {
       type: String,
       default: "",
     },
@@ -86,7 +86,10 @@ export default {
     updateTextEntry(event) {
       if (event.target.value.length == 0) {
         this.invalidTextEntryMessage = "";
-      } else this.text = event.target.value.toString();
+      } else {
+        this.text = event.target.value.toString();
+      }
+      this.$emit("update", this.text, this.dbKey);
     },
 
     /**

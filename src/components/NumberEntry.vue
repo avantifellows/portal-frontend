@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+      class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
     >
       {{ label }}
     </p>
@@ -107,8 +107,8 @@ export default {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
-        this.$emit("update", this.number, this.dbKey);
       }
+      this.$emit("update", this.number, this.dbKey);
     },
 
     /**

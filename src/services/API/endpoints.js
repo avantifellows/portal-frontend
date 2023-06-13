@@ -5,6 +5,6 @@ export const verifyOTPEndpoint = "/verifyotp";
 export const getSessionDataEndpoint = "/getSessionData";
 export const checkBirthdateEndpoint = "/checkBirthdate";
 export const studentSignupEndpoint = "/studentSignup";
-export const userSignupEndpoint = "/userSignup";
+export const userSignupEndpoint = "/user/";
 export const verifyStudentEndpoint = "/student/verify";
 export const checkForUserEndpoint = "/checkForUser";

@@ -58,7 +58,6 @@
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
-      data-cy="submitButton"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
     >

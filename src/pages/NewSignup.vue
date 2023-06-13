@@ -9,7 +9,7 @@
   </div>
 
   <div
-    class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+    class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
@@ -21,24 +21,28 @@
     class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
   >
     <p
-      class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
+      class="text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5 uppercase"
     >
       {{ formTitle }}
     </p>
 
-    <component
-      v-for="(formField, index) in formFields"
-      :key="index"
-      :is="formField.component"
-      :label="formField.label"
-      :isRequired="formField.isRequired"
-      :dbKey="formField.key"
-      :placeholder="formField.placeholder"
-      :options="formField.options"
-      :multiple="formField.multiple"
-      :maxLengthOfEntry="formField.maxLengthOfEntry"
-      @update="updateUserData"
-    />
+    <div class="mx-auto w-full xl:w-1/2">
+      <component
+        class="mx-auto w-1/2 lg:w-1/4 my-4"
+        v-for="(formField, index) in formFields"
+        :key="index"
+        :is="formField.component"
+        :label="formField.label"
+        :isRequired="formField.isRequired"
+        :dbKey="formField.key"
+        :placeholder="formField.placeholder"
+        :options="getOptions(formField)"
+        :multiple="formField.multiple"
+        :maxLengthOfEntry="formField.maxLengthOfEntry"
+        :helpText="formField.helpText"
+        @update="updateUserData"
+      />
+    </div>
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
@@ -54,7 +58,7 @@
   >
     <template v-if="idGeneration">
       <p>
-        Your ID is <b>{{ studentId }}</b>
+        Your ID is <b>{{ userId }}</b>
       </p>
       <p>Please note this down. Use this to sign-in going forward.</p>
     </template>
@@ -74,7 +78,9 @@ import formData from "../components/formData.json";
 import { typeToInputParameters } from "../services/authToInputParameters";
 import { redirectToDestination } from "../services/redirectToDestination";
 import UserAPI from "@/services/API/user.js";
+import useAssets from "@/assets/assets.js";
 
+const assets = useAssets();
 export default {
   name: "SignUp",
   data() {
@@ -83,12 +89,13 @@ export default {
       userData: {},
       formSubmitted: false,
       signUpDisabled: true,
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
+      userId: "",
     };
   },
   watch: {
     userData: {
       handler() {
-        console.log(this.userData);
         this.isUserDataIsComplete();
       },
       deep: true,
@@ -127,6 +134,14 @@ export default {
     },
   },
   methods: {
+    getOptions(field) {
+      if (field.dependant) {
+        if (this.userData[field.dependantField])
+          return field.dependantFieldMapping[
+            this.userData[field.dependantField]
+          ];
+      } else return field.options;
+    },
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;
@@ -158,10 +173,11 @@ export default {
         this.$store.state.sessionData.idGeneration
       );
 
-      if (userId == "") {
+      if (createdUserId == "" || createdUserId.error) {
         this.$router.push({
           name: "Error",
           state: {
+            type: "500",
             text: "ID could not be created. Please contact your program manager.",
           },
         });

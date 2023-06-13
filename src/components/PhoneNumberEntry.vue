@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
     >
       Enter your phone number / अपना फोन नंबर डालें
     </p>
@@ -70,6 +70,7 @@ export default {
       } else {
         this.invalidPhoneNumberMessage = "";
       }
+      this.$emit("update", this.phoneNumber, this.dbKey);
     },
     /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
     isValidPhoneNumberEntry(event) {

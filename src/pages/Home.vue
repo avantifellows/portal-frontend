@@ -12,6 +12,8 @@
   </div>
   <LandingPage v-if="isLandingPage" />
   <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+  <NewSignup v-if="isSessionTypeSignUp && doesGroupExist" />
+
   <div v-else>
     <div v-if="isAuthTypeID && doesGroupExist">
       <Entry
@@ -36,7 +38,8 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
-import NewSignIn from "@/pages/NewSignin.vue";
+import NewSignin from "@/pages/NewSignin.vue";
+import NewSignup from "@/pages/NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
 import Entry from "@/components/Entry.vue";
 
@@ -47,7 +50,8 @@ export default {
   name: "Home",
   components: {
     NoClassMessage,
-    NewSignIn,
+    NewSignup,
+    NewSignin,
     LandingPage,
     Entry,
   },
@@ -140,6 +144,9 @@ export default {
      */
     isSessionTypeSignIn() {
       return this.sessionData && this.sessionData.type == "sign-in";
+    },
+    isSessionTypeSignUp() {
+      return this.sessionData && this.sessionData.type == "sign-up";
     },
 
     /**

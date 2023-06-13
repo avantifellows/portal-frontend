@@ -282,7 +282,7 @@ export default {
             this.$store.state.sessionData.redirectPlatformParams.id,
             this.userInformation,
             this.getAuthTypes,
-            this.this.$store.state.sessionData.group,
+            this.$store.state.sessionData.group,
             this.$store.state.groupData.userType,
             this.$store.state.sessionData.sessionId,
             this.$store.state.sessionData.userIpAddress,

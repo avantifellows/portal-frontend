@@ -12,19 +12,21 @@
   </div>
   <LandingPage v-if="isLandingPage" />
   <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-  <div v-if="isAuthTypeID && doesGroupExist">
-    <Entry
-      :redirectTo="getRedirectTo"
-      :redirectId="getRedirectId"
-      :purpose="getPurpose"
-      :purposeParams="getPurposeParams"
-      :groupData="groupData"
-      :group="getGroup"
-      :authType="getAuthType"
-      :sessionId="sessionId"
-      :userIpAddress="getUserIpAddress"
-      :isExtraInputValidationRequired="isExtraInputValidationsRequired"
-    />
+  <div v-else>
+    <div v-if="isAuthTypeID && doesGroupExist">
+      <Entry
+        :redirectTo="getRedirectTo"
+        :redirectId="getRedirectId"
+        :purpose="getPurpose"
+        :purposeParams="getPurposeParams"
+        :groupData="groupData"
+        :group="getGroup"
+        :authType="getAuthType"
+        :sessionId="sessionId"
+        :userIpAddress="getUserIpAddress"
+        :isExtraInputValidationRequired="isExtraInputValidationsRequired"
+      />
+    </div>
   </div>
 </template>
 

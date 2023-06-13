@@ -18,7 +18,7 @@
         validation-visibility="dirty"
         :help="helpText"
         :classes="{
-          outer: 'py-2 min-w-full',
+          outer: 'py-2',
           inner: 'p-4 border-2 rounded-md border-gray-500 ',
           input: 'mx-auto focus:border-gray-800 focus:outline-none ',
           help: 'text-xs text-gray-400 pt-2',

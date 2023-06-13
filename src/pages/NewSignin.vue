@@ -87,7 +87,7 @@ import { sendSQSMessage } from "@/services/API/sqs";
 const assets = useAssets();
 
 export default {
-  name: "SignIn",
+  name: "NewSignIn",
   components: {
     NumberEntry,
     Datepicker,

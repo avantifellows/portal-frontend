@@ -70,7 +70,6 @@ export default {
       } else {
         this.invalidPhoneNumberMessage = "";
       }
-      this.$emit("update", this.phoneNumber, this.dbKey);
     },
     /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
     isValidPhoneNumberEntry(event) {

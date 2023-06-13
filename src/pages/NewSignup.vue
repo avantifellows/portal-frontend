@@ -82,7 +82,7 @@ import useAssets from "@/assets/assets.js";
 
 const assets = useAssets();
 export default {
-  name: "SignUp",
+  name: "NewSignUp",
   data() {
     return {
       isLoading: false,

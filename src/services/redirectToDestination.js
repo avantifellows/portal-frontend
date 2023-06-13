@@ -22,8 +22,6 @@ export function redirectToDestination(
   let userID =
     typeof userIDList == "string" ? userIDList : userIDList[0]["userID"];
 
-  console.log(redirectTo);
-
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
@@ -48,7 +46,6 @@ export function redirectToDestination(
     case "report": {
       redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
       fullURL = redirectURL + "/" + redirectId + "/" + userID;
-      console.log(fullURL, "logging full url")
       break;
     }
     case "meet": {
@@ -87,7 +84,6 @@ export function redirectToDestination(
     }
   }
 
-  console.log(fullURL);
   window.open(fullURL, "_self");
   return true;
 }

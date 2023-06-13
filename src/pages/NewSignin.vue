@@ -27,7 +27,7 @@
         :isRequired="numberEntryParameters.required"
         :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
         :dbKey="numberEntryParameters.key"
-        @updateNumber="updateUserInformation"
+        @update="updateUserInformation"
       />
       <PhoneNumberEntry
         v-if="isEntryPhoneNumber(authType)"
@@ -36,7 +36,7 @@
         :placeholder="phoneNumberEntryParameters.placeholder"
         :isRequired="phoneNumberEntryParameters.required"
         :dbKey="phoneNumberEntryParameters.key"
-        @updatePhoneNumber="updateUserInformation"
+        @updater="updateUserInformation"
       />
       <Datepicker
         v-if="isEntryDate(authType)"
@@ -44,7 +44,7 @@
         :label="dateEntryParameters.label"
         :isRequired="dateEntryParameters.required"
         :dbKey="dateEntryParameters.key"
-        @updateDate="updateUserInformation"
+        @update="updateUserInformation"
       />
     </div>
 
@@ -79,9 +79,9 @@
 import useAssets from "@/assets/assets.js";
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
-import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
+import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
 import { authToInputParameters } from "@/services/authToInputParameters";
-import { validateUser } from "@/services/validation.js";
+import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 
@@ -166,14 +166,13 @@ export default {
       if (this.mounted) {
         return !(
           (this.checkEntryTypeIsNumber
-            ? this.$refs.numberEntry["0"].isNumberEntryCompleteAndValid
+            ? this.$refs.numberEntry["0"].isNumberEntryValid
             : true) &&
           (this.checkEntryTypeIsDate
-            ? this.$refs.dateEntry["0"].isDateEntryCompleteAndValid
+            ? this.$refs.dateEntry["0"].isDateEntryValid
             : true) &&
           (this.checkEntryTypeIsPhoneNumber
-            ? this.$refs.phoneNumberEntry["0"]
-                .isPhoneNumberEntryCompleteAndValid
+            ? this.$refs.phoneNumberEntry["0"].isPhoneNumberEntryValid
             : true)
         );
       }
@@ -255,11 +254,17 @@ export default {
     async authenticate() {
       let isUserValid = await validateUser(
         this.getAuthTypes,
-        this.userInformation
+        this.userInformation,
+        this.$store.state.groupData.userType
       );
-      if (!isUserValid) {
+      if (!isUserValid.isUserIdValid) {
+        this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
+      } else if (!isUserValid.isDateOfBirthValid) {
         this.invalidLoginMessage =
-          "Student ID entered is incorrect. Please try again!";
+          "Date of birth entered is incorrect. Please try again!";
+      } else if (!isUserValid.isPhoneNumberValid) {
+        this.invalidLoginMessage =
+          "Phone number entered is incorrect. Please try again!";
       } else {
         if (
           redirectToDestination(

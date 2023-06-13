@@ -1,0 +1,32 @@
+{
+        "title": "Sign up form",
+        "fields": [
+                {
+                        "key": "first_name",
+                        "label": "First Name",
+                        "isRequired": true,
+                        "type": "text",
+                        "placeholder": "Your First Name"
+                },
+                {
+                        "key": "last_name",
+                        "label": "Last Name",
+                        "isRequired": true,
+                        "type": "text",
+                        "placeholder": "Your Last Name"
+                },
+                {
+                        "key": "dob",
+                        "label": "Date of Birth",
+                        "isRequired": true,
+                        "type": "date"
+                },
+                {
+                        "key": "phone_number",
+                        "label": "Phone Number",
+                        "isRequired": true,
+                        "type": "phone",
+                        "placeholder": "Your Phone Number"
+                }
+        ]
+}

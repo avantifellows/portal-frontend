@@ -15,7 +15,6 @@
         validation-visibility="dirty"
         :multiple="multiple"
         :name="dbKey"
-        :help="helpText"
       />
     </div>
   </div>
@@ -48,6 +47,10 @@ export default {
     dbKey: {
       type: String,
       default: "",
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

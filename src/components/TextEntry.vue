@@ -12,7 +12,7 @@
         inputmode="text"
         :placeholder="placeholder"
         :required="isRequired"
-        class="border-2 min-w-full rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none my-2"
+        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none my-2"
         :class="selectInputBoxClasses()"
         @keypress="isValidTextEntry($event)"
         @input="updateTextEntry($event)"

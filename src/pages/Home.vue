@@ -7,15 +7,26 @@
       />
     </div>
   </div>
+  <div v-if="isPurposeRegistration">
+    <Signup />
+  </div>
+
   <div v-if="!sessionEnabled">
     <NoClassMessage />
   </div>
   <LandingPage v-if="isLandingPage" />
   <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-  <NewSignup v-if="isSessionTypeSignUp && doesGroupExist" />
+  <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
 
   <div v-else>
-    <div v-if="isAuthTypeID && doesGroupExist">
+    <div
+      v-if="
+        isAuthTypeID &&
+        doesGroupExist &&
+        !isSessionTypeSignIn &&
+        !isSessionTypeSignUp
+      "
+    >
       <Entry
         :redirectTo="getRedirectTo"
         :redirectId="getRedirectId"
@@ -38,10 +49,11 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
-import NewSignin from "@/pages/NewSignin.vue";
-import NewSignup from "@/pages/NewSignup.vue";
+import NewSignIn from "./NewSignin.vue";
+import NewSignUp from "./NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
 import Entry from "@/components/Entry.vue";
+import Signup from "@/components/Signup.vue";
 
 const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
@@ -50,10 +62,11 @@ export default {
   name: "Home",
   components: {
     NoClassMessage,
-    NewSignup,
-    NewSignin,
+    NewSignUp,
+    NewSignIn,
     LandingPage,
     Entry,
+    Signup,
   },
   props: {
     /** The resource we are redirecting to */
@@ -104,6 +117,9 @@ export default {
   },
 
   computed: {
+    isPurposeRegistration() {
+      return this.sessionData ? this.getPurpose == "registration" : false;
+    },
     /** TEMP - Returns IP address of user */
     getUserIpAddress() {
       return this.sessionData ? this.sessionData.userIp : "";
@@ -162,7 +178,7 @@ export default {
      * @returns {string} The redirect destination.
      */
     getRedirectTo() {
-      return this.redirectTo == ""
+      return this.redirectTo == "" && this.sessionData != null
         ? this.sessionData.redirectPlatform
         : this.redirectTo;
     },
@@ -172,7 +188,7 @@ export default {
      * @returns {string} The redirect ID.
      */
     getRedirectId() {
-      return this.redirectId == ""
+      return this.redirectId == "" && this.sessionData != null
         ? this.sessionData.redirectPlatformParams.id
         : this.redirectId;
     },
@@ -190,7 +206,9 @@ export default {
      * @returns {string} The purpose.
      */
     getPurpose() {
-      return this.purpose == "" ? this.sessionData.purpose : this.purpose;
+      return this.purpose == "" && this.sessionData != null
+        ? this.sessionData.purpose
+        : this.purpose;
     },
 
     /**
@@ -198,7 +216,7 @@ export default {
      * @returns {object} The purpose parameters.
      */
     getPurposeParams() {
-      return this.purposeParams == ""
+      return this.purposeParams == "" && this.sessionData != null
         ? this.sessionData.purposeParams
         : this.purposeParams;
     },

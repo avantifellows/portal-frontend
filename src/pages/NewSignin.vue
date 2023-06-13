@@ -16,7 +16,7 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
+  <div class="flex flex-col my-auto h-full py-10 space-y-4">
     <!-- different input components -->
     <div v-for="(authType, index) in getAuthTypes" :key="`id-${index}`">
       <NumberEntry
@@ -36,7 +36,7 @@
         :placeholder="phoneNumberEntryParameters.placeholder"
         :isRequired="phoneNumberEntryParameters.required"
         :dbKey="phoneNumberEntryParameters.key"
-        @updater="updateUserInformation"
+        @update="updateUserInformation"
       />
       <Datepicker
         v-if="isEntryDate(authType)"

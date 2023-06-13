@@ -8,60 +8,47 @@
     <div class="flex flex-row justify-center">
       <FormKit
         type="file"
-        label="Documents"
+        :name="dbKey"
         accept=".pdf,.doc,.docx,.xml,.md,.csv"
-        help="Select as many documents as you would like."
+        :help="helpText"
         multiple="true"
+        :value="value"
       />
     </div>
-    <span
-      v-if="isInvalidEntryMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-      >{{ invalidEntryMessage }}</span
-    >
   </div>
 </template>
 <script>
-import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-
 export default {
-  name: "Dropdown",
+  name: "Upload",
   props: {
     label: {
       type: String,
       default: "",
     },
-    placeholder: {
-      type: String,
-      defult: "",
-    },
     isRequired: {
       type: Boolean,
       default: false,
-    },
-    options: {
-      type: Array,
-      default: [],
     },
     helpText: {
       type: String,
       default: "",
     },
-    key: {
+    dbKey: {
       type: String,
       default: "",
     },
   },
   data() {
     return {
-      key: "",
-      invalidEntryMessage: "",
+      value: "",
     };
   },
-  computed: {
-    /** Returns if message for an invalid text entry needs to be shown */
-    isInvalidEntryMessageShown() {
-      return this.invalidEntryMessage != null;
+  watch: {
+    /**
+     * Emits 'update' event whenever the upload value is changed
+     */
+    value() {
+      this.$emit("update", this.value, this.dbKey);
     },
   },
 };

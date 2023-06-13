@@ -11,11 +11,6 @@
         validation-visibility="dirty"
       />
     </div>
-    <span
-      v-if="isInvalidEntryMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-      >{{ invalidEntryMessage }}</span
-    >
   </div>
 </template>
 <script>
@@ -43,18 +38,14 @@ export default {
   data() {
     return {
       value: "",
-      invalidEntryMessage: "",
     };
   },
   watch: {
-    value(newValue, oldValue) {
+    /**
+     * Emits 'update' event whenever the checkbox value is changed
+     */
+    value() {
       this.$emit("update", this.value, this.dbKey);
-    },
-  },
-  computed: {
-    /** Returns if message for an invalid text entry needs to be shown */
-    isInvalidEntryMessageShown() {
-      return this.invalidEntryMessage != null;
     },
   },
 };

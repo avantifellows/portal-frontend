@@ -14,7 +14,7 @@ export default {
   userSignup(formData) {
     return new Promise((resolve) => {
       client
-        .post(userSignupEndpoint, JSON.stringify(formData))
+        .post(userSignupEndpoint, JSON.stringify(formData, idGeneration))
         .then((response) => {
           resolve(response.data.toString());
         })

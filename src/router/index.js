@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
 import Sentry from "@/pages/Sentry.vue";
 import Error from "@/pages/Error.vue";
-
+import Signup from "@/components/Signup.vue";
 // legacy URLs support redirectID, new URLs must use redirectId
 const allowedQueryParams = [
   "sessionId",
@@ -31,6 +31,11 @@ const routes = [
     }),
   },
   {
+    path: "/sign-up",
+    name: "Signup",
+    component: Signup,
+  },
+  {
     path: "/404-not-found",
     name: "Error",
     props: true,
@@ -49,7 +54,7 @@ const router = createRouter({
   mode: "history",
 });
 
-/** Check if correct query params exist */
+// /** Check if correct query params exist */
 router.beforeEach((to) => {
   const queryParams = Object.keys(to.query);
   const validQueryParams = queryParams.every((queryParam) =>

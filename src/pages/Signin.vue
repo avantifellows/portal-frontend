@@ -16,7 +16,7 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto h-full py-10 space-y-4">
+  <div class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
     <!-- different input components -->
     <div v-for="(authType, index) in getAuthTypes" :key="`id-${index}`">
       <NumberEntry
@@ -27,7 +27,7 @@
         :isRequired="numberEntryParameters.required"
         :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
         :dbKey="numberEntryParameters.key"
-        @update="updateUserInformation"
+        @updateNumber="updateUserInformation"
       />
       <PhoneNumberEntry
         v-if="isEntryPhoneNumber(authType)"
@@ -36,7 +36,7 @@
         :placeholder="phoneNumberEntryParameters.placeholder"
         :isRequired="phoneNumberEntryParameters.required"
         :dbKey="phoneNumberEntryParameters.key"
-        @update="updateUserInformation"
+        @updatePhoneNumber="updateUserInformation"
       />
       <Datepicker
         v-if="isEntryDate(authType)"
@@ -44,7 +44,7 @@
         :label="dateEntryParameters.label"
         :isRequired="dateEntryParameters.required"
         :dbKey="dateEntryParameters.key"
-        @update="updateUserInformation"
+        @updateDate="updateUserInformation"
       />
     </div>
 
@@ -166,13 +166,14 @@ export default {
       if (this.mounted) {
         return !(
           (this.checkEntryTypeIsNumber
-            ? this.$refs.numberEntry["0"].isNumberEntryValid
+            ? this.$refs.numberEntry["0"].isNumberEntryCompleteAndValid
             : true) &&
           (this.checkEntryTypeIsDate
-            ? this.$refs.dateEntry["0"].isDateEntryValid
+            ? this.$refs.dateEntry["0"].isDateEntryCompleteAndValid
             : true) &&
           (this.checkEntryTypeIsPhoneNumber
-            ? this.$refs.phoneNumberEntry["0"].isPhoneNumberEntryValid
+            ? this.$refs.phoneNumberEntry["0"]
+                .isPhoneNumberEntryCompleteAndValid
             : true)
         );
       }
@@ -254,18 +255,11 @@ export default {
     async authenticate() {
       let isUserValid = await validateUser(
         this.getAuthTypes,
-        this.userInformation,
-        this.$store.state.groupData.userType
+        this.userInformation
       );
-
-      if (!isUserValid.isUserIdValid) {
-        this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
-      } else if (!isUserValid.isDateOfBirthValid) {
+      if (!isUserValid) {
         this.invalidLoginMessage =
-          "Date of birth entered is incorrect. Please try again!";
-      } else if (!isUserValid.isPhoneNumberValid) {
-        this.invalidLoginMessage =
-          "Phone number entered is incorrect. Please try again!";
+          "Student ID entered is incorrect. Please try again!";
       } else {
         if (
           redirectToDestination(

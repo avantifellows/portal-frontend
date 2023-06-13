@@ -5,7 +5,7 @@
     >
       {{ label }}
     </p>
-    <div class="flex flex-row justify-center mt-2">
+    <div class="flex flex-row justify-center">
       <FormKit
         type="date"
         :name="dbKey"
@@ -18,10 +18,11 @@
         validation-visibility="dirty"
         :help="helpText"
         :classes="{
-          inner: ' px-4 py-1.5 border rounded-md border-gray-500 ',
+          outer: 'py-2 min-w-full',
+          inner: 'p-4 border-2 rounded-md border-gray-500 ',
           input: 'mx-auto  focus:border-gray-800 focus:outline-none ',
-          help: 'text-sm text-gray-400 pt-2',
-          message: 'mx-auto text-red-700 text-sm text-center',
+          help: 'text-xs text-gray-400 pt-2',
+          message: 'mx-auto text-red-700 text-base mb-1',
         }"
       />
     </div>
@@ -60,15 +61,6 @@ export default {
      */
     date() {
       this.$emit("update", this.date, this.dbKey);
-    },
-  },
-  computed: {
-    /**
-     * Checks if the number entry is valid.
-     * @returns {boolean} True if the number entry is valid, or if it is not required. False otherwise.
-     */
-    isDateEntryValid() {
-      return this.isRequired ? this.date != "" : true;
     },
   },
 };

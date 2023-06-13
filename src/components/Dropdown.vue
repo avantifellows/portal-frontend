@@ -16,6 +16,12 @@
         :multiple="multiple"
         :name="dbKey"
         :help="helpText"
+        :classes="{
+          outer: 'py-2  min-w-full',
+          inner: 'p-4 border-2 rounded-md border-gray-500 ',
+          input: 'mx-auto min-w-full focus:border-gray-800 focus:outline-none ',
+          help: 'text-xs text-gray-400 pt-2',
+        }"
       />
     </div>
   </div>

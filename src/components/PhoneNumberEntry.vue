@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center">
     <p
-      class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
+      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
     >
       {{ label }}
     </p>
@@ -65,12 +65,7 @@ export default {
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
-
-    /**
-     * Checks if the phone number entry is valid.
-     * @returns {boolean} True if the phone number entry is valid, or if it is not required. False otherwise.
-     */
-    isPhoneNumberEntryValid() {
+    isPhoneNumberEntryCompleteAndValid() {
       return this.isRequired
         ? this.phoneNumber != "" && this.invalidPhoneNumberMessage == ""
         : this.invalidPhoneNumberMessage == "";
@@ -103,8 +98,10 @@ export default {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
       } else {
         this.invalidPhoneNumberMessage = "";
-        this.$emit("update", this.phoneNumber, this.dbKey);
+        this.$emit("update", this.number, this.dbKey);
       }
+
+      this.$emit("update", this.phoneNumber, this.dbKey);
     },
 
     /**

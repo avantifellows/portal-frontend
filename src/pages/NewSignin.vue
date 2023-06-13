@@ -78,9 +78,9 @@
 import useAssets from "@/assets/assets.js";
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
-import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
+import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
 import { authToInputParameters } from "@/services/authToInputParameters";
-import { validateUser } from "@/services/validation.js";
+import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 
@@ -256,7 +256,6 @@ export default {
         this.userInformation,
         this.$store.state.groupData.userType
       );
-
       if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
       } else if (!isUserValid.isDateOfBirthValid) {
@@ -282,7 +281,7 @@ export default {
             this.$store.state.sessionData.redirectPlatformParams.id,
             this.userInformation,
             this.getAuthTypes,
-            this.this.$store.state.sessionData.group,
+            this.$store.state.sessionData.group,
             this.$store.state.groupData.userType,
             this.$store.state.sessionData.sessionId,
             this.$store.state.sessionData.userIpAddress,

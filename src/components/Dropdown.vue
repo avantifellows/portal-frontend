@@ -55,6 +55,10 @@ export default {
       type: String,
       default: "",
     },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {

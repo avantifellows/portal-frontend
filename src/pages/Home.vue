@@ -11,8 +11,25 @@
     <NoClassMessage />
   </div>
   <LandingPage v-if="isLandingPage" />
-  <SignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-  <SignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+  <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+  <NewSignup v-if="isSessionTypeSignUp && doesGroupExist" />
+
+  <div v-else>
+    <div v-if="isAuthTypeID && doesGroupExist">
+      <Entry
+        :redirectTo="getRedirectTo"
+        :redirectId="getRedirectId"
+        :purpose="getPurpose"
+        :purposeParams="getPurposeParams"
+        :groupData="groupData"
+        :group="getGroup"
+        :authType="getAuthType"
+        :sessionId="sessionId"
+        :userIpAddress="getUserIpAddress"
+        :isExtraInputValidationRequired="isExtraInputValidationsRequired"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -21,19 +38,22 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import useAssets from "@/assets/assets.js";
 import { useToast } from "vue-toastification";
-import SignIn from "@/pages/Signin.vue";
-import SignUp from "@/pages/Signup.vue";
+import NewSignin from "@/pages/NewSignin.vue";
+import NewSignup from "@/pages/NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
+import Entry from "@/components/Entry.vue";
 
+const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
 
 export default {
   name: "Home",
   components: {
     NoClassMessage,
-    SignUp,
-    SignIn,
+    NewSignup,
+    NewSignin,
     LandingPage,
+    Entry,
   },
   props: {
     /** The resource we are redirecting to */
@@ -84,6 +104,40 @@ export default {
   },
 
   computed: {
+    /** TEMP - Returns IP address of user */
+    getUserIpAddress() {
+      return this.sessionData ? this.sessionData.userIp : "";
+    },
+    /** TEMP - Whether authentication method chosen is an ID entry */
+    isAuthTypeID() {
+      return this.getAuthType.includes("ID");
+    },
+    /** TEMP - Returns how many authentication methods should be used */
+    getLengthOfAuthType() {
+      return this.getAuthType.split(",").length;
+    },
+
+    /** TEMP - Checks if the authentication methods mentioned are valid */
+    areAuthTypesValid() {
+      let validCount = 0;
+      this.getAuthType.split(",").every((authType) => {
+        validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
+        return validCount;
+      });
+      return validCount == this.getLengthOfAuthType;
+    },
+
+    /** TEMP - Apart from ID, are any extra inputs being validated. */
+    isExtraInputValidationsRequired() {
+      return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
+    },
+
+    /** TEMP - Returns the auth methods used by each group */
+    getAuthType() {
+      return this.groupData && this.groupData.authType
+        ? this.groupData.authType
+        : "ID";
+    },
     /**
      * Checks if the session type is a sign-in.
      * @returns {boolean} True if the session type is a sign-in, false otherwise.

@@ -230,8 +230,15 @@ export default {
           this.sessionEnabled = this.sessionData.sessionActive;
         }
       }
-      if (!this.sessionData.error && this.sessionEnabled)
-        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      if (!this.sessionData.error && this.sessionEnabled) {
+        let groupSessionMapping = await sessionAPIService.getGroupId(
+          this.sessionData.id
+        );
+        this.groupData = await groupAPIService.getGroupData({
+          id: groupSessionMapping.group_id,
+        });
+      }
+
       this.$store.dispatch("setGroupData", this.groupData);
       if (!this.sessionData.error && this.groupData && this.groupData.error) {
         // GroupAPI returns an error
@@ -244,7 +251,9 @@ export default {
         });
       }
     } else {
-      this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      this.groupData = await groupAPIService.getGroupData({
+        name: this.getGroup,
+      });
       this.$store.dispatch("setGroupData", this.groupData);
       if (this.groupData && this.groupData.error) {
         // GroupAPI returns an error

@@ -1,4 +1,5 @@
-import { client, dbClient } from "@/services/API/rootClient.js";
+
+import { dbClient } from "@/services/API/rootClient.js";
 import {
   getSessionDataEndpoint,
   sessionGroupEndpoint,
@@ -10,12 +11,9 @@ export default {
    * @param {String} sessionId - the ID of the session whose data needs to be retrieved
    */
   getSessionData(sessionId) {
-    const params = {
-      sessionId: sessionId,
-    };
     return new Promise((resolve) => {
-      client
-        .post(getSessionDataEndpoint, JSON.stringify(params))
+      dbClient
+        .get(getSessionDataEndpoint + "/" + sessionId)
         .then((response) => {
           resolve(response.data);
         })

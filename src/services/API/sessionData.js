@@ -1,5 +1,9 @@
+
 import { dbClient } from "@/services/API/rootClient.js";
-import { getSessionDataEndpoint } from "@/services/API/endpoints.js";
+import {
+  getSessionDataEndpoint,
+  sessionGroupEndpoint,
+} from "@/services/API/endpoints.js";
 
 export default {
   /**
@@ -10,6 +14,19 @@ export default {
     return new Promise((resolve) => {
       dbClient
         .get(getSessionDataEndpoint + "/" + sessionId)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("Session API returned an error:", error);
+        });
+    });
+  },
+  getGroupId(sessionId) {
+    return new Promise((resolve) => {
+      dbClient
+        .post(sessionGroupEndpoint, JSON.stringify(sessionId))
         .then((response) => {
           resolve(response.data);
         })

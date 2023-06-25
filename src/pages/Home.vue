@@ -14,12 +14,14 @@
   <div v-if="!sessionEnabled">
     <NoClassMessage />
   </div>
+
   <LandingPage v-if="isLandingPage" />
+
   <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
   <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
 
   <div v-else>
-    <div
+    <!-- <div
       v-if="
         isAuthTypeID &&
         doesGroupExist &&
@@ -39,7 +41,7 @@
         :userIpAddress="getUserIpAddress"
         :isExtraInputValidationRequired="isExtraInputValidationsRequired"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -179,7 +181,7 @@ export default {
      */
     getRedirectTo() {
       return this.redirectTo == "" && this.sessionData != null
-        ? this.sessionData.redirectPlatform
+        ? this.sessionData.platform
         : this.redirectTo;
     },
 
@@ -189,7 +191,7 @@ export default {
      */
     getRedirectId() {
       return this.redirectId == "" && this.sessionData != null
-        ? this.sessionData.redirectPlatformParams.id
+        ? this.sessionData.platform_id
         : this.redirectId;
     },
 
@@ -198,7 +200,7 @@ export default {
      * @returns {string} The group.
      */
     getGroup() {
-      return this.sessionId == null ? this.group : this.sessionData.group;
+      return this.group;
     },
 
     /**
@@ -266,24 +268,28 @@ export default {
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
         this.$store.dispatch("setSessionId", this.sessionId);
-        if ("sessionActive" in this.sessionData) {
-          this.sessionEnabled = this.sessionData.sessionActive;
+        if ("is_session_open" in this.sessionData) {
+          this.sessionEnabled = this.sessionData.is_session_open;
         }
       }
 
       /** If session is open, retrieve group data and store it */
-      if (!this.sessionData.error && this.sessionEnabled)
-        this.groupData = await groupAPIService.getGroupData(this.getGroup);
-      this.$store.dispatch("setGroupData", this.groupData);
-      if (!this.sessionData.error && this.groupData && this.groupData.error) {
-        /** Group API returns an error*/
-        this.toast.error("Network Error, please try again!", {
-          position: "top-center",
-          timeout: false,
-          closeOnClick: false,
-          draggable: false,
-          closeButton: false,
-        });
+      if (!this.sessionData.error && this.sessionEnabled) {
+        this.groupData = await groupAPIService.getGroupName(
+          this.sessionData.id
+        );
+        //this.groupData = await groupAPIService.getGroupData(groupName);
+        this.$store.dispatch("setGroupData", this.groupData);
+        if (!this.sessionData.error && this.groupData && this.groupData.error) {
+          /** Group API returns an error*/
+          this.toast.error("Network Error, please try again!", {
+            position: "top-center",
+            timeout: false,
+            closeOnClick: false,
+            draggable: false,
+            closeButton: false,
+          });
+        }
       }
     } else {
       /**
@@ -302,6 +308,7 @@ export default {
         });
       }
     }
+
     this.isLoading = false;
   },
 };

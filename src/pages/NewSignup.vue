@@ -74,13 +74,14 @@
   </div>
 </template>
 <script>
-import formData from "../components/formData.json";
-import { typeToInputParameters } from "../services/authToInputParameters";
-import { redirectToDestination } from "../services/redirectToDestination";
+import { typeToInputParameters } from "@/services/authToInputParameters";
+import { redirectToDestination } from "@/services/redirectToDestination";
 import UserAPI from "@/services/API/user.js";
+import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 
 const assets = useAssets();
+
 export default {
   name: "SignUp",
   data() {
@@ -91,7 +92,15 @@ export default {
       signUpDisabled: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       userId: "",
+      formData: {},
     };
+  },
+  async created() {
+    this.formData = await FormSchemaAPI.getFormSchema("Haryana Signup");
+    Object.keys(this.formData.attributes).forEach((field) => {
+      this.formData.attributes[field]["component"] =
+        typeToInputParameters[this.formData.attributes[field].type];
+    });
   },
   watch: {
     userData: {
@@ -104,30 +113,29 @@ export default {
   computed: {
     /** returns images to be displayed for a group */
     getGroupImages() {
-      return this.$store.state.groupData.images;
+      return this.$store.state.groupData.input_schema.images;
     },
+
     /** returns title for the form */
     formTitle() {
-      return formData.title;
+      return this.formData.name;
     },
+
     /** returns all fields to be displayed in the form */
     formFields() {
-      return formData.fields.map((field) => {
-        return {
-          ...field,
-          component: typeToInputParameters[field.type],
-        };
-      });
+      return this.formData.attributes;
     },
 
     /** whether redirection button is disabled */
     isRedirectionButtonDisabled() {
       return this.userData["user_id"] == "";
     },
+
     /** returns if ID needs to be generated */
     idGeneration() {
-      return this.$store.state.sessionData.idGeneration;
+      return this.$store.state.sessionData.id_generation;
     },
+
     /** returns if redirection is necessary */
     redirection() {
       return this.$store.state.sessionData.redirection;
@@ -142,13 +150,14 @@ export default {
           ];
       } else return field.options;
     },
+
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;
-      Object.keys(formData.fields).forEach((field) => {
+      Object.keys(this.formData.attributes).forEach((field) => {
         if (
-          !this.userData.hasOwnProperty(formData.fields[field].key) ||
-          this.userData[formData.fields[field].key] == ""
+          !this.userData.hasOwnProperty(this.formData.attributes[field].key) ||
+          this.formData.attributes[field].key == ""
         ) {
           isUserDataComplete = false;
         }
@@ -161,8 +170,10 @@ export default {
 
     /** updates user data based on user input */
     updateUserData(value, key) {
+      console.log(key, value);
       this.userData[key] = value;
     },
+
     /** creates user ID based on information */
     async signUp() {
       this.formSubmitted = true;
@@ -185,6 +196,7 @@ export default {
       this.isLoading = false;
       this.userData["user_id"] = createdUserId ? createdUserId : "";
     },
+
     /** redirects to destination */
     redirect() {
       if (

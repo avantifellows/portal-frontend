@@ -66,7 +66,7 @@
 
     <!-- signup button -->
     <button
-      v-show="$store.state.sessionData.activateSignup"
+      v-show="$store.state.sessionData.activate_signup"
       @click="redirectToSignUp"
       class="mx-auto pt-2 text-sm underline text-red-800"
     >
@@ -114,7 +114,7 @@ export default {
      * @returns {string[]} An array of authentication types.
      */
     getAuthTypes() {
-      return this.$store.state.sessionData.authType;
+      return this.$store.state.sessionData.auth_type.split(",");
     },
 
     /**
@@ -122,7 +122,7 @@ export default {
      * @returns {string[]} An array of group images.
      */
     getGroupImages() {
-      return this.$store.state.groupData.images;
+      return this.$store.state.groupData.input_schema.images;
     },
 
     /**
@@ -199,9 +199,10 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData).find((key) => {
+      Object.keys(this.$store.state.groupData.locale_data.en).find((key) => {
         if (key == authType) {
-          UIParameters = this.$store.state.groupData[key.toString()];
+          UIParameters =
+            this.$store.state.groupData.locale_data.en[key.toString()];
         }
       });
       return UIParameters;
@@ -254,17 +255,27 @@ export default {
       let isUserValid = await validateUser(
         this.getAuthTypes,
         this.userInformation,
-        this.$store.state.groupData.userType
+        this.$store.state.groupData.input_schema.userType
       );
       if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
-      } else if (!isUserValid.isDateOfBirthValid) {
+      } else if (
+        this.getAuthTypes.includes("DOB") &&
+        !isUserValid.isDateOfBirthValid
+      ) {
         this.invalidLoginMessage =
           "Date of birth entered is incorrect. Please try again!";
-      } else if (!isUserValid.isPhoneNumberValid) {
+      } else if (
+        this.getAuthTypes.includes("PH") &&
+        !isUserValid.isPhoneNumberValid
+      ) {
         this.invalidLoginMessage =
           "Phone number entered is incorrect. Please try again!";
       } else {
+        if (this.$store.state.sessionData.pop_up_form) {
+          this.$router.push(`/form/${this.userInformation["student_id"]}`);
+        }
+
         if (
           redirectToDestination(
             this.$store.state.sessionData.purposeParams,
@@ -296,7 +307,7 @@ export default {
      */
     redirectToSignUp() {
       this.$router.push({
-        name: "Signup",
+        name: "NewSignup",
       });
     },
 

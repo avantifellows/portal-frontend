@@ -3,6 +3,8 @@ import Home from "@/pages/Home.vue";
 import Sentry from "@/pages/Sentry.vue";
 import Error from "@/pages/Error.vue";
 import Signup from "@/components/Signup.vue";
+import NewSignup from "@/pages/NewSignup.vue";
+import InformationForm from "@/pages/InformationForm.vue";
 
 // legacy URLs support redirectID, new URLs must use redirectId
 const allowedQueryParams = [
@@ -35,6 +37,17 @@ const routes = [
     path: "/sign-up",
     name: "Signup",
     component: Signup,
+  },
+  {
+    path: "/new-sign-up",
+    name: "NewSignup",
+    component: NewSignup,
+  },
+  {
+    path: "/form/:id",
+    name: "Information Form",
+    props: true,
+    component: InformationForm,
   },
   {
     path: "/404-not-found",

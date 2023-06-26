@@ -27,13 +27,13 @@ export default {
    * @param {String} formName - name of the form
    * @param {String} studentId - student ID
    */
-  getFormFields(numberOfFields, formName, studentId) {
+  getFormFields(numberOfFields, group, studentId) {
     return new Promise((resolve) => {
       dbClient
-        .get("/form-schema/student-form", {
+        .get("/student-form", {
           params: {
             number_of_fields: numberOfFields,
-            form_name: formName,
+            group: group,
             student_id: studentId,
           },
         })

@@ -31,7 +31,7 @@
       <button
         class="bg-primary mx-auto hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg p-4 rounded disabled:opacity-50 btn"
         :disabled="buttonDisabled"
-        @click="redirect"
+        @click="profileDetails"
       >
         CONTINUE
       </button>
@@ -68,7 +68,15 @@ export default {
     /** Fetches all the fields that need to be filled by the student
     /* Also, maps each field to its input component
     */
-    this.formSchemaData = await FormSchemaAPI.getFormFields(this.id);
+    this.formSchemaData = await FormSchemaAPI.getFormFields(
+      this.$store.state.sessionData.meta_data.number_of_fields_in_pop_up_form,
+      this.$store.state.groupData.name,
+      this.id
+    );
+
+    if (this.formSchemaData.length == 0) {
+      this.redirect();
+    }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
         typeToInputParameters[this.formSchemaData[field].type];
@@ -114,10 +122,16 @@ export default {
     updateUserData(value, key) {
       this.userData[key] = value;
     },
+    async profileDetails() {
+      await UserAPI.studentData(
+        this.userData,
+        (this.userData["student_id"] = this.id)
+      );
+      redirect();
+    },
 
     /** redirects to destination */
-    async redirect() {
-      await UserAPI.studentData(this.userData);
+    redirect() {
       if (
         redirectToDestination(
           this.$store.state.sessionData.purpose.params,

@@ -46,7 +46,11 @@ export default {
      * Emits 'update' event whenever the checkbox value is changed
      */
     value() {
-      this.$emit("update", this.value, this.dbKey);
+      if (this.value) {
+        this.$emit("update", this.value, this.dbKey);
+      } else {
+        this.$emit("update", "", this.dbKey);
+      }
     },
   },
 };

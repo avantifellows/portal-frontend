@@ -31,7 +31,7 @@ export default {
    * Creates a new user
    * @param {Object} formData - contains data filled in the form by user
    */
-  userSignup(formData, idGeneration) {
+  userSignup(formData, idGeneration, userType) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -39,7 +39,7 @@ export default {
           JSON.stringify({
             form_data: formData,
             id_generation: idGeneration,
-            user_type: "student",
+            user_type: userType,
           })
         )
         .then((response) => {
@@ -59,7 +59,7 @@ export default {
   studentData(data) {
     return new Promise((resolve) => {
       dbClient
-        .post("/student", data)
+        .post("/user/complete-profile-details", data)
         .then((response) => {
           resolve(response.data);
         })

@@ -58,7 +58,7 @@
   >
     <template v-if="idGeneration">
       <p>
-        Your ID is <b>{{ userId }}</b>
+        Your ID is <b>{{ userData["user_id"] }}</b>
       </p>
       <p>Please note this down. Use this to sign-in going forward.</p>
     </template>
@@ -79,7 +79,7 @@ import { redirectToDestination } from "@/services/redirectToDestination";
 import UserAPI from "@/services/API/user.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
-
+import { sendSQSMessage } from "@/services/API/sqs";
 const assets = useAssets();
 
 export default {
@@ -96,7 +96,7 @@ export default {
     };
   },
   async created() {
-    this.formData = await FormSchemaAPI.getFormSchema("Haryana Signup");
+    this.formData = await FormSchemaAPI.getFormSchema("Haryana Registration");
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
@@ -138,7 +138,9 @@ export default {
 
     /** returns if redirection is necessary */
     redirection() {
-      return this.$store.state.sessionData.redirection;
+      return this.$store.state.sessionData.redirection == null
+        ? true
+        : this.$store.state.sessionData.redirection;
     },
   },
   methods: {
@@ -170,7 +172,6 @@ export default {
 
     /** updates user data based on user input */
     updateUserData(value, key) {
-      console.log(key, value);
       this.userData[key] = value;
     },
 
@@ -181,7 +182,8 @@ export default {
 
       let createdUserId = await UserAPI.userSignup(
         this.userData,
-        this.$store.state.sessionData.idGeneration
+        this.$store.state.sessionData.id_generation,
+        this.$store.state.groupData.input_schema.userType
       );
 
       if (createdUserId == "" || createdUserId.error) {
@@ -201,25 +203,24 @@ export default {
     redirect() {
       if (
         redirectToDestination(
-          this.$store.state.sessionData.purposeParams,
+          this.$store.state.sessionData.purpose.params,
           this.userData["user_id"],
-          this.$store.state.sessionData.redirectPlatformParams.id,
-          this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.groupData.userType
+          this.$store.state.sessionData.platform_id,
+          this.$store.state.sessionData.platform,
+          this.$store.state.groupData.input_schema.userType
         )
       ) {
         sendSQSMessage(
           this.$store.state.sessionData.purpose,
-          this.$store.state.sessionData.purposeParams,
-          this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.sessionData.redirectPlatformParams.id,
-          this.userData,
+          this.$store.state.sessionData.purpose.params,
+          this.$store.state.sessionData.platform,
+          this.$store.state.sessionData.platform_id,
           this.getAuthTypes,
-          this.this.$store.state.sessionData.group,
-          this.$store.state.groupData.userType,
-          this.$store.state.sessionData.sessionId,
-          this.$store.state.sessionData.userIpAddress,
-          this.$store.state.sessionData.batch
+          this.$store.state.groupData.name,
+          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.sessionData.session_id,
+          "",
+          this.$store.state.sessionData.meta_data.batch
         );
       }
     },

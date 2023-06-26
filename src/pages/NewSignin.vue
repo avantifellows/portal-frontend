@@ -272,29 +272,29 @@ export default {
       } else {
         if (this.$store.state.sessionData.pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
-        }
-
-        if (
-          redirectToDestination(
-            this.$store.state.sessionData.purpose.params,
-            this.userInformation["student_id"],
-            this.$store.state.sessionData.platform_id,
-            this.$store.state.sessionData.platform,
-            this.$store.state.groupData.input_schema.userType
-          )
-        ) {
-          sendSQSMessage(
-            this.$store.state.sessionData.purpose,
-            this.$store.state.sessionData.purpose.params,
-            this.$store.state.sessionData.platform,
-            this.$store.state.sessionData.platform_id,
-            this.getAuthTypes,
-            this.$store.state.groupData.name,
-            this.$store.state.groupData.input_schema.userType,
-            this.$store.state.sessionData.session_id,
-            "",
-            this.$store.state.sessionData.meta_data.batch
-          );
+        } else {
+          if (
+            redirectToDestination(
+              this.$store.state.sessionData.purpose.params,
+              this.userInformation["student_id"],
+              this.$store.state.sessionData.platform_id,
+              this.$store.state.sessionData.platform,
+              this.$store.state.groupData.input_schema.userType
+            )
+          ) {
+            sendSQSMessage(
+              this.$store.state.sessionData.purpose,
+              this.$store.state.sessionData.purpose.params,
+              this.$store.state.sessionData.platform,
+              this.$store.state.sessionData.platform_id,
+              this.getAuthTypes,
+              this.$store.state.groupData.name,
+              this.$store.state.groupData.input_schema.userType,
+              this.$store.state.sessionData.session_id,
+              "",
+              this.$store.state.sessionData.meta_data.batch
+            );
+          }
         }
       }
     },

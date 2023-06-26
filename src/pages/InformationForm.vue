@@ -74,7 +74,7 @@ export default {
       this.id
     );
 
-    if (this.formSchemaData.length == 0) {
+    if (Object.keys(this.formSchemaData).length == 0) {
       this.redirect();
     }
     Object.keys(this.formSchemaData).forEach((field) => {
@@ -127,7 +127,7 @@ export default {
         this.userData,
         (this.userData["student_id"] = this.id)
       );
-      redirect();
+      this.redirect();
     },
 
     /** redirects to destination */

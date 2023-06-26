@@ -19,11 +19,4 @@ export default {
         });
     });
   },
-  getGroupId(sessionId) {
-    return new Promise((resolve) => {
-      dbClient.get("/session-group/" + sessionId).then((response) => {
-        resolve(response.data);
-      });
-    });
-  },
 };

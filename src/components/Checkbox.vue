@@ -1,16 +1,17 @@
 <template>
-  <div class="flex flex-col justify-center">
-    <div class="flex flex-row justify-center">
-      <FormKit
-        type="checkbox"
-        :label="label"
-        :help="helpText"
-        :name="dbKey"
-        v-model="value"
-        :validation="[isRequired ? ['required'] : []]"
-        validation-visibility="dirty"
-      />
-    </div>
+  <div class="flex flex-row justify-between">
+    <FormKit
+      type="checkbox"
+      :help="helpText"
+      :name="dbKey"
+      v-model="value"
+      :validation="[isRequired ? ['required'] : []]"
+      validation-visibility="dirty"
+      :classes="{
+        outer: ' pr-4',
+      }"
+    />
+    {{ label }}
   </div>
 </template>
 <script>

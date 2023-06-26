@@ -8,9 +8,7 @@
     </div>
   </div>
 
-  <div
-    class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
-  >
+  <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
@@ -278,25 +276,24 @@ export default {
 
         if (
           redirectToDestination(
-            this.$store.state.sessionData.purposeParams,
+            this.$store.state.sessionData.purpose.params,
             this.userInformation["student_id"],
-            this.$store.state.sessionData.redirectPlatformParams.id,
-            this.$store.state.sessionData.redirectPlatform,
-            this.$store.state.groupData.userType
+            this.$store.state.sessionData.platform_id,
+            this.$store.state.sessionData.platform,
+            this.$store.state.groupData.input_schema.userType
           )
         ) {
           sendSQSMessage(
             this.$store.state.sessionData.purpose,
-            this.$store.state.sessionData.purposeParams,
-            this.$store.state.sessionData.redirectPlatform,
-            this.$store.state.sessionData.redirectPlatformParams.id,
-            this.userInformation,
+            this.$store.state.sessionData.purpose.params,
+            this.$store.state.sessionData.platform,
+            this.$store.state.sessionData.platform_id,
             this.getAuthTypes,
-            this.$store.state.sessionData.group,
-            this.$store.state.groupData.userType,
-            this.$store.state.sessionData.sessionId,
-            this.$store.state.sessionData.userIpAddress,
-            this.$store.state.sessionData.batch
+            this.$store.state.groupData.name,
+            this.$store.state.groupData.input_schema.userType,
+            this.$store.state.sessionData.session_id,
+            "",
+            this.$store.state.sessionData.meta_data.batch
           );
         }
       }

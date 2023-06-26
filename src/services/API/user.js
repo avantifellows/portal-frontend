@@ -6,11 +6,31 @@ import {
 } from "@/services/API/endpoints.js";
 import { checkForUserEndpoint } from "./endpoints";
 
-/**
- * Creates a new user
- * @param {Object} formData - contains data filled in the form by user
- */
 export default {
+  /**
+   * Validates that the ID exists
+   * @param {String} userID - the id that needs to be validated
+   */
+  verifyStudent(studentData) {
+    return new Promise((resolve) => {
+      dbClient
+        .get(verifyStudentEndpoint, { params: studentData })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("User API returned an error:", error);
+          }
+        });
+    });
+  },
+
+  /**
+   * Creates a new user
+   * @param {Object} formData - contains data filled in the form by user
+   */
   userSignup(formData, idGeneration) {
     return new Promise((resolve) => {
       dbClient
@@ -33,6 +53,23 @@ export default {
     });
   },
 
+  /** Posts profile data that a student has entered
+   * @param {Object} data - student data
+   */
+  studentData(data) {
+    return new Promise((resolve) => {
+      dbClient
+        .post("/student", data)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("Form API returned an error:", error);
+        });
+    });
+  },
+
   /**
    * Creates a new student
    * @param {Object} formData - contains data filled in the form by user
@@ -50,26 +87,6 @@ export default {
         });
     });
   },
-  /**
-   * Validates that the ID exists
-   * @param {String} userID - the id that needs to be validated
-   */
-  verifyStudent(studentData) {
-    return new Promise((resolve) => {
-      dbClient
-        .get(verifyStudentEndpoint, { params: studentData })
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
-          }
-        });
-    });
-  },
-
   verifyUser(userId) {
     const params = {
       userID: userId,

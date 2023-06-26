@@ -9,16 +9,18 @@
       <FormKit
         type="select"
         v-model="value"
-        :placeholder="placeholder"
         :options="options"
+        :placeholder="placeholder"
         :validation="[isRequired ? ['required'] : []]"
         validation-visibility="dirty"
         :name="dbKey"
         :help="helpText"
         :classes="{
-          outer: 'py-2',
-          inner: 'p-4 border-2 rounded-md border-gray-500 ',
-          input: 'mx-auto min-w-full focus:border-gray-800 focus:outline-none ',
+          outer: 'min-w-full max-w-full',
+          inner:
+            'p-4 border-2 rounded-md border-gray-500 min-w-full max-w-full',
+          input:
+            'mx-auto  focus:border-gray-800 focus:outline-none min-w-full max-w-full',
           help: 'text-xs text-gray-400 pt-2',
         }"
       />

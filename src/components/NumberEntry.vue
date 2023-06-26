@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col justify-center">
-    <p
-      class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
-    >
+    <p class="text-xl lg:text-2xl mx-auto font-bold md:w-3/4 text-center mb-2">
       {{ label }}
     </p>
     <div class="flex flex-row justify-center">
@@ -12,7 +10,7 @@
         inputmode="numeric"
         :placeholder="placeholder"
         :required="isRequired"
-        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2"
+        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2 text-center"
         :class="selectInputBoxClasses()"
         @keypress="isValidNumberEntry($event)"
         @input="updateNumberEntry($event)"

@@ -22,6 +22,11 @@ export default {
         });
     });
   },
+
+  /**
+   * Returns name of a group associated with a session
+   * @param {String} sessionId - ID of the session whose group name needs to be returned
+   */
   getGroupName(sessionId) {
     return new Promise((resolve) => {
       dbClient

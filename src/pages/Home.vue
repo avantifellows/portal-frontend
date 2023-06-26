@@ -16,12 +16,12 @@
   </div>
 
   <LandingPage v-if="isLandingPage" />
-
-  <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-  <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
-
+  <div v-if="!oldFlow">
+    <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+    <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+  </div>
   <div v-else>
-    <!-- <div
+    <div
       v-if="
         isAuthTypeID &&
         doesGroupExist &&
@@ -41,7 +41,7 @@
         :userIpAddress="getUserIpAddress"
         :isExtraInputValidationRequired="isExtraInputValidationsRequired"
       />
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -115,6 +115,7 @@ export default {
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
+      oldFlow: true,
     };
   },
 
@@ -122,14 +123,17 @@ export default {
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
     },
+
     /** TEMP - Returns IP address of user */
     getUserIpAddress() {
       return this.sessionData ? this.sessionData.userIp : "";
     },
+
     /** TEMP - Whether authentication method chosen is an ID entry */
     isAuthTypeID() {
       return this.getAuthType.includes("ID");
     },
+
     /** TEMP - Returns how many authentication methods should be used */
     getLengthOfAuthType() {
       return this.getAuthType.split(",").length;
@@ -163,6 +167,11 @@ export default {
     isSessionTypeSignIn() {
       return this.sessionData && this.sessionData.type == "sign-in";
     },
+
+    /**
+     * Checks if the session type is a sign-up.
+     * @returns {boolean} True if the session type is a sign-up, false otherwise.
+     */
     isSessionTypeSignUp() {
       return this.sessionData && this.sessionData.type == "sign-up";
     },
@@ -219,7 +228,7 @@ export default {
      */
     getPurposeParams() {
       return this.purposeParams == "" && this.sessionData != null
-        ? this.sessionData.purposeParams
+        ? this.sessionData.purpose.params
         : this.purposeParams;
     },
 
@@ -275,9 +284,20 @@ export default {
 
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
-        this.groupData = await groupAPIService.getGroupName(
-          this.sessionData.id
-        );
+        if (
+          this.sessionData.meta_data.batch == "10B37" ||
+          this.sessionData.meta_data.batch == "10B19" ||
+          this.sessionData.meta_data.batch == "10B33" ||
+          this.sessionData.session_id ==
+            "HaryanaStudents_10B18_45008_iqs-yibe-say"
+        ) {
+          this.groupData = await groupAPIService.getGroupName(
+            this.sessionData.id
+          );
+          this.oldFlow = false;
+        } else {
+          this.groupData = await groupAPIService.getGroupData(this.getGroup);
+        }
         //this.groupData = await groupAPIService.getGroupData(groupName);
         this.$store.dispatch("setGroupData", this.groupData);
         if (!this.sessionData.error && this.groupData && this.groupData.error) {
@@ -308,7 +328,6 @@ export default {
         });
       }
     }
-
     this.isLoading = false;
   },
 };

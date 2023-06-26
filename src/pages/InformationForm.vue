@@ -41,6 +41,7 @@
 <script>
 import useAssets from "@/assets/assets.js";
 import FormSchemaAPI from "@/services/API/form.js";
+import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
@@ -116,7 +117,7 @@ export default {
 
     /** redirects to destination */
     async redirect() {
-      await FormSchemaAPI.studentData(this.userData);
+      await UserAPI.studentData(this.userData);
       if (
         redirectToDestination(
           this.$store.state.sessionData.purpose.params,

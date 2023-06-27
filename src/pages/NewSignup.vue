@@ -101,6 +101,7 @@ export default {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
     });
+    console.log(this.formData);
   },
   watch: {
     userData: {
@@ -215,6 +216,7 @@ export default {
           this.$store.state.sessionData.purpose.params,
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
+          this.userData["user_id"],
           this.getAuthTypes,
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,

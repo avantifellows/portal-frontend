@@ -73,7 +73,7 @@ export default {
       this.$store.state.groupData.name,
       this.id
     );
-
+    console.log(this.formSchemaData);
     if (Object.keys(this.formSchemaData).length == 0) {
       this.redirect();
     }
@@ -146,6 +146,7 @@ export default {
           this.$store.state.sessionData.purpose.params,
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
+          this.id,
           this.getAuthTypes,
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,

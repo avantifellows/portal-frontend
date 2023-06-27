@@ -287,6 +287,7 @@ export default {
               this.$store.state.sessionData.purpose.params,
               this.$store.state.sessionData.platform,
               this.$store.state.sessionData.platform_id,
+              this.userInformation["student_id"],
               this.getAuthTypes,
               this.$store.state.groupData.name,
               this.$store.state.groupData.input_schema.userType,

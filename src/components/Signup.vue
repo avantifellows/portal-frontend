@@ -8,7 +8,9 @@
     </div>
   </div>
   <div class="h-full" :class="{ 'opacity-20': isLoading }">
-    <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+    <div
+      class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+    >
       <template v-for="(image, index) in getGroupImages" :key="index">
         <img :src="image" />
       </template>
@@ -23,7 +25,10 @@
         />
       </div>
     </template>
-    <div class="flex flex-col items-center justify-center p-10" v-if="!formSubmitted">
+    <div
+      class="flex flex-col items-center justify-center p-10"
+      v-if="!formSubmitted"
+    >
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
@@ -244,7 +249,13 @@
                 type="select"
                 label="*Aspiring field"
                 placeholder="Select your field"
-                :options="['Engineering', 'Medical', 'Agriculture', 'NDA', 'Other']"
+                :options="[
+                  'Engineering',
+                  'Medical',
+                  'Agriculture',
+                  'NDA',
+                  'Other',
+                ]"
                 validation="required"
                 v-model="field"
                 name="field"
@@ -409,8 +420,7 @@ export default {
             this.$router.push({
               name: "Error",
               state: {
-                text:
-                  "Student ID could not be created. Please contact your program manager.",
+                text: "Student ID could not be created. Please contact your program manager.",
               },
             });
           }

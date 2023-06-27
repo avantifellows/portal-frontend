@@ -1,10 +1,30 @@
 <template>
   <div class="flex flex-col space-y-8 items-center">
     <!-- 404 -->
-    <div v-if="isError404" class="w-full mt-16 flex flex-col space-y-4 items-center">
-      <inline-svg class="w-12 h-12 text-yellow-600 fill-current" :src="warningSvg" />
+    <div
+      v-if="isError404"
+      class="w-full mt-16 flex flex-col space-y-4 items-center"
+    >
+      <inline-svg
+        class="w-12 h-12 text-yellow-600 fill-current"
+        :src="warningSvg"
+      />
 
       <p class="text-2xl align-middle">Page Not Found</p>
+      <p class="text-lg text-gray-500 text-center w-10/12 sm:w-1/2">
+        {{ text }}
+      </p>
+    </div>
+    <div
+      v-if="isError500"
+      class="w-full mt-16 flex flex-col space-y-4 items-center"
+    >
+      <inline-svg
+        class="w-12 h-12 text-yellow-600 fill-current"
+        :src="warningSvg"
+      />
+
+      <p class="text-2xl align-middle">Oops! Something is wrong with us!</p>
       <p class="text-lg text-gray-500 text-center w-10/12 sm:w-1/2">
         {{ text }}
       </p>
@@ -37,6 +57,9 @@ export default {
     /** whether the error type is 404 */
     isError404() {
       return this.type === "404";
+    },
+    isError500() {
+      return this.type === "500";
     },
   },
 };

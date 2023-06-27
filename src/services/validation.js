@@ -38,6 +38,23 @@ async function checkUserIDInDB(
   } else {
     return isCurrentUserValid;
   }
+  if (authTypes.includes("DOB")) {
+    if (userType == "student") {
+      user["isDateOfBirthValid"] = await userAPI.verifyStudent({
+        student_id: userInformation["student_id"],
+        date_of_birth: userInformation["date_of_birth"],
+      });
+    }
+  }
+  if (authTypes.includes("PH")) {
+    if (userType == "student") {
+      user["isPhoneNumberValid"] = await userAPI.verifyStudent({
+        student_id: userInformation["student_id"],
+        phone: userInformation["phone"],
+      });
+    }
+  }
+  return user;
 }
 
 /** This function checks the data source to see which database API needs to be called.

@@ -23,10 +23,7 @@
   <div v-else>
     <div
       v-if="
-        isAuthTypeID &&
-        doesGroupExist &&
-        !isSessionTypeSignIn &&
-        !isSessionTypeSignUp
+        isAuthTypeID && doesGroupExist && !isSessionTypeSignIn && !isSessionTypeSignUp
       "
     >
       <Entry
@@ -156,9 +153,7 @@ export default {
 
     /** TEMP - Returns the auth methods used by each group */
     getAuthType() {
-      return this.groupData && this.groupData.authType
-        ? this.groupData.authType
-        : "ID";
+      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
     },
     /**
      * Checks if the session type is a sign-in.
@@ -263,20 +258,17 @@ export default {
         this.sessionId == "HaryanaStudents_10B33_45008_vty-jdgr-gsr"
       ) {
         this.oldFlow = false;
-        this.sessionData = await sessionAPIService.getSessionData(
-          this.sessionId
-        );
+        this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       } else {
-        this.sessionData = await sessionAPIService.getOldSessionData(
-          this.sessionId
-        );
+        this.sessionData = await sessionAPIService.getOldSessionData(this.sessionId);
       }
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
           name: "Error",
           params: {
-            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text:
+              "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }
@@ -309,11 +301,9 @@ export default {
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
         if (!this.oldFlow) {
-          this.groupData = await groupAPIService.getGroupName(
-            this.sessionData.id
-          );
+          this.groupData = await groupAPIService.getGroupName(this.sessionData.id);
         } else {
-          this.groupData = await groupAPIService.getGroupData(this.getGroup);
+          this.groupData = await groupAPIService.getGroupData(this.sessionData.group);
         }
         //this.groupData = await groupAPIService.getGroupData(groupName);
         this.$store.dispatch("setGroupData", this.groupData);

@@ -190,7 +190,9 @@ export default {
      */
     getRedirectTo() {
       return this.redirectTo == "" && this.sessionData != null
-        ? this.sessionData.platform
+        ? this.oldFlow
+          ? this.sessionData.redirectPlatform
+          : this.sessionData.platform
         : this.redirectTo;
     },
 
@@ -200,7 +202,9 @@ export default {
      */
     getRedirectId() {
       return this.redirectId == "" && this.sessionData != null
-        ? this.sessionData.platform_id
+        ? this.oldFlow
+          ? this.sessionData.redirectPlatformParams.id
+          : this.sessionData.platform_id
         : this.redirectId;
     },
 
@@ -228,7 +232,9 @@ export default {
      */
     getPurposeParams() {
       return this.purposeParams == "" && this.sessionData != null
-        ? this.sessionData.purpose.params
+        ? this.oldFlow
+          ? this.sessionData.purposeParams
+          : this.sessionData.purpose["sub_type"]
         : this.purposeParams;
     },
 
@@ -251,8 +257,20 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != null) {
-      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
-
+      if (
+        this.sessionId == "HaryanaStudents_10B37_45008_rxh-gkzc-kby" ||
+        this.sessionId == "HaryanaStudents_10B19_45008_vaq-qthn-quv" ||
+        this.sessionId == "HaryanaStudents_10B33_45008_vty-jdgr-gsr"
+      ) {
+        this.oldFlow = false;
+        this.sessionData = await sessionAPIService.getSessionData(
+          this.sessionId
+        );
+      } else {
+        this.sessionData = await sessionAPIService.getOldSessionData(
+          this.sessionId
+        );
+      }
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
@@ -277,24 +295,23 @@ export default {
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
         this.$store.dispatch("setSessionId", this.sessionId);
-        if ("is_session_open" in this.sessionData) {
-          this.sessionEnabled = this.sessionData.is_session_open;
+        if (this.oldFlow) {
+          if ("sessionActive" in this.sessionData) {
+            this.sessionEnabled = this.sessionData.sessionActive;
+          }
+        } else {
+          if ("is_session_open" in this.sessionData) {
+            this.sessionEnabled = this.sessionData.is_session_open;
+          }
         }
       }
 
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
-        if (
-          this.sessionData.meta_data.batch == "10B37" ||
-          this.sessionData.meta_data.batch == "10B19" ||
-          this.sessionData.meta_data.batch == "10B33" ||
-          this.sessionData.session_id ==
-            "HaryanaStudents_10B18_45008_iqs-yibe-say"
-        ) {
+        if (!this.oldFlow) {
           this.groupData = await groupAPIService.getGroupName(
             this.sessionData.id
           );
-          this.oldFlow = false;
         } else {
           this.groupData = await groupAPIService.getGroupData(this.getGroup);
         }

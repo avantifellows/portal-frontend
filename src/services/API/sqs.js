@@ -50,7 +50,7 @@ export async function sendSQSMessage(
           id: redirectId,
         },
       },
-      authType: authType.toString(),
+      authType: authType,
       user: {
         values: userIDList,
       },
@@ -66,7 +66,6 @@ export async function sendSQSMessage(
     MessageBody: JSON.stringify(messageBody),
     QueueUrl: QUEUEURL,
   };
-  console.log(purposeParams);
   try {
     const data = await sqsClient.send(new SendMessageCommand(params));
     console.log("Success, message sent. MessageID:", data.MessageId);

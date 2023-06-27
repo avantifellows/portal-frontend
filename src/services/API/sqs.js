@@ -66,7 +66,6 @@ export async function sendSQSMessage(
     MessageBody: JSON.stringify(messageBody),
     QueueUrl: QUEUEURL,
   };
-
   try {
     const data = await sqsClient.send(new SendMessageCommand(params));
     console.log("Success, message sent. MessageID:", data.MessageId);

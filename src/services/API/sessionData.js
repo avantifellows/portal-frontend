@@ -1,4 +1,4 @@
-import { client } from "@/services/API/rootClient.js";
+import { dbClient, client } from "@/services/API/rootClient.js";
 import { getSessionDataEndpoint } from "@/services/API/endpoints.js";
 
 export default {
@@ -7,12 +7,26 @@ export default {
    * @param {String} sessionId - the ID of the session whose data needs to be retrieved
    */
   getSessionData(sessionId) {
+    return new Promise((resolve) => {
+      dbClient
+        .get(getSessionDataEndpoint, { params: { session_id: sessionId } })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("Session API returned an error:", error);
+        });
+    });
+  },
+
+  getOldSessionData(sessionId) {
     const params = {
       sessionId: sessionId,
     };
     return new Promise((resolve) => {
       client
-        .post(getSessionDataEndpoint, JSON.stringify(params))
+        .post("/getSessionData", JSON.stringify(params))
         .then((response) => {
           resolve(response.data);
         })

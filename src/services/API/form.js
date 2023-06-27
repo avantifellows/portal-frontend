@@ -4,12 +4,12 @@ export default {
   /** Gets data about a form schema
    * @param {String} name - name of the form schema
    */
-  getFormSchema(name) {
+  getFormSchema(id) {
     return new Promise((resolve) => {
       dbClient
         .get("/form-schema/", {
           params: {
-            form_name: name,
+            form_id: id,
           },
         })
         .then((response) => {

@@ -142,8 +142,8 @@ export default {
         )
       ) {
         sendSQSMessage(
-          this.$store.state.sessionData.purpose,
-          this.$store.state.sessionData.purpose.params,
+          "attendance",
+          this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.id,
@@ -151,6 +151,7 @@ export default {
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,
           this.$store.state.sessionData.session_id,
+          "",
           "",
           this.$store.state.sessionData.meta_data.batch
         );

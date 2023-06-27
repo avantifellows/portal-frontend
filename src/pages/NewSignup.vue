@@ -96,7 +96,9 @@ export default {
     };
   },
   async created() {
-    this.formData = await FormSchemaAPI.getFormSchema("Haryana Registration");
+    this.formData = await FormSchemaAPI.getFormSchema(
+      this.$store.state.sessionData.form_schema_id
+    );
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
@@ -212,8 +214,8 @@ export default {
         )
       ) {
         sendSQSMessage(
-          this.$store.state.sessionData.purpose,
-          this.$store.state.sessionData.purpose.params,
+          "sign-up",
+          this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.userData["user_id"],
@@ -221,6 +223,7 @@ export default {
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,
           this.$store.state.sessionData.session_id,
+          "",
           "",
           this.$store.state.sessionData.meta_data.batch
         );

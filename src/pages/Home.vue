@@ -23,7 +23,11 @@
   <div v-else>
     <div
       v-if="
-        isAuthTypeID && doesGroupExist && !isSessionTypeSignIn && !isSessionTypeSignUp
+        !isLandingPage &&
+        isAuthTypeID &&
+        doesGroupExist &&
+        !isSessionTypeSignIn &&
+        !isSessionTypeSignUp
       "
     >
       <Entry

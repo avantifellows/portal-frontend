@@ -586,7 +586,7 @@ export default {
             this.isExtraInputValidationRequired && this.isInputPhoneNumber
               ? this.$refs.phoneNumberEntry.phoneNumber
               : "",
-            this.$store.state.sessionData.batch
+            this.$store.state.sessionData.batch ? this.$store.state.sessionData.batch : ""
           );
         }
       }

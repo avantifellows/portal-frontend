@@ -9,7 +9,7 @@ export default {
       dbClient
         .get("/form-schema/", {
           params: {
-            form_id: id,
+            form_schema_id: id,
           },
         })
         .then((response) => {
@@ -30,7 +30,7 @@ export default {
   getFormFields(numberOfFields, group, studentId) {
     return new Promise((resolve) => {
       dbClient
-        .get("/student-form", {
+        .get("/form-schema/student", {
           params: {
             number_of_fields: numberOfFields,
             group: group,

@@ -15,7 +15,6 @@ export function redirectToDestination(
   redirectTo,
   group
 ) {
-  console.log(redirectId, redirectTo);
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";

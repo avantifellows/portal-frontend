@@ -1,17 +1,20 @@
 <template>
-  <div class="flex flex-row justify-between">
+  <div class="flex flex-row">
     <FormKit
       type="checkbox"
       :help="helpText"
       :name="dbKey"
       v-model="value"
+      :label="label"
       :validation="[isRequired ? ['required'] : []]"
       validation-visibility="dirty"
       :classes="{
-        outer: ' pr-4',
+        inner: 'border border-4',
       }"
     />
-    {{ label }}
+    <!-- <p class="text-sm">
+      {{ label }}
+    </p> -->
   </div>
 </template>
 <script>

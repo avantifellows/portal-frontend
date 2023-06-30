@@ -1,32 +1,22 @@
 <template>
-  <div class="flex flex-col justify-center">
-    <p
-      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
-    >
+  <div class="flex flex-col">
+    <p class="text-md font-semibold">
       {{ label }}
     </p>
-    <div class="flex flex-row justify-center">
-      <FormKit
-        type="select"
-        v-model="value"
-        :options="options"
-        :placeholder="placeholder"
-        :validation="[isRequired ? ['required'] : []]"
-        validation-visibility="dirty"
-        :name="dbKey"
-        :help="helpText"
-        :classes="{
-          outer: 'min-w-full max-w-full',
-          inner:
-            'p-4 border-2 rounded-md border-gray-500 min-w-full max-w-full',
-          input:
-            'mx-auto  focus:border-gray-800 focus:outline-none min-w-full max-w-full',
-          help: 'text-xs text-gray-400 pt-2',
-        }"
-      />
-    </div>
+
+    <FormKit
+      type="select"
+      v-model="value"
+      :options="options"
+      placeholder=" "
+      :validation="[isRequired ? ['required'] : []]"
+      validation-visibility="dirty"
+      :name="dbKey"
+      :help="helpText"
+    />
   </div>
 </template>
+
 <script>
 export default {
   name: "Dropdown",

@@ -1,23 +1,21 @@
 <template>
   <div class="flex flex-col justify-center">
-    <p class="text-xl lg:text-2xl mx-auto font-bold md:w-3/4 text-center mb-2">
+    <p class="text-md md:text-lg font-semibold">
       {{ label }}
     </p>
-    <div class="flex flex-row justify-center">
-      <input
-        v-model="number"
-        type="text"
-        inputmode="numeric"
-        :placeholder="placeholder"
-        :required="isRequired"
-        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2 text-center"
-        :class="selectInputBoxClasses()"
-        @keypress="isValidNumberEntry($event)"
-        @input="updateNumberEntry($event)"
-        ondrop="return false"
-        onpaste="return false"
-      />
-    </div>
+    <FormKit
+      type="number"
+      v-model="number"
+      :help="helpText"
+      :name="dbKey"
+      ondrop="return false"
+      onpaste="return false"
+      :validation="[isRequired ? ['required'] : []]"
+      validation-visibility="dirty"
+      @keypress="isValidNumberEntry($event)"
+      @input="updateNumberEntry($event)"
+    />
+
     <span
       v-if="isInvalidNumberEntryMessageShown"
       class="mx-auto text-red-700 text-base mb-1"
@@ -49,6 +47,10 @@ export default {
       default: 1,
     },
     dbKey: {
+      type: String,
+      default: "",
+    },
+    helpText: {
       type: String,
       default: "",
     },
@@ -96,12 +98,11 @@ export default {
      * @param {Event} event - The input event.
      */
     updateNumberEntry(event) {
-      if (event.target.value.length == 0) {
+      if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (event.target.value.length > this.maxLengthOfEntry) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfEntry);
-        this.number = event.target.value.toString();
-      } else if (event.target.value.length < this.maxLengthOfEntry) {
+      } else if (event.length > this.maxLengthOfEntry) {
+        this.number = event.slice(0, this.maxLengthOfEntry).toString();
+      } else if (event.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";

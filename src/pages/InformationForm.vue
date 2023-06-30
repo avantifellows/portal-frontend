@@ -33,7 +33,7 @@
         :disabled="buttonDisabled"
         @click="profileDetails"
       >
-        CONTINUE
+        START SESSION
       </button>
     </div>
   </div>

@@ -1,23 +1,21 @@
 <template>
-  <div class="flex flex-col text-center justify-center">
-    <p class="w-full text-xl mx-auto font-bold">
+  <div class="flex flex-col">
+    <p class="text-left text-md font-semibold">
       {{ label }}
     </p>
-    <div class="flex flex-row justify-center">
-      <input
-        v-model="phoneNumber"
-        type="tel"
-        inputmode="numeric"
-        :placeholder="placeholder"
-        :required="isRequired"
-        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2"
-        :class="selectInputBoxClasses()"
-        @keypress="isValidPhoneNumberEntry($event)"
-        @input="updatePhoneNumberEntry($event)"
-        ondrop="return false"
-        onpaste="return false"
-      />
-    </div>
+    <FormKit
+      type="tel"
+      placeholder="xxxxxxxxxx"
+      :validation="[isRequired ? ['required'] : []]"
+      validation-visibility="dirty"
+      v-model="phoneNumber"
+      @keypress="isValidPhoneNumberEntry($event)"
+      @input="updatePhoneNumberEntry($event)"
+      ondrop="return false"
+      onpaste="return false"
+      help="Phone number can start only with 6,7,8,9"
+    />
+
     <span
       v-if="isInvalidPhoneNumberMessageShown"
       class="mx-auto text-red-700 text-base mb-1"

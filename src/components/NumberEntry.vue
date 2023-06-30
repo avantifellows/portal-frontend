@@ -18,7 +18,7 @@
 
     <span
       v-if="isInvalidNumberEntryMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="mx-auto text-red-700 text-sm mb-1"
       >{{ invalidNumberEntryMessage }}</span
     >
   </div>

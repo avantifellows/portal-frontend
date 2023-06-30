@@ -90,12 +90,11 @@ export default {
      * @param {Event} event - The input event.
      */
     updatePhoneNumberEntry(event) {
-      if (event.target.value.length == 0) {
+      if (event.length == 0) {
         this.invalidPhoneNumberMessage = "";
-      } else if (event.target.value.length > 10) {
-        event.target.value = event.target.value.slice(0, 10);
-        this.phoneNumber = event.target.value.toString();
-      } else if (event.target.value.length < 10) {
+      } else if (event.length > 10) {
+        this.phoneNumber = event.slice(0, 10).toString();
+      } else if (event.length < 10) {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
       } else {
         this.invalidPhoneNumberMessage = "";

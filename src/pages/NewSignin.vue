@@ -14,9 +14,13 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto h-full py-10 space-y-4">
+  <div class="flex flex-col mx-auto my-auto h-full py-10 space-y-4">
     <!-- different input components -->
-    <div v-for="(authType, index) in getAuthTypes" :key="`id-${index}`">
+    <div
+      v-for="(authType, index) in getAuthTypes"
+      :key="`id-${index}`"
+      class="mx-auto"
+    >
       <NumberEntry
         v-if="isEntryNumber(authType)"
         ref="numberEntry"
@@ -55,7 +59,7 @@
 
     <!-- submit button -->
     <button
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-3 rounded disabled:opacity-50 btn"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
     >
@@ -66,7 +70,7 @@
     <button
       v-show="$store.state.sessionData.activate_signup"
       @click="redirectToSignUp"
-      class="mx-auto pt-2 text-sm underline text-red-800"
+      class="mx-auto pt-2 text-xs md:text-sm underline text-red-800"
     >
       If you are a new student, click here to register
     </button>

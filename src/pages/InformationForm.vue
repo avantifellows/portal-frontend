@@ -147,7 +147,7 @@ export default {
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.id,
-          this.getAuthTypes.toString(),
+          "",
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,
           this.$store.state.sessionData.session_id,

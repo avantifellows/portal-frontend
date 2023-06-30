@@ -1,25 +1,22 @@
 <template>
-  <div class="flex flex-col justify-center">
-    <p
-      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
-    >
+  <div class="flex flex-col">
+    <p class="text-md font-semibold">
       {{ label }}
     </p>
-    <div class="flex flex-row justify-center">
-      <input
-        v-model="text"
-        type="text"
-        inputmode="text"
-        :placeholder="placeholder"
-        :required="isRequired"
-        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none my-2"
-        :class="selectInputBoxClasses()"
-        @keypress="isValidTextEntry($event)"
-        @input="updateTextEntry($event)"
-        ondrop="return false"
-        onpaste="return false"
-      />
-    </div>
+
+    <FormKit
+      type="text"
+      :help="helpText"
+      v-model="text"
+      :validation="[isRequired ? ['required'] : []]"
+      validation-visibility="dirty"
+      :name="dbKey"
+      @keypress="isValidTextEntry($event)"
+      @input="updateTextEntry($event)"
+      ondrop="return false"
+      onpaste="return false"
+    />
+
     <span
       v-if="isInvalidTextEntryMessageShown"
       class="mx-auto text-red-700 text-base mb-1"
@@ -45,6 +42,10 @@ export default {
     isRequired: {
       type: Boolean,
       default: false,
+    },
+    helpText: {
+      type: String,
+      default: "",
     },
     dbKey: {
       type: String,
@@ -84,10 +85,10 @@ export default {
      * @param {Event} event - The input event.
      */
     updateTextEntry(event) {
-      if (event.target.value.length == 0) {
+      if (event.length == 0) {
         this.invalidTextEntryMessage = "";
       } else {
-        this.text = event.target.value.toString();
+        this.text = event.toString();
       }
       this.$emit("update", this.text, this.dbKey);
     },

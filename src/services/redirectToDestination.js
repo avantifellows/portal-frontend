@@ -74,6 +74,6 @@ export function redirectToDestination(
     }
   }
 
-  window.open(fullURL, "_self");
+  window.open(fullURL);
   return true;
 }

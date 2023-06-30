@@ -8,20 +8,25 @@
     </div>
   </div>
 
-  <div class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
   </div>
 
-  <div v-if="!formSubmitted" class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
-    <p class="text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5 uppercase">
+  <div
+    v-if="!formSubmitted"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
+  >
+    <p class="text-2xl mx-auto font-bold">
       {{ formTitle }}
     </p>
+    <p class="text-center">All fields are mandatory</p>
 
-    <div class="mx-auto w-full xl:w-1/2">
+    <div class="mx-auto w-2/3 md:w-auto">
       <component
-        class="mx-auto w-1/2 lg:w-1/4 my-4"
         v-for="(formField, index) in formFields"
         :key="index"
         :is="formField.component"
@@ -60,7 +65,7 @@
       v-if="redirection"
       @click="redirect"
       :disabled="isRedirectionButtonDisabled"
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50"
     >
       Done
     </button>
@@ -96,7 +101,6 @@ export default {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
     });
-    console.log(this.formData);
   },
   watch: {
     userData: {
@@ -143,7 +147,9 @@ export default {
     getOptions(field) {
       if (field.dependant) {
         if (this.userData[field.dependantField])
-          return field.dependantFieldMapping[this.userData[field.dependantField]];
+          return field.dependantFieldMapping[
+            this.userData[field.dependantField]
+          ];
       } else return field.options;
     },
 

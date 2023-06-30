@@ -11,9 +11,9 @@
       </h2>
     </div>
 
-    <div class="mx-auto flex flex-col">
+    <div class="mx-auto w-2/3 md:w-auto">
       <component
-        class="mx-auto my-4"
+        class=""
         v-for="(formField, index) in formSchemaData"
         :key="index"
         :is="formField.component"
@@ -33,7 +33,7 @@
         :disabled="buttonDisabled"
         @click="profileDetails"
       >
-        CONTINUE
+        START SESSION
       </button>
     </div>
   </div>

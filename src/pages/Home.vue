@@ -217,7 +217,7 @@ export default {
      * @returns {string} The group.
      */
     getGroup() {
-      return this.group;
+      return this.sessionData.group ? this.sessionData.group : this.group;
     },
 
     /**

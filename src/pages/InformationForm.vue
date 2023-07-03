@@ -75,7 +75,7 @@ export default {
     );
     console.log(this.formSchemaData);
     if (Object.keys(this.formSchemaData).length == 0) {
-      this.redirect();
+      this.buttonDisabled = false;
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =

@@ -9,7 +9,7 @@ export default {
       dbClient
         .get("/form-schema/", {
           params: {
-            form_schema_id: id,
+            id: id,
           },
         })
         .then((response) => {

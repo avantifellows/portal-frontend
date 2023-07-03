@@ -7,44 +7,49 @@
       />
     </div>
   </div>
-  <div
-    v-if="isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp"
-  >
-    <Signup />
-  </div>
 
   <div v-if="!sessionEnabled">
     <NoClassMessage />
   </div>
-
-  <LandingPage v-if="isLandingPage" />
-  <div v-if="!oldFlow">
-    <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-    <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+  <div v-if="isLandingPage">
+    <LandingPage />
   </div>
   <div v-else>
-    <div
-      v-if="
-        !isPurposeRegistration &&
-        !isLandingPage &&
-        isAuthTypeID &&
-        doesGroupExist &&
-        !isSessionTypeSignIn &&
-        !isSessionTypeSignUp
-      "
-    >
-      <Entry
-        :redirectTo="getRedirectTo"
-        :redirectId="getRedirectId"
-        :purpose="getPurpose"
-        :purposeParams="getPurposeParams"
-        :groupData="groupData"
-        :group="getGroup"
-        :authType="getAuthType"
-        :sessionId="sessionId"
-        :userIpAddress="getUserIpAddress"
-        :isExtraInputValidationRequired="isExtraInputValidationsRequired"
-      />
+    <div v-if="!oldFlow">
+      <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+      <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+    </div>
+    <div v-else>
+      <div
+        v-if="
+          !isPurposeRegistration &&
+          !isLandingPage &&
+          isAuthTypeID &&
+          doesGroupExist &&
+          !isSessionTypeSignIn &&
+          !isSessionTypeSignUp
+        "
+      >
+        <Entry
+          :redirectTo="getRedirectTo"
+          :redirectId="getRedirectId"
+          :purpose="getPurpose"
+          :purposeParams="getPurposeParams"
+          :groupData="groupData"
+          :group="getGroup"
+          :authType="getAuthType"
+          :sessionId="sessionId"
+          :userIpAddress="getUserIpAddress"
+          :isExtraInputValidationRequired="isExtraInputValidationsRequired"
+        />
+      </div>
+      <div
+        v-if="
+          isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp
+        "
+      >
+        <Signup />
+      </div>
     </div>
   </div>
 </template>
@@ -217,7 +222,9 @@ export default {
      * @returns {string} The group.
      */
     getGroup() {
-      return this.sessionData.group ? this.sessionData.group : this.group;
+      return this.sessionData && this.sessionData.group
+        ? this.sessionData.group
+        : this.group;
     },
 
     /**

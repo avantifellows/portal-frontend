@@ -59,7 +59,7 @@ export default {
   studentData(data) {
     return new Promise((resolve) => {
       dbClient
-        .post("/user/complete-profile-details", data)
+        .post("/student/complete-profile-details", data)
         .then((response) => {
           resolve(response.data);
         })

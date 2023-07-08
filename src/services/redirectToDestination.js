@@ -42,7 +42,7 @@ export function redirectToDestination(
     }
     case "report": {
       redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
-      fullURL = redirectURL + "/" + redirectId + "/" + userID;
+      fullURL = redirectURL + "/" + redirectId + "/" + userId;
       break;
     }
     case "meet": {

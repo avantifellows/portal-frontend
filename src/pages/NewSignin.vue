@@ -72,7 +72,7 @@
       @click="redirectToSignUp"
       class="mx-auto pt-2 text-xs md:text-sm underline text-red-800"
     >
-      If you are a new student, click here to register
+      {{ signUpText }}
     </button>
   </div>
 </template>
@@ -110,7 +110,16 @@ export default {
   mounted() {
     this.mounted = true;
   },
+
   computed: {
+    getLocale() {
+      return this.$store.state.language;
+    },
+    signUpText() {
+      return this.getLocale == "en"
+        ? "If you are a new student, click here to register"
+        : "यदि आप नए छात्र हैं, तो पंजीकरण करने के लिए यहां क्लिक करें";
+    },
     /**
      * Retrieves the authentication types.
      * @returns {string[]} An array of authentication types.
@@ -201,12 +210,16 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData.locale_data.en).find((key) => {
-        if (key == authType) {
-          UIParameters =
-            this.$store.state.groupData.locale_data.en[key.toString()];
+      Object.keys(this.$store.state.groupData.locale_data[this.getLocale]).find(
+        (key) => {
+          if (key == authType) {
+            UIParameters =
+              this.$store.state.groupData.locale_data[this.getLocale][
+                key.toString()
+              ];
+          }
         }
-      });
+      );
       return UIParameters;
     },
 

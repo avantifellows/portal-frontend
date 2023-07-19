@@ -11,7 +11,9 @@
   <div v-if="!sessionEnabled">
     <NoClassMessage />
   </div>
-  <div v-if="isLandingPage">
+
+  <LanguagePicker />
+  <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
   <div v-else>
@@ -43,7 +45,11 @@
           :isExtraInputValidationRequired="isExtraInputValidationsRequired"
         />
       </div>
-      <div v-if="isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp">
+      <div
+        v-if="
+          isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp
+        "
+      >
         <Signup />
       </div>
     </div>
@@ -61,6 +67,7 @@ import NewSignUp from "./NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
+import LanguagePicker from "../components/LanguagePicker.vue";
 
 const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
@@ -74,6 +81,7 @@ export default {
     LandingPage,
     Entry,
     Signup,
+    LanguagePicker,
   },
   props: {
     /** The resource we are redirecting to */
@@ -161,7 +169,9 @@ export default {
 
     /** TEMP - Returns the auth methods used by each group */
     getAuthType() {
-      return this.groupData && this.groupData.authType ? this.groupData.authType : "ID";
+      return this.groupData && this.groupData.authType
+        ? this.groupData.authType
+        : "ID";
     },
     /**
      * Checks if the session type is a sign-in.
@@ -272,17 +282,20 @@ export default {
         this.sessionId == "HaryanaStudents_10B36_45008_hwx-azzu-gqk"
       ) {
         this.oldFlow = false;
-        this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+        this.sessionData = await sessionAPIService.getSessionData(
+          this.sessionId
+        );
       } else {
-        this.sessionData = await sessionAPIService.getOldSessionData(this.sessionId);
+        this.sessionData = await sessionAPIService.getOldSessionData(
+          this.sessionId
+        );
       }
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
           name: "Error",
           params: {
-            text:
-              "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }
@@ -315,9 +328,13 @@ export default {
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
         if (!this.oldFlow) {
-          this.groupData = await groupAPIService.getGroupName(this.sessionData.id);
+          this.groupData = await groupAPIService.getGroupName(
+            this.sessionData.id
+          );
         } else {
-          this.groupData = await groupAPIService.getGroupData(this.sessionData.group);
+          this.groupData = await groupAPIService.getGroupData(
+            this.sessionData.group
+          );
         }
         //this.groupData = await groupAPIService.getGroupData(groupName);
         this.$store.dispatch("setGroupData", this.groupData);

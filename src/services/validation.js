@@ -94,7 +94,7 @@ export async function validateID(
     let isBirthdateValid = await checkBirthdateInFirestore(
         birthdate,
         userID,
-        "EnableStudents"
+        "EnableStudents",
         "date_of_birth"
       );
     console.log(isCurrentUserValid && isBirthdateValid)

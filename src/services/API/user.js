@@ -3,6 +3,7 @@ import {
   studentSignupEndpoint,
   userSignupEndpoint,
   verifyStudentEndpoint,
+  checkForUserEndpoint
 } from "@/services/API/endpoints.js";
 import { checkForUserEndpoint } from "./endpoints";
 
@@ -14,7 +15,7 @@ export default {
   verifyStudent(studentData) {
     return new Promise((resolve) => {
       dbClient
-        .get(verifyStudentEndpoint, { params: studentData })
+        .get(checkForUserEndpoint, { params: studentData })
         .then((response) => {
           resolve(response.data);
         })

@@ -527,7 +527,7 @@ export default {
       );
       console.log(userValidationResponse)
       if ((this.group == "HimachalStudents" || this.group == "EnableStudents") && this.redirectTo == "quiz") {
-        this.isCurrentUserValid = userValidationResponse;
+        this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
          console.log(this.isCurrentUserValid)
         this.validateCount = 0;
         this.isLoading = false;

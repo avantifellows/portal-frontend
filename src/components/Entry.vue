@@ -525,8 +525,10 @@ export default {
         this.$refs.phoneNumberEntry.phoneNumber,
         this.group
       );
+      console.log(userValidationResponse)
       if ((this.group == "HimachalStudents" || this.group == "EnableStudents") && this.redirectTo == "quiz") {
         this.isCurrentUserValid = userValidationResponse;
+         console.log(this.isCurrentUserValid)
         this.validateCount = 0;
         this.isLoading = false;
       } else if (this.isExtraInputValidationRequired) {

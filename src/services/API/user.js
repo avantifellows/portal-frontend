@@ -2,8 +2,7 @@ import { client, dbClient } from "@/services/API/rootClient.js";
 import {
   studentSignupEndpoint,
   userSignupEndpoint,
-  verifyStudentEndpoint,
-  checkForUserEndpoint
+  verifyStudentEndpoint
 } from "@/services/API/endpoints.js";
 import { checkForUserEndpoint } from "./endpoints";
 

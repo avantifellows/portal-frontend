@@ -11,6 +11,7 @@ async function checkUserIDInDB(
   isExtraInputValidationRequired
 ) {
   let isCurrentUserValid = await userAPI.verifyStudent({ student_id: userID });
+  console.log("valid:", isCurrentUserValid)
   if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
       position: "top-center",

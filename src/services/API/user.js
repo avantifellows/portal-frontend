@@ -104,10 +104,11 @@ export default {
         });
     });
   },
-  doesBirthdateMatch(birthdate, userID, collectionName, columnName) {
+  doesBirthdateMatch(birthdate, userID, collectionName) {
     const params = {
       userID: userID,
       collectionName: collectionName,
+      dob: birthdate,
     };
 
     return new Promise((resolve) => {

@@ -6,11 +6,10 @@ async function checkBirthdateInFirestore(
   collectionName,
   columnName
 ) {
-  return await firebaseAPI.doesBirthdateMatch(
+  return await userAPI.doesBirthdateMatch(
     birthdate,
     userID,
-    collectionName,
-    columnName
+    collectionName
   );
 }
 

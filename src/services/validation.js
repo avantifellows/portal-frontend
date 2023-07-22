@@ -6,11 +6,7 @@ async function checkBirthdateInFirestore(
   collectionName,
   columnName
 ) {
-  return await userAPI.doesBirthdateMatch(
-    birthdate,
-    userID,
-    collectionName
-  );
+  return await userAPI.doesBirthdateMatch(birthdate, userID, collectionName);
 }
 
 /** This function validates an entry with the database
@@ -24,9 +20,9 @@ async function checkUserIDInDB(
   isExtraInputValidationRequired,
   birthdate
 ) {
-  let isCurrentUserValid = await userAPI.verifyStudent({"student_id": userID});
-  
-  if(isCurrentUserValid.error) {
+  let isCurrentUserValid = await userAPI.verifyStudent({ student_id: userID });
+
+  if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
       position: "top-center",
       timeout: false,
@@ -91,20 +87,20 @@ export async function validateID(
   if (group == "Candidates" || group == "EnableStudents") {
     let isCurrentUserValid = await userAPI.verifyUser(userID, "EnableStudents");
     let isBirthdateValid = await checkBirthdateInFirestore(
-        birthdate,
-        userID,
-        "EnableStudents",
-        "date_of_birth"
-      );
-    console.log(isCurrentUserValid && isBirthdateValid)
+      birthdate,
+      userID,
+      "EnableStudents",
+      "date_of_birth"
+    );
+    console.log(isCurrentUserValid && isBirthdateValid);
     return {
-      isCurrentUserValid: (isCurrentUserValid && isBirthdateValid),
+      isCurrentUserValid: isCurrentUserValid && isBirthdateValid,
       validateCount: 0,
     };
   }
   {
     if (authType.includes("ID")) {
-      console.log("here")
+      console.log("here");
       let userValidationResponse = await checkUserIDInDB(
         userID,
         validateCount,

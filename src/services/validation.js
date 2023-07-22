@@ -8,10 +8,19 @@ import userAPI from "@/services/API/user.js";
 async function checkUserIDInDB(
   userID,
   validateCount,
-  isExtraInputValidationRequired
+  isExtraInputValidationRequired,
+  birthdate,
+  userID,
+  collectionName,
+  columnName
 ) {
-  let isCurrentUserValid = await userAPI.verifyStudent({ student_id: userID });
-  console.log("valid:", isCurrentUserValid)
+  let isCurrentUserValid = await userAPI.verifyUser(
+    birthdate,
+    userID,
+    collectionName,
+    columnName
+  );
+
   if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
       position: "top-center",
@@ -74,8 +83,8 @@ export async function validateID(
   phoneNumber,
   group
 ) {
-  if (group == "Candidates") {
-    let isCurrentUserValid = await userAPI.verifyUser(userID);
+  if (group == "Candidates" || group == "EnableStudents") {
+    let isCurrentUserValid = await userAPI.verifyUser(userID, "EnableStudents");
     return {
       isCurrentUserValid: isCurrentUserValid,
       validateCount: 0,

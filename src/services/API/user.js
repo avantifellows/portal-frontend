@@ -87,11 +87,10 @@ export default {
         });
     });
   },
-  verifyUser(userId) {
+  verifyUser(userId, collectionName, columnName) {
     const params = {
       userID: userId,
-      collectionName: "Candidates",
-      columnName: "phone_number",
+      collectionName: collectionName,
     };
     return new Promise((resolve) => {
       client

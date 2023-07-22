@@ -2,7 +2,7 @@ import { client, dbClient } from "@/services/API/rootClient.js";
 import {
   studentSignupEndpoint,
   userSignupEndpoint,
-  verifyStudentEndpoint
+  verifyStudentEndpoint,
 } from "@/services/API/endpoints.js";
 import { checkForUserEndpoint } from "./endpoints";
 
@@ -123,5 +123,4 @@ export default {
         });
     });
   },
-
 };

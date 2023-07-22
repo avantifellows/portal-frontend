@@ -104,4 +104,23 @@ export default {
         });
     });
   },
+  doesBirthdateMatch(birthdate, userID, collectionName, columnName) {
+    const params = {
+      userID: userID,
+      collectionName: collectionName,
+    };
+
+    return new Promise((resolve) => {
+      client
+        .post(checkBirthdateEndpoint, JSON.stringify(params))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
+        });
+    });
+  },
+
 };

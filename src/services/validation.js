@@ -83,6 +83,7 @@ export async function validateID(
   }
   {
     if (authType.includes("ID")) {
+      console.log("here")
       let userValidationResponse = await checkUserIDInDB(
         userID,
         validateCount,

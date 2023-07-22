@@ -15,7 +15,7 @@ export default {
   verifyStudent(studentData) {
     return new Promise((resolve) => {
       dbClient
-        .get(checkForUserEndpoint, { params: studentData })
+        .get(verifyStudentEndpoint, { params: studentData })
         .then((response) => {
           resolve(response.data);
         })

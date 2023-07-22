@@ -525,7 +525,7 @@ export default {
         this.$refs.phoneNumberEntry.phoneNumber,
         this.group
       );
-      if (this.group == "HimachalStudents" && this.redirectTo == "quiz") {
+      if ((this.group == "HimachalStudents" || this.group == "EnableStudents") && this.redirectTo == "quiz") {
         this.isCurrentUserValid = userValidationResponse;
         this.validateCount = 0;
         this.isLoading = false;

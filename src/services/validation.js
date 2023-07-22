@@ -1,5 +1,19 @@
 import userAPI from "@/services/API/user.js";
 
+async function checkBirthdateInFirestore(
+  birthdate,
+  userID,
+  collectionName,
+  columnName
+) {
+  return await firebaseAPI.doesBirthdateMatch(
+    birthdate,
+    userID,
+    collectionName,
+    columnName
+  );
+}
+
 /** This function validates an entry with the database
  * @param {String} userID - current ID being validated
  * @param {Number} validateCount - indicates how many times the user has been validated
@@ -77,9 +91,15 @@ export async function validateID(
 ) {
   if (group == "Candidates" || group == "EnableStudents") {
     let isCurrentUserValid = await userAPI.verifyUser(userID, "EnableStudents");
-    console.log(isCurrentUserValid)
+    let isBirthdateValid = await checkBirthdateInFirestore(
+        birthdate,
+        userID,
+        "EnableStudents"
+        "date_of_birth"
+      );
+    console.log(isCurrentUserValid && isBirthdateValid)
     return {
-      isCurrentUserValid: isCurrentUserValid,
+      isCurrentUserValid: (isCurrentUserValid && isBirthdateValid),
       validateCount: 0,
     };
   }

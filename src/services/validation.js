@@ -9,10 +9,7 @@ async function checkUserIDInDB(
   userID,
   validateCount,
   isExtraInputValidationRequired,
-  birthdate,
-  userID,
-  collectionName,
-  columnName
+  birthdate
 ) {
   let isCurrentUserValid = await userAPI.verifyUser(
     birthdate,

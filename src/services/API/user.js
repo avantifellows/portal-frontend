@@ -87,7 +87,7 @@ export default {
         });
     });
   },
-  verifyUser(userId, collectionName, columnName) {
+  verifyUser(userId, collectionName) {
     const params = {
       userID: userId,
       collectionName: collectionName,

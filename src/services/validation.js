@@ -88,12 +88,12 @@ export async function validateID(
   phoneNumber,
   group
 ) {
-  if (group == "Candidates" || group == "EnableStudents") {
-    let isCurrentUserValid = await userAPI.verifyUser(userID, "EnableStudents");
+  if (group == "Candidates" || group == "EnableStudents" || group == "HimachalStudents") {
+    let isCurrentUserValid = await userAPI.verifyUser(userID, group);
     let isBirthdateValid = await checkBirthdateInFirestore(
         birthdate,
         userID,
-        "EnableStudents",
+        group,
         "date_of_birth"
       );
     console.log(isCurrentUserValid && isBirthdateValid)

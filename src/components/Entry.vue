@@ -532,7 +532,7 @@ export default {
         this.validateCount = 0;
         this.isLoading = false;
       } else if (this.isExtraInputValidationRequired) {
-        this.isCurrentUserValid = userValidationResponse;
+        this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = 2;
         this.isLoading = false;
       } else {

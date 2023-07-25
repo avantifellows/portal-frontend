@@ -4,7 +4,7 @@ import {
   userSignupEndpoint,
   verifyStudentEndpoint,
 } from "@/services/API/endpoints.js";
-import { checkForUserEndpoint } from "./endpoints";
+import { checkForUserEndpoint, checkBirthdateEndpoint } from "./endpoints";
 
 export default {
   /**

@@ -18,9 +18,9 @@ async function checkUserIDInDB(
   userID,
   validateCount,
   isExtraInputValidationRequired,
-  birthdate
+  group
 ) {
-  let isCurrentUserValid = await userAPI.verifyStudent({ student_id: userID });
+  let isCurrentUserValid = await userAPI.verifyUser(userID, group);
 
   if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
@@ -90,13 +90,16 @@ export async function validateID(
     group == "HimachalStudents"
   ) {
     let isCurrentUserValid = await userAPI.verifyUser(userID, group);
-    let isBirthdateValid = await checkBirthdateInFirestore(
-      birthdate,
-      userID,
-      group,
-      "date_of_birth"
-    );
-    console.log(isCurrentUserValid && isBirthdateValid);
+    let isBirthdateValid = true;
+    if (authType.includes("DOB")) {
+      isBirthdateValid = await checkBirthdateInFirestore(
+        birthdate,
+        userID,
+        group,
+        "date_of_birth"
+      );
+    }
+    console.log(isCurrentUserValid, isBirthdateValid);
     return {
       isCurrentUserValid: isCurrentUserValid && isBirthdateValid,
       validateCount: 0,
@@ -108,7 +111,8 @@ export async function validateID(
       let userValidationResponse = await checkUserIDInDB(
         userID,
         validateCount,
-        isExtraInputValidationRequired
+        isExtraInputValidationRequired,
+        group
       );
       if (isExtraInputValidationRequired) {
         if (userValidationResponse) {

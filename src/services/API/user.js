@@ -3,8 +3,10 @@ import {
   studentSignupEndpoint,
   userSignupEndpoint,
   verifyStudentEndpoint,
+  checkForUserEndpoint,
+  checkBirthdateEndpoint,
+  verifyAIETStudentEndpoint,
 } from "@/services/API/endpoints.js";
-import { checkForUserEndpoint, checkBirthdateEndpoint } from "./endpoints";
 
 export default {
   /**
@@ -120,6 +122,26 @@ export default {
         .catch((error) => {
           resolve({ error: error });
           throw new Error("User API returned an error:", error);
+        });
+    });
+  },
+  verifyAIETStudent(phoneNumber, dateOfBirth) {
+    const params = {
+      phone_number: phoneNumber,
+      date_of_birth: dateOfBirth,
+    };
+    console.log(params);
+    return new Promise((resolve) => {
+      client
+        .post(verifyAIETStudentEndpoint, JSON.stringify(params))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("User API returned an error:", error);
+          }
         });
     });
   },

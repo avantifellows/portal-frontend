@@ -8,7 +8,9 @@
       />
     </div>
   </div>
-  <div class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
@@ -51,15 +53,20 @@
 
       <div v-show="hasUserEnteredMoreThanOne" class="my-auto px-3">
         <button @click="deleteInputBox(index, userIDList)">
-          <inline-svg class="fill-current text-red-600 h-8 w-8" :src="deleteSvg" />
+          <inline-svg
+            class="fill-current text-red-600 h-8 w-8"
+            :src="deleteSvg"
+          />
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
-      invalidInputMessage
-    }}</span>
+    <span
+      v-if="isInvalidInputMessageShown"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidInputMessage }}</span
+    >
     <span
       v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
       class="mx-auto text-red-700 text-base mb-1"
@@ -71,7 +78,10 @@
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
         @click="addField"
       >
-        <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1" :src="addSvg" />
+        <inline-svg
+          class="fill-current text-green-600 h-10 w-10 pr-1"
+          :src="addSvg"
+        />
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             {{ addButtonText }}
@@ -217,6 +227,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    enableRegistration: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -238,6 +252,19 @@ export default {
     };
   },
   computed: {
+    formatDateOfBirth() {
+      return (
+        (this.dateOfBirth.month < 10
+          ? "0" + this.dateOfBirth.month
+          : this.dateOfBirth.month) +
+        "-" +
+        (this.dateOfBirth.day < 10
+          ? "0" + this.dateOfBirth.day
+          : this.dateOfBirth.day) +
+        "-" +
+        this.dateOfBirth.year
+      );
+    },
     /** Returns if the authentication type includes date of birth */
     isInputDateOfBirth() {
       return this.authType.includes("DOB");
@@ -248,7 +275,7 @@ export default {
     },
     /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
-      return this.groupData.enableRegistration;
+      return this.groupData.enableRegistration && this.enableRegistration;
     },
     getGroupImages() {
       return this.groupData.images;
@@ -525,10 +552,12 @@ export default {
         this.$refs.phoneNumberEntry.phoneNumber,
         this.group
       );
-      console.log(userValidationResponse)
-      if ((this.group == "HimachalStudents" || this.group == "EnableStudents") && this.redirectTo == "quiz") {
+
+      if (
+        (this.group == "HimachalStudents" || this.group == "EnableStudents") &&
+        this.redirectTo == "quiz"
+      ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
-         console.log(this.isCurrentUserValid)
         this.validateCount = 0;
         this.isLoading = false;
       } else if (this.isExtraInputValidationRequired) {
@@ -565,31 +594,43 @@ export default {
       this.setValidFlag();
       if (this.isCurrentUserValid || this.validateCount > 1) {
         if (
-          redirectToDestination(
-            this.purposeParams,
-            this.userIDList[0]["userID"],
-            this.redirectId,
-            this.redirectTo,
-            this.authType,
-            this.group
-          )
+          !this.isCurrentUserValid &&
+          this.purposeParams == "reporting" &&
+          this.group == "EnableStudents"
         ) {
-          sendSQSMessage(
-            this.purpose,
-            this.purposeParams,
-            this.redirectTo,
-            this.redirectId,
-            this.userIDList,
-            this.authType,
-            this.group,
-            this.$store.state.groupData.userType,
-            this.sessionId,
-            this.userIpAddress,
-            this.isExtraInputValidationRequired && this.isInputPhoneNumber
-              ? this.$refs.phoneNumberEntry.phoneNumber
-              : "",
-            this.$store.state.sessionData.batch ? this.$store.state.sessionData.batch : ""
-          );
+          this.$router.push({
+            path: `aiet-reporting/${this.redirectId}/${latestUserID}/${this.formatDateOfBirth}`,
+          });
+        } else {
+          if (
+            redirectToDestination(
+              this.purposeParams,
+              this.userIDList[0]["userID"],
+              this.redirectId,
+              this.redirectTo,
+              this.authType,
+              this.group
+            )
+          ) {
+            sendSQSMessage(
+              this.purpose,
+              this.purposeParams,
+              this.redirectTo,
+              this.redirectId,
+              this.userIDList,
+              this.authType,
+              this.group,
+              this.$store.state.groupData.userType,
+              this.sessionId,
+              this.userIpAddress,
+              this.isExtraInputValidationRequired && this.isInputPhoneNumber
+                ? this.$refs.phoneNumberEntry.phoneNumber
+                : "",
+              this.$store.state.sessionData.batch
+                ? this.$store.state.sessionData.batch
+                : ""
+            );
+          }
         }
       }
     },

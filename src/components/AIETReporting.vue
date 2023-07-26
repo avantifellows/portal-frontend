@@ -92,7 +92,7 @@ export default {
         this.$refs.phoneNumberEntry.phoneNumber,
         this.$route.params.dateOfBirth
       );
-      console.log(this.isUserValid);
+      console.log(this.isUserValid, this.$route.params.redirectId);
       this.isLoading = false;
       if (this.isUserValid) {
         if (
@@ -109,8 +109,8 @@ export default {
             "attendance",
             "reporting",
             "report",
-            this.redirectId,
-            this.$route.params.id,
+            this.$route.params.redirectId,
+            [{ userID: this.$route.params.id, valid: "False" }],
             "ID,DOB",
             "EnableStudents",
             this.$store.state.groupData.userType,
@@ -119,9 +119,7 @@ export default {
             this.$refs.phoneNumberEntry
               ? this.$refs.phoneNumberEntry.phoneNumber
               : "",
-            this.$store.state.sessionData.batch
-              ? this.$store.state.sessionData.batch
-              : ""
+            ""
           );
         }
       } else {

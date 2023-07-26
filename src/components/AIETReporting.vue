@@ -28,8 +28,7 @@
     <span
       v-if="isInvalidLoginMessageShown"
       class="mx-auto text-red-700 mb-1 text-center text-xs md:text-sm"
-      >Phone Number does not exist! <br />Please contact your Program Manager to
-      resolve the issue!</span
+      >Phone Number does not exist!
     >
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"

@@ -554,7 +554,7 @@ export default {
       );
 
       if (
-        (this.group == "HimachalStudents" || this.group == "EnableStudents") &&
+        (this.group == "HimachalStudents" || this.group == "EnableStudents" || this.group="NGOStudents") &&
         this.redirectTo == "quiz"
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;

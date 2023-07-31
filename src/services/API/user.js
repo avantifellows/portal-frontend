@@ -33,7 +33,7 @@ export default {
    * Creates a new user
    * @param {Object} formData - contains data filled in the form by user
    */
-  userSignup(formData, idGeneration, userType) {
+  newUserSignup(formData, idGeneration, userType) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -51,6 +51,19 @@ export default {
           console.log(error);
           resolve({ error: error });
           throw new Error(error);
+        });
+    });
+  },
+  userSignup(formData) {
+    return new Promise((resolve) => {
+      client
+        .post("/userSignup", JSON.stringify(formData))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
         });
     });
   },

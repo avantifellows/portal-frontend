@@ -470,7 +470,8 @@ export default {
           this.$store.state.groupData.userType,
           this.$store.state.sessionData.sessionId,
           this.$store.state.sessionData.userIp,
-          ""
+          "",
+          this.$store.state.sessionData.batch,
         );
       }
     },

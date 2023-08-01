@@ -47,7 +47,7 @@
         'NIT Warangal',
         'NIT Rourkela',
         'NITK Surathkal',
-        'Central University of Karnataka',
+        'Central University of Kerala',
       ]"
       validation="required"
       name="college"

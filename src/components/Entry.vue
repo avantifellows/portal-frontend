@@ -278,7 +278,6 @@ export default {
       return this.groupData.enableRegistration && this.enableRegistration;
     },
     getGroupImages() {
-      console.log(this.groupData);
       return this.groupData.images;
     },
 

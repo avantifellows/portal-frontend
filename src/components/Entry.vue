@@ -278,6 +278,7 @@ export default {
       return this.groupData.enableRegistration && this.enableRegistration;
     },
     getGroupImages() {
+      console.log(this.groupData);
       return this.groupData.images;
     },
 
@@ -554,7 +555,9 @@ export default {
       );
 
       if (
-        (this.group == "HimachalStudents" || this.group == "EnableStudents" || this.group == "NGOStudents") &&
+        (this.group == "HimachalStudents" ||
+          this.group == "EnableStudents" ||
+          this.group == "NGOStudents") &&
         this.redirectTo == "quiz"
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
@@ -628,7 +631,8 @@ export default {
                 : "",
               this.$store.state.sessionData.batch
                 ? this.$store.state.sessionData.batch
-                : ""
+                : "",
+              this.isInputDateOfBirth ? this.formatDateOfBirth : ""
             );
           }
         }

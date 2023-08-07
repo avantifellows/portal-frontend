@@ -38,7 +38,8 @@ export async function sendSQSMessage(
   sessionId,
   userIpAddress,
   phoneNumber,
-  batch
+  batch,
+  dateOfBirth
 ) {
   const messageBody = [
     {
@@ -60,6 +61,7 @@ export async function sendSQSMessage(
       userIpAddress: userIpAddress,
       phoneNumber: phoneNumber,
       batch: batch,
+      dateOfBirth: dateOfBirth,
     },
   ];
   const params = {

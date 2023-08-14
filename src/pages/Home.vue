@@ -268,16 +268,14 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != null) {
-      if (this.sessionId == "DelhiStudents_Test+Batch_44711_vfr-mndk-ado") {
-        this.oldFlow = false;
-        this.sessionData = await sessionAPIService.getSessionData(
-          this.sessionId
-        );
-      } else {
-        this.sessionData = await sessionAPIService.getOldSessionData(
-          this.sessionId
-        );
-      }
+      this.oldFlow = false;
+      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+
+      // } else {
+      //   this.sessionData = await sessionAPIService.getOldSessionData(
+      //     this.sessionId
+      //   );
+      // }
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({

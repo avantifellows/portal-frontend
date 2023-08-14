@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" v-if="show">
     <p class="text-left text-md font-semibold">
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
       type="tel"
@@ -30,6 +30,10 @@ export default {
   name: "PhoneNumberEntry",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",

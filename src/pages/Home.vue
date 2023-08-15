@@ -11,7 +11,9 @@
   <div v-if="!sessionEnabled">
     <NoClassMessage />
   </div>
-  <div v-if="isLandingPage">
+
+  <LanguagePicker />
+  <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
   <div v-else>
@@ -65,6 +67,7 @@ import NewSignUp from "./NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
+import LanguagePicker from "../components/LanguagePicker.vue";
 
 const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
@@ -78,6 +81,7 @@ export default {
     LandingPage,
     Entry,
     Signup,
+    LanguagePicker,
   },
   props: {
     /** The resource we are redirecting to */

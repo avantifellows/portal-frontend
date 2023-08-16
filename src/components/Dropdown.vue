@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" v-if="show">
     <p class="text-md font-semibold">
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
 
     <FormKit
@@ -22,6 +22,10 @@ export default {
   name: "Dropdown",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",
@@ -55,6 +59,9 @@ export default {
     return {
       value: "",
     };
+  },
+  created() {
+    // console.log(this.label, this.options);
   },
   watch: {
     /**

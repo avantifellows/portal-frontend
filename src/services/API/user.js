@@ -3,8 +3,10 @@ import {
   studentSignupEndpoint,
   userSignupEndpoint,
   verifyStudentEndpoint,
+  checkForUserEndpoint,
+  checkBirthdateEndpoint,
+  verifyAIETStudentEndpoint,
 } from "@/services/API/endpoints.js";
-import { checkForUserEndpoint } from "./endpoints";
 
 export default {
   /**
@@ -31,7 +33,7 @@ export default {
    * Creates a new user
    * @param {Object} formData - contains data filled in the form by user
    */
-  userSignup(formData, idGeneration, userType) {
+  newUserSignup(formData, idGeneration, userType) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -49,6 +51,19 @@ export default {
           console.log(error);
           resolve({ error: error });
           throw new Error(error);
+        });
+    });
+  },
+  userSignup(formData) {
+    return new Promise((resolve) => {
+      client
+        .post("/userSignup", JSON.stringify(formData))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
         });
     });
   },
@@ -87,11 +102,10 @@ export default {
         });
     });
   },
-  verifyUser(userId) {
+  verifyUser(userId, collectionName) {
     const params = {
       userID: userId,
-      collectionName: "Candidates",
-      columnName: "phone_number",
+      collectionName: collectionName,
     };
     return new Promise((resolve) => {
       client
@@ -102,6 +116,45 @@ export default {
         .catch((error) => {
           resolve({ error: error });
           throw new Error("User API returned an error:", error);
+        });
+    });
+  },
+  doesBirthdateMatch(birthdate, userID, collectionName) {
+    const params = {
+      userID: userID,
+      collectionName: collectionName,
+      dob: birthdate,
+    };
+
+    return new Promise((resolve) => {
+      client
+        .post(checkBirthdateEndpoint, JSON.stringify(params))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
+        });
+    });
+  },
+  verifyAIETStudent(phoneNumber, dateOfBirth) {
+    const params = {
+      phone_number: phoneNumber,
+      date_of_birth: dateOfBirth,
+    };
+    console.log(params);
+    return new Promise((resolve) => {
+      client
+        .post(verifyAIETStudentEndpoint, JSON.stringify(params))
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("User API returned an error:", error);
+          }
         });
     });
   },

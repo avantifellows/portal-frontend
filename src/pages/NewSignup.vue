@@ -23,18 +23,19 @@
     <p class="text-2xl mx-auto font-bold">
       {{ formTitle }}
     </p>
-    <p class="text-center">All fields are mandatory</p>
+    <p class="text-center">{{ formSubTitle }}</p>
 
     <div class="mx-auto w-2/3 md:w-auto">
       <component
         v-for="(formField, index) in formFields"
+        :show="formField.show"
         :key="index"
         :is="formField.component"
         :label="formField.label"
-        :isRequired="formField.isRequired"
+        :isRequired="formField.required"
         :dbKey="formField.key"
         :placeholder="formField.placeholder"
-        :options="getOptions(formField)"
+        :options="formField.options"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText"
@@ -100,12 +101,18 @@ export default {
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
+      this.formData.attributes[field]["show"] =
+        this.formData.attributes[field].showBasedOn == "" ? true : false;
+      this.formData.attributes[field]["required"] =
+        this.formData.attributes[field].required == "TRUE" ? true : false;
     });
   },
   watch: {
     userData: {
       handler() {
         this.isUserDataIsComplete();
+        this.getOptions();
+        this.showBasedOn();
       },
       deep: true,
     },
@@ -120,7 +127,9 @@ export default {
     formTitle() {
       return this.formData.name;
     },
-
+    formSubTitle() {
+      return this.formData.sub_heading;
+    },
     /** returns all fields to be displayed in the form */
     formFields() {
       return this.formData.attributes;
@@ -144,23 +153,51 @@ export default {
     },
   },
   methods: {
-    getOptions(field) {
-      if (field.dependant) {
-        if (this.userData[field.dependantField])
-          return field.dependantFieldMapping[
-            this.userData[field.dependantField]
-          ];
-      } else return field.options;
-    },
+    showBasedOn() {
+      return Object.keys(this.formData.attributes).forEach((field) => {
+        let fieldAttributes = this.formData.attributes[field];
+        let showBasedOn = fieldAttributes.showBasedOn;
 
+        if (fieldAttributes.showBasedOn != "") {
+          if (
+            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
+            Object.values(JSON.parse(showBasedOn))
+          ) {
+            fieldAttributes["show"] = true;
+          } else fieldAttributes["show"] = false;
+        }
+      });
+    },
+    getOptions() {
+      Object.keys(this.formData.attributes).forEach((field) => {
+        let fieldAttributes = this.formData.attributes[field];
+
+        if (fieldAttributes.dependant) {
+          if (this.userData[fieldAttributes.dependantField]) {
+            fieldAttributes["options"] = JSON.parse(
+              fieldAttributes.dependantFieldMapping
+            )[this.userData[fieldAttributes.dependantField]];
+          }
+        } else {
+          fieldAttributes["options"] = Object.values(fieldAttributes.options);
+        }
+      });
+    },
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;
       Object.keys(this.formData.attributes).forEach((field) => {
         if (
-          !this.userData.hasOwnProperty(this.formData.attributes[field].key) ||
-          this.formData.attributes[field].key == ""
+          (!this.userData.hasOwnProperty(this.formData.attributes[field].key) ||
+            this.userData[this.formData.attributes[field].key] == "") &&
+          this.formData.attributes[field].required &&
+          this.formData.attributes[field].show
         ) {
+          console.log(
+            !this.userData.hasOwnProperty(this.formData.attributes[field].key),
+            this.formData.attributes[field].key,
+            this.formData.attributes[field].required
+          );
           isUserDataComplete = false;
         }
       });
@@ -180,21 +217,21 @@ export default {
       this.formSubmitted = true;
       this.isLoading = true;
 
-      let createdUserId = await UserAPI.userSignup(
-        this.userData,
-        this.$store.state.sessionData.id_generation,
-        this.$store.state.groupData.input_schema.userType
-      );
+      // let createdUserId = await UserAPI.userSignup(
+      //   this.userData,
+      //   this.$store.state.sessionData.id_generation,
+      //   this.$store.state.groupData.input_schema.userType
+      // );
 
-      if (createdUserId == "" || createdUserId.error) {
-        this.$router.push({
-          name: "Error",
-          state: {
-            type: "500",
-            text: "ID could not be created. Please contact your program manager.",
-          },
-        });
-      }
+      // if (createdUserId == "" || createdUserId.error) {
+      //   this.$router.push({
+      //     name: "Error",
+      //     state: {
+      //       type: "500",
+      //       text: "ID could not be created. Please contact your program manager.",
+      //     },
+      //   });
+      // }
       this.isLoading = false;
       this.userData["user_id"] = createdUserId ? createdUserId : "";
     },

@@ -23,6 +23,14 @@
       help="Select your gender."
     />
     <FormKit
+      type="email"
+      label="Email Address"
+      validation="email"
+      validation-visibility="live"
+      name="email"
+      help="Enter a valid email address if you have one. Example: karn.mathur@gmail.com"
+    />
+    <FormKit
       type="select"
       label="*Degree"
       placeholder="Select your degree"
@@ -39,7 +47,7 @@
         'NIT Warangal',
         'NIT Rourkela',
         'NITK Surathkal',
-        'Central University of Karnataka',
+        'Central University of Kerala',
       ]"
       validation="required"
       name="college"

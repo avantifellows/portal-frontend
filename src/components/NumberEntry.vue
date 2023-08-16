@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col justify-center">
+  <div class="flex flex-col justify-center" v-if="show">
     <p class="text-md md:text-lg font-semibold">
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
       type="number"
@@ -30,6 +30,10 @@ export default {
   name: "NumberEntry",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",

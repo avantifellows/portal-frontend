@@ -1,5 +1,14 @@
 import userAPI from "@/services/API/user.js";
 
+async function checkBirthdateInFirestore(
+  birthdate,
+  userID,
+  collectionName,
+  columnName
+) {
+  return await userAPI.doesBirthdateMatch(birthdate, userID, collectionName);
+}
+
 /** This function validates an entry with the database
  * @param {String} userID - current ID being validated
  * @param {Number} validateCount - indicates how many times the user has been validated
@@ -8,9 +17,11 @@ import userAPI from "@/services/API/user.js";
 async function checkUserIDInDB(
   userID,
   validateCount,
-  isExtraInputValidationRequired
+  isExtraInputValidationRequired,
+  group
 ) {
-  let isCurrentUserValid = await userAPI.verifyStudent({ student_id: userID });
+  let isCurrentUserValid = await userAPI.verifyUser(userID, group);
+
   if (isCurrentUserValid.error) {
     this.toast.error("Network Error, please try again!", {
       position: "top-center",
@@ -20,6 +31,7 @@ async function checkUserIDInDB(
       closeButton: false,
     });
   }
+  console.log("extra:", isExtraInputValidationRequired);
   if (!isExtraInputValidationRequired) {
     if (isCurrentUserValid) {
       return {
@@ -73,19 +85,37 @@ export async function validateID(
   phoneNumber,
   group
 ) {
-  if (group == "Candidates") {
-    let isCurrentUserValid = await userAPI.verifyUser(userID);
+  if (
+    group == "Candidates" ||
+    group == "EnableStudents" ||
+    group == "HimachalStudents" ||
+    group == "DelhiStudents" ||
+    group == "NGOStudents"
+  ) {
+    let isCurrentUserValid = await userAPI.verifyUser(userID, group);
+    let isBirthdateValid = true;
+    if (authType.includes("DOB")) {
+      isBirthdateValid = await checkBirthdateInFirestore(
+        birthdate,
+        userID,
+        group,
+        "date_of_birth"
+      );
+    }
+    console.log(isCurrentUserValid, isBirthdateValid);
     return {
-      isCurrentUserValid: isCurrentUserValid,
+      isCurrentUserValid: isCurrentUserValid && isBirthdateValid,
       validateCount: 0,
     };
   }
   {
     if (authType.includes("ID")) {
+      console.log("here");
       let userValidationResponse = await checkUserIDInDB(
         userID,
         validateCount,
-        isExtraInputValidationRequired
+        isExtraInputValidationRequired,
+        group
       );
       if (isExtraInputValidationRequired) {
         if (userValidationResponse) {

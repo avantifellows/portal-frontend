@@ -10,6 +10,7 @@ export default createStore({
     phoneNumber: null,
     groupData: {},
     sessionData: {},
+    language: "en",
   },
   actions: {
     setPhoneNumber({ commit }, phoneNumber) {
@@ -24,6 +25,9 @@ export default createStore({
     setSessionId({ commit }, sessionId) {
       commit("setSessionId", sessionId);
     },
+    setLanguage({ commit }, language) {
+      commit("setLanguage", language);
+    },
   },
   mutations: {
     setPhoneNumber(state, phoneNumber) {
@@ -37,6 +41,9 @@ export default createStore({
     },
     setSessionId(state, sessionId) {
       state.sessionData.sessionId = sessionId;
+    },
+    setLanguage(state, language) {
+      state.language = language;
     },
   },
   plugins: [

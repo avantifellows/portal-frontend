@@ -8,7 +8,7 @@
       type="select"
       v-model="value"
       :options="options"
-      placeholder=" "
+      :placeholder="placeholder"
       :validation="[isRequired ? ['required'] : []]"
       validation-visibility="dirty"
       :name="dbKey"

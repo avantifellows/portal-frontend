@@ -187,9 +187,7 @@ export default {
               ];
           }
         } else {
-          fieldAttributes["options"] = Object.values(
-            fieldAttributes.options[this.getLocale]
-          );
+          return fieldAttributes.options[this.getLocale]
         }
       });
     },

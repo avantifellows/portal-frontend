@@ -3,7 +3,6 @@
     <p class="text-md font-semibold">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
-    <div class="flex flex-row justify-center mt-2">
       <FormKit
         type="date"
         :name="dbKey"
@@ -16,7 +15,6 @@
         validation-visibility="dirty"
         :help="helpText"
       />
-    </div>
   </div>
 </template>
 <script>

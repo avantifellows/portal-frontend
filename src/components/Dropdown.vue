@@ -8,7 +8,7 @@
       type="select"
       v-model="value"
       :options="options"
-      :placeholder="placeholder"
+      placeholder="Select"
       :validation="[isRequired ? ['required'] : []]"
       validation-visibility="dirty"
       :name="dbKey"
@@ -32,7 +32,7 @@ export default {
     },
     placeholder: {
       type: String,
-      defult: "",
+      default: "",
     },
     isRequired: {
       type: Boolean,
@@ -60,9 +60,7 @@ export default {
       value: "",
     };
   },
-  created() {
-    // console.log(this.label, this.options);
-  },
+  created() {},
   watch: {
     /**
      * Emits 'update' event whenever the dropdown value is changed

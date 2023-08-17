@@ -109,6 +109,7 @@ export default {
   },
   mounted() {
     this.mounted = true;
+    console.log(this.$store.state.sessionData);
   },
 
   computed: {

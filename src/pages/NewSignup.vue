@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-
+  <LanguagePicker />
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
@@ -31,14 +31,14 @@
         :show="formField.show"
         :key="index"
         :is="formField.component"
-        :label="formField.label"
+        :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
         :placeholder="formField.placeholder"
         :options="formField.options"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText"
+        :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
       />
     </div>
@@ -79,10 +79,13 @@ import UserAPI from "@/services/API/user.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
+import LanguagePicker from "../components/LanguagePicker.vue";
+
 const assets = useAssets();
 
 export default {
   name: "SignUp",
+  components: { LanguagePicker },
   data() {
     return {
       isLoading: false,
@@ -106,6 +109,7 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
+    console.log(typeof this.$store.state.sessionData.id_generation);
   },
   watch: {
     userData: {
@@ -118,6 +122,9 @@ export default {
     },
   },
   computed: {
+    getLocale() {
+      return this.$store.state.language;
+    },
     /** returns images to be displayed for a group */
     getGroupImages() {
       return this.$store.state.groupData.input_schema.images;
@@ -174,12 +181,15 @@ export default {
 
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
-            fieldAttributes["options"] = JSON.parse(
-              fieldAttributes.dependantFieldMapping
-            )[this.userData[fieldAttributes.dependantField]];
+            fieldAttributes["options"] =
+              fieldAttributes.dependantFieldMapping[
+                this.userData[fieldAttributes.dependantField]
+              ];
           }
         } else {
-          fieldAttributes["options"] = Object.values(fieldAttributes.options);
+          fieldAttributes["options"] = Object.values(
+            fieldAttributes.options[this.getLocale]
+          );
         }
       });
     },
@@ -193,11 +203,6 @@ export default {
           this.formData.attributes[field].required &&
           this.formData.attributes[field].show
         ) {
-          console.log(
-            !this.userData.hasOwnProperty(this.formData.attributes[field].key),
-            this.formData.attributes[field].key,
-            this.formData.attributes[field].required
-          );
           isUserDataComplete = false;
         }
       });
@@ -217,21 +222,22 @@ export default {
       this.formSubmitted = true;
       this.isLoading = true;
 
-      // let createdUserId = await UserAPI.userSignup(
-      //   this.userData,
-      //   this.$store.state.sessionData.id_generation,
-      //   this.$store.state.groupData.input_schema.userType
-      // );
+      let createdUserId = await UserAPI.newUserSignup(
+        this.userData,
+        this.$store.state.sessionData.id_generation,
+        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.groupData.name
+      );
 
-      // if (createdUserId == "" || createdUserId.error) {
-      //   this.$router.push({
-      //     name: "Error",
-      //     state: {
-      //       type: "500",
-      //       text: "ID could not be created. Please contact your program manager.",
-      //     },
-      //   });
-      // }
+      if (createdUserId == "" || createdUserId.error) {
+        this.$router.push({
+          name: "Error",
+          state: {
+            type: "500",
+            text: "ID could not be created. Please contact your program manager.",
+          },
+        });
+      }
       this.isLoading = false;
       this.userData["user_id"] = createdUserId ? createdUserId : "";
     },

@@ -12,11 +12,11 @@
     <NoClassMessage />
   </div>
 
-  <LanguagePicker />
   <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
   <div v-else>
+    <LanguagePicker />
     <div v-if="!oldFlow">
       <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
       <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />

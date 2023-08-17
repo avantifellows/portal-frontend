@@ -32,7 +32,7 @@ export default {
       dbClient
         .get("/form-schema/student", {
           params: {
-            number_of_fields: numberOfFields,
+            number_of_fields_in_pop_form: numberOfFields,
             group: group,
             student_id: studentId,
           },

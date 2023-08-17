@@ -2,6 +2,7 @@
   <div
     class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8"
   >
+    <LanguagePicker />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <img class="mx-auto h-10 w-auto" :src="AFLogo" />
       <h2
@@ -17,14 +18,14 @@
         v-for="(formField, index) in formSchemaData"
         :key="index"
         :is="formField.component"
-        :label="formField.label"
+        :label="formField.label[getLocale]"
         :isRequired="formField.isRequired"
         :dbKey="formField.key"
         :placeholder="formField.placeholder"
         :options="getOptions(formField)"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText"
+        :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
       />
 
@@ -45,11 +46,13 @@ import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import LanguagePicker from "../components/LanguagePicker.vue";
 
 const assets = useAssets();
 
 export default {
   name: "Information Form",
+  components: { LanguagePicker },
   data() {
     return {
       AFLogo: assets.AFLogoSvg,
@@ -65,21 +68,25 @@ export default {
     },
   },
   async created() {
+    console.log(this.$store.state.sessionData);
     /** Fetches all the fields that need to be filled by the student
     /* Also, maps each field to its input component
     */
     this.formSchemaData = await FormSchemaAPI.getFormFields(
-      this.$store.state.sessionData.meta_data.number_of_fields_in_pop_up_form,
+      this.$store.state.sessionData.number_of_fields_in_pop_form,
       this.$store.state.groupData.name,
       this.id
     );
-    console.log(this.formSchemaData);
     if (Object.keys(this.formSchemaData).length == 0) {
       this.buttonDisabled = false;
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
         typeToInputParameters[this.formSchemaData[field].type];
+      this.formSchemaData[field]["show"] =
+        this.formSchemaData[field].showBasedOn == "" ? true : false;
+      this.formSchemaData[field]["required"] =
+        this.formSchemaData[field].required == "TRUE" ? true : false;
     });
   },
   watch: {
@@ -90,6 +97,11 @@ export default {
       deep: true,
     },
   },
+  computed: {
+    getLocale() {
+      return this.$store.state.language;
+    },
+  },
   methods: {
     getOptions(field) {
       /** Gets dropdown options for a field that is dependant on the value of another field */
@@ -98,7 +110,7 @@ export default {
           return field.dependantFieldMapping[
             this.userData[field.dependantField]
           ];
-      } else return field.options;
+      } else return field.options[this.getLocale];
     },
 
     /** checks if user data has all the fields required */
@@ -106,8 +118,10 @@ export default {
       let isUserDataComplete = true;
       Object.keys(this.formSchemaData).forEach((field) => {
         if (
-          !this.userData.hasOwnProperty(this.formSchemaData[field].key) ||
-          this.userData[this.formSchemaData[field].key] == ""
+          (!this.userData.hasOwnProperty(this.formSchemaData[field].key) ||
+            this.userData[this.formSchemaData[field].key] == "") &&
+          this.formSchemaData[field].required &&
+          this.formSchemaData[field].show
         ) {
           isUserDataComplete = false;
         }

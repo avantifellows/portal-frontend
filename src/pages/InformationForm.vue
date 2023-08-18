@@ -16,10 +16,11 @@
       <component
         class=""
         v-for="(formField, index) in formSchemaData"
+        :show="formField.show"
         :key="index"
         :is="formField.component"
         :label="formField.label[getLocale]"
-        :isRequired="formField.isRequired"
+        :isRequired="formField.required"
         :dbKey="formField.key"
         :placeholder="formField.placeholder"
         :options="getOptions(formField)"
@@ -47,6 +48,7 @@ import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LanguagePicker from "../components/LanguagePicker.vue";
+import { useToast } from "vue-toastification";
 
 const assets = useAssets();
 
@@ -59,6 +61,7 @@ export default {
       formSchemaData: {}, // contains data about the form schema
       buttonDisabled: true,
       userData: {}, // contains data entered by user
+      toast: useToast(),
     };
   },
   props: {
@@ -68,7 +71,6 @@ export default {
     },
   },
   async created() {
-    console.log(this.$store.state.sessionData);
     /** Fetches all the fields that need to be filled by the student
     /* Also, maps each field to its input component
     */
@@ -77,6 +79,15 @@ export default {
       this.$store.state.groupData.name,
       this.id
     );
+    if (this.formSchemaData.error) {
+      this.toast.error("Unable to fetch form!", {
+        position: "top-center",
+        timeout: false,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: false,
+      });
+    }
     if (Object.keys(this.formSchemaData).length == 0) {
       this.buttonDisabled = false;
     }
@@ -93,6 +104,8 @@ export default {
     userData: {
       handler() {
         this.isUserDataIsComplete();
+        this.getOptions();
+        this.showBasedOn();
       },
       deep: true,
     },
@@ -103,14 +116,36 @@ export default {
     },
   },
   methods: {
-    getOptions(field) {
-      /** Gets dropdown options for a field that is dependant on the value of another field */
-      if (field.dependant) {
-        if (this.userData[field.dependantField])
-          return field.dependantFieldMapping[
-            this.userData[field.dependantField]
-          ];
-      } else return field.options[this.getLocale];
+    showBasedOn() {
+      return Object.keys(this.formSchemaData).forEach((field) => {
+        let fieldAttributes = this.formSchemaData[field];
+        let showBasedOn = fieldAttributes.showBasedOn;
+
+        if (fieldAttributes.showBasedOn != "") {
+          if (
+            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
+            Object.values(JSON.parse(showBasedOn))
+          ) {
+            fieldAttributes["show"] = true;
+          } else fieldAttributes["show"] = false;
+        }
+      });
+    },
+    getOptions() {
+      Object.keys(this.formSchemaData).forEach((field) => {
+        let fieldAttributes = this.formSchemaData[field];
+
+        if (fieldAttributes.dependant) {
+          if (this.userData[fieldAttributes.dependantField]) {
+            fieldAttributes["options"] =
+              fieldAttributes.dependantFieldMapping[
+                this.userData[fieldAttributes.dependantField]
+              ];
+          }
+        } else {
+          return fieldAttributes.options[this.getLocale];
+        }
+      });
     },
 
     /** checks if user data has all the fields required */

@@ -109,7 +109,6 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
-    console.log(typeof this.$store.state.sessionData.id_generation);
   },
   watch: {
     userData: {
@@ -187,7 +186,7 @@ export default {
               ];
           }
         } else {
-          return fieldAttributes.options[this.getLocale]
+          return fieldAttributes.options[this.getLocale];
         }
       });
     },

@@ -15,12 +15,22 @@
   <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
+
   <div v-else>
     <LanguagePicker />
     <div v-if="!oldFlow">
-      <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-      <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+      <NewSignIn
+        v-if="isSessionTypeSignIn && doesGroupExist"
+        :sendSQSMessageHelper="sendSQSMessageHelper"
+        :redirectToDestinationHelper="redirectToDestinationHelper"
+      />
+      <NewSignUp
+        v-if="isSessionTypeSignUp && doesGroupExist"
+        :sendSQSMessageHelper="sendSQSMessageHelper"
+        :redirectToDestinationHelper="redirectToDestinationHelper"
+      />
     </div>
+
     <div v-else>
       <div
         v-if="
@@ -45,6 +55,7 @@
           :isExtraInputValidationRequired="isExtraInputValidationsRequired"
         />
       </div>
+
       <div
         v-if="
           isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp
@@ -57,17 +68,21 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
+
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
+
 import NoClassMessage from "@/components/NoClassMessage.vue";
+import Entry from "@/components/Entry.vue";
+import Signup from "@/components/Signup.vue";
+import LanguagePicker from "@/components/LanguagePicker.vue";
+
 import useAssets from "@/assets/assets.js";
-import { useToast } from "vue-toastification";
+
 import NewSignIn from "./NewSignin.vue";
 import NewSignUp from "./NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
-import Entry from "@/components/Entry.vue";
-import Signup from "@/components/Signup.vue";
-import LanguagePicker from "../components/LanguagePicker.vue";
 
 const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
@@ -133,6 +148,7 @@ export default {
   },
 
   computed: {
+    /** TEMP - returns if the purpose is registration */
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
     },
@@ -173,6 +189,7 @@ export default {
         ? this.groupData.authType
         : "ID";
     },
+
     /**
      * Checks if the session type is a sign-in.
      * @returns {boolean} True if the session type is a sign-in, false otherwise.
@@ -267,19 +284,50 @@ export default {
       );
     },
   },
+  methods: {
+    sendSQSMessageHelper(purpose, userId, phoneNumber, dateOfBirth) {
+      sendSQSMessage(
+        purpose,
+        this.$store.state.sessionData.purpose["sub-type"],
+        this.$store.state.sessionData.platform,
+        this.$store.state.sessionData.platform_id,
+        userId,
+        this.getAuthTypes.toString(),
+        this.$store.state.groupData.name,
+        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.sessionData.session_id,
+        "", // user IP address
+        phoneNumber,
+        this.$store.state.sessionData.meta_data.batch,
+        dateOfBirth
+      );
+    },
+    redirectToDestinationHelper(userId) {
+      return redirectToDestination(
+        this.$store.state.sessionData.purpose.params,
+        userId,
+        this.$store.state.sessionData.platform_id,
+        this.$store.state.sessionData.platform,
+        this.$store.state.groupData.input_schema.userType
+      );
+    },
+  },
   async created() {
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != null) {
-      this.oldFlow = false;
-      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
+      if (this.sessionId.startsWith("HaryanaStudents")) {
+        this.oldFlow = false;
+        this.sessionData = await sessionAPIService.getSessionData(
+          this.sessionId
+        );
+      } else {
+        this.sessionData = await sessionAPIService.getOldSessionData(
+          this.sessionId
+        );
+      }
 
-      // } else {
-      //   this.sessionData = await sessionAPIService.getOldSessionData(
-      //     this.sessionId
-      //   );
-      // }
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
@@ -304,6 +352,7 @@ export default {
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
         this.$store.dispatch("setSessionId", this.sessionId);
+
         if (this.oldFlow) {
           if ("sessionActive" in this.sessionData) {
             this.sessionEnabled = this.sessionData.sessionActive;
@@ -326,6 +375,7 @@ export default {
             this.sessionData.group
           );
         }
+
         //this.groupData = await groupAPIService.getGroupData(groupName);
         this.$store.dispatch("setGroupData", this.groupData);
         if (!this.sessionData.error && this.groupData && this.groupData.error) {

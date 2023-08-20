@@ -231,7 +231,13 @@ export default {
   methods: {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
-      console.log(formData);
+      this.isUserValid = await UserAPI.verifyAIETStudent({
+        phone_number: formData.number,
+        alternate_number: formData.number,
+        school_name: formData.school,
+        date_of_birth: formData.dateOfBirth,
+        grade: formData.grade,
+      });
     },
 
     redirect() {

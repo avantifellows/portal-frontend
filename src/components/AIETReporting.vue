@@ -87,10 +87,10 @@ export default {
   methods: {
     async authenticate() {
       this.isLoading = true;
-      this.isUserValid = await userAPI.verifyAIETStudent(
-        this.$refs.phoneNumberEntry.phoneNumber,
-        this.$route.params.dateOfBirth
-      );
+      this.isUserValid = await userAPI.verifyAIETStudent({
+        phone_number: this.$refs.phoneNumberEntry.phoneNumber,
+        date_of_birth: this.$route.params.dateOfBirth,
+      });
       console.log(this.isUserValid, this.$route.params.redirectId);
       this.isLoading = false;
       if (this.isUserValid) {
@@ -115,9 +115,7 @@ export default {
             this.$store.state.groupData.userType,
             "",
             "",
-            this.$refs.phoneNumberEntry
-              ? this.$refs.phoneNumberEntry.phoneNumber
-              : "",
+            this.$refs.phoneNumberEntry ? this.$refs.phoneNumberEntry.phoneNumber : "",
             ""
           );
         }

@@ -226,7 +226,7 @@ export default {
     },
     enableRegistration: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
@@ -273,8 +273,7 @@ export default {
     },
     /** Returns if the group has enabled registration */
     isRegistrationEnabled() {
-      console.log(this.groupData.enableRegistration, this.enableRegistration);
-      return this.groupData.enableRegistration && this.enableRegistration;
+      return this.groupData.enableRegistration || this.enableRegistration;
     },
     getGroupImages() {
       return this.groupData.images;

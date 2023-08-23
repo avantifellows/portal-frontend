@@ -117,6 +117,7 @@
         help="Please enter the phone number you registered with. Example: 9848022335"
       />
     </FormKit>
+  </div>
 
     <button
         v-show="formSubmitted && isUserIdEmpty"
@@ -146,7 +147,6 @@
         Take Test
       </button>
     </div>
-  </div>
 </template>
 <script>
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";

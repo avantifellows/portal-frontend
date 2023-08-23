@@ -250,7 +250,7 @@ export default {
   },
   computed: {
     isAIET() {
-      return true;
+      return this.$store.state.sessionData.isAIET;
     },
     formatDateOfBirth() {
       return (

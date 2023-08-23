@@ -33,6 +33,7 @@
             placeholder="Day"
             :options="dayList"
             validation="required"
+            help="Select your Date of Birth."
           />
           <FormKit
             type="select"
@@ -42,9 +43,7 @@
             placeholder="Month"
             :options="monthList"
             validation="required"
-            help="Select your Date of Birth."
           />
-
           <FormKit
             type="select"
             name="year"
@@ -117,7 +116,15 @@
         name="number"
         help="Please enter the phone number you registered with. Example: 9848022335"
       />
+      <button
+        v-show="isUserIdEmpty"
+        class="mx-auto pb-2 text-md underline text-red-800"
+        @click="redirectToSignup"
+      >
+        You are not registered. Please sign up.
+      </button>
     </FormKit>
+
     <div
       v-if="formSubmitted"
       class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
@@ -171,7 +178,7 @@ export default {
       studentId: "",
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
-      userId: "",
+      userId: null,
     };
   },
   created() {
@@ -227,17 +234,27 @@ export default {
         this.$store.state.sessionData.group != "Candidates"
       );
     },
+    isUserIdEmpty() {
+      return this.userId == "";
+    },
   },
   methods: {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
-      this.isUserValid = await UserAPI.verifyAIETStudent({
+      let dateOfBirth =
+        (this.month > 9 ? this.month : "0" + this.month) +
+        "-" +
+        (this.day > 9 ? this.day : "0" + this.day) +
+        "-" +
+        this.year;
+      this.userId = await UserAPI.verifyAIETStudent({
         phone_number: formData.number,
         alternate_number: formData.number,
         school_name: formData.school,
-        date_of_birth: formData.dateOfBirth,
+        date_of_birth: dateOfBirth,
         grade: formData.grade,
       });
+      console.log(this.userId == "");
     },
 
     redirect() {
@@ -271,6 +288,11 @@ export default {
           this.dateOfBirth
         );
       }
+    },
+    redirectToSignup() {
+      this.$router.push({
+        name: "Signup",
+      });
     },
   },
 };

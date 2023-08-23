@@ -17,7 +17,7 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto items-center h-full pt-12 pb-10 space-y-3">
+  <div class="flex flex-col my-auto items-center h-full pt-12 pb-10 space-y-3" v-if="!formSubmitted">
     <FormKit
       type="form"
       :config="{ validationVisibility: 'submit' }"
@@ -116,17 +116,18 @@
         name="number"
         help="Please enter the phone number you registered with. Example: 9848022335"
       />
-      <button
-        v-show="isUserIdEmpty"
+    </FormKit>
+
+    <button
+        v-show="formSubmitted && isUserIdEmpty"
         class="mx-auto pb-2 text-md underline text-red-800"
         @click="redirectToSignup"
       >
         You are not registered. Please sign up.
       </button>
-    </FormKit>
 
     <div
-      v-if="formSubmitted"
+      v-if="formSubmitted && !isUserIdEmpty"
       class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
     >
       <template v-if="!isNotStudentRegistration">
@@ -256,6 +257,7 @@ export default {
         grade: formData.grade,
       });
       console.log(this.userId);
+      this.studentId = this.userId;
     },
 
     redirect() {

@@ -119,19 +119,19 @@
     </FormKit>
   </div>
 
-    <button
-        v-show="formSubmitted && isUserIdEmpty"
-        class="mx-auto pb-2 text-md underline text-red-800"
-        @click="redirectToSignup"
-      >
-        You are not registered. Please sign up.
-      </button>
-
     <div
-      v-if="formSubmitted && !isUserIdEmpty"
+      v-if="formSubmitted"
       class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
     >
-      <template v-if="!isNotStudentRegistration">
+      <button
+          v-show="isUserIdEmpty"
+          class="mx-auto pb-2 text-md underline text-red-800"
+          @click="redirectToSignup"
+        >
+          You are not registered. Please sign up.
+        </button>
+
+      <template v-if="!isNotStudentRegistration && !isUserIdEmpty">
         <p>
           Your Student ID is <b>{{ studentId }}</b>
         </p>
@@ -139,7 +139,7 @@
       </template>
 
       <button
-        v-if="!isPurposeRegistration"
+        v-if="!isPurposeRegistration && !isUserIdEmpty"
         @click="redirect"
         :disabled="isTakeTestDisabled"
         class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
@@ -249,6 +249,7 @@ export default {
         (this.day > 9 ? this.day : "0" + this.day) +
         "-" +
         this.year;
+      this.isLoading = true;
       this.userId = await UserAPI.verifyAIETStudent({
         phone_number: formData.number,
         alternate_number: formData.number,
@@ -256,6 +257,7 @@ export default {
         date_of_birth: dateOfBirth,
         grade: formData.grade,
       });
+      this.isLoading = false;
       console.log(this.userId);
       this.studentId = this.userId;
     },

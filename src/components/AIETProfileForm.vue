@@ -241,6 +241,7 @@ export default {
   methods: {
     // Called after form is submitted, returns API response containing generated ID
     async submitForm(formData) {
+      this.formSubmitted = true;
       let dateOfBirth =
         (this.month > 9 ? this.month : "0" + this.month) +
         "-" +
@@ -254,7 +255,7 @@ export default {
         date_of_birth: dateOfBirth,
         grade: formData.grade,
       });
-      console.log(this.userId == "");
+      console.log(this.userId);
     },
 
     redirect() {

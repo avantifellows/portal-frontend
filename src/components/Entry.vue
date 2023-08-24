@@ -555,7 +555,6 @@ export default {
         this.$refs.phoneNumberEntry.phoneNumber,
         this.group
       );
-
       if (
         (this.group == "HimachalStudents" ||
           this.group == "EnableStudents" ||
@@ -589,7 +588,6 @@ export default {
     async authenticate() {
       let latestUserID = this.latestEntry["userID"];
       await this.authenticateID(latestUserID);
-
       if (!this.isCurrentUserValid && this.validateCount == 0) {
         this.invalidLoginMessage =
           this.group == "Candidates"
@@ -597,7 +595,7 @@ export default {
             : "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
       }
       this.setValidFlag();
-      if (this.isCurrentUserValid || this.validateCount > 1) {
+      if (this.isCurrentUserValid == true || this.validateCount > 1) {
         if (
           !this.isCurrentUserValid &&
           this.purposeParams == "reporting" &&

@@ -139,7 +139,6 @@ export default {
     });
   },
   verifyAIETStudent(data) {
-    console.log(data);
     return new Promise((resolve) => {
       client
         .post(verifyAIETStudentEndpoint, JSON.stringify(data))

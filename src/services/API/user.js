@@ -138,15 +138,10 @@ export default {
         });
     });
   },
-  verifyAIETStudent(phoneNumber, dateOfBirth) {
-    const params = {
-      phone_number: phoneNumber,
-      date_of_birth: dateOfBirth,
-    };
-    console.log(params);
+  verifyAIETStudent(data) {
     return new Promise((resolve) => {
       client
-        .post(verifyAIETStudentEndpoint, JSON.stringify(params))
+        .post(verifyAIETStudentEndpoint, JSON.stringify(data))
         .then((response) => {
           resolve(response.data);
         })

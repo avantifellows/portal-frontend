@@ -62,7 +62,6 @@ export default {
   },
   mounted() {
     this.mounted = true;
-    console.log(this.$route.params);
   },
   computed: {
     getGroupImages() {
@@ -91,7 +90,6 @@ export default {
         phone_number: this.$refs.phoneNumberEntry.phoneNumber,
         date_of_birth: this.$route.params.dateOfBirth,
       });
-      console.log(this.isUserValid, this.$route.params.redirectId);
       this.isLoading = false;
       if (this.isUserValid) {
         if (

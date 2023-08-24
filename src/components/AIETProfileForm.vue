@@ -17,7 +17,10 @@
     </template>
   </div>
 
-  <div class="flex flex-col my-auto items-center h-full pt-12 pb-10 space-y-3" v-if="!formSubmitted">
+  <div
+    class="flex flex-col my-auto items-center h-full pt-12 pb-10 space-y-3"
+    v-if="!formSubmitted"
+  >
     <FormKit
       type="form"
       :config="{ validationVisibility: 'submit' }"
@@ -119,34 +122,34 @@
     </FormKit>
   </div>
 
-    <div
-      v-if="formSubmitted"
-      class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
+  <div
+    v-if="formSubmitted"
+    class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
+  >
+    <button
+      v-show="isUserIdEmpty"
+      class="mx-auto pb-2 text-md underline text-red-800"
+      @click="redirectToSignup"
     >
-      <button
-          v-show="isUserIdEmpty"
-          class="mx-auto pb-2 text-md underline text-red-800"
-          @click="redirectToSignup"
-        >
-          You are not registered. Please sign up.
-        </button>
+      You are not registered. Please sign up.
+    </button>
 
-      <template v-if="!isNotStudentRegistration && !isUserIdEmpty">
-        <p>
-          Your Student ID is <b>{{ studentId }}</b>
-        </p>
-        <p>Please note this down. Use this to sign-in going forward.</p>
-      </template>
+    <template v-if="!isNotStudentRegistration && !isUserIdEmpty">
+      <p>
+        Your Student ID is <b>{{ studentId }}</b>
+      </p>
+      <p>Please note this down. Use this to sign-in going forward.</p>
+    </template>
 
-      <button
-        v-if="!isPurposeRegistration && !isUserIdEmpty"
-        @click="redirect"
-        :disabled="isTakeTestDisabled"
-        class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
-      >
-        Take Test
-      </button>
-    </div>
+    <button
+      v-if="!isPurposeRegistration && !isUserIdEmpty"
+      @click="redirect"
+      :disabled="isTakeTestDisabled"
+      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50 btn"
+    >
+      Take Test
+    </button>
+  </div>
 </template>
 <script>
 import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
@@ -258,7 +261,6 @@ export default {
         grade: formData.grade,
       });
       this.isLoading = false;
-      console.log(this.userId);
       this.studentId = this.userId;
     },
 
@@ -290,7 +292,11 @@ export default {
           this.$store.state.sessionData.userIp,
           this.phoneNumber,
           this.$store.state.sessionData.batch,
-          this.dateOfBirth
+          (this.month > 9 ? this.month : "0" + this.month) +
+            "-" +
+            (this.day > 9 ? this.day : "0" + this.day) +
+            "-" +
+            this.year
         );
       }
     },

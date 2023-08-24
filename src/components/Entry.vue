@@ -102,20 +102,21 @@
             <div class="flex flex-row space-x-3">
               <FormKit
                 type="select"
-                name="month"
-                v-model="dateOfBirth.month"
-                placeholder="Month"
-                :options="monthList"
-                validation="required"
-              />
-              <FormKit
-                type="select"
                 name="day"
                 v-model="dateOfBirth.day"
                 placeholder="Day"
                 :options="dayList"
                 validation="required"
               />
+              <FormKit
+                type="select"
+                name="month"
+                v-model="dateOfBirth.month"
+                placeholder="Month"
+                :options="monthList"
+                validation="required"
+              />
+
               <FormKit
                 type="select"
                 name="year"

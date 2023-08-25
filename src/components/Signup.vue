@@ -8,9 +8,7 @@
     </div>
   </div>
   <div class="h-full" :class="{ 'opacity-20': isLoading }">
-    <div
-      class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
-    >
+    <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
       <template v-for="(image, index) in getGroupImages" :key="index">
         <img :src="image" />
       </template>
@@ -25,10 +23,7 @@
         />
       </div>
     </template>
-    <div
-      class="flex flex-col items-center justify-center p-10"
-      v-if="!formSubmitted"
-    >
+    <div class="flex flex-col items-center justify-center p-10" v-if="!formSubmitted">
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
@@ -69,6 +64,15 @@
             <div class="flex flex-row space-x-5">
               <FormKit
                 type="select"
+                name="day"
+                v-model="day"
+                label="*Day"
+                placeholder="Day"
+                :options="dayList"
+                validation="required"
+              />
+              <FormKit
+                type="select"
                 label="*Month"
                 name="month"
                 v-model="month"
@@ -77,15 +81,7 @@
                 validation="required"
                 help="Select your Date of Birth."
               />
-              <FormKit
-                type="select"
-                name="day"
-                v-model="day"
-                label="*Day"
-                placeholder="Day"
-                :options="dayList"
-                validation="required"
-              />
+
               <FormKit
                 type="select"
                 name="year"
@@ -249,13 +245,7 @@
                 type="select"
                 label="*Aspiring field"
                 placeholder="Select your field"
-                :options="[
-                  'Engineering',
-                  'Medical',
-                  'Agriculture',
-                  'NDA',
-                  'Other',
-                ]"
+                :options="['Engineering', 'Medical', 'Agriculture', 'NDA', 'Other']"
                 validation="required"
                 v-model="field"
                 name="field"
@@ -420,7 +410,8 @@ export default {
             this.$router.push({
               name: "Error",
               state: {
-                text: "Student ID could not be created. Please contact your program manager.",
+                text:
+                  "Student ID could not be created. Please contact your program manager.",
               },
             });
           }
@@ -440,7 +431,11 @@ export default {
               this.$store.state.sessionData.userIp,
               this.phoneNumber,
               this.$store.state.sessionData.batch,
-              this.dateOfBirth
+              (this.month > 9 ? this.month : "0" + this.month) +
+                "-" +
+                (this.day > 9 ? this.day : "0" + this.day) +
+                "-" +
+                this.year
             );
           }
         }
@@ -475,7 +470,11 @@ export default {
           this.$store.state.sessionData.userIp,
           this.phoneNumber,
           this.$store.state.sessionData.batch,
-          this.dateOfBirth
+          (this.month > 9 ? this.month : "0" + this.month) +
+            "-" +
+            (this.day > 9 ? this.day : "0" + this.day) +
+            "-" +
+            this.year
         );
       }
     },

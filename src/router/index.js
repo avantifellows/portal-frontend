@@ -6,6 +6,8 @@ import Signup from "@/components/Signup.vue";
 import NewSignup from "@/pages/NewSignup.vue";
 import InformationForm from "@/pages/InformationForm.vue";
 import AIETReporting from "@/components/AIETReporting.vue";
+import AIETProfileForm from "@/components/AIETProfileForm.vue";
+
 // legacy URLs support redirectID, new URLs must use redirectId
 const allowedQueryParams = [
   "sessionId",
@@ -59,6 +61,11 @@ const routes = [
     path: "/aiet-reporting/:redirectId/:id/:dateOfBirth",
     name: "AIETReporting",
     component: AIETReporting,
+  },
+  {
+    path: "/aiet-profile-form",
+    name: "AIETProfileForm",
+    component: AIETProfileForm,
   },
   {
     path: "/sentry",

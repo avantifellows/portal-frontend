@@ -4,9 +4,12 @@
       class="bg-white w-11/12 sm:w-9/12 lg:w-7/12 p-4 sm:p-10 rounded-lg border border-black"
     >
       <img :src="AFLogoSvg" class="w-32 m-auto" />
-      <p class="text-center text-2xl sm:text-4xl py-4 sm:py-8" data-cy="noClassMessage">
+      <p
+        class="text-center text-2xl sm:text-4xl py-4 sm:py-8"
+        data-cy="noClassMessage"
+      >
         अभी आपकी कोई क्लास नहीं है| <br />
-        There is no class right now.
+        There is no session right now.
       </p>
     </div>
   </div>

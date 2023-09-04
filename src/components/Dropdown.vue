@@ -60,7 +60,6 @@ export default {
       value: "",
     };
   },
-  created() {},
   watch: {
     /**
      * Emits 'update' event whenever the dropdown value is changed

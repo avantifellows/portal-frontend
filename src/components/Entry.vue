@@ -379,7 +379,8 @@ export default {
         (!this.isCurrentUserValid &&
           this.validateCount == 0 &&
           this.isExtraInputValidationRequired) ||
-        this.group == "Candidates"
+        this.group == "Candidates" ||
+        this.group == "TNStudents"
       );
     },
 
@@ -558,7 +559,8 @@ export default {
       if (
         (this.group == "HimachalStudents" ||
           this.group == "EnableStudents" ||
-          this.group == "NGOStudents") &&
+          this.group == "NGOStudents" ||
+          this.group == "TNStudents") &&
         this.redirectTo == "quiz"
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
@@ -569,6 +571,7 @@ export default {
         this.validateCount = 2;
         this.isLoading = false;
       } else {
+        ``;
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = userValidationResponse.validateCount;
         this.isLoading = false;
@@ -592,7 +595,7 @@ export default {
         this.invalidLoginMessage =
           this.group == "Candidates"
             ? "Phone Number is incorrect!"
-            : "Student ID entered is incorrect. Please try again!<br/> Please register incase you are a new user.";
+            : "Student ID entered is incorrect. Please try again!";
       }
       this.setValidFlag();
       if (this.isCurrentUserValid == true || this.validateCount > 1) {

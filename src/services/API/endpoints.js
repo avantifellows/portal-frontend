@@ -9,3 +9,4 @@ export const userSignupEndpoint = "/user/";
 export const verifyStudentEndpoint = "/student/verify";
 export const checkForUserEndpoint = "/checkForUser";
 export const verifyAIETStudentEndpoint = "/checkForAIETStudent";
+export const createAccessToken = "/auth/create-access-token";

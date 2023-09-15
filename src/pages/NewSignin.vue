@@ -276,6 +276,8 @@ export default {
       } else {
         if (this.$store.state.sessionData.pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
+          this.setCookie('access_token', isUserValid.tokenResponse.access_token);
+          this.setCookie('refresh_token', isUserValid.tokenResponse.refresh_token);
           sendSQSMessage(
             "sign-in",
             this.$store.state.sessionData.purpose["sub-type"],
@@ -300,6 +302,8 @@ export default {
               this.$store.state.groupData.input_schema.userType
             )
           ) {
+            this.setCookie('access_token', isUserValid.tokenResponse.access_token);
+            this.setCookie('refresh_token', isUserValid.tokenResponse.access_token);
             sendSQSMessage(
               "sign-in",
               this.$store.state.sessionData.purpose["sub-type"],
@@ -326,6 +330,13 @@ export default {
       this.$router.push({
         name: "NewSignup",
       });
+    },
+
+    /**
+     * This method will set the access token and the refresh token in the browser
+     */
+    setCookie(name, value) {
+      document.cookie = `${name}=${value};`;
     },
 
     /**

@@ -7,13 +7,17 @@ export async function validateUser(authTypes, userInformation, userType) {
   async function generateToken() {
     try {
       const tokenResponse = await generateTokens();
-      if (tokenResponse && tokenResponse.access_token && tokenResponse.refresh_token) {
+      if (
+        tokenResponse &&
+        tokenResponse.access_token &&
+        tokenResponse.refresh_token
+      ) {
         return { ...user, tokenResponse };
       } else {
-        throw new Error('Failed to retrieve access and refresh tokens.');
+        throw new Error("Failed to retrieve access and refresh tokens.");
       }
     } catch (error) {
-      throw new Error('Error generating tokens: ' + error.message);
+      throw new Error("Error generating tokens: " + error.message);
     }
   }
 

@@ -105,8 +105,8 @@ export default {
       if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
       } else if (event.length > this.maxLengthOfEntry) {
-        console.log(this.maxLengthOfEntry, event);
         this.number = event.slice(0, this.maxLengthOfEntry).toString();
+        console.log(this.number);
       } else if (event.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {

@@ -105,14 +105,14 @@ export default {
       if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
       } else if (event.length > this.maxLengthOfEntry) {
-        console.log(event.slice(0, this.maxLengthOfEntry).toString());
+        console.log("max:", event.slice(0, this.maxLengthOfEntry).toString());
         this.number = event.slice(0, this.maxLengthOfEntry).toString();
       } else if (event.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
       }
-      console.log(this.number);
+      console.log("here:",this.number);
       this.$emit("update", this.number, this.dbKey);
     },
 

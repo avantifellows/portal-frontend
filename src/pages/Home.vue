@@ -19,16 +19,8 @@
   <div v-else>
     <LanguagePicker />
     <div v-if="!oldFlow">
-      <NewSignIn
-        v-if="isSessionTypeSignIn && doesGroupExist"
-        :sendSQSMessageHelper="sendSQSMessageHelper"
-        :redirectToDestinationHelper="redirectToDestinationHelper"
-      />
-      <NewSignUp
-        v-if="isSessionTypeSignUp && doesGroupExist"
-        :sendSQSMessageHelper="sendSQSMessageHelper"
-        :redirectToDestinationHelper="redirectToDestinationHelper"
-      />
+      <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+      <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
     </div>
 
     <div v-else>
@@ -281,34 +273,6 @@ export default {
         this.redirectId == "" &&
         this.redirectTo == "" &&
         this.sessionId == null
-      );
-    },
-  },
-  methods: {
-    sendSQSMessageHelper(purpose, userId, phoneNumber, dateOfBirth) {
-      sendSQSMessage(
-        purpose,
-        this.$store.state.sessionData.purpose["sub-type"],
-        this.$store.state.sessionData.platform,
-        this.$store.state.sessionData.platform_id,
-        userId,
-        this.getAuthTypes.toString(),
-        this.$store.state.groupData.name,
-        this.$store.state.groupData.input_schema.userType,
-        this.$store.state.sessionData.session_id,
-        "", // user IP address
-        phoneNumber,
-        this.$store.state.sessionData.meta_data.batch,
-        dateOfBirth
-      );
-    },
-    redirectToDestinationHelper(userId) {
-      return redirectToDestination(
-        this.$store.state.sessionData.purpose.params,
-        userId,
-        this.$store.state.sessionData.platform_id,
-        this.$store.state.sessionData.platform,
-        this.$store.state.groupData.input_schema.userType
       );
     },
   },

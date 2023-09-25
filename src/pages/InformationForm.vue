@@ -23,7 +23,7 @@
         :isRequired="formField.required"
         :dbKey="formField.key"
         :placeholder="formField.placeholder"
-        :options="getOptions(formField)"
+        :options="formField.options"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -201,8 +201,9 @@ export default {
           this.$store.state.groupData.input_schema.userType,
           this.$store.state.sessionData.session_id,
           "",
-          "",
-          this.$store.state.sessionData.meta_data.batch
+          "phone" in this.userData ? this.userData["phone"] : "",
+          this.$store.state.sessionData.meta_data.batch,
+          "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
     },

@@ -201,6 +201,8 @@ export default {
           this.formData.attributes[field].show
         ) {
           isUserDataComplete = false;
+        } else {
+          isUserDataComplete = true;
         }
       });
 
@@ -256,13 +258,14 @@ export default {
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.userData["user_id"],
-          this.getAuthTypes,
+          "",
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,
           this.$store.state.sessionData.session_id,
           "",
-          "",
-          this.$store.state.sessionData.meta_data.batch
+          "phone" in this.userData ? this.userData["phone"] : "",
+          this.$store.state.sessionData.meta_data.batch,
+          "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
     },

@@ -101,19 +101,16 @@ export default {
      * Updates the number value based on user entry
      * @param {Event} event - The input event.
      */
-    updateNumberEntry(event) {
-      console.log(event);
-      if (event.length == 0) {
+    updateNumberEntry() {
+      if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (event.length > this.maxLengthOfEntry) {
-        console.log("max:", event.slice(0, this.maxLengthOfEntry).toString());
-        this.number = event.slice(0, this.maxLengthOfEntry).toString();
-      } else if (event.length < this.maxLengthOfEntry) {
+      } else if (this.number.length > this.maxLengthOfEntry) {
+        this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
+      } else if (this.number.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
       }
-      console.log("here:",this.number);
       this.$emit("update", this.number, this.dbKey);
     },
 

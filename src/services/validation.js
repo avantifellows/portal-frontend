@@ -93,7 +93,6 @@ export async function validateID(
     group == "DelhiStudents" ||
     group == "NGOStudents"
   ) {
-
     let isCurrentUserValid = await userAPI.verifyUser(userID, group);
     let token = await fetchToken(userID);
     let isBirthdateValid = true;

@@ -1,4 +1,5 @@
 import userAPI from "@/services/API/user.js";
+import { generateTokens } from "@/services/generateToken.js";
 
 async function checkBirthdateInFirestore(
   birthdate,
@@ -92,7 +93,9 @@ export async function validateID(
     group == "DelhiStudents" ||
     group == "NGOStudents"
   ) {
+
     let isCurrentUserValid = await userAPI.verifyUser(userID, group);
+    let token = await fetchToken(userID);
     let isBirthdateValid = true;
     if (authType.includes("DOB")) {
       isBirthdateValid = await checkBirthdateInFirestore(
@@ -106,6 +109,8 @@ export async function validateID(
     return {
       isCurrentUserValid: isCurrentUserValid && isBirthdateValid,
       validateCount: 0,
+      accessToken: token.access_token,
+      refreshToken: token.refresh_token,
     };
   }
   {
@@ -149,5 +154,18 @@ export async function validateID(
         phone_number: userID,
       });
     }
+  }
+}
+
+async function fetchToken(userID) {
+  try {
+    const tokenResponse = await generateTokens(userID);
+    if (tokenResponse) {
+      return tokenResponse;
+    } else {
+      throw new Error("Failed to retrieve access and refresh tokens.");
+    }
+  } catch (error) {
+    throw new Error("Error generating tokens: " + error.message);
   }
 }

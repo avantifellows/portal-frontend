@@ -107,12 +107,12 @@ export default {
         this.invalidNumberEntryMessage = "";
       } else if (event.length > this.maxLengthOfEntry) {
         event = event.slice(0, this.maxLengthOfEntry).toString();
-        this.number = event;
       } else if (event.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
       }
+      this.number = event;
       console.log("number:", this.number);
       this.$emit("update", this.number, this.dbKey);
     },

@@ -102,18 +102,18 @@ export default {
      * @param {Event} event - The input event.
      */
     updateNumberEntry(event) {
-      console.log(event);
-      if (this.number.length == 0) {
+      console.log("event:", event);
+      if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (this.number.length > this.maxLengthOfEntry) {
-        console.log(event);
-        this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
-      } else if (this.number.length < this.maxLengthOfEntry) {
+      } else if (event.length > this.maxLengthOfEntry) {
+        event = event.slice(0, this.maxLengthOfEntry).toString();
+        this.number = event;
+      } else if (event.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
       }
-      console.log(this.number);
+      console.log("number:", this.number);
       this.$emit("update", this.number, this.dbKey);
     },
 

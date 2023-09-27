@@ -5,7 +5,6 @@ export async function generateTokens(userID) {
   const params = {
     id: userID,
     type: "user",
-    name: "string",
     is_user_valid: true,
   };
   console.log(params, "params");

@@ -580,8 +580,6 @@ export default {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = 0;
         this.isLoading = false;
-        this.accessToken = userValidationResponse.accessToken;
-        this.refreshToken = userValidationResponse.refreshToken;
       } else if (this.isExtraInputValidationRequired) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = 2;
@@ -593,7 +591,6 @@ export default {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = userValidationResponse.validateCount;
         this.isLoading = false;
-        this.refreshToken = userValidationResponse.refreshToken;
 
         if (this.validateCount == 1) {
           this.invalidLoginMessage = this.invalidLoginText;

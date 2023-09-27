@@ -101,10 +101,12 @@ export default {
      * Updates the number value based on user entry
      * @param {Event} event - The input event.
      */
-    updateNumberEntry() {
+    updateNumberEntry(event) {
+      console.log(event);
       if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
       } else if (this.number.length > this.maxLengthOfEntry) {
+        console.log(event);
         this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
       } else if (this.number.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";

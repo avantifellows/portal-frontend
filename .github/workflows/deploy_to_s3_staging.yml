@@ -19,15 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Cache node modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-build-
-            ${{ runner.OS }}-
-
       - name: Install
         run: npm install
 
@@ -63,4 +54,4 @@ jobs:
 
       # sync with the given S3 bucket
       - name: Deploy static site to S3 bucket
-        run: aws s3 sync ./dist s3://quiz-staging-backend --delete --acl public-read
+        run: aws s3 sync ./dist s3://af-auth-layer-staging --delete --acl public-read

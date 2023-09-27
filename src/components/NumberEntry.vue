@@ -102,7 +102,6 @@ export default {
      * @param {Event} event - The input event.
      */
     updateNumberEntry(event) {
-      console.log("event:", event);
       if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
       } else if (event.length > this.maxLengthOfEntry) {
@@ -113,7 +112,6 @@ export default {
         this.invalidNumberEntryMessage = "";
       }
       this.number = event;
-      console.log("number:", this.number);
       this.$emit("update", this.number, this.dbKey);
     },
 

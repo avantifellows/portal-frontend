@@ -111,6 +111,7 @@ export default {
       } else {
         this.invalidNumberEntryMessage = "";
       }
+      console.log(this.number);
       this.$emit("update", this.number, this.dbKey);
     },
 

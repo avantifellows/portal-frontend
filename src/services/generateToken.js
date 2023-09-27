@@ -7,7 +7,6 @@ export async function generateTokens(userID) {
     type: "user",
     is_user_valid: true,
   };
-  console.log(params, "params");
   try {
     const response = await dbClient.post(createAccessToken, params);
     return response.data;

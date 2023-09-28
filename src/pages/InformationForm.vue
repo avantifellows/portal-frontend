@@ -23,7 +23,7 @@
         :isRequired="formField.required"
         :dbKey="formField.key"
         :placeholder="formField.placeholder"
-        :options="formField.options"
+        :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -128,22 +128,6 @@ export default {
           ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
-        }
-      });
-    },
-    getOptions() {
-      Object.keys(this.formSchemaData).forEach((field) => {
-        let fieldAttributes = this.formSchemaData[field];
-
-        if (fieldAttributes.dependant) {
-          if (this.userData[fieldAttributes.dependantField]) {
-            fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[
-                this.userData[fieldAttributes.dependantField]
-              ];
-          }
-        } else {
-          return fieldAttributes.options[this.getLocale];
         }
       });
     },

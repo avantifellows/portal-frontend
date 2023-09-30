@@ -7,7 +7,7 @@
     <FormKit
       type="select"
       v-model="value"
-      :options="options"
+      :options="getOptions"
       placeholder="Select"
       :validation="[isRequired ? ['required'] : []]"
       validation-visibility="dirty"
@@ -27,10 +27,6 @@ export default {
       default: true,
     },
     label: {
-      type: String,
-      default: "",
-    },
-    placeholder: {
       type: String,
       default: "",
     },
@@ -66,6 +62,16 @@ export default {
      */
     value() {
       this.$emit("update", this.value, this.dbKey);
+    },
+
+    options: this.getOptions,
+  },
+  created() {
+    console.log(this.options);
+  },
+  computed: {
+    getOptions() {
+      return this.options;
     },
   },
 };

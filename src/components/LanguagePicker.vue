@@ -17,7 +17,7 @@ export default {
   components: { Dropdown },
   computed: {
     placeholder() {
-      return this.$store.state.language == "en" ? "English" : "Hindi";
+      return this.$store.state.language == "en" ? "English" : "हिंदी";
     },
   },
   methods: {

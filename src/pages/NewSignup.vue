@@ -34,8 +34,7 @@
         :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :placeholder="formField.placeholder"
-        :options="formField.options"
+        :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -109,6 +108,7 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
+    console.log(this.formData);
   },
   watch: {
     userData: {
@@ -181,12 +181,12 @@ export default {
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[
+              fieldAttributes.dependantFieldMapping[this.getLocale][
                 this.userData[fieldAttributes.dependantField]
               ];
+            console.log(fieldAttributes);
+            return fieldAttributes.options[this.getLocale];
           }
-        } else {
-          return fieldAttributes.options[this.getLocale];
         }
       });
     },

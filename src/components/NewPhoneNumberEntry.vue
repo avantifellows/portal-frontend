@@ -13,7 +13,7 @@
       @input="updatePhoneNumberEntry($event)"
       ondrop="return false"
       onpaste="return false"
-      help="Phone number can start only with 6,7,8,9"
+      :help="helpText"
     />
 
     <span
@@ -47,6 +47,10 @@ export default {
       default: false,
     },
     dbKey: {
+      type: String,
+      default: "",
+    },
+    helpText: {
       type: String,
       default: "",
     },

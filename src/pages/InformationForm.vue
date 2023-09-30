@@ -8,7 +8,7 @@
       <h2
         class="mt-6 text-center text-xl font-bold leading-9 tracking-tight text-gray-900"
       >
-        Please fill in some of your details!
+        {{ getFormHeading }}
       </h2>
     </div>
 
@@ -22,8 +22,7 @@
         :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :placeholder="formField.placeholder"
-        :options="formField.options[getLocale]"
+        :options="getOptions"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -99,6 +98,7 @@ export default {
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
+    console.log(this.formSchemaData);
   },
   watch: {
     userData: {
@@ -113,6 +113,13 @@ export default {
   computed: {
     getLocale() {
       return this.$store.state.language;
+    },
+    getFormHeading() {
+      const formHeading = {
+        en: "Welcome! Please fill the form to proceed!",
+        hi: "नमस्ते! कृपया आगे बढ़ने के लिए यह फॉर्म भरें!",
+      };
+      return formHeading[this.getLocale];
     },
   },
   methods: {

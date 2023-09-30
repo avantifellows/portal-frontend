@@ -8,7 +8,9 @@
       />
     </div>
   </div>
-  <div class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-11/12 h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in getGroupImages" :key="index">
       <img :src="image" />
     </template>
@@ -51,15 +53,20 @@
 
       <div v-show="hasUserEnteredMoreThanOne" class="my-auto px-3">
         <button @click="deleteInputBox(index, userIDList)">
-          <inline-svg class="fill-current text-red-600 h-8 w-8" :src="deleteSvg" />
+          <inline-svg
+            class="fill-current text-red-600 h-8 w-8"
+            :src="deleteSvg"
+          />
         </button>
       </div>
     </div>
 
     <!-- invalid input and login message  -->
-    <span v-if="isInvalidInputMessageShown" class="mx-auto text-red-700 text-base mb-1">{{
-      invalidInputMessage
-    }}</span>
+    <span
+      v-if="isInvalidInputMessageShown"
+      class="mx-auto text-red-700 text-base mb-1"
+      >{{ invalidInputMessage }}</span
+    >
     <span
       v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
       class="mx-auto text-red-700 text-base mb-1"
@@ -71,7 +78,10 @@
         class="flex flex-row mx-auto p-2 items-center border-2 rounded-xl bg-gray-200 btn"
         @click="addField"
       >
-        <inline-svg class="fill-current text-green-600 h-10 w-10 pr-1" :src="addSvg" />
+        <inline-svg
+          class="fill-current text-green-600 h-10 w-10 pr-1"
+          :src="addSvg"
+        />
         <div class="border-l-2 border-gray-500 pl-3">
           <p class="leading-tight">
             {{ addButtonText }}
@@ -259,7 +269,9 @@ export default {
           ? "0" + this.dateOfBirth.month
           : this.dateOfBirth.month) +
         "-" +
-        (this.dateOfBirth.day < 10 ? "0" + this.dateOfBirth.day : this.dateOfBirth.day) +
+        (this.dateOfBirth.day < 10
+          ? "0" + this.dateOfBirth.day
+          : this.dateOfBirth.day) +
         "-" +
         this.dateOfBirth.year
       );
@@ -560,7 +572,8 @@ export default {
         (this.group == "HimachalStudents" ||
           this.group == "EnableStudents" ||
           this.group == "NGOStudents" ||
-          this.group == "TNStudents") &&
+          this.group == "TNStudents" ||
+          this.group == "DMVSStudents") &&
         this.redirectTo == "quiz"
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;

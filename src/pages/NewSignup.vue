@@ -199,8 +199,6 @@ export default {
           this.formData.attributes[field].show
         ) {
           isUserDataComplete = false;
-        } else {
-          isUserDataComplete = true;
         }
       });
 

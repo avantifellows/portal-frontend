@@ -22,7 +22,7 @@
         :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :options="getOptions"
+        :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -104,7 +104,6 @@ export default {
     userData: {
       handler() {
         this.isUserDataIsComplete();
-        this.getOptions();
         this.showBasedOn();
       },
       deep: true,

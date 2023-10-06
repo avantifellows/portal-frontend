@@ -17,8 +17,8 @@
   </div>
 
   <div v-else>
-    <LanguagePicker />
     <div v-if="!oldFlow">
+      <LanguagePicker />
       <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
       <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
     </div>

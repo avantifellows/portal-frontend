@@ -67,7 +67,7 @@
       :disabled="isRedirectionButtonDisabled"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50"
     >
-      Done
+      Start Session
     </button>
   </div>
 </template>
@@ -214,6 +214,21 @@ export default {
 
     /** creates user ID based on information */
     async signUp() {
+      sendSQSMessage(
+        "sign-up",
+        this.$store.state.sessionData.purpose["sub-type"],
+        this.$store.state.sessionData.platform,
+        this.$store.state.sessionData.platform_id,
+        this.userData["student_id"],
+        "",
+        this.$store.state.groupData.name,
+        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.sessionData.session_id,
+        "",
+        "phone" in this.userData ? this.userData["phone"] : "",
+        this.$store.state.sessionData.meta_data.batch,
+        "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
+      );
       this.formSubmitted = true;
       this.isLoading = true;
 
@@ -249,7 +264,7 @@ export default {
         )
       ) {
         sendSQSMessage(
-          "sign-up",
+          "attendance-sign-up",
           this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,

@@ -98,7 +98,6 @@ export default {
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
-    console.log(this.formSchemaData);
   },
   watch: {
     userData: {
@@ -181,7 +180,7 @@ export default {
         )
       ) {
         sendSQSMessage(
-          "attendance",
+          "attendance-sign-in",
           this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,

@@ -1,5 +1,6 @@
 <template>
-  <div class="flex flex-row">
+  <div class="flex flex-row" v-if="show">
+    <span v-if="isRequired">*</span>
     <FormKit
       type="checkbox"
       :help="helpText"
@@ -22,6 +23,10 @@ export default {
   name: "Checkbox",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",

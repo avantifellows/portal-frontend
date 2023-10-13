@@ -4,9 +4,11 @@
       class="bg-white w-11/12 sm:w-9/12 lg:w-7/12 p-4 sm:p-10 rounded-lg border border-black"
     >
       <img :src="AFLogoSvg" class="w-32 m-auto" />
-      <p class="text-center text-2xl sm:text-4xl py-4 sm:py-8" data-cy="noClassMessage">
-        अभी आपकी कोई क्लास नहीं है| <br />
-        There is no class right now.
+      <p
+        class="text-center text-2xl sm:text-4xl py-4 sm:py-8"
+        data-cy="noClassMessage"
+      >
+        {{ displayMessage }}
       </p>
     </div>
   </div>
@@ -23,6 +25,20 @@ export default {
     return {
       AFLogoSvg: assets.AFLogoSvg,
     };
+  },
+  computed: {
+    displayMessage() {
+      return this.isLanguageSelectedEnglish
+        ? "There is no class right now."
+        : "अभी आपकी कोई क्लास नहीं है|";
+    },
+
+    isLanguageSelectedEnglish() {
+      return this.$store.state.language == "en";
+    },
+    isLanguageSelectedHindi() {
+      return this.$store.state.language == "hi";
+    },
   },
 };
 </script>

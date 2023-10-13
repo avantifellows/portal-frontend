@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" v-if="show">
     <p class="text-left text-md font-semibold">
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
       type="tel"
@@ -13,7 +13,7 @@
       @input="updatePhoneNumberEntry($event)"
       ondrop="return false"
       onpaste="return false"
-      help="Phone number can start only with 6,7,8,9"
+      :help="helpText"
     />
 
     <span
@@ -30,6 +30,10 @@ export default {
   name: "PhoneNumberEntry",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",
@@ -43,6 +47,10 @@ export default {
       default: false,
     },
     dbKey: {
+      type: String,
+      default: "",
+    },
+    helpText: {
       type: String,
       default: "",
     },

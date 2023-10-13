@@ -33,7 +33,7 @@ export default {
    * Creates a new user
    * @param {Object} formData - contains data filled in the form by user
    */
-  newUserSignup(formData, idGeneration, userType) {
+  newUserSignup(formData, idGeneration, userType, group) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -42,6 +42,7 @@ export default {
             form_data: formData,
             id_generation: idGeneration,
             user_type: userType,
+            group: group,
           })
         )
         .then((response) => {

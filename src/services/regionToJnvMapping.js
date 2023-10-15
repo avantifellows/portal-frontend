@@ -4,7 +4,7 @@ export const regionState = {
   Chandigarh: [
     "Chandigarh",
     "Himachal Pradesh",
-    "Jammu & Kashmir",
+    "Jammu and Kashmir",
     "Ladakh",
     "Punjab",
   ],
@@ -264,7 +264,7 @@ export const jnvState = {
     "JNV Kullu",
     "JNV Kinnaur",
   ],
-  "Jammu & Kashmir": [
+  "Jammu and Kashmir": [
     "JNV Ramban",
     "JNV Reasi",
     "JNV Samba",

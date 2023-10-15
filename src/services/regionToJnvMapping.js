@@ -421,7 +421,7 @@ export const jnvState = {
     "JNV Dhalai",
     "JNV West Tripura",
   ],
-  "Dadra & Nagar Haveli": ["JNV Silvassa"],
+  "Dadra \& Nagar Haveli": ["JNV Silvassa"],
   "Daman & Diu": ["JNV Diu", "JNV Daman"],
   Goa: ["JNV North Goa", "JNV South Goa"],
   Gujarat: [

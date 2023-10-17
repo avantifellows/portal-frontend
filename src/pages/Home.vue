@@ -282,7 +282,11 @@ export default {
      */
     if (this.sessionId != null) {
       if (
-        this.sessionId == "HaryanaStudents_1"
+        this.sessionId == "HaryanaStudents_10B37_45008_rxh-gkzc-kby" ||
+        this.sessionId == "HaryanaStudents_10B19_45008_vaq-qthn-quv" ||
+        this.sessionId == "HaryanaStudents_10B36_45008_hwx-azzu-gqk" ||
+        this.sessionId == "HaryanaStudents_10B30_45008_bpv-sofq-aeb" ||
+        this.sessionId == "HaryanaStudents_10B15_45008_zvn-ijtw-gvt"
       ) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(

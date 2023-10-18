@@ -282,7 +282,7 @@ export default {
      */
     if (this.sessionId != null) {
       if (
-        this.sessionId == "HaryanaStudents"
+        this.sessionId == "HaryanaStudents_10B30_45008_bpv-sofq-aeb"
       ) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(

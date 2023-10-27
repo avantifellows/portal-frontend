@@ -41,6 +41,7 @@ export function redirectToDestination(
       break;
     }
     case "report": {
+      console.log(import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL);
       redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
       fullURL = redirectURL + "/" + redirectId + "/" + userId;
       break;
@@ -51,6 +52,10 @@ export function redirectToDestination(
       break;
     }
     case "zoom": {
+      fullURL = redirectId;
+      break;
+    }
+    case "teams": {
       fullURL = redirectId;
       break;
     }

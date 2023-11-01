@@ -8,11 +8,11 @@
       type="select"
       v-model="value"
       :options="options"
-      placeholder="Select"
       :validation="[isRequired ? ['required'] : []]"
       validation-visibility="dirty"
       :name="dbKey"
       :help="helpText"
+      :classes="{}"
     />
   </div>
 </template>
@@ -49,6 +49,10 @@ export default {
     multiple: {
       type: Boolean,
       default: false,
+    },
+    defaultValue: {
+      type: String,
+      default: "",
     },
   },
   data() {

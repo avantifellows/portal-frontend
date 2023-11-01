@@ -1,7 +1,7 @@
 <template>
-  <div class="mt-6 flex justify-center">
+  <div class="flex justify-end px-6 py-4">
     <Dropdown
-      label="Select your language"
+      label=""
       :options="['English', 'हिंदी']"
       :placeholder="placeholder"
       @update="updateLanguage"

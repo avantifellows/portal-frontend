@@ -54,6 +54,10 @@ export function redirectToDestination(
       fullURL = redirectId;
       break;
     }
+    case "teams": {
+      fullURL = redirectId;
+      break;
+    }
     case "youtube": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_YOUTUBE;
       fullURL = new URL(redirectURL + redirectId);

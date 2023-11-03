@@ -1,20 +1,14 @@
 <template>
-  <div
-    class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8"
-  >
+  <div class="">
     <LanguagePicker />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <img class="mx-auto h-10 w-auto" :src="AFLogo" />
-      <h2
-        class="mt-6 text-center text-xl font-bold leading-9 tracking-tight text-gray-900"
-      >
-        {{ getFormHeading }}
+      <h2 class="mt-6 text-center text-black font-bold">
+        Complete your Profile
       </h2>
     </div>
 
-    <div class="mx-auto w-2/3 md:w-auto">
+    <div class="mx-auto w-64">
       <component
-        class=""
         v-for="(formField, index) in formSchemaData"
         :show="formField.show"
         :key="index"
@@ -27,14 +21,15 @@
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
+        class="mt-[25px]"
       />
 
       <button
-        class="bg-primary mx-auto hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg p-4 rounded disabled:opacity-50 btn"
+        class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
         :disabled="buttonDisabled"
         @click="profileDetails"
       >
-        START SESSION
+        Start Session
       </button>
     </div>
   </div>

@@ -14,7 +14,7 @@
     </template>
   </div>
 
-  <div class="flex flex-col mx-auto my-auto h-full py-10 space-y-4">
+  <div class="flex flex-col mx-auto my-auto h-full py-10">
     <!-- different input components -->
     <div
       v-for="(authType, index) in getAuthTypes"
@@ -30,6 +30,7 @@
         :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
         :dbKey="numberEntryParameters.key"
         @update="updateUserInformation"
+        :invalid="isInvalidLoginMessageShown"
       />
       <PhoneNumberEntry
         v-if="isEntryPhoneNumber(authType)"
@@ -54,25 +55,29 @@
     <span
       v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown"
-      class="mx-auto text-red-700 text-base mb-1 text-center md:text-sm"
+      class="text-red text-sm text-center mt-[10px]"
     ></span>
 
     <!-- submit button -->
     <button
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-3 rounded disabled:opacity-50 btn"
+      class="mt-[20px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
     >
-      SIGN IN
+      Sign In
     </button>
-
+    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+      <hr class="w-20 text-grey" />
+      <p class="text-grey font-roboto text-sm opacity-40">or</p>
+      <hr class="w-20 text-grey" />
+    </div>
     <!-- signup button -->
     <button
       v-show="isSignupActivated"
       @click="redirectToSignUp"
-      class="mx-auto pt-2 text-xs md:text-sm underline text-red-800"
+      class="mt-[20px] mx-auto pt-2 text-primary text-sm"
     >
-      {{ signUpText }}
+      New Student? <b class="text-bolder"> Register Now </b>
     </button>
   </div>
 </template>
@@ -127,7 +132,7 @@ export default {
     /** Returns text based on locale */
     signUpText() {
       return this.getLocale == "en"
-        ? "If you are a new student, click here to register"
+        ? "New Student? Register Now"
         : "यदि आप नए छात्र हैं, तो पंजीकरण करने के लिए यहां क्लिक करें";
     },
 

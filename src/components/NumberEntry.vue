@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-center" v-if="show">
-    <p class="text-md md:text-lg font-semibold">
+    <p class="text-base mb-[10px]">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
@@ -10,15 +10,32 @@
       :name="dbKey"
       ondrop="return false"
       onpaste="return false"
-      :validation="[isRequired ? ['required'] : []]"
-      validation-visibility="dirty"
       @keypress="isValidNumberEntry($event)"
       @input="updateNumberEntry($event)"
+      :wrapper-class="{
+        'mx-auto': true,
+      }"
+      :inner-class="{
+        border: true,
+        'py-2': true,
+        'px-2': true,
+        rounded: true,
+
+        'mx-auto': true,
+        'border-red': this.invalid,
+        'border-grey': !this.invalid,
+      }"
+      :help-class="{
+        'mt-[10px]': true,
+        'text-sm': true,
+        'text-grey': true,
+        italic: true,
+      }"
     />
 
     <span
       v-if="isInvalidNumberEntryMessageShown"
-      class="mx-auto text-red-700 text-sm mb-1"
+      class="text-red text-sm mt-[10px]"
       >{{ invalidNumberEntryMessage }}</span
     >
   </div>
@@ -57,6 +74,10 @@ export default {
     helpText: {
       type: String,
       default: "",
+    },
+    invalid: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

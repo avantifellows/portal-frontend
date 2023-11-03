@@ -20,12 +20,12 @@
     v-if="!formSubmitted"
     class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
   >
-    <p class="text-2xl mx-auto font-bold">
+    <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
     <p class="text-center">{{ formSubTitle }}</p>
 
-    <div class="mx-auto w-2/3 md:w-auto">
+    <div class="mx-auto w-64">
       <component
         v-for="(formField, index) in formFields"
         :show="formField.show"
@@ -39,15 +39,29 @@
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
+        class="mt-[25px]"
       />
+
+      <!-- submit button -->
+      <button
+        class="mt-[30px] bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md w-full p-2 rounded"
+        :disabled="signUpDisabled"
+        @click="signUp"
+      >
+        Sign Up
+      </button>
     </div>
-    <!-- submit button -->
+    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+      <hr class="w-20 text-grey" />
+      <p class="text-grey font-roboto text-sm opacity-40">or</p>
+      <hr class="w-20 text-grey" />
+    </div>
+    <!-- signup button -->
     <button
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
-      :disabled="signUpDisabled"
-      @click="signUp"
+      @click="redirectToSignUp"
+      class="mt-[20px] mx-auto pt-2 text-primary text-base"
     >
-      SIGN UP
+      Already Registered? <span class="font-bolder"> Sign In </span>
     </button>
   </div>
   <div

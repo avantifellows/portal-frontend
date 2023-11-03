@@ -1,20 +1,19 @@
 <template>
-  <div class="flex justify-end px-6 py-4">
-    <Dropdown
-      label=""
+  <div class="text-right">
+    <FormKit
+      type="select"
       :options="['English', 'हिंदी']"
-      :placeholder="placeholder"
       @update="updateLanguage"
+      :inner-class="{
+        'p-2': true,
+      }"
     />
   </div>
 </template>
 
 <script>
-import Dropdown from "@/components/Dropdown.vue";
-
 export default {
   name: "LanguagePicker",
-  components: { Dropdown },
   computed: {
     placeholder() {
       return this.$store.state.language == "en" ? "English" : "हिंदी";

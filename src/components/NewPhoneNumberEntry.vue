@@ -1,24 +1,41 @@
 <template>
-  <div class="flex flex-col" v-if="show">
-    <p class="text-left text-md font-semibold">
+  <div class="" v-if="show">
+    <p class="text-base mb-[10px] text-left">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
       type="tel"
       placeholder="xxxxxxxxxx"
-      :validation="[isRequired ? ['required'] : []]"
-      validation-visibility="dirty"
       v-model="phoneNumber"
       @keypress="isValidPhoneNumberEntry($event)"
       @input="updatePhoneNumberEntry($event)"
       ondrop="return false"
       onpaste="return false"
       :help="helpText"
+      :wrapper-class="{
+        'mx-auto': true,
+      }"
+      :inner-class="{
+        border: true,
+        'py-2': true,
+        'px-2': true,
+        rounded: true,
+
+        'mx-auto': true,
+        'border-red': this.invalid,
+        'border-grey': !this.invalid,
+      }"
+      :help-class="{
+        'mt-[10px]': true,
+        'text-sm': true,
+        'text-grey': true,
+        italic: true,
+      }"
     />
 
     <span
       v-if="isInvalidPhoneNumberMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="text-red text-sm text-center mt-[10px]"
       >{{ invalidPhoneNumberMessage }}</span
     >
   </div>
@@ -53,6 +70,10 @@ export default {
     helpText: {
       type: String,
       default: "",
+    },
+    invalid: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

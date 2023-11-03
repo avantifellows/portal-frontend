@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col" v-if="show">
-    <p class="text-md font-semibold">
+  <div v-if="show">
+    <p class="text-base mb-[10px]">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
 
@@ -8,18 +8,33 @@
       type="text"
       :help="helpText"
       v-model="text"
-      :validation="[isRequired ? ['required'] : []]"
-      validation-visibility="dirty"
       :name="dbKey"
       @keypress="isValidTextEntry($event)"
       @input="updateTextEntry($event)"
       ondrop="return false"
       onpaste="return false"
+      :input-class="{
+        'w-full': true,
+      }"
+      :inner-class="{
+        border: true,
+        'py-2': true,
+        'px-2': true,
+        rounded: true,
+        'border-grey': true,
+        'overflow-hidden': true,
+      }"
+      :help-class="{
+        'mt-[10px]': true,
+        'text-sm': true,
+        'text-grey': true,
+        italic: true,
+      }"
     />
 
     <span
       v-if="isInvalidTextEntryMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="text-red text-sm mt-[10px]"
       >{{ invalidTextEntryMessage }}</span
     >
   </div>

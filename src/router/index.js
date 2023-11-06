@@ -4,6 +4,7 @@ import Sentry from "@/pages/Sentry.vue";
 import Error from "@/pages/Error.vue";
 import Signup from "@/components/Signup.vue";
 import NewSignup from "@/pages/NewSignup.vue";
+import NewSignin from "@/pages/NewSignin.vue";
 import InformationForm from "@/pages/InformationForm.vue";
 import AIETReporting from "@/components/AIETReporting.vue";
 import AIETProfileForm from "@/components/AIETProfileForm.vue";
@@ -44,6 +45,11 @@ const routes = [
     path: "/new-sign-up",
     name: "NewSignup",
     component: NewSignup,
+  },
+  {
+    path: "/sign-in",
+    name: "NewSignin",
+    component: NewSignin,
   },
   {
     path: "/form/:id",

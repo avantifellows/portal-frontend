@@ -19,9 +19,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install
-
+      - name: Node version
         run: echo '$(node --version)'
+        
+      - name: Install
         run: npm install
 
       # build the vuepress docs

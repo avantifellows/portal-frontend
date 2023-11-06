@@ -88,18 +88,6 @@ export default {
   },
   methods: {
     /**
-     * Generates the CSS classes for the input box based on the state of the text entry.
-     * @returns {string[]} An array of CSS classes.
-     */
-    selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidTextEntryMessage,
-        },
-      ];
-    },
-
-    /**
      * Updates the text value based on user entry
      * @param {Event} event - The input event.
      */

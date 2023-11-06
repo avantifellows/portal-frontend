@@ -47,9 +47,8 @@
         class="mt-[30px] bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md w-full p-2 rounded"
         :disabled="signUpDisabled"
         @click="signUp"
-      >
-        {{ signUpButtonLabel }}
-      </button>
+        v-html="signUpButtonLabel"
+      />
     </div>
     <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
       <hr class="w-20 text-grey" />
@@ -78,10 +77,9 @@
       v-if="redirection"
       @click="redirect"
       :disabled="isRedirectionButtonDisabled"
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50"
-    >
-      Start Session
-    </button>
+      class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
+      v-html="startSessionText"
+    />
   </div>
 </template>
 <script>
@@ -126,24 +124,34 @@ export default {
     userData: {
       handler() {
         this.isUserDataIsComplete();
-        this.getOptions();
         this.showBasedOn();
       },
       deep: true,
     },
   },
   computed: {
+    /** Returns button text */
     signUpButtonLabel() {
       return this.getLocale == "en" ? "Sign Up" : "साइन अप";
     },
+
+    /** Returns button text */
+    startSessionText() {
+      return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
+    },
+
+    /** Returns the locale selected by user */
     getLocale() {
       return this.$store.state.language;
     },
+
+    /** Returns text based on locale */
     signInText() {
       return this.getLocale == "en"
         ? "Already Registered? <b> Sign In</b>"
         : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
     },
+
     /** returns images to be displayed for a group */
     getGroupImages() {
       return this.$store.state.groupData.input_schema.images;
@@ -153,9 +161,11 @@ export default {
     formTitle() {
       return this.formData.name;
     },
+
     formSubTitle() {
       return this.formData.sub_heading;
     },
+
     /** returns all fields to be displayed in the form */
     formFields() {
       return this.formData.attributes;
@@ -179,6 +189,7 @@ export default {
     },
   },
   methods: {
+    /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formData.attributes).forEach((field) => {
         let fieldAttributes = this.formData.attributes[field];
@@ -194,21 +205,7 @@ export default {
         }
       });
     },
-    getOptions() {
-      Object.keys(this.formData.attributes).forEach((field) => {
-        let fieldAttributes = this.formData.attributes[field];
 
-        if (fieldAttributes.dependant) {
-          if (this.userData[fieldAttributes.dependantField]) {
-            fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[
-                this.userData[fieldAttributes.dependantField]
-              ];
-            return fieldAttributes.options[this.getLocale];
-          }
-        }
-      });
-    },
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;

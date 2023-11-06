@@ -103,9 +103,11 @@ export default {
     },
   },
   computed: {
+    /** Returns the locale selected by user */
     getLocale() {
       return this.$store.state.language;
     },
+
     getFormHeading() {
       const formHeading = {
         en: "Complete your Profile",
@@ -113,11 +115,14 @@ export default {
       };
       return formHeading[this.getLocale];
     },
+
+    /** Returns button text */
     startSessionText() {
       return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
     },
   },
   methods: {
+    /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];

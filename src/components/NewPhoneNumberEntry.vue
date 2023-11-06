@@ -20,7 +20,6 @@
         'py-2': true,
         'px-2': true,
         rounded: true,
-
         'mx-auto': true,
         'border-red': this.invalid,
         'border-grey': !this.invalid,
@@ -102,18 +101,6 @@ export default {
     },
   },
   methods: {
-    /**
-     * Generates the CSS classes for the input box based on the state of the phone number entry.
-     * @returns {string[]} An array of CSS classes.
-     */
-    selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidPhoneNumberMessage,
-        },
-      ];
-    },
-
     /**
      * Updates the phone number value based on user entry
      * @param {Event} event - The input event.

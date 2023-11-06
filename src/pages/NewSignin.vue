@@ -30,6 +30,7 @@
         :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
         :dbKey="numberEntryParameters.key"
         @update="updateUserInformation"
+        @resetInvalidLoginMessage="resetInvalidLoginMessage"
         :invalid="isInvalidLoginMessageShown"
       />
       <PhoneNumberEntry
@@ -55,12 +56,12 @@
     <span
       v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown"
-      class="text-red text-sm text-center mt-[10px]"
-    ></span>
+      class="text-red text-sm text-center font-bold mt-[10px]"
+    />
 
     <!-- submit button -->
     <button
-      class="mt-[20px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md"
+      class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
     >
@@ -111,6 +112,20 @@ export default {
       phoneNumberEntryParameters: {}, // stores UI parameters for phone number entry component
       dateEntryParameters: {}, // stores UI parameters for date entry component
       userInformation: {}, // stores data about the user
+      invalidLoginMessageTranslations: {
+        ID: {
+          en: "This ID is not registered. Try again",
+          hi: "यह आईडी पंजीकृत नहीं है। पुनः प्रयास करें",
+        },
+        DOB: {
+          en: "This date of birth is not registered. Try again",
+          hi: "यह जन्मतिथि पंजीकृत नहीं है। पुनः प्रयास करें",
+        },
+        PH: {
+          en: "This phone number is not registered. Try again",
+          hi: "यह फ़ोन नंबर पंजीकृत नहीं है। पुनः प्रयास करें",
+        },
+      },
     };
   },
   mounted() {
@@ -118,6 +133,7 @@ export default {
   },
 
   computed: {
+    /** Returns button text */
     signInButtonLabel() {
       return this.getLocale == "en" ? "Sign In" : "साइन इन";
     },
@@ -209,6 +225,11 @@ export default {
     },
   },
   methods: {
+    /** Resets the invalid login message to empty string */
+    resetInvalidLoginMessage() {
+      this.invalidLoginMessage = "";
+    },
+
     /**
      * Finds the entry type based on the provided authentication type.
      * @param {string} authType - The authentication type.
@@ -301,19 +322,20 @@ export default {
         this.$store.state.groupData.input_schema.userType
       );
       if (!isUserValid.isUserIdValid) {
-        this.invalidLoginMessage = "ID entered is incorrect. Please try again!";
+        this.invalidLoginMessage =
+          this.invalidLoginMessageTranslations["ID"][this.getLocale];
       } else if (
         this.getAuthTypes.includes("DOB") &&
         !isUserValid.isDateOfBirthValid
       ) {
         this.invalidLoginMessage =
-          "Date of birth entered is incorrect. Please try again!";
+          this.invalidLoginMessageTranslations["DOB"][this.getLocale];
       } else if (
         this.getAuthTypes.includes("PH") &&
         !isUserValid.isPhoneNumberValid
       ) {
         this.invalidLoginMessage =
-          "Phone number entered is incorrect. Please try again!";
+          this.invalidLoginMessageTranslations["PH"][this.getLocale];
       } else {
         if (this.$store.state.sessionData.pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);

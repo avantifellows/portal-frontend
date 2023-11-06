@@ -20,7 +20,6 @@
         'py-2': true,
         'px-2': true,
         rounded: true,
-
         'mx-auto': true,
         'border-red': this.invalid,
         'border-grey': !this.invalid,
@@ -45,7 +44,7 @@ import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.j
 
 export default {
   name: "NumberEntry",
-  emits: ["update"],
+  emits: ["update", "reset-invalid-login-message"],
   props: {
     show: {
       type: Boolean,
@@ -84,7 +83,18 @@ export default {
     return {
       number: "",
       invalidNumberEntryMessage: "",
+      invalidEntryMessage: {
+        en: `ID should have ${this.maxLengthOfEntry} digits`,
+        hi: `आईडी में ${this.maxLengthOfEntry} अंक होने चाहिए`,
+      },
     };
+  },
+  watch: {
+    invalidNumberEntryMessage() {
+      if (this.invalidNumberEntryMessage != "") {
+        this.$emit("reset-invalid-login-message");
+      }
+    },
   },
   computed: {
     /**
@@ -104,20 +114,13 @@ export default {
         ? this.number != "" && this.invalidNumberEntryMessage == ""
         : this.invalidNumberEntryMessage == "";
     },
+
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.language;
+    },
   },
   methods: {
-    /**
-     * Generates the CSS classes for the input box based on the state of the number entry.
-     * @returns {string[]} An array of CSS classes.
-     */
-    selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidNumberEntryMessage,
-        },
-      ];
-    },
-
     /**
      * Updates the number value based on user entry
      * @param {Event} event - The input event.
@@ -128,7 +131,8 @@ export default {
       } else if (event.length > this.maxLengthOfEntry) {
         event = event.slice(0, this.maxLengthOfEntry).toString();
       } else if (event.length < this.maxLengthOfEntry) {
-        this.invalidNumberEntryMessage = "Please enter valid number";
+        this.invalidNumberEntryMessage =
+          this.invalidEntryMessage[this.getLocale];
       } else {
         this.invalidNumberEntryMessage = "";
       }

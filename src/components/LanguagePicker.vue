@@ -20,6 +20,9 @@ export default {
     };
   },
   watch: {
+    /**
+     * Sets the language in the store based on the user input
+     */
     language() {
       if (this.language == "English") {
         this.$store.dispatch("setLanguage", "en");

@@ -64,7 +64,7 @@
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
     >
-      Sign In
+      {{ signInButtonLabel }}
     </button>
     <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
       <hr class="w-20 text-grey" />
@@ -76,9 +76,8 @@
       v-show="isSignupActivated"
       @click="redirectToSignUp"
       class="mt-[20px] mx-auto pt-2 text-primary text-sm"
-    >
-      New Student? <b class="text-bolder"> Register Now </b>
-    </button>
+      v-html="signUpText"
+    />
   </div>
 </template>
 <script>
@@ -119,6 +118,10 @@ export default {
   },
 
   computed: {
+    signInButtonLabel() {
+      return this.getLocale == "en" ? "Sign In" : "साइन इन";
+    },
+
     /** Retutns if sign up flow should be activated */
     isSignupActivated() {
       return this.$store.state.sessionData.activate_signup;
@@ -132,8 +135,8 @@ export default {
     /** Returns text based on locale */
     signUpText() {
       return this.getLocale == "en"
-        ? "New Student? Register Now"
-        : "यदि आप नए छात्र हैं, तो पंजीकरण करने के लिए यहां क्लिक करें";
+        ? "New Student? <b> Register Now</b>"
+        : "नया छात्र? <b>अब रजिस्टर करें। </b>";
     },
 
     /**

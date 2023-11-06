@@ -48,7 +48,7 @@
         :disabled="signUpDisabled"
         @click="signUp"
       >
-        Sign Up
+        {{ signUpButtonLabel }}
       </button>
     </div>
     <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
@@ -60,9 +60,8 @@
     <button
       @click="redirectToSignUp"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
-    >
-      Already Registered? <span class="font-bolder"> Sign In </span>
-    </button>
+      v-html="signInText"
+    />
   </div>
   <div
     v-if="formSubmitted"
@@ -134,8 +133,16 @@ export default {
     },
   },
   computed: {
+    signUpButtonLabel() {
+      return this.getLocale == "en" ? "Sign Up" : "साइन अप";
+    },
     getLocale() {
       return this.$store.state.language;
+    },
+    signInText() {
+      return this.getLocale == "en"
+        ? "Already Registered? <b> Sign In</b>"
+        : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
     },
     /** returns images to be displayed for a group */
     getGroupImages() {

@@ -3,7 +3,7 @@
     <LanguagePicker />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-black font-bold">
-        Complete your Profile
+        {{ getFormHeading }}
       </h2>
     </div>
 
@@ -28,9 +28,8 @@
         class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
         :disabled="buttonDisabled"
         @click="profileDetails"
-      >
-        Start Session
-      </button>
+        v-html="startSessionText"
+      />
     </div>
   </div>
 </template>
@@ -109,10 +108,13 @@ export default {
     },
     getFormHeading() {
       const formHeading = {
-        en: "Welcome! Please fill the form to proceed!",
-        hi: "नमस्ते! कृपया आगे बढ़ने के लिए यह फॉर्म भरें!",
+        en: "Complete your Profile",
+        hi: "अपनी प्रोफाइल पूर्ण करें",
       };
       return formHeading[this.getLocale];
+    },
+    startSessionText() {
+      return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
     },
   },
   methods: {

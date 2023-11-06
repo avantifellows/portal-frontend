@@ -1,9 +1,9 @@
 <template>
   <div class="text-right">
     <FormKit
+      v-model="language"
       type="select"
       :options="['English', 'हिंदी']"
-      @update="updateLanguage"
       :inner-class="{
         'p-2': true,
       }"
@@ -14,14 +14,14 @@
 <script>
 export default {
   name: "LanguagePicker",
-  computed: {
-    placeholder() {
-      return this.$store.state.language == "en" ? "English" : "हिंदी";
-    },
+  data() {
+    return {
+      language: this.$store.state.language,
+    };
   },
-  methods: {
-    updateLanguage(e) {
-      if (e == "English") {
+  watch: {
+    language() {
+      if (this.language == "English") {
         this.$store.dispatch("setLanguage", "en");
       } else {
         this.$store.dispatch("setLanguage", "hi");

@@ -76,7 +76,7 @@
     <button
       v-show="isSignupActivated"
       @click="redirectToSignUp"
-      class="mt-[20px] mx-auto pt-2 text-primary text-sm"
+      class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signUpText"
     />
   </div>

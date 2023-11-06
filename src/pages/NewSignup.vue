@@ -57,7 +57,7 @@
     </div>
     <!-- signup button -->
     <button
-      @click="redirectToSignUp"
+      @click="redirectToSignIn"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signInText"
     />
@@ -297,6 +297,15 @@ export default {
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
+    },
+
+    /**
+     * Redirects the user to the sign-in page.
+     */
+    redirectToSignIn() {
+      this.$router.push({
+        name: "NewSignin",
+      });
     },
   },
 };

@@ -281,22 +281,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != null) {
-      if (
-        this.sessionId == "HaryanaStudents_10B37_45008_rxh-gkzc-kby" ||
-        this.sessionId == "HaryanaStudents_10B19_45008_vaq-qthn-quv" ||
-        this.sessionId == "HaryanaStudents_10B36_45008_hwx-azzu-gqk" ||
-        this.sessionId == "HaryanaStudents_10B30_45008_bpv-sofq-aeb" ||
-        this.sessionId == "HaryanaStudents_10B15_45008_zvn-ijtw-gvt" ||
-        this.sessionId == "HaryanaStudents_10B01_45008_zdx-pjkb-vos" ||
-        this.sessionId == "HaryanaStudents_10B06_45008_xde-uzkh-wjr" ||
-        this.sessionId == "HaryanaStudents_10B10_45008_xvq-njnu-gxi" ||
-        this.sessionId == "HaryanaStudents_10B13_45008_kgo-hkab-dtj" ||
-        this.sessionId == "HaryanaStudents_10B16_45008_qkv-awtk-wuv" ||
-        this.sessionId == "HaryanaStudents_10B18_45008_iqs-yibe-say" ||
-        this.sessionId == "HaryanaStudents_10B26_45008_mwd-yjhm-ceb" ||
-        this.sessionId == "HaryanaStudents_10B39_45008_bxc-rbio-dgq" ||
-        this.sessionId == "HaryanaStudents_10B41_45008_bww-pepw-rcb"
-      ) {
+      if (this.sessionId.startsWith("HaryanaStudents")) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId

@@ -125,6 +125,7 @@ export default {
       handler() {
         this.isUserDataIsComplete();
         this.showBasedOn();
+        this.getOptions();
       },
       deep: true,
     },
@@ -202,6 +203,24 @@ export default {
           ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
+        }
+      });
+    },
+
+    /** Builds options for dependant fields */
+    getOptions() {
+      Object.keys(this.formData.attributes).forEach((field) => {
+        let fieldAttributes = this.formData.attributes[field];
+
+        if (fieldAttributes.dependant) {
+          if (this.userData[fieldAttributes.dependantField]) {
+            fieldAttributes["options"] =
+              fieldAttributes.dependantFieldMapping[
+                this.userData[fieldAttributes.dependantField]
+              ];
+            console.log(typeof fieldAttributes);
+            return fieldAttributes.options[this.getLocale];
+          }
         }
       });
     },

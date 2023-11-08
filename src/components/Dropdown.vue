@@ -10,9 +10,8 @@
       :options="options"
       :name="dbKey"
       :help="helpText"
-      :input-class="{
-        'w-full': true,
-      }"
+      placeholder=" "
+      :input-class="{ 'w-full': true }"
       :inner-class="{
         border: true,
         'py-2': true,
@@ -79,6 +78,9 @@ export default {
     };
   },
   watch: {
+    options() {
+      this.value = this.options[0];
+    },
     /**
      * Emits 'update' event whenever the dropdown value is changed
      */

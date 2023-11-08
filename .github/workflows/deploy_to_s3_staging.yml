@@ -18,10 +18,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
+      
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with: 
+          node-version: 18.16.1
+          
+      - name: Node version
+        run: echo $(npm --version)
+        
       - name: Install
-
-        run: echo '$(node --version)'
         run: npm install
 
       # build the vuepress docs

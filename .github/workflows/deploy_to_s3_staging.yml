@@ -18,15 +18,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Setup Node
         uses: actions/setup-node@v3
-        with: 
+        with:
           node-version: 18.16.1
-          
+
       - name: Node version
         run: echo $(npm --version)
-        
+
       - name: Install
         run: npm install
 

@@ -145,6 +145,7 @@ export default {
 
     /** Returns the locale selected by user */
     getLocale() {
+      // console.log(this.$store.state);
       return this.$store.state.language;
     },
 
@@ -319,8 +320,10 @@ export default {
       let isUserValid = await validateUser(
         this.getAuthTypes,
         this.userInformation,
-        this.$store.state.groupData.input_schema.userType
+        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.groupData.id
       );
+      console.log(isUserValid);
       if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["ID"][this.getLocale];

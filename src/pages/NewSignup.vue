@@ -218,7 +218,6 @@ export default {
               fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
-            console.log(typeof fieldAttributes);
             return fieldAttributes.options[this.getLocale];
           }
         }

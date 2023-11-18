@@ -3,10 +3,9 @@
     <FormKit
       v-model="language"
       type="select"
-      :options="['English', 'हिंदी']"
-      :inner-class="{
-        'p-2': true,
-      }"
+      :options="options"
+      :inner-class="{ 'p-2': true }"
+      name="language"
     />
   </div>
 </template>
@@ -14,10 +13,19 @@
 <script>
 export default {
   name: "LanguagePicker",
+  props: {
+    options: {
+      type: Array,
+      default: [],
+    },
+  },
   data() {
     return {
-      language: this.$store.state.language,
+      language: "",
     };
+  },
+  mounted() {
+    // this.language = this.$store.state.language;
   },
   watch: {
     /**

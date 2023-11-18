@@ -18,7 +18,7 @@
 
   <div v-else>
     <div v-if="!oldFlow">
-      <LanguagePicker />
+      <LanguagePicker :options="getLanguages" />
       <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
       <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
     </div>
@@ -140,6 +140,11 @@ export default {
   },
 
   computed: {
+    getLanguages() {
+      return this.groupData
+        ? this.groupData.input_schema.languages
+        : ["English", "हिंदी"];
+    },
     /** TEMP - returns if the purpose is registration */
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
@@ -277,11 +282,15 @@ export default {
     },
   },
   async created() {
+    this.$store.dispatch("setLanguage", "en");
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != null) {
-      if (this.sessionId.startsWith("HaryanaStudents")) {
+      if (
+        this.sessionId.startsWith("HaryanaStudents") ||
+        this.sessionId.startsWith("EnableStudents")
+      ) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
@@ -331,9 +340,10 @@ export default {
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
         if (!this.oldFlow) {
-          this.groupData = await groupAPIService.getGroupName(
+          let groupData = await groupAPIService.getGroupName(
             this.sessionData.id
           );
+          this.groupData = groupData["child_id"];
         } else {
           this.groupData = await groupAPIService.getGroupData(
             this.sessionData.group

@@ -92,6 +92,7 @@ export default {
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
+    this.isUserDataIsComplete();
   },
   watch: {
     userData: {
@@ -128,30 +129,39 @@ export default {
       return Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         let showBasedOn = fieldAttributes.showBasedOn;
-
+        // console.log(fieldAttributes, showBasedOn, fieldAttributes["show"]);
         if (fieldAttributes.showBasedOn != "") {
           if (
             this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-            Object.values(JSON.parse(showBasedOn))
+            Object.values(JSON.parse(showBasedOn))[0]
           ) {
             fieldAttributes["show"] = true;
-          } else fieldAttributes["show"] = false;
+          } else {
+            fieldAttributes["show"] = false;
+            // console.log(
+            //   fieldAttributes.key,
+            //   this.userData,
+            //   this.userData[fieldAttributes.key]
+            // );
+            this.userData[fieldAttributes.key] = "";
+          }
         }
+        // } else {
+        //   fieldAttributes["show"] = false;
+        // }
       });
     },
 
     /** Builds options for dependant fields */
     getOptions() {
-      Object.keys(this.formData.attributes).forEach((field) => {
-        let fieldAttributes = this.formData.attributes[field];
-
+      Object.keys(this.formSchemaData).forEach((field) => {
+        let fieldAttributes = this.formSchemaData[field];
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
               fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
-            console.log(typeof fieldAttributes);
             return fieldAttributes.options[this.getLocale];
           }
         }
@@ -191,31 +201,31 @@ export default {
 
     /** redirects to destination */
     redirect() {
-      if (
-        redirectToDestination(
-          this.$store.state.sessionData.purpose.params,
-          this.id,
-          this.$store.state.sessionData.platform_id,
-          this.$store.state.sessionData.platform,
-          this.$store.state.groupData.input_schema.userType
-        )
-      ) {
-        sendSQSMessage(
-          "attendance-sign-in",
-          this.$store.state.sessionData.purpose["sub-type"],
-          this.$store.state.sessionData.platform,
-          this.$store.state.sessionData.platform_id,
-          this.id,
-          "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
-          this.$store.state.sessionData.session_id,
-          "",
-          "phone" in this.userData ? this.userData["phone"] : "",
-          this.$store.state.sessionData.meta_data.batch,
-          "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
-        );
-      }
+      // if (
+      //   redirectToDestination(
+      //     this.$store.state.sessionData.purpose.params,
+      //     this.id,
+      //     this.$store.state.sessionData.platform_id,
+      //     this.$store.state.sessionData.platform,
+      //     this.$store.state.groupData.input_schema.userType
+      //   )
+      // ) {
+      //   sendSQSMessage(
+      //     "attendance-sign-in",
+      //     this.$store.state.sessionData.purpose["sub-type"],
+      //     this.$store.state.sessionData.platform,
+      //     this.$store.state.sessionData.platform_id,
+      //     this.id,
+      //     "",
+      //     this.$store.state.groupData.name,
+      //     this.$store.state.groupData.input_schema.userType,
+      //     this.$store.state.sessionData.session_id,
+      //     "",
+      //     "phone" in this.userData ? this.userData["phone"] : "",
+      //     this.$store.state.sessionData.meta_data.batch,
+      //     "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
+      //   );
+      // }
     },
   },
 };

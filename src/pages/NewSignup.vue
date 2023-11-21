@@ -119,6 +119,7 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
+    console.log(this.formData);
   },
   watch: {
     userData: {
@@ -215,7 +216,7 @@ export default {
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[
+              fieldAttributes.dependantFieldMapping[0][
                 this.userData[fieldAttributes.dependantField]
               ];
             return fieldAttributes.options[this.getLocale];

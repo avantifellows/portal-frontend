@@ -569,7 +569,7 @@ export default {
         this.group
       );
       if (
-        ( this.group == "EnableStudents" ||
+        (this.group == "EnableStudents" ||
           this.group == "NGOStudents" ||
           this.group == "TNStudents" ||
           this.group == "DMVSStudents") &&

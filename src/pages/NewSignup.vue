@@ -64,14 +64,20 @@
   </div>
   <div
     v-if="formSubmitted"
-    class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
+    class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <template v-if="idGeneration">
+    <div
+      v-if="idGeneration"
+      class="bg-primary-hover py-10 rounded-md shadow-sm"
+    >
       <p>
-        Your ID is <b>{{ userData["user_id"] }}</b>
+        <b>Your ID is {{ userData["user_id"] }}</b>
       </p>
-      <p>Please note this down. Use this to sign-in going forward.</p>
-    </template>
+      <p>
+        Kindly make a note of it. You will need this to log in to all your
+        future sessions.
+      </p>
+    </div>
 
     <button
       v-if="redirection"

@@ -307,7 +307,7 @@ export default {
         this.invalidLoginMessage =
           "Phone number entered is incorrect. Please try again!";
       } else {
-        if (this.$store.state.sessionData.pop_up_form) {
+        if (this.$store.state.sessionData.pop_up_form == 'True') {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",

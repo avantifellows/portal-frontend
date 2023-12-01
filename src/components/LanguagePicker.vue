@@ -2,7 +2,7 @@
   <div class="mt-6 flex justify-center">
     <Dropdown
       label="Select your language"
-      :options="['English', 'हिंदी']"
+      :options="['English']"
       :placeholder="placeholder"
       @update="updateLanguage"
     />

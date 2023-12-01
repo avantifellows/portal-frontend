@@ -329,34 +329,37 @@ export default {
               : ""
           );
         } else {
-          sendSQSMessage(
-            "sign-in",
-            this.$store.state.sessionData.purpose["sub-type"],
-            this.$store.state.sessionData.platform,
-            this.$store.state.sessionData.platform_id,
-            "student_id" in this.userInformation
-              ? this.userInformation["student_id"]
-              : this.userInformation["teacher_id"],
-            this.getAuthTypes.toString(),
-            this.$store.state.groupData.name,
-            this.$store.state.groupData.input_schema.userType,
-            this.$store.state.sessionData.session_id,
-            "",
-            "phone" in this.userInformation
-              ? this.userInformation["phone"]
-              : "",
-            this.$store.state.sessionData.meta_data.batch,
-            "date_of_birth" in this.userInformation
-              ? this.userInformation["date_of_birth"]
-              : ""
-          );
-          redirectToDestination(
-            this.$store.state.sessionData.purpose.params,
-            this.userInformation["student_id"],
-            this.$store.state.sessionData.platform_id,
-            this.$store.state.sessionData.platform,
-            this.$store.state.groupData.input_schema.userType
-          );
+          if (
+            sendSQSMessage(
+              "sign-in",
+              this.$store.state.sessionData.purpose["sub-type"],
+              this.$store.state.sessionData.platform,
+              this.$store.state.sessionData.platform_id,
+              "student_id" in this.userInformation
+                ? this.userInformation["student_id"]
+                : this.userInformation["teacher_id"],
+              this.getAuthTypes.toString(),
+              this.$store.state.groupData.name,
+              this.$store.state.groupData.input_schema.userType,
+              this.$store.state.sessionData.session_id,
+              "",
+              "phone" in this.userInformation
+                ? this.userInformation["phone"]
+                : "",
+              this.$store.state.sessionData.meta_data.batch,
+              "date_of_birth" in this.userInformation
+                ? this.userInformation["date_of_birth"]
+                : ""
+            )
+          ) {
+            redirectToDestination(
+              this.$store.state.sessionData.purpose.params,
+              this.userInformation["student_id"],
+              this.$store.state.sessionData.platform_id,
+              this.$store.state.sessionData.platform,
+              this.$store.state.groupData.input_schema.userType
+            );
+          }
         }
       }
     },

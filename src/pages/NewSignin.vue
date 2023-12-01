@@ -116,7 +116,7 @@ export default {
   computed: {
     /** Retutns if sign up flow should be activated */
     isSignupActivated() {
-      return this.$store.state.sessionData.activate_signup;
+      return this.$store.state.sessionData.activate_signup == 'True';
     },
 
     /** Returns the locale selected by user */

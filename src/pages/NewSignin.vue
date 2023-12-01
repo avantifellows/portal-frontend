@@ -116,7 +116,7 @@ export default {
   computed: {
     /** Retutns if sign up flow should be activated */
     isSignupActivated() {
-      return this.$store.state.sessionData.activate_signup == 'True';
+      return this.$store.state.sessionData.activate_signup == "True";
     },
 
     /** Returns the locale selected by user */
@@ -307,7 +307,7 @@ export default {
         this.invalidLoginMessage =
           "Phone number entered is incorrect. Please try again!";
       } else {
-        if (this.$store.state.sessionData.pop_up_form == 'True') {
+        if (this.$store.state.sessionData.pop_up_form == "True") {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",

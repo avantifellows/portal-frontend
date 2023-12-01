@@ -342,7 +342,9 @@ export default {
             this.$store.state.sessionData.purpose["sub-type"],
             this.$store.state.sessionData.platform,
             this.$store.state.sessionData.platform_id,
-            this.userInformation["student_id"],
+            "student_id" in this.userInformation
+              ? this.userInformation["student_id"]
+              : this.userInformation["teacher_id"],
             this.getAuthTypes.toString(),
             this.$store.state.groupData.name,
             this.$store.state.groupData.input_schema.userType,

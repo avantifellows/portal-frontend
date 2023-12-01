@@ -287,7 +287,6 @@ export default {
      * @returns {Promise<void>} A Promise that resolves once the authentication process is complete.
      */
     async authenticate() {
-      console.log("here");
       let isUserValid = await validateUser(
         this.getAuthTypes,
         this.userInformation,

@@ -357,12 +357,7 @@ export default {
      * - if cap of maximum entries hasn't been reached yet
      */
     isAddButtonAllowed() {
-      return (
-        !this.isMultipleIDEntryAllowed &&
-        !this.isCurrentEntryIncomplete &&
-        this.numOfUserIds < this.maxNumberOfIds &&
-        !this.isExtraInputValidationRequired
-      );
+      return false
     },
 
     /** Checks if entire birth date is entered */

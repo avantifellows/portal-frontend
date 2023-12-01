@@ -11,27 +11,12 @@ import "vue-toastification/dist/index.css";
 import { plugin, defaultConfig } from "@formkit/vue";
 import { createLocalStoragePlugin } from "@formkit/addons";
 
-const config = defaultConfig({
-  plugins: [
-    createLocalStoragePlugin({
-      // plugin defaults:
-      prefix: "formkit",
-      key: undefined,
-      control: undefined,
-      maxAge: 3600000, // 1 hour
-      debounce: 200,
-      beforeSave: undefined,
-      beforeLoad: undefined,
-    }),
-  ],
-});
-
 const app = createApp(App)
   .component("inline-svg", InlineSvg)
   .use(router)
   .use(store)
   .use(Toast)
-  .use(plugin, config);
+  .use(plugin, defaultConfig);
 
 if (["staging", "production"].includes(import.meta.env.MODE)) {
   Sentry.init({

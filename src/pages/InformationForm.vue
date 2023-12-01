@@ -131,11 +131,6 @@ export default {
         let showBasedOn = fieldAttributes.showBasedOn;
 
         if (fieldAttributes.showBasedOn != "") {
-          console.log(
-            fieldAttributes.key,
-            showBasedOn,
-            fieldAttributes["show"]
-          );
           if (
             this.userData[Object.keys(JSON.parse(showBasedOn))] ==
             Object.values(JSON.parse(showBasedOn))[0]
@@ -143,17 +138,9 @@ export default {
             fieldAttributes["show"] = true;
           } else {
             fieldAttributes["show"] = false;
-            // console.log(
-            //   fieldAttributes.key,
-            //   this.userData,
-            //   this.userData[fieldAttributes.key]
-            // );
             this.userData[fieldAttributes.key] = "";
           }
         }
-        // } else {
-        //   fieldAttributes["show"] = false;
-        // }
       });
     },
 

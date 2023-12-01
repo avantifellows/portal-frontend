@@ -25,7 +25,7 @@ export default {
     };
   },
   mounted() {
-    // this.language = this.$store.state.language;
+    this.language = this.$store.state.language;
   },
   watch: {
     /**

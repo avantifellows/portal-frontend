@@ -337,10 +337,9 @@ export default {
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
         if (!this.oldFlow) {
-          let groupData = await groupAPIService.getGroupName(
+          this.groupData = await groupAPIService.getGroupName(
             this.sessionData.id
           );
-          this.groupData = groupData["child_id"];
         } else {
           this.groupData = await groupAPIService.getGroupData(
             this.sessionData.group

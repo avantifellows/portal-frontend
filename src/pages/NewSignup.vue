@@ -125,7 +125,6 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
-    console.log(this.formData);
   },
   watch: {
     userData: {

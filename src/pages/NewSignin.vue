@@ -323,7 +323,7 @@ export default {
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.groupData.id
       );
-      console.log(isUserValid);
+
       if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["ID"][this.getLocale];

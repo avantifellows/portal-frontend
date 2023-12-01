@@ -573,7 +573,7 @@ export default {
           this.group == "NGOStudents" ||
           this.group == "TNStudents" ||
           this.group == "DMVSStudents") &&
-        this.redirectTo == "quiz"
+        (this.redirectTo == "quiz" || this.redirectTo == "google-forms")
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
         this.validateCount = 0;

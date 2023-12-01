@@ -6,6 +6,7 @@ import {
   checkForUserEndpoint,
   checkBirthdateEndpoint,
   verifyAIETStudentEndpoint,
+  verifyTeacherEndpoint,
 } from "@/services/API/endpoints.js";
 
 export default {
@@ -17,6 +18,26 @@ export default {
     return new Promise((resolve) => {
       dbClient
         .get(verifyStudentEndpoint, { params: studentData })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("User API returned an error:", error);
+          }
+        });
+    });
+  },
+
+  /**
+   * Validates that the ID exists
+   * @param {String} teacherId - the id that needs to be validated
+   */
+  verifyTeacher(teacherData) {
+    return new Promise((resolve) => {
+      dbClient
+        .get(verifyTeacherEndpoint, { params: teacherData })
         .then((response) => {
           resolve(response.data);
         })

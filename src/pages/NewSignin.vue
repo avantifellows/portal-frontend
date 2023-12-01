@@ -140,7 +140,7 @@ export default {
 
     /** Retutns if sign up flow should be activated */
     isSignupActivated() {
-      return this.$store.state.sessionData.activate_signup;
+      return this.$store.state.sessionData.activate_signup == "True";
     },
 
     /** Returns the locale selected by user */
@@ -340,7 +340,7 @@ export default {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.getLocale];
       } else {
-        if (this.$store.state.sessionData.pop_up_form) {
+        if (this.$store.state.sessionData.pop_up_form == "True") {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",

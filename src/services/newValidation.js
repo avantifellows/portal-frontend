@@ -7,11 +7,17 @@ export async function validateUser(
   groupId
 ) {
   let user = {};
+
   if (authTypes.includes("ID")) {
     if (userType == "student") {
       user["isUserIdValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
         group_id: groupId,
+      });
+    }
+    if (userType == "teacher") {
+      user["isUserIdValid"] = await userAPI.verifyTeacher({
+        teacher_id: userInformation["teacher_id"],
       });
     }
   }

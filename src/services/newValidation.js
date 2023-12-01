@@ -2,10 +2,16 @@ import userAPI from "@/services/API/user.js";
 
 export async function validateUser(authTypes, userInformation, userType) {
   let user = {};
+
   if (authTypes.includes("ID")) {
     if (userType == "student") {
       user["isUserIdValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
+      });
+    }
+    if (userType == "teacher") {
+      user["isUserIdValid"] = await userAPI.verifyTeacher({
+        teacher_id: userInformation["teacher_id"],
       });
     }
   }

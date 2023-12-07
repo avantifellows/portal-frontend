@@ -388,7 +388,8 @@ export default {
           this.isExtraInputValidationRequired) ||
         this.group == "Candidates" ||
         this.group == "TNStudents" ||
-        this.group == "PunjabStudents"
+        this.group == "PunjabStudents" ||
+        this.group == "PunjabTeachers"
       );
     },
 
@@ -569,7 +570,8 @@ export default {
           this.group == "NGOStudents" ||
           this.group == "TNStudents" ||
           this.group == "DMVSStudents" ||
-          this.group == "PunjabStudents") &&
+          this.group == "PunjabStudents" ||
+          this.group == "PunjabTeachers") &&
         (this.redirectTo == "quiz" || this.redirectTo == "google-forms")
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;

@@ -387,7 +387,8 @@ export default {
           this.validateCount == 0 &&
           this.isExtraInputValidationRequired) ||
         this.group == "Candidates" ||
-        this.group == "TNStudents"
+        this.group == "TNStudents" ||
+        this.group == "PunjabStudents"
       );
     },
 

@@ -606,7 +606,7 @@ export default {
         this.invalidLoginMessage =
           this.group == "Candidates"
             ? "Phone Number is incorrect!"
-            : "Student ID entered is incorrect. Please try again!";
+            : "ID entered is incorrect. Please try again!";
       }
       this.setValidFlag();
       if (this.isCurrentUserValid == true || this.validateCount > 1) {

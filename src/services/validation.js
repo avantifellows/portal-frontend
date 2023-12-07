@@ -91,7 +91,8 @@ export async function validateID(
     group == "HimachalStudents" ||
     group == "DelhiStudents" ||
     group == "NGOStudents" ||
-    group == "DMVSStudents"
+    group == "DMVSStudents" ||
+    group == "PunjabStudents"
   ) {
     let isCurrentUserValid = await userAPI.verifyUser(userID, group);
     let isBirthdateValid = true;

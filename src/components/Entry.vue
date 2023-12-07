@@ -357,7 +357,7 @@ export default {
      * - if cap of maximum entries hasn't been reached yet
      */
     isAddButtonAllowed() {
-      return false
+      return false;
     },
 
     /** Checks if entire birth date is entered */
@@ -564,10 +564,11 @@ export default {
         this.group
       );
       if (
-        ( this.group == "EnableStudents" ||
+        (this.group == "EnableStudents" ||
           this.group == "NGOStudents" ||
           this.group == "TNStudents" ||
-          this.group == "DMVSStudents") &&
+          this.group == "DMVSStudents" ||
+          this.group == "PunjabStudents") &&
         (this.redirectTo == "quiz" || this.redirectTo == "google-forms")
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;

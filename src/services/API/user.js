@@ -6,6 +6,7 @@ import {
   checkForUserEndpoint,
   checkBirthdateEndpoint,
   verifyAIETStudentEndpoint,
+  verifyTeacherEndpoint,
 } from "@/services/API/endpoints.js";
 
 export default {
@@ -30,10 +31,30 @@ export default {
   },
 
   /**
+   * Validates that the ID exists
+   * @param {String} teacherId - the id that needs to be validated
+   */
+  verifyTeacher(teacherData) {
+    return new Promise((resolve) => {
+      dbClient
+        .get(verifyTeacherEndpoint, { params: teacherData })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("User API returned an error:", error);
+          }
+        });
+    });
+  },
+
+  /**
    * Creates a new user
    * @param {Object} formData - contains data filled in the form by user
    */
-  newUserSignup(formData, idGeneration, userType) {
+  newUserSignup(formData, idGeneration, userType, group) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -42,6 +63,7 @@ export default {
             form_data: formData,
             id_generation: idGeneration,
             user_type: userType,
+            group: group,
           })
         )
         .then((response) => {

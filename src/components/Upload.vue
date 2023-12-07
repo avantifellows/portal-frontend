@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col justify-center">
+  <div class="flex flex-col justify-center" v-if="show">
     <p
       class="w-1/2 text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center"
     >
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
     <div class="flex flex-row justify-center">
       <FormKit
@@ -21,6 +21,10 @@
 export default {
   name: "Upload",
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",

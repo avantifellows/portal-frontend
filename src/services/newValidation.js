@@ -27,6 +27,11 @@ export async function validateUser(authTypes, userInformation, userType) {
         student_id: userInformation["student_id"],
       });
     }
+    if (userType == "teacher") {
+      user["isUserIdValid"] = await userAPI.verifyTeacher({
+        teacher_id: userInformation["teacher_id"],
+      });
+    }
   }
   if (authTypes.includes("DOB")) {
     if (userType == "student") {

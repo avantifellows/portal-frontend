@@ -11,14 +11,18 @@
   <div v-if="!sessionEnabled">
     <NoClassMessage />
   </div>
-  <div v-if="isLandingPage">
+
+  <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
+
   <div v-else>
     <div v-if="!oldFlow">
+      <LanguagePicker />
       <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
       <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
     </div>
+
     <div v-else>
       <div
         v-if="
@@ -43,6 +47,7 @@
           :isExtraInputValidationRequired="isExtraInputValidationsRequired"
         />
       </div>
+
       <div
         v-if="
           isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp
@@ -55,16 +60,21 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
+
 import groupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
+
 import NoClassMessage from "@/components/NoClassMessage.vue";
+import Entry from "@/components/Entry.vue";
+import Signup from "@/components/Signup.vue";
+import LanguagePicker from "@/components/LanguagePicker.vue";
+
 import useAssets from "@/assets/assets.js";
-import { useToast } from "vue-toastification";
+
 import NewSignIn from "./NewSignin.vue";
 import NewSignUp from "./NewSignup.vue";
 import LandingPage from "./LandingPage.vue";
-import Entry from "@/components/Entry.vue";
-import Signup from "@/components/Signup.vue";
 
 const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
@@ -78,6 +88,7 @@ export default {
     LandingPage,
     Entry,
     Signup,
+    LanguagePicker,
   },
   props: {
     /** The resource we are redirecting to */
@@ -129,6 +140,7 @@ export default {
   },
 
   computed: {
+    /** TEMP - returns if the purpose is registration */
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
     },
@@ -169,6 +181,7 @@ export default {
         ? this.groupData.authType
         : "ID";
     },
+
     /**
      * Checks if the session type is a sign-in.
      * @returns {boolean} True if the session type is a sign-in, false otherwise.
@@ -268,7 +281,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != null) {
-      if (this.sessionId == "DelhiStudents_Test+Batch_44711_vfr-mndk-ado") {
+      if (this.sessionId.startsWith('PunjabTeachers')) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
@@ -278,6 +291,7 @@ export default {
           this.sessionId
         );
       }
+
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
         this.$router.push({
@@ -302,6 +316,7 @@ export default {
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
         this.$store.dispatch("setSessionId", this.sessionId);
+
         if (this.oldFlow) {
           if ("sessionActive" in this.sessionData) {
             this.sessionEnabled = this.sessionData.sessionActive;
@@ -324,6 +339,7 @@ export default {
             this.sessionData.group
           );
         }
+
         //this.groupData = await groupAPIService.getGroupData(groupName);
         this.$store.dispatch("setGroupData", this.groupData);
         if (!this.sessionData.error && this.groupData && this.groupData.error) {

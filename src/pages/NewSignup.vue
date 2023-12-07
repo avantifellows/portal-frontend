@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-
+  <LanguagePicker />
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
@@ -23,21 +23,21 @@
     <p class="text-2xl mx-auto font-bold">
       {{ formTitle }}
     </p>
-    <p class="text-center">All fields are mandatory</p>
+    <p class="text-center">{{ formSubTitle }}</p>
 
     <div class="mx-auto w-2/3 md:w-auto">
       <component
         v-for="(formField, index) in formFields"
+        :show="formField.show"
         :key="index"
         :is="formField.component"
-        :label="formField.label"
-        :isRequired="formField.isRequired"
+        :label="formField.label[getLocale]"
+        :isRequired="formField.required"
         :dbKey="formField.key"
-        :placeholder="formField.placeholder"
-        :options="getOptions(formField)"
+        :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText"
+        :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
       />
     </div>
@@ -67,7 +67,7 @@
       :disabled="isRedirectionButtonDisabled"
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50"
     >
-      Done
+      Start Session
     </button>
   </div>
 </template>
@@ -78,10 +78,13 @@ import UserAPI from "@/services/API/user.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
+import LanguagePicker from "../components/LanguagePicker.vue";
+
 const assets = useAssets();
 
 export default {
   name: "SignUp",
+  components: { LanguagePicker },
   data() {
     return {
       isLoading: false,
@@ -100,17 +103,26 @@ export default {
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
+      this.formData.attributes[field]["show"] =
+        this.formData.attributes[field].showBasedOn == "" ? true : false;
+      this.formData.attributes[field]["required"] =
+        this.formData.attributes[field].required == "TRUE" ? true : false;
     });
   },
   watch: {
     userData: {
       handler() {
         this.isUserDataIsComplete();
+        this.getOptions();
+        this.showBasedOn();
       },
       deep: true,
     },
   },
   computed: {
+    getLocale() {
+      return this.$store.state.language;
+    },
     /** returns images to be displayed for a group */
     getGroupImages() {
       return this.$store.state.groupData.input_schema.images;
@@ -120,7 +132,9 @@ export default {
     formTitle() {
       return this.formData.name;
     },
-
+    formSubTitle() {
+      return this.formData.sub_heading;
+    },
     /** returns all fields to be displayed in the form */
     formFields() {
       return this.formData.attributes;
@@ -144,22 +158,45 @@ export default {
     },
   },
   methods: {
-    getOptions(field) {
-      if (field.dependant) {
-        if (this.userData[field.dependantField])
-          return field.dependantFieldMapping[
-            this.userData[field.dependantField]
-          ];
-      } else return field.options;
-    },
+    showBasedOn() {
+      return Object.keys(this.formData.attributes).forEach((field) => {
+        let fieldAttributes = this.formData.attributes[field];
+        let showBasedOn = fieldAttributes.showBasedOn;
 
+        if (fieldAttributes.showBasedOn != "") {
+          if (
+            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
+            Object.values(JSON.parse(showBasedOn))
+          ) {
+            fieldAttributes["show"] = true;
+          } else fieldAttributes["show"] = false;
+        }
+      });
+    },
+    getOptions() {
+      Object.keys(this.formData.attributes).forEach((field) => {
+        let fieldAttributes = this.formData.attributes[field];
+
+        if (fieldAttributes.dependant) {
+          if (this.userData[fieldAttributes.dependantField]) {
+            fieldAttributes["options"] =
+              fieldAttributes.dependantFieldMapping[
+                this.userData[fieldAttributes.dependantField]
+              ];
+            return fieldAttributes.options[this.getLocale];
+          }
+        }
+      });
+    },
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;
       Object.keys(this.formData.attributes).forEach((field) => {
         if (
-          !this.userData.hasOwnProperty(this.formData.attributes[field].key) ||
-          this.formData.attributes[field].key == ""
+          (!this.userData.hasOwnProperty(this.formData.attributes[field].key) ||
+            this.userData[this.formData.attributes[field].key] == "") &&
+          this.formData.attributes[field].required &&
+          this.formData.attributes[field].show
         ) {
           isUserDataComplete = false;
         }
@@ -177,13 +214,29 @@ export default {
 
     /** creates user ID based on information */
     async signUp() {
+      sendSQSMessage(
+        "sign-up",
+        this.$store.state.sessionData.purpose["sub-type"],
+        this.$store.state.sessionData.platform,
+        this.$store.state.sessionData.platform_id,
+        this.userData["student_id"],
+        "",
+        this.$store.state.groupData.name,
+        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.sessionData.session_id,
+        "",
+        "phone" in this.userData ? this.userData["phone"] : "",
+        this.$store.state.sessionData.meta_data.batch,
+        "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
+      );
       this.formSubmitted = true;
       this.isLoading = true;
 
-      let createdUserId = await UserAPI.userSignup(
+      let createdUserId = await UserAPI.newUserSignup(
         this.userData,
         this.$store.state.sessionData.id_generation,
-        this.$store.state.groupData.input_schema.userType
+        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.groupData.name
       );
 
       if (createdUserId == "" || createdUserId.error) {
@@ -211,18 +264,19 @@ export default {
         )
       ) {
         sendSQSMessage(
-          "sign-up",
+          "attendance-sign-up",
           this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.userData["user_id"],
-          this.getAuthTypes,
+          "",
           this.$store.state.groupData.name,
           this.$store.state.groupData.input_schema.userType,
           this.$store.state.sessionData.session_id,
           "",
-          "",
-          this.$store.state.sessionData.meta_data.batch
+          "phone" in this.userData ? this.userData["phone"] : "",
+          this.$store.state.sessionData.meta_data.batch,
+          "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
     },

@@ -1,11 +1,8 @@
 <template>
-  <div class="flex flex-col justify-center">
-    <p
-      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
-    >
-      {{ label }}
+  <div class="flex flex-col justify-center" v-if="show">
+    <p class="text-md font-semibold">
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
-    <div class="flex flex-row justify-center mt-2">
       <FormKit
         type="date"
         :name="dbKey"
@@ -17,15 +14,7 @@
         v-model="date"
         validation-visibility="dirty"
         :help="helpText"
-        :classes="{
-          outer: 'py-2',
-          inner: 'p-4 border-2 rounded-md border-gray-500 ',
-          input: 'mx-auto focus:border-gray-800 focus:outline-none ',
-          help: 'text-xs text-gray-400 pt-2',
-          message: 'mx-auto text-red-700 text-xs mb-1',
-        }"
       />
-    </div>
   </div>
 </template>
 <script>
@@ -33,6 +22,10 @@ export default {
   name: "Datepicker",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",

@@ -1,14 +1,14 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" v-if="show">
     <p class="text-md font-semibold">
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
 
     <FormKit
       type="select"
       v-model="value"
       :options="options"
-      placeholder=" "
+      placeholder="Select"
       :validation="[isRequired ? ['required'] : []]"
       validation-visibility="dirty"
       :name="dbKey"
@@ -22,13 +22,13 @@ export default {
   name: "Dropdown",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",
-    },
-    placeholder: {
-      type: String,
-      defult: "",
     },
     isRequired: {
       type: Boolean,

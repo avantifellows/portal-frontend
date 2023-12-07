@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col justify-center">
+  <div class="flex flex-col justify-center" v-if="show">
     <p class="text-md md:text-lg font-semibold">
-      {{ label }}
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
       type="number"
@@ -30,6 +30,10 @@ export default {
   name: "NumberEntry",
   emits: ["update"],
   props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",
@@ -101,12 +105,13 @@ export default {
       if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
       } else if (event.length > this.maxLengthOfEntry) {
-        this.number = event.slice(0, this.maxLengthOfEntry).toString();
+        event = event.slice(0, this.maxLengthOfEntry).toString();
       } else if (event.length < this.maxLengthOfEntry) {
         this.invalidNumberEntryMessage = "Please enter valid number";
       } else {
         this.invalidNumberEntryMessage = "";
       }
+      this.number = event;
       this.$emit("update", this.number, this.dbKey);
     },
 

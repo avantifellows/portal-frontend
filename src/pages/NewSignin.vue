@@ -1,10 +1,7 @@
 <template>
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <inline-svg
-        class="text-black text-4xl m-auto animate-spin h-20 w-20"
-        :src="loadingSpinnerSvg"
-      />
+      <inline-svg class="text-black text-4xl m-auto animate-spin h-20 w-20" :src="loadingSpinnerSvg" />
     </div>
   </div>
 
@@ -16,71 +13,44 @@
 
   <div class="flex flex-col mx-auto my-auto h-full py-10 space-y-4">
     <!-- different input components -->
-    <div
-      v-for="(authType, index) in getAuthTypes"
-      :key="`id-${index}`"
-      class="mx-auto"
-    >
-      <NumberEntry
-        v-if="isEntryNumber(authType)"
-        ref="numberEntry"
-        :label="numberEntryParameters.label"
-        :placeholder="numberEntryParameters.placeholder"
-        :isRequired="numberEntryParameters.required"
-        :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry"
-        :dbKey="numberEntryParameters.key"
-        @update="updateUserInformation"
-      />
-      <PhoneNumberEntry
-        v-if="isEntryPhoneNumber(authType)"
-        ref="phoneNumberEntry"
-        :label="phoneNumberEntryParameters.label"
-        :placeholder="phoneNumberEntryParameters.placeholder"
-        :isRequired="phoneNumberEntryParameters.required"
-        :dbKey="phoneNumberEntryParameters.key"
-        @update="updateUserInformation"
-      />
-      <Datepicker
-        v-if="isEntryDate(authType)"
-        ref="dateEntry"
-        :label="dateEntryParameters.label"
-        :isRequired="dateEntryParameters.required"
-        :dbKey="dateEntryParameters.key"
-        @update="updateUserInformation"
-      />
+    <div v-for="(authType, index) in getAuthTypes" :key="`id-${index}`" class="mx-auto">
+      <NumberEntry v-if="isEntryNumber(authType)" ref="numberEntry" :label="numberEntryParameters.label"
+        :placeholder="numberEntryParameters.placeholder" :isRequired="numberEntryParameters.required"
+        :maxLengthOfEntry="numberEntryParameters.maxLengthOfEntry" :dbKey="numberEntryParameters.key"
+        @update="updateUserInformation" />
+      <PhoneNumberEntry v-if="isEntryPhoneNumber(authType)" ref="phoneNumberEntry"
+        :label="phoneNumberEntryParameters.label" :placeholder="phoneNumberEntryParameters.placeholder"
+        :isRequired="phoneNumberEntryParameters.required" :dbKey="phoneNumberEntryParameters.key"
+        @update="updateUserInformation" />
+      <Datepicker v-if="isEntryDate(authType)" ref="dateEntry" :label="dateEntryParameters.label"
+        :isRequired="dateEntryParameters.required" :dbKey="dateEntryParameters.key" @update="updateUserInformation" />
     </div>
 
     <!-- invalid login message -->
-    <span
-      v-html="invalidLoginMessage"
-      v-if="isInvalidLoginMessageShown"
-      class="mx-auto text-red-700 text-base mb-1 text-center md:text-sm"
-    ></span>
+    <span v-html="invalidLoginMessage" v-if="isInvalidLoginMessageShown"
+      class="mx-auto text-red-700 text-base mb-1 text-center md:text-sm"></span>
 
     <!-- submit button -->
     <button
       class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-3 rounded disabled:opacity-50 btn"
-      :disabled="isSubmitButtonDisabled"
-      @click="authenticate"
-    >
+      :disabled="isSubmitButtonDisabled" @click="authenticate">
       SIGN IN
     </button>
 
     <!-- signup button -->
-    <button
-      v-show="$store.state.sessionData.activate_signup"
-      @click="redirectToSignUp"
-      class="mx-auto pt-2 text-xs md:text-sm underline text-red-800"
-    >
-      If you are a new student, click here to register
+    <button v-show="isSignupActivated" @click="redirectToSignUp"
+      class="mx-auto pt-2 text-xs md:text-sm underline text-red-800">
+      {{ signUpText }}
     </button>
   </div>
 </template>
 <script>
 import useAssets from "@/assets/assets.js";
+
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
+
 import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
@@ -110,7 +80,25 @@ export default {
   mounted() {
     this.mounted = true;
   },
+
   computed: {
+    /** Retutns if sign up flow should be activated */
+    isSignupActivated() {
+      return this.$store.state.sessionData.activate_signup == "True";
+    },
+
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.language;
+    },
+
+    /** Returns text based on locale */
+    signUpText() {
+      return this.getLocale == "en"
+        ? "If you are a new student, click here to register"
+        : "यदि आप नए छात्र हैं, तो पंजीकरण करने के लिए यहां क्लिक करें";
+    },
+
     /**
      * Retrieves the authentication types.
      * @returns {string[]} An array of authentication types.
@@ -201,12 +189,16 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData.locale_data.en).find((key) => {
-        if (key == authType) {
-          UIParameters =
-            this.$store.state.groupData.locale_data.en[key.toString()];
+      Object.keys(this.$store.state.groupData.locale_data[this.getLocale]).find(
+        (key) => {
+          if (key == authType) {
+            UIParameters =
+              this.$store.state.groupData.locale_data[this.getLocale][
+              key.toString()
+              ];
+          }
         }
-      });
+      );
       return UIParameters;
     },
 
@@ -250,6 +242,15 @@ export default {
     },
 
     /**
+     * Updates the user information object with the provided value for the specified database key.
+     * @param {string} value - The value to update.
+     * @param {string} dbKey - The key corresponding to the user information field in the database.
+     */
+    updateUserInformation(value, dbKey) {
+      this.userInformation[dbKey] = value;
+    },
+
+    /**
      * Performs authentication by validating the user and redirecting user only if valid.
      * @returns {Promise<void>} A Promise that resolves once the authentication process is complete.
      */
@@ -274,7 +275,7 @@ export default {
         this.invalidLoginMessage =
           "Phone number entered is incorrect. Please try again!";
       } else {
-        if (this.$store.state.sessionData.pop_up_form) {
+        if (this.$store.state.sessionData.pop_up_form == "True") {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           this.setCookie('access_token', isUserValid.tokenResponse.access_token);
           this.setCookie('refresh_token', isUserValid.tokenResponse.refresh_token);
@@ -289,35 +290,47 @@ export default {
             this.$store.state.groupData.input_schema.userType,
             this.$store.state.sessionData.session_id,
             "",
-            "",
-            this.$store.state.sessionData.meta_data.batch
+            "phone" in this.userInformation
+              ? this.userInformation["phone"]
+              : "",
+            this.$store.state.sessionData.meta_data.batch,
+            "date_of_birth" in this.userInformation
+              ? this.userInformation["date_of_birth"]
+              : ""
           );
         } else {
           if (
+            sendSQSMessage(
+              "sign-in",
+              this.$store.state.sessionData.purpose["sub-type"],
+              this.$store.state.sessionData.platform,
+              this.$store.state.sessionData.platform_id,
+              "student_id" in this.userInformation
+                ? this.userInformation["student_id"]
+                : this.userInformation["teacher_id"],
+              this.getAuthTypes.toString(),
+              this.$store.state.groupData.name,
+              this.$store.state.groupData.input_schema.userType,
+              this.$store.state.sessionData.session_id,
+              "",
+              "phone" in this.userInformation
+                ? this.userInformation["phone"]
+                : "",
+              this.$store.state.sessionData.meta_data.batch,
+              "date_of_birth" in this.userInformation
+                ? this.userInformation["date_of_birth"]
+                : ""
+            )
+          ) {
             redirectToDestination(
               this.$store.state.sessionData.purpose.params,
               this.userInformation["student_id"],
               this.$store.state.sessionData.platform_id,
               this.$store.state.sessionData.platform,
               this.$store.state.groupData.input_schema.userType
-            )
-          ) {
+            );
             this.setCookie('access_token', isUserValid.tokenResponse.access_token);
             this.setCookie('refresh_token', isUserValid.tokenResponse.access_token);
-            sendSQSMessage(
-              "sign-in",
-              this.$store.state.sessionData.purpose["sub-type"],
-              this.$store.state.sessionData.platform,
-              this.$store.state.sessionData.platform_id,
-              this.userInformation["student_id"],
-              this.getAuthTypes.toString(),
-              this.$store.state.groupData.name,
-              this.$store.state.groupData.input_schema.userType,
-              this.$store.state.sessionData.session_id,
-              "",
-              "",
-              this.$store.state.sessionData.meta_data.batch
-            );
           }
         }
       }
@@ -331,21 +344,11 @@ export default {
         name: "NewSignup",
       });
     },
-
     /**
-     * This method will set the access token and the refresh token in the browser
-     */
+ * This method will set the access token and the refresh token in the browser
+ */
     setCookie(name, value) {
       document.cookie = `${name}=${value};`;
-    },
-
-    /**
-     * Updates the user information object with the provided value for the specified database key.
-     * @param {string} value - The value to update.
-     * @param {string} dbKey - The key corresponding to the user information field in the database.
-     */
-    updateUserInformation(value, dbKey) {
-      this.userInformation[dbKey] = value;
     },
   },
 };

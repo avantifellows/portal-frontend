@@ -4,7 +4,7 @@ export const regionState = {
   Chandigarh: [
     "Chandigarh",
     "Himachal Pradesh",
-    "Jammu & Kashmir",
+    "Jammu and Kashmir",
     "Ladakh",
     "Punjab",
   ],
@@ -19,8 +19,8 @@ export const regionState = {
     "Tripura",
   ],
   Pune: [
-    "Dadra & Nagar Haveli",
-    "Daman & Diu",
+    "Dadra and Nagar Haveli",
+    "Daman and Diu",
     "Goa",
     "Gujarat",
     "Maharashtra",
@@ -264,7 +264,7 @@ export const jnvState = {
     "JNV Kullu",
     "JNV Kinnaur",
   ],
-  "Jammu & Kashmir": [
+  "Jammu and Kashmir": [
     "JNV Ramban",
     "JNV Reasi",
     "JNV Samba",
@@ -421,8 +421,8 @@ export const jnvState = {
     "JNV Dhalai",
     "JNV West Tripura",
   ],
-  "Dadra & Nagar Haveli": ["JNV Silvassa"],
-  "Daman & Diu": ["JNV Diu", "JNV Daman"],
+  "Dadra and Nagar Haveli": ["JNV Silvassa"],
+  "Daman and Diu": ["JNV Diu", "JNV Daman"],
   Goa: ["JNV North Goa", "JNV South Goa"],
   Gujarat: [
     "JNV Anand",

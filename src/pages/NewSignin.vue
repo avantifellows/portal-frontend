@@ -9,7 +9,7 @@
   </div>
 
   <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
-    <template v-for="(image, index) in getGroupImages" :key="index">
+    <template v-for="(image, index) in images" :key="index">
       <img :src="image" />
     </template>
   </div>
@@ -17,7 +17,7 @@
   <div class="flex flex-col mx-auto my-auto h-full py-10">
     <!-- different input components -->
     <div
-      v-for="(authType, index) in getAuthTypes"
+      v-for="(authType, index) in auth_type"
       :key="`id-${index}`"
       class="mx-auto"
     >
@@ -67,14 +67,17 @@
     >
       {{ signInButtonLabel }}
     </button>
-    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+    <div
+      v-show="enable_signup"
+      class="mt-[30px] flex w-48 mx-auto justify-between items-center"
+    >
       <hr class="w-20 text-grey" />
       <p class="text-grey font-roboto text-sm opacity-40">or</p>
       <hr class="w-20 text-grey" />
     </div>
     <!-- signup button -->
     <button
-      v-show="isSignupActivated"
+      v-show="enable_signup"
       @click="redirectToSignUp"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signUpText"
@@ -101,6 +104,44 @@ export default {
     NumberEntry,
     Datepicker,
     PhoneNumberEntry,
+  },
+  props: {
+    auth_type: {
+      default: "ID",
+      type: String,
+    },
+    enable_signup: {
+      default: false,
+      type: Boolean,
+    },
+    enable_pop_up_form: {
+      default: false,
+      type: Boolean,
+    },
+    id_generation: {
+      default: false,
+      type: Boolean,
+    },
+    redirection: {
+      default: false,
+      type: Boolean,
+    },
+    platform: {
+      default: null,
+      type: String,
+    },
+    platform_id: {
+      default: null,
+      type: String,
+    },
+    locale: {
+      default: "en",
+      type: String,
+    },
+    images: {
+      default: [],
+      type: Array,
+    },
   },
   data() {
     return {
@@ -131,22 +172,10 @@ export default {
   mounted() {
     this.mounted = true;
   },
-
   computed: {
     /** Returns button text */
     signInButtonLabel() {
       return this.getLocale == "en" ? "Sign In" : "साइन इन";
-    },
-
-    /** Retutns if sign up flow should be activated */
-    isSignupActivated() {
-      return this.$store.state.sessionData.activate_signup == "True";
-    },
-
-    /** Returns the locale selected by user */
-    getLocale() {
-      // console.log(this.$store.state);
-      return this.$store.state.language;
     },
 
     /** Returns text based on locale */
@@ -154,22 +183,6 @@ export default {
       return this.getLocale == "en"
         ? "New Student? <b> Register Now</b>"
         : "नया छात्र? <b>अब रजिस्टर करें। </b>";
-    },
-
-    /**
-     * Retrieves the authentication types.
-     * @returns {string[]} An array of authentication types.
-     */
-    getAuthTypes() {
-      return this.$store.state.sessionData.auth_type.split(",");
-    },
-
-    /**
-     * Retrieves the group images.
-     * @returns {string[]} An array of group images.
-     */
-    getGroupImages() {
-      return this.$store.state.groupData.input_schema.images;
     },
 
     /**
@@ -251,11 +264,11 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData.locale_data[this.getLocale]).find(
+      Object.keys(this.$store.state.groupData.locale_data[this.locale]).find(
         (key) => {
           if (key == authType) {
             UIParameters =
-              this.$store.state.groupData.locale_data[this.getLocale][
+              this.$store.state.groupData.locale_data[this.locale][
                 key.toString()
               ];
           }
@@ -318,7 +331,7 @@ export default {
      */
     async authenticate() {
       let isUserValid = await validateUser(
-        this.getAuthTypes,
+        this.auth_type,
         this.userInformation,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.groupData.id
@@ -326,29 +339,29 @@ export default {
 
       if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["ID"][this.getLocale];
+          this.invalidLoginMessageTranslations["ID"][this.locale];
       } else if (
-        this.getAuthTypes.includes("DOB") &&
+        this.auth_type.includes("DOB") &&
         !isUserValid.isDateOfBirthValid
       ) {
         this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["DOB"][this.getLocale];
+          this.invalidLoginMessageTranslations["DOB"][this.locale];
       } else if (
-        this.getAuthTypes.includes("PH") &&
+        this.auth_type.includes("PH") &&
         !isUserValid.isPhoneNumberValid
       ) {
         this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["PH"][this.getLocale];
+          this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
-        if (this.$store.state.sessionData.pop_up_form == "True") {
+        if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",
             this.$store.state.sessionData.purpose["sub-type"],
-            this.$store.state.sessionData.platform,
-            this.$store.state.sessionData.platform_id,
+            this.platform,
+            this.platform_id,
             this.userInformation["student_id"],
-            this.getAuthTypes.toString(),
+            this.auth_type.toString(),
             this.$store.state.groupData.name,
             this.$store.state.groupData.input_schema.userType,
             this.$store.state.sessionData.session_id,
@@ -366,12 +379,12 @@ export default {
             sendSQSMessage(
               "sign-in",
               this.$store.state.sessionData.purpose["sub-type"],
-              this.$store.state.sessionData.platform,
-              this.$store.state.sessionData.platform_id,
+              this.platform,
+              this.platform_id,
               "student_id" in this.userInformation
                 ? this.userInformation["student_id"]
                 : this.userInformation["teacher_id"],
-              this.getAuthTypes.toString(),
+              this.auth_type.toString(),
               this.$store.state.groupData.name,
               this.$store.state.groupData.input_schema.userType,
               this.$store.state.sessionData.session_id,
@@ -388,8 +401,8 @@ export default {
             redirectToDestination(
               this.$store.state.sessionData.purpose.params,
               this.userInformation["student_id"],
-              this.$store.state.sessionData.platform_id,
-              this.$store.state.sessionData.platform,
+              this.platform_id,
+              this.platform,
               this.$store.state.groupData.input_schema.userType
             );
           }

@@ -1,5 +1,4 @@
 <template>
-
   <div class="text-right">
     <FormKit
       v-model="language"
@@ -22,11 +21,8 @@ export default {
   },
   data() {
     return {
-      language: "",
+      language: "English",
     };
-  },
-  mounted() {
-    this.language = this.$store.state.language;
   },
   watch: {
     /**

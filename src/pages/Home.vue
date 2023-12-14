@@ -156,7 +156,7 @@ export default {
 
     /** What are the sign-in options the user must be displayed with. */
     auth_type: {
-      default: "ID",
+      default: "",
       type: String,
     },
 
@@ -225,7 +225,7 @@ export default {
      * @returns {string[]} An array of group images.
      */
     getGroupImages() {
-      return this.$store.state.groupData.input_schema.images;
+      return this.groupData.input_schema.images;
     },
 
     /** Returns if the purpose is registration.
@@ -290,15 +290,16 @@ export default {
      */
     getAuthTypes() {
       return (
-        this.$store.state.sessionData.auth_type.split(",") ||
-        this.auth_type.split(",")
+        (this.sessionData && this.sessionData.auth_type.split(",")) ||
+        (this.auth_type && this.auth_type.split(",")) ||
+        (this.groupData && this.groupData.input_schema.auth_type.split(","))
       );
     },
 
     /** Returns if sign up flow should be enabled */
     isSignupEnabled() {
       return (
-        this.$store.state.sessionData.enable_signup == "True" ||
+        (this.sessionData && this.sessionData.enable_signup == "True") ||
         this.enable_signup == "True"
       );
     },
@@ -306,7 +307,7 @@ export default {
     /** Returns if any additional form is to be displayed to the user after authentication. */
     isPopUpFormEnabled() {
       return (
-        this.$store.state.sessionData.enable_pop_up_form == "True" ||
+        (this.sessionData && this.sessionData.enable_pop_up_form == "True") ||
         this.enable_pop_up_form == "True"
       );
     },
@@ -314,7 +315,7 @@ export default {
     /** Returns if ID should be generated for a user after sign up. */
     isIdGenerationEnabled() {
       return (
-        this.$store.state.sessionData.id_generation == "True" ||
+        (this.sessionData && this.sessionData.id_generation == "True") ||
         this.id_generation == "True"
       );
     },
@@ -322,19 +323,21 @@ export default {
     /** Returns if user should be redirected to external platform after authentication. */
     isRedirectionEnabled() {
       return (
-        this.$store.state.sessionData.redirection == "True" ||
+        (this.sessionData && this.sessionData.redirection == "True") ||
         this.redirection == "True"
       );
     },
 
     /** Returns the external platform the user should be redirected to. */
     getPlatform() {
-      return this.$store.state.sessionData.platform || this.platform;
+      return (this.sessionData && this.sessionData.platform) || this.platform;
     },
 
     /** Returns the external platform ID the user should be redirected to. */
     getPlatformId() {
-      return this.$store.state.sessionData.platform_id || this.platform_id;
+      return (
+        (this.sessionData && this.sessionData.platform_id) || this.platform_id
+      );
     },
 
     /**

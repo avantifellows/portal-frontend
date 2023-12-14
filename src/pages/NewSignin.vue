@@ -376,6 +376,14 @@ export default {
           );
         } else {
           if (
+            redirectToDestination(
+              this.$store.state.sessionData.purpose.params,
+              this.userInformation["student_id"],
+              this.platform_id,
+              this.platform,
+              this.$store.state.groupData.input_schema.userType
+            )
+          ) {
             sendSQSMessage(
               "sign-in",
               this.$store.state.sessionData.purpose["sub-type"],
@@ -396,14 +404,6 @@ export default {
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]
                 : ""
-            )
-          ) {
-            redirectToDestination(
-              this.$store.state.sessionData.purpose.params,
-              this.userInformation["student_id"],
-              this.platform_id,
-              this.platform,
-              this.$store.state.groupData.input_schema.userType
             );
           }
         }

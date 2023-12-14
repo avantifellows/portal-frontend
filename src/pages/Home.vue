@@ -434,8 +434,10 @@ export default {
       return (
         this.purpose == "" &&
         this.purposeParams == "" &&
-        (this.redirectId == "" || this.platform_id == "") &&
-        (this.redirectTo == "" || this.platform == "") &&
+        this.redirectId == "" &&
+        this.platform_id == "" &&
+        this.redirectTo == "" &&
+        this.platform == "" &&
         this.sessionId == null
       );
     },

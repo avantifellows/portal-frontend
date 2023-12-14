@@ -107,8 +107,8 @@ export default {
   },
   props: {
     auth_type: {
-      default: "ID",
-      type: String,
+      default: [],
+      type: Array,
     },
     enable_signup: {
       default: false,
@@ -175,12 +175,12 @@ export default {
   computed: {
     /** Returns button text */
     signInButtonLabel() {
-      return this.getLocale == "en" ? "Sign In" : "साइन इन";
+      return this.locale == "en" ? "Sign In" : "साइन इन";
     },
 
     /** Returns text based on locale */
     signUpText() {
-      return this.getLocale == "en"
+      return this.locale == "en"
         ? "New Student? <b> Register Now</b>"
         : "नया छात्र? <b>अब रजिस्टर करें। </b>";
     },

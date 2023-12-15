@@ -267,11 +267,11 @@ export default {
         this.platform,
         this.platform_id,
         this.userData["student_id"],
-        "",
+        "", // list of authentication methods
         this.$store.state.groupData.name,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.sessionData.session_id,
-        "",
+        "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
         this.$store.state.sessionData.meta_data.batch,
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""

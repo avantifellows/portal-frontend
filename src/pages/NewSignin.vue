@@ -1,7 +1,10 @@
 <template>
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
-      <inline-svg class="text-black text-4xl m-auto animate-spin h-20 w-20" :src="loadingSpinnerSvg" />
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
     </div>
   </div>
 
@@ -63,7 +66,6 @@
       @click="authenticate"
     >
       {{ signInButtonLabel }}
-
     </button>
     <div
       v-show="enable_signup"
@@ -94,6 +96,7 @@ import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { createAccessToken } from "@/services/API/token";
 
 const assets = useAssets();
 
@@ -363,10 +366,10 @@ export default {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
+        createAccessToken(this.userInformation["student_id"]);
         if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
-          this.setCookie('access_token', isUserValid.tokenResponse.access_token);
-          this.setCookie('refresh_token', isUserValid.tokenResponse.refresh_token);
+
           sendSQSMessage(
             "sign-in",
             this.sub_type,
@@ -420,8 +423,6 @@ export default {
                 ? this.userInformation["date_of_birth"]
                 : ""
             );
-            this.setCookie('access_token', isUserValid.tokenResponse.access_token);
-            this.setCookie('refresh_token', isUserValid.tokenResponse.access_token);
           }
         }
       }
@@ -434,12 +435,6 @@ export default {
       this.$router.push({
         name: "NewSignup",
       });
-    },
-    /**
- * This method will set the access token and the refresh token in the browser
- */
-    setCookie(name, value) {
-      document.cookie = `${name}=${value};`;
     },
   },
 };

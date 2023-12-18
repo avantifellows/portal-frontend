@@ -126,6 +126,7 @@ export default {
      * @param {Event} event - The input event.
      */
     updateNumberEntry(event) {
+      console.log(event.length, this.maxLengthOfEntry);
       if (event.length == 0) {
         this.invalidNumberEntryMessage = "";
       } else if (event.length > this.maxLengthOfEntry) {

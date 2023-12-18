@@ -305,7 +305,7 @@ export default {
       return (
         this.purposeParams ||
         this.sub_type ||
-        this.sessionData.purpose["sub-type"]
+        (this.sessionData && this.sessionData.purpose["sub-type"])
       );
     },
 
@@ -465,7 +465,7 @@ export default {
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
-    if (this.sessionId != null) {
+    if (this.sessionId != "") {
       if (this.sessionId == "Test") {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(

@@ -388,7 +388,7 @@ export default {
         } else {
           if (
             redirectToDestination(
-              this.$store.state.sessionData.purpose.params,
+              this.sub_type,
               this.userInformation["student_id"],
               this.platform_id,
               this.platform,

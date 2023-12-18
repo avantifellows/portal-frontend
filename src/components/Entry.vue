@@ -64,12 +64,12 @@
     <!-- invalid input and login message  -->
     <span
       v-if="isInvalidInputMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="mx-auto text-red text-base mb-1"
       >{{ invalidInputMessage }}</span
     >
     <span
       v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="mx-auto text-red text-base mb-1"
       >{{ invalidLoginMessage }}</span
     >
     <!-- button to add another input -->
@@ -152,7 +152,7 @@
     <span
       v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
-      class="mx-auto text-red-700 text-base mb-1 text-center text-xs md:text-sm"
+      class="mx-auto text-red text-base mb-1 text-center text-xs md:text-sm"
     ></span>
     <!-- submit button -->
     <button
@@ -388,7 +388,8 @@ export default {
           this.isExtraInputValidationRequired) ||
         this.group == "Candidates" ||
         this.group == "TNStudents" ||
-        this.group == "PunjabStudents"
+        this.group == "PunjabStudents" ||
+        this.group == "PunjabTeachers"
       );
     },
 
@@ -569,7 +570,8 @@ export default {
           this.group == "NGOStudents" ||
           this.group == "TNStudents" ||
           this.group == "DMVSStudents" ||
-          this.group == "PunjabStudents") &&
+          this.group == "PunjabStudents" ||
+          this.group == "PunjabTeachers") &&
         (this.redirectTo == "quiz" || this.redirectTo == "google-forms")
       ) {
         this.isCurrentUserValid = userValidationResponse.isCurrentUserValid;
@@ -604,7 +606,7 @@ export default {
         this.invalidLoginMessage =
           this.group == "Candidates"
             ? "Phone Number is incorrect!"
-            : "Student ID entered is incorrect. Please try again!";
+            : "ID entered is incorrect. Please try again!";
       }
       this.setValidFlag();
       if (this.isCurrentUserValid == true || this.validateCount > 1) {

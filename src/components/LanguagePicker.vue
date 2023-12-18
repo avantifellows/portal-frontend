@@ -1,28 +1,35 @@
 <template>
-  <div class="mt-6 flex justify-center">
-    <Dropdown
-      label="Select your language"
-      :options="['English']"
-      :placeholder="placeholder"
-      @update="updateLanguage"
+  <div class="text-right">
+    <FormKit
+      v-model="language"
+      type="select"
+      :options="options"
+      :inner-class="{ 'p-2': true }"
+      name="language"
     />
   </div>
 </template>
 
 <script>
-import Dropdown from "@/components/Dropdown.vue";
-
 export default {
   name: "LanguagePicker",
-  components: { Dropdown },
-  computed: {
-    placeholder() {
-      return this.$store.state.language == "en" ? "English" : "हिंदी";
+  props: {
+    options: {
+      type: Array,
+      default: [],
     },
   },
-  methods: {
-    updateLanguage(e) {
-      if (e == "English") {
+  data() {
+    return {
+      language: "English",
+    };
+  },
+  watch: {
+    /**
+     * Sets the language in the store based on the user input
+     */
+    language() {
+      if (this.language == "English") {
         this.$store.dispatch("setLanguage", "en");
       } else {
         this.$store.dispatch("setLanguage", "hi");

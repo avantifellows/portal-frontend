@@ -1,7 +1,12 @@
 import userAPI from "@/services/API/user.js";
 import { generateTokens } from "./generateToken";
 
-export async function validateUser(authTypes, userInformation, userType) {
+export async function validateUser(
+  authTypes,
+  userInformation,
+  userType,
+  groupId
+) {
   let user = {};
 
   async function generateToken() {
@@ -25,6 +30,7 @@ export async function validateUser(authTypes, userInformation, userType) {
     if (userType == "student") {
       user["isUserIdValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
+        group_id: groupId,
       });
     }
     if (userType == "teacher") {
@@ -38,6 +44,7 @@ export async function validateUser(authTypes, userInformation, userType) {
       user["isDateOfBirthValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
         date_of_birth: userInformation["date_of_birth"],
+        group_id: groupId,
       });
     }
   }
@@ -46,6 +53,7 @@ export async function validateUser(authTypes, userInformation, userType) {
       user["isPhoneNumberValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
         phone: userInformation["phone"],
+        group_id: groupId,
       });
     }
   }

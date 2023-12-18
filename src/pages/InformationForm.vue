@@ -1,20 +1,14 @@
 <template>
-  <div
-    class="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8"
-  >
+  <div class="">
     <LanguagePicker />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <img class="mx-auto h-10 w-auto" :src="AFLogo" />
-      <h2
-        class="mt-6 text-center text-xl font-bold leading-9 tracking-tight text-gray-900"
-      >
+      <h2 class="mt-6 text-center text-black font-bold">
         {{ getFormHeading }}
       </h2>
     </div>
 
-    <div class="mx-auto w-2/3 md:w-auto">
+    <div class="mx-auto w-64">
       <component
-        class=""
         v-for="(formField, index) in formSchemaData"
         :show="formField.show"
         :key="index"
@@ -27,15 +21,15 @@
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
+        class="mt-[25px]"
       />
 
       <button
-        class="bg-primary mx-auto hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg p-4 rounded disabled:opacity-50 btn"
+        class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
         :disabled="buttonDisabled"
         @click="profileDetails"
-      >
-        START SESSION
-      </button>
+        v-html="startSessionText"
+      />
     </div>
   </div>
 </template>
@@ -98,29 +92,39 @@ export default {
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
+    this.isUserDataIsComplete();
   },
   watch: {
     userData: {
       handler() {
         this.isUserDataIsComplete();
         this.showBasedOn();
+        this.getOptions();
       },
       deep: true,
     },
   },
   computed: {
+    /** Returns the locale selected by user */
     getLocale() {
       return this.$store.state.language;
     },
+
     getFormHeading() {
       const formHeading = {
-        en: "Welcome! Please fill the form to proceed!",
-        hi: "नमस्ते! कृपया आगे बढ़ने के लिए यह फॉर्म भरें!",
+        en: "Complete your Profile",
+        hi: "अपनी प्रोफाइल पूर्ण करें",
       };
       return formHeading[this.getLocale];
     },
+
+    /** Returns button text */
+    startSessionText() {
+      return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
+    },
   },
   methods: {
+    /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
@@ -129,10 +133,29 @@ export default {
         if (fieldAttributes.showBasedOn != "") {
           if (
             this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-            Object.values(JSON.parse(showBasedOn))
+            Object.values(JSON.parse(showBasedOn))[0]
           ) {
             fieldAttributes["show"] = true;
-          } else fieldAttributes["show"] = false;
+          } else {
+            fieldAttributes["show"] = false;
+            this.userData[fieldAttributes.key] = "";
+          }
+        }
+      });
+    },
+
+    /** Builds options for dependant fields */
+    getOptions() {
+      Object.keys(this.formSchemaData).forEach((field) => {
+        let fieldAttributes = this.formSchemaData[field];
+        if (fieldAttributes.dependant) {
+          if (this.userData[fieldAttributes.dependantField]) {
+            fieldAttributes["options"] =
+              fieldAttributes.dependantFieldMapping[
+                this.userData[fieldAttributes.dependantField]
+              ];
+            return fieldAttributes.options[this.getLocale];
+          }
         }
       });
     },

@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col" v-if="show">
-    <p class="text-md font-semibold">
+  <div class="" v-if="show">
+    <p class="text-base mb-[10px]">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
 
@@ -8,11 +8,24 @@
       type="select"
       v-model="value"
       :options="options"
-      placeholder="Select"
-      :validation="[isRequired ? ['required'] : []]"
-      validation-visibility="dirty"
       :name="dbKey"
       :help="helpText"
+      placeholder=" "
+      :input-class="{ 'w-full': true }"
+      :inner-class="{
+        border: true,
+        'py-2': true,
+        'px-2': true,
+        rounded: true,
+        'border-grey': true,
+        'overflow-hidden': true,
+      }"
+      :help-class="{
+        'mt-[10px]': true,
+        'text-sm': true,
+        'text-grey': true,
+        italic: true,
+      }"
     />
   </div>
 </template>
@@ -50,6 +63,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    defaultValue: {
+      type: String,
+      default: "",
+    },
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -57,6 +78,9 @@ export default {
     };
   },
   watch: {
+    options() {
+      this.value = this.options[0];
+    },
     /**
      * Emits 'update' event whenever the dropdown value is changed
      */

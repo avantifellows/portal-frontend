@@ -18,9 +18,29 @@
 
   <div v-else>
     <div v-if="!oldFlow">
-      <LanguagePicker />
-      <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-      <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+      <LanguagePicker :options="getLanguages" />
+      <NewSignIn
+        v-if="isTypeSignIn && doesGroupExist"
+        :sub_type="getSubType"
+        :auth_type="getAuthTypes"
+        :enable_signup="isSignupEnabled"
+        :enable_pop_up_form="isPopUpFormEnabled"
+        :id_generation="isIdGenerationEnabled"
+        :redirection="isRedirectionEnabled"
+        :platform="getPlatform"
+        :platform_id="getPlatformId"
+        :locale="getLocale"
+        :images="getGroupImages"
+      />
+      <NewSignUp
+        v-if="isTypeSignUp && doesGroupExist"
+        :id_generation="isIdGenerationEnabled"
+        :redirection="isRedirectionEnabled"
+        :platform="getPlatform"
+        :platform_id="getPlatformId"
+        :locale="getLocale"
+        :images="getGroupImages"
+      />
     </div>
 
     <div v-else>
@@ -29,9 +49,7 @@
           !isPurposeRegistration &&
           !isLandingPage &&
           isAuthTypeID &&
-          doesGroupExist &&
-          !isSessionTypeSignIn &&
-          !isSessionTypeSignUp
+          doesGroupExist
         "
       >
         <Entry
@@ -48,11 +66,7 @@
         />
       </div>
 
-      <div
-        v-if="
-          isPurposeRegistration && !isSessionTypeSignIn && !isSessionTypeSignUp
-        "
-      >
+      <div v-if="isPurposeRegistration && !isTypeSignIn && !isTypeSignUp">
         <Signup />
       </div>
     </div>
@@ -91,19 +105,25 @@ export default {
     LanguagePicker,
   },
   props: {
-    /** The resource we are redirecting to */
+    /** The resource we are redirecting to.
+     * (WILL BE DEPRECATED IN V2)
+     */
     redirectTo: {
       default: "",
       type: String,
     },
 
-    /** ID of the resource */
+    /** ID of the resource.
+     * (WILL BE DEPRECATED IN V2)
+     */
     redirectId: {
       default: "",
       type: String,
     },
 
-    /** General category of why the data is being captured. Eg: attendance */
+    /** General category of why the data is being captured. Eg: attendance
+     * (WILL BE DEPRECATED IN V2)
+     */
     purpose: {
       default: "",
       type: String,
@@ -123,7 +143,61 @@ export default {
 
     /** ID of session */
     sessionId: {
-      default: null,
+      default: "",
+      type: String,
+    },
+
+    /** What authentication action the user is doing. Eg: Sign-in or sign-up */
+    type: {
+      default: "sign-in",
+      type: String,
+    },
+
+    /** Which module is being used */
+    sub_type: {
+      default: "",
+      type: String,
+    },
+
+    /** What are the sign-in options the user must be displayed with. */
+    auth_type: {
+      default: "",
+      type: String,
+    },
+
+    /** Whether the sign-up flow will be enabled for the user. */
+    enable_signup: {
+      default: false,
+      type: Boolean,
+    },
+
+    /** Whether any additional form is to be displayed to the user after authentication. */
+    enable_pop_up_form: {
+      default: false,
+      type: Boolean,
+    },
+
+    /** Whether an ID needs to be generated when the user signs up. */
+    id_generation: {
+      default: false,
+      type: Boolean,
+    },
+
+    /** Whether the user should be redirected to an external platform after authentication. */
+    redirection: {
+      default: false,
+      type: Boolean,
+    },
+
+    /** What the external platform is. */
+    platform: {
+      default: "",
+      type: String,
+    },
+
+    /** What the external platform ID is. */
+    platform_id: {
+      default: "",
       type: String,
     },
   },
@@ -135,32 +209,61 @@ export default {
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
-      oldFlow: true,
+      oldFlow: true, // oldFlow refers to user using V1
     };
   },
-
   computed: {
-    /** TEMP - returns if the purpose is registration */
+    /** Returns list of available language options. */
+    getLanguages() {
+      return this.groupData && "languages" in this.groupData.input_schema
+        ? this.groupData.input_schema.languages
+        : ["English"];
+    },
+
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.language;
+    },
+
+    /**
+     * Retrieves the group images.
+     * @returns {string[]} An array of group images.
+     */
+    getGroupImages() {
+      return this.groupData.input_schema.images;
+    },
+
+    /** Returns if the purpose is registration.
+     *  (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
     },
 
-    /** TEMP - Returns IP address of user */
+    /** Returns IP address of user.
+     *  (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     getUserIpAddress() {
       return this.sessionData ? this.sessionData.userIp : "";
     },
 
-    /** TEMP - Whether authentication method chosen is an ID entry */
+    /** Whether authentication method chosen is an ID entry.
+     *  (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     isAuthTypeID() {
       return this.getAuthType.includes("ID");
     },
 
-    /** TEMP - Returns how many authentication methods should be used */
+    /** Returns how many authentication methods should be used.
+     * (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     getLengthOfAuthType() {
       return this.getAuthType.split(",").length;
     },
 
-    /** TEMP - Checks if the authentication methods mentioned are valid */
+    /** Checks if the authentication methods mentioned are valid.
+     * (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     areAuthTypesValid() {
       let validCount = 0;
       this.getAuthType.split(",").every((authType) => {
@@ -170,12 +273,16 @@ export default {
       return validCount == this.getLengthOfAuthType;
     },
 
-    /** TEMP - Apart from ID, are any extra inputs being validated. */
+    /** Apart from ID, are any extra inputs being validated.
+     * (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     isExtraInputValidationsRequired() {
       return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
     },
 
-    /** TEMP - Returns the auth methods used by each group */
+    /** Returns the auth methods used by each group.
+     * (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     getAuthType() {
       return this.groupData && this.groupData.authType
         ? this.groupData.authType
@@ -183,19 +290,90 @@ export default {
     },
 
     /**
-     * Checks if the session type is a sign-in.
-     * @returns {boolean} True if the session type is a sign-in, false otherwise.
+     * Retrieves the authentication types.
+     * @returns {string[]} An array of authentication types.
      */
-    isSessionTypeSignIn() {
-      return this.sessionData && this.sessionData.type == "sign-in";
+    getAuthTypes() {
+      return (
+        (this.sessionData && this.sessionData.auth_type.split(",")) ||
+        (this.auth_type && this.auth_type.split(",")) ||
+        (this.groupData && this.groupData.input_schema.auth_type.split(","))
+      );
+    },
+
+    getSubType() {
+      return (
+        this.purposeParams ||
+        this.sub_type ||
+        (this.sessionData ? this.sessionData.purpose["sub-type"] : "")
+      );
+    },
+
+    /** Returns if sign up flow should be enabled */
+    isSignupEnabled() {
+      return (
+        (this.sessionData && this.sessionData.enable_signup == "True") ||
+        this.enable_signup == "True"
+      );
+    },
+
+    /** Returns if any additional form is to be displayed to the user after authentication. */
+    isPopUpFormEnabled() {
+      return (
+        (this.sessionData && this.sessionData.enable_pop_up_form == "True") ||
+        this.enable_pop_up_form == "True"
+      );
+    },
+
+    /** Returns if ID should be generated for a user after sign up. */
+    isIdGenerationEnabled() {
+      return (
+        (this.sessionData && this.sessionData.id_generation == "True") ||
+        this.id_generation == "True"
+      );
+    },
+
+    /** Returns if user should be redirected to external platform after authentication. */
+    isRedirectionEnabled() {
+      return (
+        (this.sessionData && this.sessionData.redirection == "True") ||
+        this.redirection == "True"
+      );
+    },
+
+    /** Returns the external platform the user should be redirected to. */
+    getPlatform() {
+      return (this.sessionData && this.sessionData.platform) || this.platform;
+    },
+
+    /** Returns the external platform ID the user should be redirected to. */
+    getPlatformId() {
+      return (
+        (this.sessionData && this.sessionData.platform_id) || this.platform_id
+      );
     },
 
     /**
-     * Checks if the session type is a sign-up.
-     * @returns {boolean} True if the session type is a sign-up, false otherwise.
+     * Checks if the authentication flow type is a sign-in.
+     * @returns {boolean} True if the type is a sign-in, false otherwise.
      */
-    isSessionTypeSignUp() {
-      return this.sessionData && this.sessionData.type == "sign-up";
+    isTypeSignIn() {
+      return (
+        (this.sessionData && this.sessionData.type == "sign-in") ||
+        this.type == "sign-in" ||
+        this.purpose == "attendance"
+      );
+    },
+
+    /**
+     * Checks if the authentication flow type is a sign-up.
+     * @returns {boolean} True if the type is a sign-up, false otherwise.
+     */
+    isTypeSignUp() {
+      return (
+        (this.sessionData && this.sessionData.type == "sign-up") ||
+        this.type == "sign-up"
+      );
     },
 
     /**
@@ -209,6 +387,7 @@ export default {
     /**
      * Retrieves the redirect destination.
      * @returns {string} The redirect destination.
+     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatform)
      */
     getRedirectTo() {
       return this.redirectTo == "" && this.sessionData != null
@@ -221,6 +400,7 @@ export default {
     /**
      * Retrieves the redirect ID.
      * @returns {string} The redirect ID.
+     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatformId)
      */
     getRedirectId() {
       return this.redirectId == "" && this.sessionData != null
@@ -243,6 +423,7 @@ export default {
     /**
      * Retrieves the purpose.
      * @returns {string} The purpose.
+     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with type.)
      */
     getPurpose() {
       return this.purpose == "" && this.sessionData != null
@@ -272,16 +453,20 @@ export default {
         this.purposeParams == "" &&
         this.redirectId == "" &&
         this.redirectTo == "" &&
-        this.sessionId == null
+        this.platform == "" &&
+        this.platform_id == "" &&
+        this.sub_type == "" &&
+        this.sessionId == ""
       );
     },
   },
   async created() {
+    this.$store.dispatch("setLanguage", "en");
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
-    if (this.sessionId != null) {
-      if (this.sessionId.startsWith('PunjabTeachers')) {
+    if (this.sessionId != "") {
+      if (this.sessionId == "Test") {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
@@ -315,7 +500,6 @@ export default {
         /** Store session data retrieved by API and set sessionEnabled */
         this.toast.clear();
         this.$store.dispatch("setSessionData", this.sessionData);
-        this.$store.dispatch("setSessionId", this.sessionId);
 
         if (this.oldFlow) {
           if ("sessionActive" in this.sessionData) {
@@ -339,8 +523,6 @@ export default {
             this.sessionData.group
           );
         }
-
-        //this.groupData = await groupAPIService.getGroupData(groupName);
         this.$store.dispatch("setGroupData", this.groupData);
         if (!this.sessionData.error && this.groupData && this.groupData.error) {
           /** Group API returns an error*/
@@ -354,10 +536,17 @@ export default {
         }
       }
     } else {
+      if (this.platform == "gurukul") {
+        this.oldFlow = false;
+      }
       /**
        * If sessionId does not exist in route, then retrieve group data directly
        */
-      this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      if (!this.oldFlow) {
+        this.groupData = await groupAPIService.getNewGroupData(this.group);
+      } else {
+        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      }
       this.$store.dispatch("setGroupData", this.groupData);
       if (this.groupData && this.groupData.error) {
         /** Group API returns an error*/

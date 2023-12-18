@@ -106,6 +106,10 @@ export default {
     PhoneNumberEntry,
   },
   props: {
+    sub_type: {
+      default: "",
+      type: String,
+    },
     auth_type: {
       default: [],
       type: Array,
@@ -127,11 +131,11 @@ export default {
       type: Boolean,
     },
     platform: {
-      default: null,
+      default: "",
       type: String,
     },
     platform_id: {
-      default: null,
+      default: "",
       type: String,
     },
     locale: {
@@ -236,6 +240,13 @@ export default {
         );
       }
       return true;
+    },
+    getBatch() {
+      return "sessionData" in this.$store.state &&
+        "meta_data" in this.$store.state.sessionData &&
+        "batch" in this.$store.state.sessionData.meta_data
+        ? this.$store.state.sessionData.meta_data.batch
+        : "";
     },
   },
   methods: {
@@ -357,7 +368,7 @@ export default {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",
-            this.$store.state.sessionData.purpose["sub-type"],
+            this.sub_type,
             this.platform,
             this.platform_id,
             this.userInformation["student_id"],
@@ -369,7 +380,7 @@ export default {
             "phone" in this.userInformation
               ? this.userInformation["phone"]
               : "",
-            this.$store.state.sessionData.meta_data.batch,
+            this.getBatch,
             "date_of_birth" in this.userInformation
               ? this.userInformation["date_of_birth"]
               : ""
@@ -386,7 +397,7 @@ export default {
           ) {
             sendSQSMessage(
               "sign-in",
-              this.$store.state.sessionData.purpose["sub-type"],
+              this.sub_type,
               this.platform,
               this.platform_id,
               "student_id" in this.userInformation
@@ -400,7 +411,7 @@ export default {
               "phone" in this.userInformation
                 ? this.userInformation["phone"]
                 : "",
-              this.$store.state.sessionData.meta_data.batch,
+              this.getBatch,
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]
                 : ""

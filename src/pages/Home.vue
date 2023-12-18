@@ -48,9 +48,7 @@
           !isPurposeRegistration &&
           !isLandingPage &&
           isAuthTypeID &&
-          doesGroupExist &&
-          !isTypeSignIn &&
-          !isTypeSignUp
+          doesGroupExist
         "
       >
         <Entry
@@ -151,6 +149,12 @@ export default {
     /** What authentication action the user is doing. Eg: Sign-in or sign-up */
     type: {
       default: "sign-in",
+      type: String,
+    },
+
+    /** Which module is being used */
+    sub_type: {
+      default: "",
       type: String,
     },
 
@@ -347,7 +351,8 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && this.sessionData.type == "sign-in") ||
-        this.type == "sign-in"
+        this.type == "sign-in" ||
+        this.purpose == "attendance"
       );
     },
 
@@ -438,9 +443,10 @@ export default {
         this.purpose == "" &&
         this.purposeParams == "" &&
         this.redirectId == "" &&
-        this.platform_id == "" &&
         this.redirectTo == "" &&
-        this.platform == "" &&
+        (this.platform == "" || this.platform == null) &&
+        (this.platform_id == "" || this.platform_id == null) &&
+        this.sub_type == "" &&
         this.sessionId == null
       );
     },

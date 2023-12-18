@@ -305,7 +305,7 @@ export default {
       return (
         this.purposeParams ||
         this.sub_type ||
-        (this.sessionData && this.sessionData.purpose["sub-type"])
+        (this.sessionData ? this.sessionData.purpose["sub-type"] : "")
       );
     },
 

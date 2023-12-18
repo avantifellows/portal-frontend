@@ -406,7 +406,8 @@ export default {
               this.auth_type.toString(),
               this.$store.state.groupData.name,
               this.$store.state.groupData.input_schema.userType,
-              "sessionData" in this.$store.state
+              "sessionData" in this.$store.state &&
+                "session_id" in this.$store.state.sessionData
                 ? this.$store.state.sessionData.session_id
                 : "",
               "",

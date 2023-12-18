@@ -21,6 +21,7 @@
       <LanguagePicker :options="getLanguages" />
       <NewSignIn
         v-if="isTypeSignIn && doesGroupExist"
+        :sub_type="getSubType"
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
         :enable_pop_up_form="isPopUpFormEnabled"
@@ -142,7 +143,7 @@ export default {
 
     /** ID of session */
     sessionId: {
-      default: null,
+      default: "",
       type: String,
     },
 
@@ -190,13 +191,13 @@ export default {
 
     /** What the external platform is. */
     platform: {
-      default: null,
+      default: "",
       type: String,
     },
 
     /** What the external platform ID is. */
     platform_id: {
-      default: null,
+      default: "",
       type: String,
     },
   },
@@ -297,6 +298,14 @@ export default {
         (this.sessionData && this.sessionData.auth_type.split(",")) ||
         (this.auth_type && this.auth_type.split(",")) ||
         (this.groupData && this.groupData.input_schema.auth_type.split(","))
+      );
+    },
+
+    getSubType() {
+      return (
+        this.purposeParams ||
+        this.sub_type ||
+        this.sessionData.purpose["sub-type"]
       );
     },
 
@@ -444,10 +453,10 @@ export default {
         this.purposeParams == "" &&
         this.redirectId == "" &&
         this.redirectTo == "" &&
-        (this.platform == "" || this.platform == null) &&
-        (this.platform_id == "" || this.platform_id == null) &&
+        this.platform == "" &&
+        this.platform_id == "" &&
         this.sub_type == "" &&
-        this.sessionId == null
+        this.sessionId == ""
       );
     },
   },

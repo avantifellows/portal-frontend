@@ -64,6 +64,7 @@ export async function sendSQSMessage(
       dateOfBirth: dateOfBirth,
     },
   ];
+  console.log(messageBody);
   const params = {
     MessageBody: JSON.stringify(messageBody),
     QueueUrl: QUEUEURL,

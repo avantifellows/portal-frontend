@@ -77,6 +77,7 @@ export function redirectToDestination(
     }
     case "gurukul": {
       fullURL = import.meta.env.VITE_APP_GURUKUL_BASE_URL;
+      console.log(fullURL);
       break;
     }
     default: {

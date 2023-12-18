@@ -7,6 +7,7 @@ export async function validateUser(
   groupId
 ) {
   let user = {};
+
   if (authTypes.includes("ID")) {
     if (userType == "student") {
       user["isUserIdValid"] = await userAPI.verifyStudent({

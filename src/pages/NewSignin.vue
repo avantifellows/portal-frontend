@@ -75,8 +75,8 @@
       <p class="text-grey font-roboto text-sm opacity-40">or</p>
       <hr class="w-20 text-grey" />
     </div>
-    <!-- signup button -->
 
+    <!-- signup button -->
     <button
       v-show="enable_signup"
       @click="redirectToSignUp"
@@ -369,7 +369,6 @@ export default {
         createAccessToken(this.userInformation["student_id"]);
         if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
-
           sendSQSMessage(
             "sign-in",
             this.sub_type,

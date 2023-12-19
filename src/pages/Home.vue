@@ -25,19 +25,10 @@
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
         :enable_pop_up_form="isPopUpFormEnabled"
-        :id_generation="isIdGenerationEnabled"
-        :redirection="isRedirectionEnabled"
-        :platform="getPlatform"
-        :platform_id="getPlatformId"
         :locale="getLocale"
-        :images="getGroupImages"
       />
       <NewSignUp
         v-if="isTypeSignUp && doesGroupExist"
-        :id_generation="isIdGenerationEnabled"
-        :redirection="isRedirectionEnabled"
-        :platform="getPlatform"
-        :platform_id="getPlatformId"
         :locale="getLocale"
         :images="getGroupImages"
       />
@@ -230,7 +221,7 @@ export default {
      * @returns {string[]} An array of group images.
      */
     getGroupImages() {
-      return this.groupData.input_schema.images;
+      this.$store.dispatch("setImages", this.groupData.input_schema.images);
     },
 
     /** Returns if the purpose is registration.
@@ -312,7 +303,7 @@ export default {
     /** Returns if sign up flow should be enabled */
     isSignupEnabled() {
       return (
-        (this.sessionData && this.sessionData.enable_signup == "True") ||
+        (this.sessionData && this.sessionData.activate_signup == "True") ||
         this.enable_signup == "True"
       );
     },
@@ -327,28 +318,34 @@ export default {
 
     /** Returns if ID should be generated for a user after sign up. */
     isIdGenerationEnabled() {
-      return (
+      this.$store.dispatch(
+        "setIdGeneration",
         (this.sessionData && this.sessionData.id_generation == "True") ||
-        this.id_generation == "True"
+          this.id_generation == "True"
       );
     },
 
     /** Returns if user should be redirected to external platform after authentication. */
     isRedirectionEnabled() {
-      return (
+      this.$store.dispatch(
+        "setRedirection",
         (this.sessionData && this.sessionData.redirection == "True") ||
-        this.redirection == "True"
+          this.redirection == "True"
       );
     },
 
     /** Returns the external platform the user should be redirected to. */
     getPlatform() {
-      return (this.sessionData && this.sessionData.platform) || this.platform;
+      this.$store.dispatch(
+        "setPlatform",
+        (this.sessionData && this.sessionData.platform) || this.platform
+      );
     },
 
     /** Returns the external platform ID the user should be redirected to. */
     getPlatformId() {
-      return (
+      this.$store.dispatch(
+        "setPlatformId",
         (this.sessionData && this.sessionData.platform_id) || this.platform_id
       );
     },
@@ -560,6 +557,11 @@ export default {
       }
     }
     this.isLoading = false;
+    this.isIdGenerationEnabled;
+    this.isRedirectionEnabled;
+    this.getPlatform;
+    this.getPlatformId;
+    this.getGroupImages;
   },
 };
 </script>

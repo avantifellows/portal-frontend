@@ -9,6 +9,12 @@ export default createStore({
   state: {
     groupData: {},
     language: "en",
+    id_generation: false,
+    redirection: false,
+    platform: "",
+    platform_id: "",
+    locale: "en",
+    images: [],
   },
   actions: {
     setGroupData({ commit }, groupData) {
@@ -20,6 +26,24 @@ export default createStore({
     setLanguage({ commit }, language) {
       commit("setLanguage", language);
     },
+    setIdGeneration({ commit }, id_generation) {
+      commit("setIdGeneration", id_generation);
+    },
+    setRedirection({ commit }, redirection) {
+      commit("setRedirection", redirection);
+    },
+    setPlatform({ commit }, platform) {
+      commit("setPlatform", platform);
+    },
+    setPlatformId({ commit }, platform_id) {
+      commit("setPlatformId", platform_id);
+    },
+    setLocale({ commit }, locale) {
+      commit("setLocale", locale);
+    },
+    setImages({ commit }, images) {
+      commit("setImages", images);
+    },
   },
   mutations: {
     setGroupData(state, groupData) {
@@ -30,6 +54,24 @@ export default createStore({
     },
     setLanguage(state, language) {
       state.language = language;
+    },
+    setIdGeneration(state, id_generation) {
+      state.id_generation = id_generation;
+    },
+    setRedirection(state, redirection) {
+      state.redirection = redirection;
+    },
+    setPlatform(state, platform) {
+      state.platform = platform;
+    },
+    setPlatformId(state, platform_id) {
+      state.platform_id = platform_id;
+    },
+    setLocale(state, locale) {
+      state.locale = locale;
+    },
+    setImages(state, images) {
+      state.images = images;
     },
   },
   plugins: [

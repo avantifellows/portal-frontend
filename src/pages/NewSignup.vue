@@ -11,7 +11,7 @@
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
-    <template v-for="(image, index) in images" :key="index">
+    <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
@@ -66,10 +66,7 @@
     v-if="formSubmitted"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <div
-      v-if="id_generation"
-      class="bg-primary-hover py-10 rounded-md shadow-sm"
-    >
+    <div class="bg-primary-hover py-10 rounded-md shadow-sm">
       <p>
         <b>Your ID is {{ userData["user_id"] }}</b>
       </p>
@@ -80,7 +77,7 @@
     </div>
 
     <button
-      v-if="redirection"
+      v-if="$store.state.redirection"
       @click="redirect"
       :disabled="isRedirectionButtonDisabled"
       class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
@@ -103,29 +100,9 @@ export default {
   name: "SignUp",
   components: { LanguagePicker },
   props: {
-    id_generation: {
-      default: false,
-      type: Boolean,
-    },
-    redirection: {
-      default: false,
-      type: Boolean,
-    },
-    platform: {
-      default: null,
-      type: String,
-    },
-    platform_id: {
-      default: null,
-      type: String,
-    },
     locale: {
       default: "en",
       type: String,
-    },
-    images: {
-      default: [],
-      type: Array,
     },
   },
   data() {
@@ -151,6 +128,7 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
+    console.log(this.$store.state);
   },
   watch: {
     userData: {
@@ -225,8 +203,9 @@ export default {
 
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
+            console.log(fieldAttributes);
             fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[0][
+              fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
             return fieldAttributes.options[this.locale];
@@ -281,7 +260,7 @@ export default {
 
       let createdUserId = await UserAPI.newUserSignup(
         this.userData,
-        this.id_generation,
+        this.$store.state.id_generation,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.groupData.name
       );
@@ -303,18 +282,18 @@ export default {
     redirect() {
       if (
         redirectToDestination(
-          this.$store.state.sessionData.purpose.params,
+          this.sub_type,
           this.userData["user_id"],
-          this.platform_id,
-          this.platform,
+          this.$store.state.platform_id,
+          this.$store.state.platform,
           this.$store.state.groupData.input_schema.userType
         )
       ) {
         sendSQSMessage(
           "attendance-sign-up",
-          this.$store.state.sessionData.purpose["sub-type"],
-          this.platform,
-          this.platform_id,
+          this.sub_type,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
           this.userData["user_id"],
           "",
           this.$store.state.groupData.name,

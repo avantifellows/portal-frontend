@@ -9,7 +9,7 @@
   </div>
 
   <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
-    <template v-for="(image, index) in images" :key="index">
+    <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
@@ -124,29 +124,10 @@ export default {
       default: false,
       type: Boolean,
     },
-    id_generation: {
-      default: false,
-      type: Boolean,
-    },
-    redirection: {
-      default: false,
-      type: Boolean,
-    },
-    platform: {
-      default: "",
-      type: String,
-    },
-    platform_id: {
-      default: "",
-      type: String,
-    },
+
     locale: {
       default: "en",
       type: String,
-    },
-    images: {
-      default: [],
-      type: Array,
     },
   },
   data() {
@@ -372,8 +353,8 @@ export default {
           sendSQSMessage(
             "sign-in",
             this.sub_type,
-            this.platform,
-            this.platform_id,
+            this.$store.state.platform,
+            this.$store.state.platform_id,
             this.userInformation["student_id"],
             this.auth_type.toString(),
             this.$store.state.groupData.name,
@@ -393,16 +374,16 @@ export default {
             redirectToDestination(
               this.sub_type,
               this.userInformation["student_id"],
-              this.platform_id,
-              this.platform,
+              this.$store.state.platform_id,
+              this.$store.state.platform,
               this.$store.state.groupData.input_schema.userType
             )
           ) {
             sendSQSMessage(
               "sign-in",
               this.sub_type,
-              this.platform,
-              this.platform_id,
+              this.$store.state.platform,
+              this.$store.state.platform_id,
               "student_id" in this.userInformation
                 ? this.userInformation["student_id"]
                 : this.userInformation["teacher_id"],

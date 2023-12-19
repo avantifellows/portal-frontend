@@ -19,6 +19,7 @@ export function redirectToDestination(
   let fullURL = "";
   let finalURLQueryParams = "";
 
+  console.log(redirectTo);
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;

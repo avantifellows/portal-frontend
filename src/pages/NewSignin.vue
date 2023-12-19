@@ -158,6 +158,7 @@ export default {
   },
   mounted() {
     this.mounted = true;
+    console.log(this.enable_pop_up_form);
   },
   computed: {
     /** Returns button text */
@@ -348,6 +349,7 @@ export default {
           this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
         createAccessToken(this.userInformation["student_id"]);
+
         if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(

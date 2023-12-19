@@ -310,8 +310,11 @@ export default {
 
     /** Returns if any additional form is to be displayed to the user after authentication. */
     isPopUpFormEnabled() {
+      console.log(
+        this.sessionData && this.sessionData.enable_pop_up_form == "True"
+      );
       return (
-        (this.sessionData && this.sessionData.enable_pop_up_form == "True") ||
+        (this.sessionData && this.sessionData.pop_up_form == "True") ||
         this.enable_pop_up_form == "True"
       );
     },

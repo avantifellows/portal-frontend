@@ -27,11 +27,7 @@
         :enable_pop_up_form="isPopUpFormEnabled"
         :locale="getLocale"
       />
-      <NewSignUp
-        v-if="isTypeSignUp && doesGroupExist"
-        :locale="getLocale"
-        :images="getGroupImages"
-      />
+      <NewSignUp v-if="isTypeSignUp && doesGroupExist" :locale="getLocale" />
     </div>
 
     <div v-else>
@@ -310,16 +306,13 @@ export default {
 
     /** Returns if any additional form is to be displayed to the user after authentication. */
     isPopUpFormEnabled() {
-      console.log(
-        this.sessionData && this.sessionData.enable_pop_up_form == "True"
-      );
       return (
         (this.sessionData && this.sessionData.pop_up_form == "True") ||
         this.enable_pop_up_form == "True"
       );
     },
 
-    /** Returns if ID should be generated for a user after sign up. */
+    /** Stores if ID should be generated for a user after sign up in the store. */
     isIdGenerationEnabled() {
       this.$store.dispatch(
         "setIdGeneration",
@@ -328,7 +321,7 @@ export default {
       );
     },
 
-    /** Returns if user should be redirected to external platform after authentication. */
+    /** Stores if user should be redirected to external platform after authentication in the store. */
     isRedirectionEnabled() {
       this.$store.dispatch(
         "setRedirection",
@@ -337,8 +330,8 @@ export default {
       );
     },
 
-    /** Returns the external platform the user should be redirected to. */
-    getPlatform() {
+    /** Stores the external platform the user should be redirected to in the store. */
+    setPlatform() {
       this.$store.dispatch(
         "setPlatform",
         (this.sessionData && this.sessionData.platform) || this.platform
@@ -346,7 +339,7 @@ export default {
     },
 
     /** Returns the external platform ID the user should be redirected to. */
-    getPlatformId() {
+    setPlatformId() {
       this.$store.dispatch(
         "setPlatformId",
         (this.sessionData && this.sessionData.platform_id) || this.platform_id

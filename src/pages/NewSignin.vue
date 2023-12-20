@@ -158,7 +158,6 @@ export default {
   },
   mounted() {
     this.mounted = true;
-    console.log(this.enable_pop_up_form);
   },
   computed: {
     /** Returns button text */

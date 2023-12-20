@@ -128,7 +128,6 @@ export default {
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
-    console.log(this.$store.state);
   },
   watch: {
     userData: {
@@ -203,7 +202,6 @@ export default {
 
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
-            console.log(fieldAttributes);
             fieldAttributes["options"] =
               fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]

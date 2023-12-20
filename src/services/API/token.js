@@ -11,8 +11,8 @@ export async function createAccessToken(id) {
     dbClient
       .post(createAccessTokenEndpoint, params)
       .then((response) => {
-        document.cookie = `access_token=${response.data.access_token};`;
-        document.cookie = `refresh_token=${response.data.refresh_token};`;
+        document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+        document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
       })
       .catch((error) => {
         resolve({ error: error });

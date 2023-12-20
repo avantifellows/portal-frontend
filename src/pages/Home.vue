@@ -332,6 +332,7 @@ export default {
 
     /** Stores the external platform the user should be redirected to in the store. */
     setPlatform() {
+      console.log("platform:", this.platform);
       this.$store.dispatch(
         "setPlatform",
         (this.sessionData && this.sessionData.platform) || this.platform

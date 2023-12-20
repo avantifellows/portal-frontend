@@ -17,18 +17,10 @@
         'w-full': true,
       }"
       :inner-class="{
-        border: true,
-        'py-2': true,
-        'px-2': true,
-        rounded: true,
-        'border-grey': true,
-        'overflow-hidden': true,
+        'border py-2 px-2 rounded border-grey overflow-hidden': true,
       }"
       :help-class="{
-        'mt-[10px]': true,
-        'text-sm': true,
-        'text-grey': true,
-        italic: true,
+        'mt-[10px] text-sm text-grey italic': true,
       }"
     />
 

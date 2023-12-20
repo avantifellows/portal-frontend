@@ -1,18 +1,18 @@
 <template>
   <div class="text-right">
     <FormKit
-      v-model="language"
+      v-model="locale"
       type="select"
       :options="options"
       :inner-class="{ 'p-2': true }"
-      name="language"
+      name="locale"
     />
   </div>
 </template>
 
 <script>
 export default {
-  name: "LanguagePicker",
+  name: "LocalePicker",
   props: {
     options: {
       type: Array,
@@ -21,18 +21,21 @@ export default {
   },
   data() {
     return {
-      language: "English",
+      locale: "",
     };
+  },
+  mounted() {
+    this.locale = this.$store.state.locale;
   },
   watch: {
     /**
      * Sets the language in the store based on the user input
      */
-    language() {
-      if (this.language == "English") {
-        this.$store.dispatch("setLanguage", "en");
+    locale() {
+      if (this.locale == "English") {
+        this.$store.dispatch("setLocale", "en");
       } else {
-        this.$store.dispatch("setLanguage", "hi");
+        this.$store.dispatch("setLocale", "hi");
       }
     },
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <LanguagePicker />
+    <LocalePicker />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-black font-bold">
         {{ getFormHeading }}
@@ -40,14 +40,14 @@ import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
-import LanguagePicker from "../components/LanguagePicker.vue";
+import LocalePicker from "../components/LocalePicker.vue";
 import { useToast } from "vue-toastification";
 
 const assets = useAssets();
 
 export default {
   name: "Information Form",
-  components: { LanguagePicker },
+  components: { LocalePicker },
   data() {
     return {
       AFLogo: assets.AFLogoSvg,
@@ -107,7 +107,7 @@ export default {
   computed: {
     /** Returns the locale selected by user */
     getLocale() {
-      return this.$store.state.language;
+      return this.$store.state.locale;
     },
 
     getFormHeading() {

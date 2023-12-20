@@ -18,16 +18,9 @@
 
   <div v-else>
     <div v-if="!oldFlow">
-      <LanguagePicker :options="getLanguages" />
-      <NewSignIn
-        v-if="isTypeSignIn && doesGroupExist"
-        :sub_type="getSubType"
-        :auth_type="getAuthTypes"
-        :enable_signup="isSignupEnabled"
-        :enable_pop_up_form="isPopUpFormEnabled"
-        :locale="getLocale"
-      />
-      <NewSignUp v-if="isTypeSignUp && doesGroupExist" :locale="getLocale" />
+      <LocalePicker :options="getLocale" />
+      <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
+      <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
     </div>
 
     <div v-else>
@@ -69,7 +62,7 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
-import LanguagePicker from "@/components/LanguagePicker.vue";
+import LocalePicker from "@/components/LocalePicker.vue";
 
 import useAssets from "@/assets/assets.js";
 
@@ -89,7 +82,7 @@ export default {
     LandingPage,
     Entry,
     Signup,
-    LanguagePicker,
+    LocalePicker,
   },
   props: {
     /** The resource we are redirecting to.
@@ -200,29 +193,10 @@ export default {
     };
   },
   computed: {
-    /** Returns list of available language options. */
-    getLanguages() {
-      return this.groupData && "languages" in this.groupData.input_schema
-        ? this.groupData.input_schema.languages
-        : ["English"];
-    },
-
-    /** Returns the locale selected by user */
     getLocale() {
-      return this.$store.state.language;
+      return this.groupData ? this.groupData.locale : ["English", "हिंदी"];
     },
-
-    /**
-     * Retrieves the group images.
-     * @returns {string[]} An array of group images.
-     */
-    getGroupImages() {
-      this.$store.dispatch("setImages", this.groupData.input_schema.images);
-    },
-
-    /** Returns if the purpose is registration.
-     *  (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
+    /** TEMP - returns if the purpose is registration */
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
     },
@@ -454,7 +428,7 @@ export default {
     },
   },
   async created() {
-    this.$store.dispatch("setLanguage", "en");
+    this.$store.dispatch("setLocale", "en");
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */

@@ -19,8 +19,14 @@
   <div v-else>
     <div v-if="!oldFlow">
       <LocalePicker :options="getLocale" />
-      <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
-      <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
+      <NewSignIn
+        v-if="isTypeSignIn && doesGroupExist"
+        :sub_type="getSubType"
+        :auth_type="getAuthTypes"
+        :enable_signup="isSignupEnabled"
+        :enable_pop_up_form="isPopUpFormEnabled"
+      />
+      <NewSignUp v-if="isTypeSignUp && doesGroupExist" />
     </div>
 
     <div v-else>
@@ -194,9 +200,11 @@ export default {
   },
   computed: {
     getLocale() {
-      return this.groupData ? this.groupData.locale : ["English", "हिंदी"];
+      return this.groupData ? this.groupData.locale.split(",") : ["English"];
     },
-    /** TEMP - returns if the purpose is registration */
+    /** Returns if the purpose is registration.
+     * (THIS METHOD WILL BE DEPRECATED IN V2)
+     */
     isPurposeRegistration() {
       return this.sessionData ? this.getPurpose == "registration" : false;
     },
@@ -429,6 +437,7 @@ export default {
   },
   async created() {
     this.$store.dispatch("setLocale", "en");
+
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */

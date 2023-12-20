@@ -124,14 +124,10 @@ export default {
       default: false,
       type: Boolean,
     },
-
-    locale: {
-      default: "en",
-      type: String,
-    },
   },
   data() {
     return {
+      locale: this.$store.state.locale,
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       invalidLoginMessage: "", // message to display when login is invalid
@@ -162,18 +158,12 @@ export default {
   computed: {
     /** Returns button text */
     signInButtonLabel() {
-      return this.getLocale == "en" ? "Sign In" : "साइन इन";
+      return this.locale == "en" ? "Sign In" : "साइन इन";
     },
 
     /** Retutns if sign up flow should be activated */
     isSignupActivated() {
       return this.$store.state.sessionData.activate_signup == "True";
-    },
-
-    /** Returns the locale selected by user */
-    getLocale() {
-      // console.log(this.$store.state);
-      return this.$store.state.locale;
     },
 
     /** Returns text based on locale */

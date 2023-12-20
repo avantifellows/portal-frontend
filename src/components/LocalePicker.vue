@@ -34,7 +34,7 @@ export default {
     locale() {
       if (this.locale == "English") {
         this.$store.dispatch("setLocale", "en");
-      } else {
+      } else if (this.locale == "Hindi") {
         this.$store.dispatch("setLocale", "hi");
       }
     },

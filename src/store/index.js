@@ -10,6 +10,11 @@ export default createStore({
     groupData: {},
     sessionData: {},
     locale: "en",
+    id_generation: false,
+    redirection: true,
+    platform: "",
+    platform_id: "",
+    images: [],
   },
   actions: {
     setGroupData({ commit }, groupData) {
@@ -17,12 +22,6 @@ export default createStore({
     },
     setSessionData({ commit }, sessionData) {
       commit("setSessionData", sessionData);
-    },
-    setSessionId({ commit }, sessionId) {
-      commit("setSessionId", sessionId);
-    },
-    setLocale({ commit }, locale) {
-      commit("setLocale", locale);
     },
     setIdGeneration({ commit }, id_generation) {
       commit("setIdGeneration", id_generation);
@@ -49,12 +48,6 @@ export default createStore({
     },
     setSessionData(state, sessionData) {
       state.sessionData = Object.assign({}, sessionData);
-    },
-    setSessionId(state, sessionId) {
-      state.sessionData.sessionId = sessionId;
-    },
-    setLocale(state, locale) {
-      state.locale = locale;
     },
     setIdGeneration(state, id_generation) {
       state.id_generation = id_generation;

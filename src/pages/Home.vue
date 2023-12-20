@@ -558,6 +558,7 @@ export default {
     this.getPlatform;
     this.getPlatformId;
     this.getGroupImages;
+    console.log(this.$store.state);
   },
 };
 </script>

@@ -18,7 +18,7 @@
 
   <div v-else>
     <div v-if="!oldFlow">
-      <LanguagePicker :options="getLanguages" />
+      <LocalePicker :options="getLocale" />
       <NewSignIn v-if="isSessionTypeSignIn && doesGroupExist" />
       <NewSignUp v-if="isSessionTypeSignUp && doesGroupExist" />
     </div>
@@ -68,7 +68,7 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
-import LanguagePicker from "@/components/LanguagePicker.vue";
+import LocalePicker from "@/components/LocalePicker.vue";
 
 import useAssets from "@/assets/assets.js";
 
@@ -88,7 +88,7 @@ export default {
     LandingPage,
     Entry,
     Signup,
-    LanguagePicker,
+    LocalePicker,
   },
   props: {
     /** The resource we are redirecting to */
@@ -140,10 +140,8 @@ export default {
   },
 
   computed: {
-    getLanguages() {
-      return this.groupData
-        ? this.groupData.input_schema.languages
-        : ["English", "हिंदी"];
+    getLocale() {
+      return this.groupData ? this.groupData.locale : ["English", "हिंदी"];
     },
     /** TEMP - returns if the purpose is registration */
     isPurposeRegistration() {
@@ -282,7 +280,7 @@ export default {
     },
   },
   async created() {
-    this.$store.dispatch("setLanguage", "en");
+    this.$store.dispatch("setLocale", "en");
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */

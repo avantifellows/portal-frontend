@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-  <LanguagePicker />
+  <LocalePicker />
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
@@ -95,13 +95,13 @@ import UserAPI from "@/services/API/user.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
-import LanguagePicker from "../components/LanguagePicker.vue";
+import LocalePicker from "../components/LocalePicker.vue";
 
 const assets = useAssets();
 
 export default {
   name: "SignUp",
-  components: { LanguagePicker },
+  components: { LocalePicker },
   data() {
     return {
       isLoading: false,
@@ -149,7 +149,7 @@ export default {
 
     /** Returns the locale selected by user */
     getLocale() {
-      return this.$store.state.language;
+      return this.$store.state.locale;
     },
 
     /** Returns text based on locale */

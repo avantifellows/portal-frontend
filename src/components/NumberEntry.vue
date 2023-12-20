@@ -16,19 +16,12 @@
         'mx-auto': true,
       }"
       :inner-class="{
-        border: true,
-        'py-2': true,
-        'px-2': true,
-        rounded: true,
-        'mx-auto': true,
+        'border py-2 px-2 rounded mx-auto': true,
         'border-red': this.invalid,
         'border-grey': !this.invalid,
       }"
       :help-class="{
-        'mt-[10px]': true,
-        'text-sm': true,
-        'text-grey': true,
-        italic: true,
+        'mt-[10px] text-sm text-grey italic': true,
       }"
     />
 
@@ -117,7 +110,7 @@ export default {
 
     /** Returns the locale selected by user */
     getLocale() {
-      return this.$store.state.language;
+      return this.$store.state.locale;
     },
   },
   methods: {

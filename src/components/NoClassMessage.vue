@@ -28,16 +28,16 @@ export default {
   },
   computed: {
     displayMessage() {
-      return this.isLanguageSelectedEnglish
+      return this.isLocaleSelectedEnglish
         ? "There is no class right now."
         : "अभी आपकी कोई क्लास नहीं है|";
     },
 
-    isLanguageSelectedEnglish() {
-      return this.$store.state.language == "en";
+    isLocaleSelectedEnglish() {
+      return this.$store.state.locale == "en";
     },
-    isLanguageSelectedHindi() {
-      return this.$store.state.language == "hi";
+    isLocaleSelectedHindi() {
+      return this.$store.state.locale == "hi";
     },
   },
 };

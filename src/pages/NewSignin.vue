@@ -146,7 +146,7 @@ export default {
     /** Returns the locale selected by user */
     getLocale() {
       // console.log(this.$store.state);
-      return this.$store.state.language;
+      return this.$store.state.locale;
     },
 
     /** Returns text based on locale */

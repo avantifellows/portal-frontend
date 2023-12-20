@@ -11,7 +11,7 @@
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
-    <template v-for="(image, index) in getGroupImages" :key="index">
+    <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
@@ -31,13 +31,13 @@
         :show="formField.show"
         :key="index"
         :is="formField.component"
-        :label="formField.label[getLocale]"
+        :label="formField.label[locale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :options="formField.options[getLocale]"
+        :options="formField.options[locale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText[getLocale]"
+        :helpText="formField.helpText[locale]"
         @update="updateUserData"
         class="mt-[25px]"
       />
@@ -66,10 +66,7 @@
     v-if="formSubmitted"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <div
-      v-if="idGeneration"
-      class="bg-primary-hover py-10 rounded-md shadow-sm"
-    >
+    <div class="bg-primary-hover py-10 rounded-md shadow-sm">
       <p>
         <b>Your ID is {{ userData["user_id"] }}</b>
       </p>
@@ -80,7 +77,7 @@
     </div>
 
     <button
-      v-if="redirection"
+      v-if="$store.state.redirection"
       @click="redirect"
       :disabled="isRedirectionButtonDisabled"
       class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
@@ -139,7 +136,7 @@ export default {
   computed: {
     /** Returns button text */
     signUpButtonLabel() {
-      return this.getLocale == "en" ? "Sign Up" : "साइन अप";
+      return this.locale == "en" ? "Sign Up" : "साइन अप";
     },
 
     /** Returns button text */
@@ -154,14 +151,9 @@ export default {
 
     /** Returns text based on locale */
     signInText() {
-      return this.getLocale == "en"
+      return this.locale == "en"
         ? "Already Registered? <b> Sign In</b>"
         : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
-    },
-
-    /** returns images to be displayed for a group */
-    getGroupImages() {
-      return this.$store.state.groupData.input_schema.images;
     },
 
     /** returns title for the form */
@@ -169,6 +161,7 @@ export default {
       return this.formData.name;
     },
 
+    /** returns sub-title for the form */
     formSubTitle() {
       return this.formData.sub_heading;
     },
@@ -181,18 +174,6 @@ export default {
     /** whether redirection button is disabled */
     isRedirectionButtonDisabled() {
       return this.userData["user_id"] == "";
-    },
-
-    /** returns if ID needs to be generated */
-    idGeneration() {
-      return this.$store.state.sessionData.id_generation;
-    },
-
-    /** returns if redirection is necessary */
-    redirection() {
-      return this.$store.state.sessionData.redirection == null
-        ? true
-        : this.$store.state.sessionData.redirection;
     },
   },
   methods: {
@@ -221,10 +202,10 @@ export default {
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[0][
+              fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
-            return fieldAttributes.options[this.getLocale];
+            return fieldAttributes.options[this.locale];
           }
         }
       });
@@ -259,14 +240,14 @@ export default {
       sendSQSMessage(
         "sign-up",
         this.$store.state.sessionData.purpose["sub-type"],
-        this.$store.state.sessionData.platform,
-        this.$store.state.sessionData.platform_id,
+        this.platform,
+        this.platform_id,
         this.userData["student_id"],
-        "",
+        "", // list of authentication methods
         this.$store.state.groupData.name,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.sessionData.session_id,
-        "",
+        "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
         this.$store.state.sessionData.meta_data.batch,
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
@@ -276,7 +257,7 @@ export default {
 
       let createdUserId = await UserAPI.newUserSignup(
         this.userData,
-        this.$store.state.sessionData.id_generation,
+        this.$store.state.id_generation,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.groupData.name
       );
@@ -298,18 +279,18 @@ export default {
     redirect() {
       if (
         redirectToDestination(
-          this.$store.state.sessionData.purpose.params,
+          this.sub_type,
           this.userData["user_id"],
-          this.$store.state.sessionData.platform_id,
-          this.$store.state.sessionData.platform,
+          this.$store.state.platform_id,
+          this.$store.state.platform,
           this.$store.state.groupData.input_schema.userType
         )
       ) {
         sendSQSMessage(
           "attendance-sign-up",
-          this.$store.state.sessionData.purpose["sub-type"],
-          this.$store.state.sessionData.platform,
-          this.$store.state.sessionData.platform_id,
+          this.sub_type,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
           this.userData["user_id"],
           "",
           this.$store.state.groupData.name,

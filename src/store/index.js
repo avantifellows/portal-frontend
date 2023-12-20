@@ -7,15 +7,11 @@ let localStorage = new SecureLS({ isCompression: true });
 
 export default createStore({
   state: {
-    phoneNumber: null,
     groupData: {},
     sessionData: {},
     locale: "en",
   },
   actions: {
-    setPhoneNumber({ commit }, phoneNumber) {
-      commit("setPhoneNumber", phoneNumber);
-    },
     setGroupData({ commit }, groupData) {
       commit("setGroupData", groupData);
     },
@@ -28,11 +24,26 @@ export default createStore({
     setLocale({ commit }, locale) {
       commit("setLocale", locale);
     },
+    setIdGeneration({ commit }, id_generation) {
+      commit("setIdGeneration", id_generation);
+    },
+    setRedirection({ commit }, redirection) {
+      commit("setRedirection", redirection);
+    },
+    setPlatform({ commit }, platform) {
+      commit("setPlatform", platform);
+    },
+    setPlatformId({ commit }, platform_id) {
+      commit("setPlatformId", platform_id);
+    },
+    setLocale({ commit }, locale) {
+      commit("setLocale", locale);
+    },
+    setImages({ commit }, images) {
+      commit("setImages", images);
+    },
   },
   mutations: {
-    setPhoneNumber(state, phoneNumber) {
-      state.phoneNumber = phoneNumber;
-    },
     setGroupData(state, groupData) {
       state.groupData = Object.assign({}, groupData);
     },
@@ -44,6 +55,24 @@ export default createStore({
     },
     setLocale(state, locale) {
       state.locale = locale;
+    },
+    setIdGeneration(state, id_generation) {
+      state.id_generation = id_generation;
+    },
+    setRedirection(state, redirection) {
+      state.redirection = redirection;
+    },
+    setPlatform(state, platform) {
+      state.platform = platform;
+    },
+    setPlatformId(state, platform_id) {
+      state.platform_id = platform_id;
+    },
+    setLocale(state, locale) {
+      state.locale = locale;
+    },
+    setImages(state, images) {
+      state.images = images;
     },
   },
   plugins: [

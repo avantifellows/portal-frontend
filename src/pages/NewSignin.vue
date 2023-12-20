@@ -9,7 +9,7 @@
   </div>
 
   <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
-    <template v-for="(image, index) in getGroupImages" :key="index">
+    <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
@@ -17,7 +17,7 @@
   <div class="flex flex-col mx-auto my-auto h-full py-10">
     <!-- different input components -->
     <div
-      v-for="(authType, index) in getAuthTypes"
+      v-for="(authType, index) in auth_type"
       :key="`id-${index}`"
       class="mx-auto"
     >
@@ -67,14 +67,18 @@
     >
       {{ signInButtonLabel }}
     </button>
-    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+    <div
+      v-show="enable_signup"
+      class="mt-[30px] flex w-48 mx-auto justify-between items-center"
+    >
       <hr class="w-20 text-grey" />
       <p class="text-grey font-roboto text-sm opacity-40">or</p>
       <hr class="w-20 text-grey" />
     </div>
+
     <!-- signup button -->
     <button
-      v-show="isSignupActivated"
+      v-show="enable_signup"
       @click="redirectToSignUp"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signUpText"
@@ -92,6 +96,7 @@ import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { createAccessToken } from "@/services/API/token";
 
 const assets = useAssets();
 
@@ -101,6 +106,29 @@ export default {
     NumberEntry,
     Datepicker,
     PhoneNumberEntry,
+  },
+  props: {
+    sub_type: {
+      default: "",
+      type: String,
+    },
+    auth_type: {
+      default: [],
+      type: Array,
+    },
+    enable_signup: {
+      default: false,
+      type: Boolean,
+    },
+    enable_pop_up_form: {
+      default: false,
+      type: Boolean,
+    },
+
+    locale: {
+      default: "en",
+      type: String,
+    },
   },
   data() {
     return {
@@ -131,7 +159,6 @@ export default {
   mounted() {
     this.mounted = true;
   },
-
   computed: {
     /** Returns button text */
     signInButtonLabel() {
@@ -151,25 +178,9 @@ export default {
 
     /** Returns text based on locale */
     signUpText() {
-      return this.getLocale == "en"
+      return this.locale == "en"
         ? "New Student? <b> Register Now</b>"
         : "नया छात्र? <b>अब रजिस्टर करें। </b>";
-    },
-
-    /**
-     * Retrieves the authentication types.
-     * @returns {string[]} An array of authentication types.
-     */
-    getAuthTypes() {
-      return this.$store.state.sessionData.auth_type.split(",");
-    },
-
-    /**
-     * Retrieves the group images.
-     * @returns {string[]} An array of group images.
-     */
-    getGroupImages() {
-      return this.$store.state.groupData.input_schema.images;
     },
 
     /**
@@ -224,6 +235,13 @@ export default {
       }
       return true;
     },
+    getBatch() {
+      return "sessionData" in this.$store.state &&
+        "meta_data" in this.$store.state.sessionData &&
+        "batch" in this.$store.state.sessionData.meta_data
+        ? this.$store.state.sessionData.meta_data.batch
+        : "";
+    },
   },
   methods: {
     /** Resets the invalid login message to empty string */
@@ -251,11 +269,11 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData.locale_data[this.getLocale]).find(
+      Object.keys(this.$store.state.groupData.locale_data[this.locale]).find(
         (key) => {
           if (key == authType) {
             UIParameters =
-              this.$store.state.groupData.locale_data[this.getLocale][
+              this.$store.state.groupData.locale_data[this.locale][
                 key.toString()
               ];
           }
@@ -318,7 +336,7 @@ export default {
      */
     async authenticate() {
       let isUserValid = await validateUser(
-        this.getAuthTypes,
+        this.auth_type,
         this.userInformation,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.groupData.id
@@ -326,29 +344,31 @@ export default {
 
       if (!isUserValid.isUserIdValid) {
         this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["ID"][this.getLocale];
+          this.invalidLoginMessageTranslations["ID"][this.locale];
       } else if (
-        this.getAuthTypes.includes("DOB") &&
+        this.auth_type.includes("DOB") &&
         !isUserValid.isDateOfBirthValid
       ) {
         this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["DOB"][this.getLocale];
+          this.invalidLoginMessageTranslations["DOB"][this.locale];
       } else if (
-        this.getAuthTypes.includes("PH") &&
+        this.auth_type.includes("PH") &&
         !isUserValid.isPhoneNumberValid
       ) {
         this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["PH"][this.getLocale];
+          this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
-        if (this.$store.state.sessionData.pop_up_form == "True") {
+        createAccessToken(this.userInformation["student_id"]);
+
+        if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",
-            this.$store.state.sessionData.purpose["sub-type"],
-            this.$store.state.sessionData.platform,
-            this.$store.state.sessionData.platform_id,
+            this.sub_type,
+            this.$store.state.platform,
+            this.$store.state.platform_id,
             this.userInformation["student_id"],
-            this.getAuthTypes.toString(),
+            this.auth_type.toString(),
             this.$store.state.groupData.name,
             this.$store.state.groupData.input_schema.userType,
             this.$store.state.sessionData.session_id,
@@ -356,41 +376,44 @@ export default {
             "phone" in this.userInformation
               ? this.userInformation["phone"]
               : "",
-            this.$store.state.sessionData.meta_data.batch,
+            this.getBatch,
             "date_of_birth" in this.userInformation
               ? this.userInformation["date_of_birth"]
               : ""
           );
         } else {
           if (
+            redirectToDestination(
+              this.sub_type,
+              this.userInformation["student_id"],
+              this.$store.state.platform_id,
+              this.$store.state.platform,
+              this.$store.state.groupData.input_schema.userType
+            )
+          ) {
             sendSQSMessage(
               "sign-in",
-              this.$store.state.sessionData.purpose["sub-type"],
-              this.$store.state.sessionData.platform,
-              this.$store.state.sessionData.platform_id,
+              this.sub_type,
+              this.$store.state.platform,
+              this.$store.state.platform_id,
               "student_id" in this.userInformation
                 ? this.userInformation["student_id"]
                 : this.userInformation["teacher_id"],
-              this.getAuthTypes.toString(),
+              this.auth_type.toString(),
               this.$store.state.groupData.name,
               this.$store.state.groupData.input_schema.userType,
-              this.$store.state.sessionData.session_id,
+              "sessionData" in this.$store.state &&
+                "session_id" in this.$store.state.sessionData
+                ? this.$store.state.sessionData.session_id
+                : "",
               "",
               "phone" in this.userInformation
                 ? this.userInformation["phone"]
                 : "",
-              this.$store.state.sessionData.meta_data.batch,
+              this.getBatch,
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]
                 : ""
-            )
-          ) {
-            redirectToDestination(
-              this.$store.state.sessionData.purpose.params,
-              this.userInformation["student_id"],
-              this.$store.state.sessionData.platform_id,
-              this.$store.state.sessionData.platform,
-              this.$store.state.groupData.input_schema.userType
             );
           }
         }

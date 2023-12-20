@@ -19,6 +19,14 @@ const allowedQueryParams = [
   "group",
   "redirectId",
   "authType",
+  "session_type",
+  "auth_type",
+  "enable_signup",
+  "enable_pop_up_form",
+  "id_generation",
+  "redirection",
+  "platform",
+  "platform_id",
 ];
 
 const routes = [
@@ -34,6 +42,15 @@ const routes = [
       redirectId: route.query.redirectID || route.query.redirectId,
       group: route.query.group,
       sessionId: route.query.sessionId,
+      type: route.query.type || route.query.purpose,
+      sub_type: route.query.sub_type || route.query.subPurpose,
+      auth_type: route.query.auth_type,
+      enable_signup: route.query.enable_signup,
+      enable_pop_up_form: route.query.enable_pop_up_form,
+      id_generation: route.query.id_generation,
+      redirection: route.query.redirection,
+      platform: route.query.platform || route.query.redirectTo,
+      platform_id: route.query.platform_id || route.query.redirectId,
     }),
   },
   {

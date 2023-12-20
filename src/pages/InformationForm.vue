@@ -197,16 +197,16 @@ export default {
         redirectToDestination(
           this.$store.state.sessionData.purpose.params,
           this.id,
-          this.$store.state.sessionData.platform_id,
-          this.$store.state.sessionData.platform,
+          this.$store.state.platform_id,
+          this.$store.state.platform,
           this.$store.state.groupData.input_schema.userType
         )
       ) {
         sendSQSMessage(
           "attendance-sign-in",
           this.$store.state.sessionData.purpose["sub-type"],
-          this.$store.state.sessionData.platform,
-          this.$store.state.sessionData.platform_id,
+          this.$store.platform,
+          this.$store.platform_id,
           this.id,
           "",
           this.$store.state.groupData.name,

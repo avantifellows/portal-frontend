@@ -64,12 +64,12 @@
     <!-- invalid input and login message  -->
     <span
       v-if="isInvalidInputMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="mx-auto text-red text-base mb-1"
       >{{ invalidInputMessage }}</span
     >
     <span
       v-if="isInvalidLoginMessageShown && !isExtraInputValidationRequired"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="mx-auto text-red text-base mb-1"
       >{{ invalidLoginMessage }}</span
     >
     <!-- button to add another input -->
@@ -152,7 +152,7 @@
     <span
       v-html="invalidLoginMessage"
       v-if="isInvalidLoginMessageShown && isExtraInputValidationRequired"
-      class="mx-auto text-red-700 text-base mb-1 text-center text-xs md:text-sm"
+      class="mx-auto text-red text-base mb-1 text-center text-xs md:text-sm"
     ></span>
     <!-- submit button -->
     <button

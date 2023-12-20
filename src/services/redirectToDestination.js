@@ -19,7 +19,6 @@ export function redirectToDestination(
   let fullURL = "";
   let finalURLQueryParams = "";
 
-  console.log("here:", redirectTo);
   switch (redirectTo) {
     case "plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
@@ -78,7 +77,6 @@ export function redirectToDestination(
     }
     case "gurukul": {
       fullURL = import.meta.env.VITE_APP_GURUKUL_BASE_URL;
-      console.log(fullURL);
       break;
     }
     default: {

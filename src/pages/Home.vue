@@ -556,8 +556,8 @@ export default {
     this.isLoading = false;
     this.isIdGenerationEnabled;
     this.isRedirectionEnabled;
-    this.getPlatform;
-    this.getPlatformId;
+    this.setPlatform;
+    this.setPlatformId;
     this.getGroupImages;
     console.log(this.$store.state);
   },

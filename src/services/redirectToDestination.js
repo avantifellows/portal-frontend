@@ -75,7 +75,10 @@ export function redirectToDestination(
       fullURL = redirectId;
       break;
     }
-
+    case "gurukul": {
+      fullURL = import.meta.env.VITE_APP_GURUKUL_BASE_URL;
+      break;
+    }
     default: {
       var purpose = "Error";
       sendSQSMessage(purpose, purposeParams, redirectTo, redirectId, userId);

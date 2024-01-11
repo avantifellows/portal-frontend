@@ -7,11 +7,11 @@
       />
     </div>
   </div>
-  <LanguagePicker />
+  <LocalePicker />
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
-    <template v-for="(image, index) in getGroupImages" :key="index">
+    <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
@@ -20,55 +20,69 @@
     v-if="!formSubmitted"
     class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
   >
-    <p class="text-2xl mx-auto font-bold">
+    <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
     <p class="text-center">{{ formSubTitle }}</p>
 
-    <div class="mx-auto w-2/3 md:w-auto">
+    <div class="mx-auto w-64">
       <component
         v-for="(formField, index) in formFields"
         :show="formField.show"
         :key="index"
         :is="formField.component"
-        :label="formField.label[getLocale]"
+        :label="formField.label[locale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :options="formField.options[getLocale]"
+        :options="formField.options[locale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText[getLocale]"
+        :helpText="formField.helpText[locale]"
         @update="updateUserData"
+        class="mt-[25px]"
+      />
+
+      <!-- submit button -->
+      <button
+        class="mt-[30px] bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md w-full p-2 rounded"
+        :disabled="signUpDisabled"
+        @click="signUp"
+        v-html="signUpButtonLabel"
       />
     </div>
-    <!-- submit button -->
+    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+      <hr class="w-20 text-grey" />
+      <p class="text-grey font-roboto text-sm opacity-40">or</p>
+      <hr class="w-20 text-grey" />
+    </div>
+    <!-- signup button -->
     <button
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-4 rounded disabled:opacity-50 btn"
-      :disabled="signUpDisabled"
-      @click="signUp"
-    >
-      SIGN UP
-    </button>
+      @click="redirectToSignIn"
+      class="mt-[20px] mx-auto pt-2 text-primary text-base"
+      v-html="signInText"
+    />
   </div>
   <div
     v-if="formSubmitted"
-    class="w-5/6 lg:w-1/2 mx-auto flex flex-col bg-peach text-center mt-20 shadow-sm justify-evenly text-lg md:text-xl rounded-md p-6 space-y-6"
+    class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <template v-if="idGeneration">
+    <div class="bg-primary-hover py-10 rounded-md shadow-sm">
       <p>
-        Your ID is <b>{{ userData["user_id"] }}</b>
+        <b>Your ID is {{ userData["user_id"] }}</b>
       </p>
-      <p>Please note this down. Use this to sign-in going forward.</p>
-    </template>
+      <p>
+        Kindly make a note of it. You will need this to log in to all your
+        future sessions.
+      </p>
+    </div>
 
     <button
-      v-if="redirection"
+      v-if="$store.state.redirection"
       @click="redirect"
       :disabled="isRedirectionButtonDisabled"
-      class="bg-primary hover:bg-primary-hover text-white font-bold shadow-xl uppercase text-lg mx-auto p-2 rounded disabled:opacity-50"
-    >
-      Start Session
-    </button>
+      class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
+      v-html="startSessionText"
+    />
   </div>
 </template>
 <script>
@@ -78,13 +92,13 @@ import UserAPI from "@/services/API/user.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
-import LanguagePicker from "../components/LanguagePicker.vue";
+import LocalePicker from "../components/LocalePicker.vue";
 
 const assets = useAssets();
 
 export default {
   name: "SignUp",
-  components: { LanguagePicker },
+  components: { LocalePicker },
   data() {
     return {
       isLoading: false,
@@ -113,28 +127,45 @@ export default {
     userData: {
       handler() {
         this.isUserDataIsComplete();
-        this.getOptions();
         this.showBasedOn();
+        this.getOptions();
       },
       deep: true,
     },
   },
   computed: {
-    getLocale() {
-      return this.$store.state.language;
+    /** Returns button text */
+    signUpButtonLabel() {
+      return this.locale == "en" ? "Sign Up" : "साइन अप";
     },
-    /** returns images to be displayed for a group */
-    getGroupImages() {
-      return this.$store.state.groupData.input_schema.images;
+
+    /** Returns button text */
+    startSessionText() {
+      return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
+    },
+
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.locale;
+    },
+
+    /** Returns text based on locale */
+    signInText() {
+      return this.locale == "en"
+        ? "Already Registered? <b> Sign In</b>"
+        : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
     },
 
     /** returns title for the form */
     formTitle() {
       return this.formData.name;
     },
+
+    /** returns sub-title for the form */
     formSubTitle() {
       return this.formData.sub_heading;
     },
+
     /** returns all fields to be displayed in the form */
     formFields() {
       return this.formData.attributes;
@@ -144,20 +175,9 @@ export default {
     isRedirectionButtonDisabled() {
       return this.userData["user_id"] == "";
     },
-
-    /** returns if ID needs to be generated */
-    idGeneration() {
-      return this.$store.state.sessionData.id_generation;
-    },
-
-    /** returns if redirection is necessary */
-    redirection() {
-      return this.$store.state.sessionData.redirection == null
-        ? true
-        : this.$store.state.sessionData.redirection;
-    },
   },
   methods: {
+    /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formData.attributes).forEach((field) => {
         let fieldAttributes = this.formData.attributes[field];
@@ -173,6 +193,8 @@ export default {
         }
       });
     },
+
+    /** Builds options for dependant fields */
     getOptions() {
       Object.keys(this.formData.attributes).forEach((field) => {
         let fieldAttributes = this.formData.attributes[field];
@@ -183,11 +205,12 @@ export default {
               fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
-            return fieldAttributes.options[this.getLocale];
+            return fieldAttributes.options[this.locale];
           }
         }
       });
     },
+
     /** checks if user data has all the fields required */
     isUserDataIsComplete() {
       let isUserDataComplete = true;
@@ -217,14 +240,14 @@ export default {
       sendSQSMessage(
         "sign-up",
         this.$store.state.sessionData.purpose["sub-type"],
-        this.$store.state.sessionData.platform,
-        this.$store.state.sessionData.platform_id,
+        this.platform,
+        this.platform_id,
         this.userData["student_id"],
-        "",
+        "", // list of authentication methods
         this.$store.state.groupData.name,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.sessionData.session_id,
-        "",
+        "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
         this.$store.state.sessionData.meta_data.batch,
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
@@ -234,7 +257,7 @@ export default {
 
       let createdUserId = await UserAPI.newUserSignup(
         this.userData,
-        this.$store.state.sessionData.id_generation,
+        this.$store.state.id_generation,
         this.$store.state.groupData.input_schema.userType,
         this.$store.state.groupData.name
       );
@@ -256,18 +279,18 @@ export default {
     redirect() {
       if (
         redirectToDestination(
-          this.$store.state.sessionData.purpose.params,
+          this.sub_type,
           this.userData["user_id"],
-          this.$store.state.sessionData.platform_id,
-          this.$store.state.sessionData.platform,
+          this.$store.state.platform_id,
+          this.$store.state.platform,
           this.$store.state.groupData.input_schema.userType
         )
       ) {
         sendSQSMessage(
           "attendance-sign-up",
-          this.$store.state.sessionData.purpose["sub-type"],
-          this.$store.state.sessionData.platform,
-          this.$store.state.sessionData.platform_id,
+          this.sub_type,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
           this.userData["user_id"],
           "",
           this.$store.state.groupData.name,
@@ -279,6 +302,15 @@ export default {
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
+    },
+
+    /**
+     * Redirects the user to the sign-in page.
+     */
+    redirectToSignIn() {
+      this.$router.push({
+        name: "NewSignin",
+      });
     },
   },
 };

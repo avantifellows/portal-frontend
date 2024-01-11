@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col" v-if="show">
-    <p class="text-md font-semibold">
+  <div v-if="show">
+    <p class="text-base mb-[10px]">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
 
@@ -8,18 +8,25 @@
       type="text"
       :help="helpText"
       v-model="text"
-      :validation="[isRequired ? ['required'] : []]"
-      validation-visibility="dirty"
       :name="dbKey"
       @keypress="isValidTextEntry($event)"
       @input="updateTextEntry($event)"
       ondrop="return false"
       onpaste="return false"
+      :input-class="{
+        'w-full': true,
+      }"
+      :inner-class="{
+        'border py-2 px-2 rounded border-grey overflow-hidden': true,
+      }"
+      :help-class="{
+        'mt-[10px] text-sm text-grey italic': true,
+      }"
     />
 
     <span
       v-if="isInvalidTextEntryMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="text-red text-sm mt-[10px]"
       >{{ invalidTextEntryMessage }}</span
     >
   </div>
@@ -72,18 +79,6 @@ export default {
     },
   },
   methods: {
-    /**
-     * Generates the CSS classes for the input box based on the state of the text entry.
-     * @returns {string[]} An array of CSS classes.
-     */
-    selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidTextEntryMessage,
-        },
-      ];
-    },
-
     /**
      * Updates the text value based on user entry
      * @param {Event} event - The input event.

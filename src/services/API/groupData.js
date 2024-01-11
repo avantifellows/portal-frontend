@@ -40,4 +40,24 @@ export default {
         });
     });
   },
+  /**
+   * Returns name of a group associated with a session
+   * @param {String} sessionId - ID of the session whose group name needs to be returned
+   */
+  getNewGroupData(group) {
+    const params = {
+      name: group,
+    };
+    return new Promise((resolve) => {
+      dbClient
+        .get("/group/", { params })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("Group API returned an error:", error);
+        });
+    });
+  },
 };

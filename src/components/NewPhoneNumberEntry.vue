@@ -1,24 +1,33 @@
 <template>
-  <div class="flex flex-col" v-if="show">
-    <p class="text-left text-md font-semibold">
+  <div class="" v-if="show">
+    <p class="text-base mb-[10px] text-left">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
     <FormKit
       type="tel"
       placeholder="xxxxxxxxxx"
-      :validation="[isRequired ? ['required'] : []]"
-      validation-visibility="dirty"
       v-model="phoneNumber"
       @keypress="isValidPhoneNumberEntry($event)"
       @input="updatePhoneNumberEntry($event)"
       ondrop="return false"
       onpaste="return false"
       :help="helpText"
+      :wrapper-class="{
+        'mx-auto': true,
+      }"
+      :inner-class="{
+        'border py-2 px-2 rounded mx-auto': true,
+        'border-red': this.invalid,
+        'border-grey': !this.invalid,
+      }"
+      :help-class="{
+        'mt-[10px] text-sm text-grey italic': true,
+      }"
     />
 
     <span
       v-if="isInvalidPhoneNumberMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
+      class="text-red text-sm text-center mt-[10px]"
       >{{ invalidPhoneNumberMessage }}</span
     >
   </div>
@@ -54,6 +63,10 @@ export default {
       type: String,
       default: "",
     },
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -81,18 +94,6 @@ export default {
     },
   },
   methods: {
-    /**
-     * Generates the CSS classes for the input box based on the state of the phone number entry.
-     * @returns {string[]} An array of CSS classes.
-     */
-    selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidPhoneNumberMessage,
-        },
-      ];
-    },
-
     /**
      * Updates the phone number value based on user entry
      * @param {Event} event - The input event.

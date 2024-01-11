@@ -8,13 +8,20 @@ module.exports = {
       lg: "1024px",
       xl: "1280px",
     },
+    fontSize: {
+      base: "14px",
+      sm: "12px",
+    },
     extend: {
+      fontFamily: {
+        roboto: ["Roboto"],
+      },
       colors: {
-        primary: "#F78000",
-        "primary-hover": "#db7506",
-        peach: "#F4EAE1",
-        "peach-light": "#FFF6EF",
-        "peach-hover": "#FFE0B2",
+        primary: "#008181",
+        "primary-hover": "#A6D3D3",
+        grey: "#787878",
+        black: "#000000",
+        red: "#B3261E",
       },
     },
   },

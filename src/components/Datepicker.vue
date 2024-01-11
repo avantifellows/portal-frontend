@@ -1,20 +1,23 @@
 <template>
-  <div class="flex flex-col justify-center" v-if="show">
-    <p class="text-md font-semibold">
+  <div v-if="show">
+    <p class="text-base mb-[10px]">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
-      <FormKit
-        type="date"
-        :name="dbKey"
-        :validation="[
-          isRequired ? ['required'] : [],
-          ['date_after', '1990'],
-          ['date_before', '2020'],
-        ]"
-        v-model="date"
-        validation-visibility="dirty"
-        :help="helpText"
-      />
+    <FormKit
+      type="date"
+      :name="dbKey"
+      v-model="date"
+      :help="helpText"
+      :input-class="{
+        'w-full': true,
+      }"
+      :inner-class="{
+        'border py-2 px-2 rounded border-grey overflow-hidden': true,
+      }"
+      :help-class="{
+        'mt-[10px] text-sm text-grey italic': true,
+      }"
+    />
   </div>
 </template>
 <script>

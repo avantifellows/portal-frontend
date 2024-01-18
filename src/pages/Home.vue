@@ -441,9 +441,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      console.log(this.sessionId, this.sessionId.startsWith("EnableStudents"));
       if (this.sessionId.startsWith("EnableStudents")) {
-        console.log(this.sessionId);
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
@@ -455,86 +453,86 @@ export default {
       }
 
       /** SessionId does not exist */
-      // if (Object.keys(this.sessionData).length == 0) {
-      //   this.$router.push({
-      //     name: "Error",
-      //     params: {
-      //       text: "There is no session scheduled with this ID. Please contact your Program Manager.",
-      //     },
-      //   });
-      // }
+      if (Object.keys(this.sessionData).length == 0) {
+        this.$router.push({
+          name: "Error",
+          params: {
+            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
+          },
+        });
+      }
 
       /** Session API returns an error*/
-      // if (this.sessionData.error) {
-      //   this.toast.error("Network Error, please try again!", {
-      //     position: "top-center",
-      //     timeout: false,
-      //     closeOnClick: false,
-      //     draggable: false,
-      //     closeButton: false,
-      //   });
-      // } else {
-      //   /** Store session data retrieved by API and set sessionEnabled */
-      //   this.toast.clear();
-      //   this.$store.dispatch("setSessionData", this.sessionData);
-
-      //   if (this.oldFlow) {
-      //     if ("sessionActive" in this.sessionData) {
-      //       this.sessionEnabled = this.sessionData.sessionActive;
-      //     }
-      //   } else {
-      //     if ("is_session_open" in this.sessionData) {
-      //       this.sessionEnabled = this.sessionData.is_session_open;
-      //     }
-      //   }
-      // }
-
-      /** If session is open, retrieve group data and store it */
-      //   if (!this.sessionData.error && this.sessionEnabled) {
-      //     if (!this.oldFlow) {
-      //       this.groupData = await groupAPIService.getGroupName(
-      //         this.sessionData.id
-      //       );
-      //     } else {
-      //       this.groupData = await groupAPIService.getGroupData(
-      //         this.sessionData.group
-      //       );
-      //     }
-      //     this.$store.dispatch("setGroupData", this.groupData);
-      //     if (!this.sessionData.error && this.groupData && this.groupData.error) {
-      //       /** Group API returns an error*/
-      //       this.toast.error("Network Error, please try again!", {
-      //         position: "top-center",
-      //         timeout: false,
-      //         closeOnClick: false,
-      //         draggable: false,
-      //         closeButton: false,
-      //       });
-      //     }
-      //   }
-      // } else {
-      //   if (this.platform == "gurukul") {
-      //     this.oldFlow = false;
-      //   }
-      //   /**
-      //    * If sessionId does not exist in route, then retrieve group data directly
-      //    */
-      //   if (!this.oldFlow) {
-      //     this.groupData = await groupAPIService.getNewGroupData(this.group);
-      //   } else {
-      //     this.groupData = await groupAPIService.getGroupData(this.getGroup);
-      //   }
-      //   this.$store.dispatch("setGroupData", this.groupData);
-      //if (this.groupData && this.groupData.error) {
-      /** Group API returns an error*/
-      /** this.toast.error("Network Error, please try again!", {
+      if (this.sessionData.error) {
+        this.toast.error("Network Error, please try again!", {
           position: "top-center",
           timeout: false,
           closeOnClick: false,
           draggable: false,
           closeButton: false,
         });
-      } */
+      } else {
+        /** Store session data retrieved by API and set sessionEnabled */
+        this.toast.clear();
+        this.$store.dispatch("setSessionData", this.sessionData);
+
+        if (this.oldFlow) {
+          if ("sessionActive" in this.sessionData) {
+            this.sessionEnabled = this.sessionData.sessionActive;
+          }
+        } else {
+          if ("is_session_open" in this.sessionData) {
+            this.sessionEnabled = this.sessionData.is_session_open;
+          }
+        }
+      }
+
+      /** If session is open, retrieve group data and store it */
+      if (!this.sessionData.error && this.sessionEnabled) {
+        if (!this.oldFlow) {
+          this.groupData = await groupAPIService.getGroupName(
+            this.sessionData.id
+          );
+        } else {
+          this.groupData = await groupAPIService.getGroupData(
+            this.sessionData.group
+          );
+        }
+        this.$store.dispatch("setGroupData", this.groupData);
+        if (!this.sessionData.error && this.groupData && this.groupData.error) {
+          /** Group API returns an error*/
+          this.toast.error("Network Error, please try again!", {
+            position: "top-center",
+            timeout: false,
+            closeOnClick: false,
+            draggable: false,
+            closeButton: false,
+          });
+        }
+      }
+    } else {
+      if (this.platform == "gurukul") {
+        this.oldFlow = false;
+      }
+      /**
+       * If sessionId does not exist in route, then retrieve group data directly
+       */
+      if (!this.oldFlow) {
+        this.groupData = await groupAPIService.getNewGroupData(this.group);
+      } else {
+        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      }
+      this.$store.dispatch("setGroupData", this.groupData);
+      if (this.groupData && this.groupData.error) {
+        /** Group API returns an error*/
+        this.toast.error("Network Error, please try again!", {
+          position: "top-center",
+          timeout: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+        });
+      }
     }
     this.isLoading = false;
     this.isIdGenerationEnabled;

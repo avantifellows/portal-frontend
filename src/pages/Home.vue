@@ -441,7 +441,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      console.log(this.sessionId, this.sessionId.startsWith("EnableStudents"))
+      console.log(this.sessionId, this.sessionId.startsWith("EnableStudents"));
       if (this.sessionId.startsWith("EnableStudents")) {
         console.log(this.sessionId);
         this.oldFlow = false;
@@ -490,44 +490,44 @@ export default {
       }
 
       /** If session is open, retrieve group data and store it */
-      if (!this.sessionData.error && this.sessionEnabled) {
-        if (!this.oldFlow) {
-          this.groupData = await groupAPIService.getGroupName(
-            this.sessionData.id
-          );
-        } else {
-          this.groupData = await groupAPIService.getGroupData(
-            this.sessionData.group
-          );
-        }
-        this.$store.dispatch("setGroupData", this.groupData);
-        if (!this.sessionData.error && this.groupData && this.groupData.error) {
-          /** Group API returns an error*/
-          this.toast.error("Network Error, please try again!", {
-            position: "top-center",
-            timeout: false,
-            closeOnClick: false,
-            draggable: false,
-            closeButton: false,
-          });
-        }
-      }
-    } else {
-      if (this.platform == "gurukul") {
-        this.oldFlow = false;
-      }
-      /**
-       * If sessionId does not exist in route, then retrieve group data directly
-       */
-      if (!this.oldFlow) {
-        this.groupData = await groupAPIService.getNewGroupData(this.group);
-      } else {
-        this.groupData = await groupAPIService.getGroupData(this.getGroup);
-      }
-      this.$store.dispatch("setGroupData", this.groupData);
+      //   if (!this.sessionData.error && this.sessionEnabled) {
+      //     if (!this.oldFlow) {
+      //       this.groupData = await groupAPIService.getGroupName(
+      //         this.sessionData.id
+      //       );
+      //     } else {
+      //       this.groupData = await groupAPIService.getGroupData(
+      //         this.sessionData.group
+      //       );
+      //     }
+      //     this.$store.dispatch("setGroupData", this.groupData);
+      //     if (!this.sessionData.error && this.groupData && this.groupData.error) {
+      //       /** Group API returns an error*/
+      //       this.toast.error("Network Error, please try again!", {
+      //         position: "top-center",
+      //         timeout: false,
+      //         closeOnClick: false,
+      //         draggable: false,
+      //         closeButton: false,
+      //       });
+      //     }
+      //   }
+      // } else {
+      //   if (this.platform == "gurukul") {
+      //     this.oldFlow = false;
+      //   }
+      //   /**
+      //    * If sessionId does not exist in route, then retrieve group data directly
+      //    */
+      //   if (!this.oldFlow) {
+      //     this.groupData = await groupAPIService.getNewGroupData(this.group);
+      //   } else {
+      //     this.groupData = await groupAPIService.getGroupData(this.getGroup);
+      //   }
+      //   this.$store.dispatch("setGroupData", this.groupData);
       //if (this.groupData && this.groupData.error) {
-        /** Group API returns an error*/
-       /** this.toast.error("Network Error, please try again!", {
+      /** Group API returns an error*/
+      /** this.toast.error("Network Error, please try again!", {
           position: "top-center",
           timeout: false,
           closeOnClick: false,

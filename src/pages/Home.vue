@@ -525,16 +525,16 @@ export default {
         this.groupData = await groupAPIService.getGroupData(this.getGroup);
       }
       this.$store.dispatch("setGroupData", this.groupData);
-      if (this.groupData && this.groupData.error) {
+      //if (this.groupData && this.groupData.error) {
         /** Group API returns an error*/
-        this.toast.error("Network Error, please try again!", {
+       /** this.toast.error("Network Error, please try again!", {
           position: "top-center",
           timeout: false,
           closeOnClick: false,
           draggable: false,
           closeButton: false,
         });
-      }
+      } */
     }
     this.isLoading = false;
     this.isIdGenerationEnabled;

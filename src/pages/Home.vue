@@ -437,12 +437,11 @@ export default {
   },
   async created() {
     this.$store.dispatch("setLocale", "en");
-
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId.startsWith("HaryanaStudents")) {
+      if (this.sessionId.startsWith("EnableStudents")) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId

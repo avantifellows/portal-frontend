@@ -193,21 +193,21 @@ export default {
         let showBasedOnCondition = fieldAttributes.showBasedOnCondition;
 
         if (fieldAttributes.showBasedOn != "") {
-          if (showBasedOnCondition == "IS") {
-            if (
-              this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-              Object.values(JSON.parse(showBasedOn))
-            ) {
-              fieldAttributes["show"] = true;
-            } else fieldAttributes["show"] = false;
-          } else if (showBasedOnCondition == "IS NOT") {
-            if (
-              Object.keys(JSON.parse(showBasedOn)) in this.userData &&
-              this.userData[Object.keys(JSON.parse(showBasedOn))] !=
-                Object.values(JSON.parse(showBasedOn))
-            ) {
-              fieldAttributes["show"] = true;
-            } else fieldAttributes["show"] = false;
+          if (
+            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
+            Object.values(JSON.parse(showBasedOn))
+          ) {
+            fieldAttributes["show"] = true;
+          } else fieldAttributes["show"] = false;
+        }
+        if (fieldAttributes.dependant) {
+          if (
+            fieldAttributes.dependantField in this.userData &&
+            this.userData[fieldAttributes.dependantField] != ""
+          ) {
+            fieldAttributes["show"] = true;
+          } else {
+            fieldAttributes["show"] = false;
           }
         }
       });

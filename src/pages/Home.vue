@@ -455,14 +455,14 @@ export default {
       }
 
       /** SessionId does not exist */
-      if (Object.keys(this.sessionData).length == 0) {
-        this.$router.push({
-          name: "Error",
-          params: {
-            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
-          },
-        });
-      }
+      // if (Object.keys(this.sessionData).length == 0) {
+      //   this.$router.push({
+      //     name: "Error",
+      //     params: {
+      //       text: "There is no session scheduled with this ID. Please contact your Program Manager.",
+      //     },
+      //   });
+      // }
 
       /** Session API returns an error*/
       if (this.sessionData.error) {

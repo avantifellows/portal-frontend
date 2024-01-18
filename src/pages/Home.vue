@@ -441,6 +441,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
+      console.log(this.sessionId, this.sessionId.startsWith("EnableStudents"))
       if (this.sessionId.startsWith("EnableStudents")) {
         console.log(this.sessionId);
         this.oldFlow = false;

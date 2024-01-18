@@ -442,6 +442,7 @@ export default {
      */
     if (this.sessionId != "") {
       if (this.sessionId.startsWith("EnableStudents")) {
+        console.log(this.sessionId);
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId

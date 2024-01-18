@@ -465,29 +465,29 @@ export default {
       // }
 
       /** Session API returns an error*/
-      if (this.sessionData.error) {
-        this.toast.error("Network Error, please try again!", {
-          position: "top-center",
-          timeout: false,
-          closeOnClick: false,
-          draggable: false,
-          closeButton: false,
-        });
-      } else {
-        /** Store session data retrieved by API and set sessionEnabled */
-        this.toast.clear();
-        this.$store.dispatch("setSessionData", this.sessionData);
+      // if (this.sessionData.error) {
+      //   this.toast.error("Network Error, please try again!", {
+      //     position: "top-center",
+      //     timeout: false,
+      //     closeOnClick: false,
+      //     draggable: false,
+      //     closeButton: false,
+      //   });
+      // } else {
+      //   /** Store session data retrieved by API and set sessionEnabled */
+      //   this.toast.clear();
+      //   this.$store.dispatch("setSessionData", this.sessionData);
 
-        if (this.oldFlow) {
-          if ("sessionActive" in this.sessionData) {
-            this.sessionEnabled = this.sessionData.sessionActive;
-          }
-        } else {
-          if ("is_session_open" in this.sessionData) {
-            this.sessionEnabled = this.sessionData.is_session_open;
-          }
-        }
-      }
+      //   if (this.oldFlow) {
+      //     if ("sessionActive" in this.sessionData) {
+      //       this.sessionEnabled = this.sessionData.sessionActive;
+      //     }
+      //   } else {
+      //     if ("is_session_open" in this.sessionData) {
+      //       this.sessionEnabled = this.sessionData.is_session_open;
+      //     }
+      //   }
+      // }
 
       /** If session is open, retrieve group data and store it */
       //   if (!this.sessionData.error && this.sessionEnabled) {

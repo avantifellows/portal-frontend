@@ -19,7 +19,7 @@
     <div
       v-for="(authType, index) in auth_type"
       :key="`id-${index}`"
-      class="mx-auto"
+      class="mx-auto w-56 my-2"
     >
       <NumberEntry
         v-if="isEntryNumber(authType)"

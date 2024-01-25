@@ -69,6 +69,7 @@ import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
 import LocalePicker from "@/components/LocalePicker.vue";
+import TokenAPI from "@/services/API/token";
 
 import useAssets from "@/assets/assets.js";
 
@@ -437,6 +438,7 @@ export default {
   },
   async created() {
     this.$store.dispatch("setLocale", "en");
+    let token_verified = await TokenAPI.verifyToken();
 
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.

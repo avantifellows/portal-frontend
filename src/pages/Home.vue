@@ -539,8 +539,9 @@ export default {
       }
     }
     let [token_verified, user_id] = await TokenAPI.verifyToken(this.group);
-    console.log(token_verified, user_id);
+
     if (token_verified) {
+      console.log("here");
       if (
         redirectToDestination(
           this.sub_type,
@@ -563,12 +564,14 @@ export default {
             "session_id" in this.$store.state.sessionData
             ? this.$store.state.sessionData.session_id
             : "",
+          "sessionData" in this.$store.state &&
+            "meta_data" in this.$store.state.sessionData &&
+            "batch" in this.$store.state.sessionData.meta_data
+            ? this.$store.state.sessionData.meta_data.batch
+            : "",
+          "", //phone number
           "",
-          "phone" in this.userInformation ? this.userInformation["phone"] : "",
-          this.getBatch,
-          "date_of_birth" in this.userInformation
-            ? this.userInformation["date_of_birth"]
-            : ""
+          "" // date of birth
         );
       }
     }

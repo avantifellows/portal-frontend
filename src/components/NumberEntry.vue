@@ -8,8 +8,6 @@
       v-model="number"
       :help="helpText"
       :name="dbKey"
-      ondrop="return false"
-      onpaste="return false"
       @keypress="isValidNumberEntry($event)"
       @input="updateNumberEntry($event)"
       :wrapper-class="{

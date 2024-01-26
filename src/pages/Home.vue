@@ -70,6 +70,8 @@ import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
 import LocalePicker from "@/components/LocalePicker.vue";
 import TokenAPI from "@/services/API/token";
+import { redirectToDestination } from "@/services/redirectToDestination";
+import { sendSQSMessage } from "@/services/API/sqs";
 
 import useAssets from "@/assets/assets.js";
 
@@ -438,7 +440,6 @@ export default {
   },
   async created() {
     this.$store.dispatch("setLocale", "en");
-    let token_verified = await TokenAPI.verifyToken();
 
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
@@ -535,6 +536,40 @@ export default {
           draggable: false,
           closeButton: false,
         });
+      }
+    }
+    let [token_verified, user_id] = await TokenAPI.verifyToken(this.group);
+    console.log(token_verified, user_id);
+    if (token_verified) {
+      if (
+        redirectToDestination(
+          this.sub_type,
+          user_id,
+          this.$store.state.platform_id,
+          this.$store.state.platform,
+          this.$store.state.groupData.input_schema.userType
+        )
+      ) {
+        sendSQSMessage(
+          "sign-in",
+          this.sub_type,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
+          user_id,
+          this.auth_type.toString(),
+          this.$store.state.groupData.name,
+          this.$store.state.groupData.input_schema.userType,
+          "sessionData" in this.$store.state &&
+            "session_id" in this.$store.state.sessionData
+            ? this.$store.state.sessionData.session_id
+            : "",
+          "",
+          "phone" in this.userInformation ? this.userInformation["phone"] : "",
+          this.getBatch,
+          "date_of_birth" in this.userInformation
+            ? this.userInformation["date_of_birth"]
+            : ""
+        );
       }
     }
     this.isLoading = false;

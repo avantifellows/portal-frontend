@@ -6,11 +6,12 @@ import {
 } from "./endpoints";
 
 export default {
-  async createAccessToken(id) {
+  async createAccessToken(id, group) {
     const params = {
       type: "user",
       is_user_valid: true,
       id: id,
+      data: { group: group },
     };
     return new Promise((resolve) => {
       dbClient
@@ -26,7 +27,7 @@ export default {
     });
   },
 
-  async refreshToken(refresh_token) {
+  async refreshToken(refresh_token, group) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -36,20 +37,20 @@ export default {
             headers: { Authorization: `Bearer ${refresh_token}` },
           }
         )
-        .then((response) => {
+        .then(async (response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
           document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-          resolve(true);
+          await this.verifyToken(group);
         })
         .catch(() => {
-          resolve(false);
+          resolve({ error: error });
+          throw new Error("Token API returned an error:", error);
         });
     });
   },
 
-  async verifyToken() {
-    console.log(document.cookie);
-    if (decodeURIComponent(document.cookie) == "") return false;
+  async verifyToken(group) {
+    if (decodeURIComponent(document.cookie) == "") return [false, ""];
     let cookies = decodeURIComponent(document.cookie).split(";");
     let access_token = cookies[0].split("=")[1];
     let refresh_token = cookies[1].split("=")[1];
@@ -60,19 +61,16 @@ export default {
           headers: { Authorization: `Bearer ${access_token}` },
         })
         .then((response) => {
-          console.log(response);
-          resolve(true);
+          resolve([response.data.data.group == group, response.data.id]);
         })
         .catch(async (error) => {
           if (
             error.response.status == 422 &&
             error.response.data.detail == "Signature has expired"
           ) {
-            if (await this.refreshToken(refresh_token)) {
-              resolve(true);
-            }
+            await this.refreshToken(refresh_token, group);
           }
-          resolve(false);
+          resolve([false, ""]);
         });
     });
   },

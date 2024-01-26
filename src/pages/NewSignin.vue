@@ -348,7 +348,10 @@ export default {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
-        TokenAPI.createAccessToken(this.userInformation["student_id"]);
+        TokenAPI.createAccessToken(
+          this.userInformation["student_id"],
+          this.$store.state.groupData.name
+        );
 
         if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);

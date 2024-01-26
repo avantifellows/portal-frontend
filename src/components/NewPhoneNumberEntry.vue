@@ -9,8 +9,6 @@
       v-model="phoneNumber"
       @keypress="isValidPhoneNumberEntry($event)"
       @input="updatePhoneNumberEntry($event)"
-      ondrop="return false"
-      onpaste="return false"
       :help="helpText"
       :wrapper-class="{
         'mx-auto': true,

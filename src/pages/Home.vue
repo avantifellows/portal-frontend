@@ -442,7 +442,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId == 'Test') {
+      if (this.sessionId == "Test") {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
@@ -475,6 +475,7 @@ export default {
       } else {
         /** Store session data retrieved by API and set sessionEnabled */
         this.toast.clear();
+        this.sessionData["sessionId"] = this.sessionId;
         this.$store.dispatch("setSessionData", this.sessionData);
 
         if (this.oldFlow) {
@@ -535,6 +536,7 @@ export default {
         });
       }
     }
+
     this.isLoading = false;
     this.isIdGenerationEnabled;
     this.isRedirectionEnabled;

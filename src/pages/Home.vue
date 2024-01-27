@@ -538,7 +538,7 @@ export default {
         });
       }
     }
-    let [token_verified, user_id] = await TokenAPI.verifyToken(this.group);
+    let [token_verified, user_id] = await TokenAPI.checkForTokens(this.group);
 
     if (token_verified) {
       console.log("here");

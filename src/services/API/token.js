@@ -30,6 +30,9 @@ export default {
         .then((response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
           document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+
+          document.cookie = `access_token=${response.data.access_token}; Domain=localhost; Path=/; SameSite=None; Secure`;
+          document.cookie = `refresh_token=${response.data.refresh_token}; Domain=localhost; Path=/; SameSite=None; Secure`;
         })
         .catch((error) => {
           resolve({ error: error });
@@ -48,7 +51,7 @@ export default {
    *
    * @throws {Error} Throws an error if the Token API returns an error during the refresh process.
    */
-  async refreshToken(refresh_token) {
+  async refreshToken(refresh_token, group) {
     return new Promise((resolve) => {
       dbClient
         .post(
@@ -60,11 +63,14 @@ export default {
         )
         .then(async (response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-          document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-
-          return;
+          document.cookie = `access_token=${response.data.access_token}; Domain=localhost; Path=/; SameSite=None; Secure`;
+          await this.verifyToken(
+            response.data.access_token,
+            refresh_token,
+            group
+          );
         })
-        .catch(() => {
+        .catch((error) => {
           resolve({ error: error });
           throw new Error("Token API returned an error:", error);
         });
@@ -84,19 +90,15 @@ export default {
    *
    * @throws {Error} Throws an error if the Token API returns an error during the verification process.
    */
-  async verifyToken(group) {
-    if (decodeURIComponent(document.cookie) == "") return [false, ""];
-
-    let cookies = decodeURIComponent(document.cookie).split(";");
-    let access_token = cookies[0].split("=")[1];
-    let refresh_token = cookies[1].split("=")[1];
-
+  async verifyToken(access_token, refresh_token, group) {
+    console.log("verification");
     return new Promise((resolve) => {
       dbClient
         .get(verifyTokenEndpoint, {
           headers: { Authorization: `Bearer ${access_token}` },
         })
         .then((response) => {
+          console.log(response);
           resolve([response.data.data.group == group, response.data.id]);
         })
         .catch(async (error) => {
@@ -104,11 +106,27 @@ export default {
             error.response.status == 422 &&
             error.response.data.detail == "Signature has expired"
           ) {
-            await this.refreshToken(refresh_token);
-            await this.verifyToken(group);
+            await this.refreshToken(refresh_token, group);
           }
           resolve([false, ""]);
         });
     });
+  },
+
+  deleteCookie(name) {
+    document.cookie = `${name}=; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+    document.cookie = `${name}=; Domain=localhost; Path=/; SameSite=None; Secure`;
+  },
+  checkForTokens(group) {
+    if (decodeURIComponent(document.cookie) == "") return [false, ""];
+    const cookies = {};
+
+    let document_cookies = decodeURIComponent(document.cookie).split(";");
+    for (let index = 0; index < document_cookies.length; index++) {
+      const cookie = document_cookies[index];
+      let [cookie_name, cookie_value] = cookie.split("=");
+      cookies[cookie_name.trim()] = cookie_value;
+    }
+    this.verifyToken(cookies["access_token"], cookies["refresh_token"], group);
   },
 };

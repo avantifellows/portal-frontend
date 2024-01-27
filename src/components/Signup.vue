@@ -351,7 +351,7 @@ export default {
     };
   },
   created() {
-    if (this.$store.state.sessionData.sessionId == null) {
+    if (this.$store.state.sessionData == null) {
       this.$router.push({ name: "Error" });
     }
   },

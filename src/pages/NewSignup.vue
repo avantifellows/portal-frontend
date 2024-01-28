@@ -66,15 +66,11 @@
     v-if="formSubmitted"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <div class="bg-primary-hover py-10 rounded-md shadow-sm">
-      <p>{{ idGeneratedText }}</p>
-      <!-- <p>
-        <b>Your ID is {{ userData["user_id"] }}</b>
-      </p>
-      <p>
-        Kindly make a note of it. You will need this to log in to all your
-        future sessions.
-      </p> -->
+    <div
+      v-if="userData['user_id'] != '' || userData['user_id'] != undefined"
+      class="bg-primary-hover py-10 rounded-md shadow-sm"
+    >
+      <p v-html="idGeneratedText" />
     </div>
 
     <button
@@ -160,9 +156,9 @@ export default {
     /** Returns text based on locale */
     idGeneratedText() {
       return this.getLocale == "en"
-        ? `Your ID is + this.userData["user_id"]. + <br/> Kindly make a note of it. You will need this to log in to all your
+        ? `Your ID is <b> ${this.userData["user_id"]}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
         future sessions.`
-        : `आपकी आईडी + this.userData["user_id"] +  है + <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
+        : `आपकी आईडी <b> ${this.userData["user_id"]}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
     },
     /** returns title for the form */
     formTitle() {

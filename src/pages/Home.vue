@@ -474,6 +474,7 @@ export default {
       } else {
         /** Store session data retrieved by API and set sessionEnabled */
         this.toast.clear();
+        this.sessionData["sessionId"] = this.sessionId;
         this.$store.dispatch("setSessionData", this.sessionData);
 
         if (this.oldFlow) {
@@ -534,6 +535,7 @@ export default {
         });
       }
     }
+
     this.isLoading = false;
     this.isIdGenerationEnabled;
     this.isRedirectionEnabled;

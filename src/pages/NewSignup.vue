@@ -237,6 +237,10 @@ export default {
           this.formData.attributes[field].required &&
           this.formData.attributes[field].show
         ) {
+          console.log(
+            this.formData.attributes[field].key,
+            this.userData.hasOwnProperty(this.formData.attributes[field].key)
+          );
           isUserDataComplete = false;
         }
       });

@@ -239,7 +239,11 @@ export default {
         ) {
           console.log(
             this.formData.attributes[field].key,
-            this.userData.hasOwnProperty(this.formData.attributes[field].key)
+            this.userData.hasOwnProperty(this.formData.attributes[field].key),
+            this.formData.attributes[field].required,
+            this.formData.attributes[field].show,
+            this.userData[this.formData.attributes[field].key],
+            this.userData[this.formData.attributes[field].key] == ""
           );
           isUserDataComplete = false;
         }

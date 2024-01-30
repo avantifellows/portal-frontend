@@ -67,7 +67,11 @@
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
     <div
-      v-if="userData['user_id'] != '' || userData['user_id'] != undefined"
+      v-if="
+        userData['user_id'] != '' ||
+        userData['user_id'] != undefined ||
+        userData['user_id'] != 'undefined'
+      "
       class="bg-primary-hover py-10 rounded-md shadow-sm"
     >
       <p v-html="idGeneratedText" />
@@ -237,14 +241,6 @@ export default {
           this.formData.attributes[field].required &&
           this.formData.attributes[field].show
         ) {
-          console.log(
-            this.formData.attributes[field].key,
-            this.userData.hasOwnProperty(this.formData.attributes[field].key),
-            this.formData.attributes[field].required,
-            this.formData.attributes[field].show,
-            this.userData[this.formData.attributes[field].key],
-            this.userData[this.formData.attributes[field].key] == ""
-          );
           isUserDataComplete = false;
         }
       });

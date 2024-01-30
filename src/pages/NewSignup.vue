@@ -111,6 +111,7 @@ export default {
     this.formData = await FormSchemaAPI.getFormSchema(
       this.$store.state.sessionData.form_schema_id
     );
+
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];

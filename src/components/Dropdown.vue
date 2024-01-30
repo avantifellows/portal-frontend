@@ -55,6 +55,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    defaultValue: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {

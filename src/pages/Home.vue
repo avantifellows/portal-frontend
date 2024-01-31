@@ -338,7 +338,7 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && this.sessionData.type == "sign-in") ||
-        this.type == "sign-in" ||
+        (this.type == "sign-in" && this.oldFlow == false) ||
         this.purpose == "attendance"
       );
     },
@@ -445,7 +445,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId.startsWith("HaryanaStudents")) {
+      if (this.sessionId == "Test") {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
@@ -478,6 +478,7 @@ export default {
       } else {
         /** Store session data retrieved by API and set sessionEnabled */
         this.toast.clear();
+        this.sessionData["sessionId"] = this.sessionId;
         this.$store.dispatch("setSessionData", this.sessionData);
 
         if (this.oldFlow) {

@@ -10,6 +10,7 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { plugin, defaultConfig } from "@formkit/vue";
 import { createLocalStoragePlugin } from "@formkit/addons";
+import "@formkit/themes/genesis";
 
 const app = createApp(App)
   .component("inline-svg", InlineSvg)

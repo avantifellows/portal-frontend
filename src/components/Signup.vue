@@ -8,7 +8,9 @@
     </div>
   </div>
   <div class="h-full" :class="{ 'opacity-20': isLoading }">
-    <div class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+    <div
+      class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+    >
       <template v-for="(image, index) in getGroupImages" :key="index">
         <img :src="image" />
       </template>
@@ -23,7 +25,10 @@
         />
       </div>
     </template>
-    <div class="flex flex-col items-center justify-center p-10" v-if="!formSubmitted">
+    <div
+      class="flex flex-col items-center justify-center p-10"
+      v-if="!formSubmitted"
+    >
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
@@ -131,16 +136,7 @@
             type="select"
             label="*Region"
             placeholder="Select your region"
-            :options="[
-              'Bhopal',
-              'Chandigarh',
-              'Hyderabad',
-              'Jaipur',
-              'Lucknow',
-              'Patna',
-              'Pune',
-              'Shillong',
-            ]"
+            :options="regionMapping"
             validation="required"
             name="region"
             v-model="region"
@@ -231,6 +227,7 @@
               help="Please enter a valid mobile number. Example: 9848022335"
             />
             <FormKit
+              v-if="isLongForm"
               type="select"
               label="*Aspiring Stream post 10th"
               placeholder="Select your stream"
@@ -245,7 +242,13 @@
                 type="select"
                 label="*Aspiring field"
                 placeholder="Select your field"
-                :options="['Engineering', 'Medical', 'Agriculture', 'NDA', 'Other']"
+                :options="[
+                  'Engineering',
+                  'Medical',
+                  'Agriculture',
+                  'NDA',
+                  'Other',
+                ]"
                 validation="required"
                 v-model="field"
                 name="field"
@@ -340,7 +343,7 @@ export default {
     };
   },
   created() {
-    if (this.$store.state.sessionData.sessionId == null) {
+    if (this.$store.state.sessionData == null) {
       this.$router.push({ name: "Error" });
     }
   },
@@ -355,6 +358,20 @@ export default {
       return this.$store.state.sessionData.sessionId == "JNV10_Form"
         ? ["10"]
         : ["11", "12"];
+    },
+    regionMapping() {
+      return this.$store.state.sessionData.sessionId == "JNV10_Form"
+        ? ["Shillong", "Hyderabad"]
+        : [
+            "Bhopal",
+            "Chandigarh",
+            "Hyderabad",
+            "Jaipur",
+            "Lucknow",
+            "Patna",
+            "Pune",
+            "Shillong",
+          ];
     },
     isLongForm() {
       return this.$store.state.sessionData.isLongForm;
@@ -410,8 +427,7 @@ export default {
             this.$router.push({
               name: "Error",
               state: {
-                text:
-                  "Student ID could not be created. Please contact your program manager.",
+                text: "Student ID could not be created. Please contact your program manager.",
               },
             });
           }

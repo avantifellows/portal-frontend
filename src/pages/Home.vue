@@ -335,7 +335,7 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && this.sessionData.type == "sign-in") ||
-        this.type == "sign-in" ||
+        (this.type == "sign-in" && this.oldFlow == false) ||
         this.purpose == "attendance"
       );
     },

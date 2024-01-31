@@ -136,16 +136,7 @@
             type="select"
             label="*Region"
             placeholder="Select your region"
-            :options="[
-              'Bhopal',
-              'Chandigarh',
-              'Hyderabad',
-              'Jaipur',
-              'Lucknow',
-              'Patna',
-              'Pune',
-              'Shillong',
-            ]"
+            :options="regionMapping"
             validation="required"
             name="region"
             v-model="region"
@@ -236,6 +227,7 @@
               help="Please enter a valid mobile number. Example: 9848022335"
             />
             <FormKit
+              v-if="isLongForm"
               type="select"
               label="*Aspiring Stream post 10th"
               placeholder="Select your stream"
@@ -366,6 +358,20 @@ export default {
       return this.$store.state.sessionData.sessionId == "JNV10_Form"
         ? ["10"]
         : ["11", "12"];
+    },
+    regionMapping() {
+      return this.$store.state.sessionData.sessionId == "JNV10_Form"
+        ? ["Shillong", "Hyderabad"]
+        : [
+            "Bhopal",
+            "Chandigarh",
+            "Hyderabad",
+            "Jaipur",
+            "Lucknow",
+            "Patna",
+            "Pune",
+            "Shillong",
+          ];
     },
     isLongForm() {
       return this.$store.state.sessionData.isLongForm;

@@ -361,7 +361,7 @@ export default {
     },
     regionMapping() {
       return this.$store.state.sessionData.sessionId == "JNV10_Form"
-        ? ["Shillong", "Hyderabad"]
+        ? ["Shillong", "Hyderabad", "Pune"]
         : [
             "Bhopal",
             "Chandigarh",

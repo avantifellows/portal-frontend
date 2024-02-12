@@ -44,10 +44,18 @@
       label="*College/University"
       placeholder="Select your college/university"
       :options="[
-        'NIT Warangal',
-        'NIT Rourkela',
-        'NITK Surathkal',
         'Central University of Kerala',
+        'Delhi University',
+        'NIT Delhi',
+        'NIT Hamirpur',
+        'NIT Jalandhar',
+        'NIT Kurukshetra',
+        'NIT Rourkela',
+        'NIT Srinagar',
+        'NITK Surathkal',
+        'NIT Trichy',
+        'NIT Uttarakhand',
+        'NIT Warangal'
       ]"
       validation="required"
       name="college"

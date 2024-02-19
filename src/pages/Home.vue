@@ -53,7 +53,8 @@
       </div>
 
       <div v-if="isPurposeRegistration && !isTypeSignIn && !isTypeSignUp">
-        <Signup />
+        <div v-if="sessionId == 'HimachalSelection'"><HimachalSignup /></div>
+        <div v-else><Signup /></div>
       </div>
     </div>
   </div>
@@ -69,6 +70,7 @@ import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
 import LocalePicker from "@/components/LocalePicker.vue";
+import HimachalSignup from "@/components/HimachalSignup.vue";
 
 import useAssets from "@/assets/assets.js";
 
@@ -89,6 +91,7 @@ export default {
     Entry,
     Signup,
     LocalePicker,
+    HimachalSignup,
   },
   props: {
     /** The resource we are redirecting to.

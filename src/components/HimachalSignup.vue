@@ -108,6 +108,7 @@
           label="*Gender"
           placeholder="Select your gender"
           :options="['Female', 'Male', 'Other']"
+          v-model="gender"
           validation="required"
           name="gender"
         />
@@ -119,6 +120,7 @@
           :options="['Gen', 'Gen-EWS', 'OBC', 'SC', 'ST']"
           validation="required"
           name="category"
+          v-model="category"
           help="Select your category. Example: OBC"
         />
 
@@ -127,6 +129,7 @@
           label="*Stream"
           placeholder="Select your stream"
           :options="['PCB', 'PCM']"
+          v-model="stream"
           validation="required"
           name="stream"
         />
@@ -137,6 +140,7 @@
           placeholder="Physically handicapped?"
           :options="['Yes', 'No']"
           validation="required"
+          v-model="physically_handicapped"
           name="physically_handicapped"
           help="Please select Yes if you are physically handicapped"
         />
@@ -147,6 +151,7 @@
           validation="required|email"
           validation-visibility="live"
           name="email"
+          v-model="email"
           help="Enter a valid email address if you have one. Example: karn.mathur@gmail.com"
         />
 
@@ -156,6 +161,7 @@
           validation="required|matches:/^[0-9]{10}$/"
           validation-visibility="live"
           name="mobile_number"
+          v-model="mobile_number"
           help="Preferably whatsapp number"
         />
 
@@ -164,6 +170,7 @@
           label="*Parents / Guardian Contact Number"
           validation="required|matches:/^[0-9]{10}$/"
           validation-visibility="live"
+          v-model="parent_mobile_number"
           name="parent_mobile_number"
         />
 
@@ -172,6 +179,7 @@
           label="*Mobile Number of Subject Teacher (Physics or Chemistry or Mathematics)"
           validation="required|matches:/^[0-9]{10}$/"
           validation-visibility="live"
+          v-model="teacher_mobile_number"
           name="teacher_mobile_number"
         />
 
@@ -204,6 +212,7 @@
           validation="required|number"
           validation-visibility="live"
           name="school_code"
+          v-model="school_code"
           help="Ex: 02533 (if you have four or less digits in school id, please put 0 in the beginning.)"
         />
 
@@ -213,6 +222,7 @@
           validation="required|number"
           validation-visibility="live"
           name="school_udise_code"
+          v-model="school_udise_code"
           help="Ex: Please enter UDISE code as mentioned in the given sheet List of school codes"
         />
 
@@ -232,6 +242,7 @@
           validation="required|number"
           validation-visibility="live"
           name="total_marks"
+          v-model="total_marks"
           help="Ex: 81/100"
         />
 
@@ -241,6 +252,7 @@
           validation="required|number"
           validation-visibility="live"
           name="maths_marks"
+          v-model="maths_marks"
           help="Ex: 81/100"
         />
 
@@ -250,6 +262,7 @@
           validation="required|number"
           validation-visibility="live"
           name="science_marks"
+          v-model="science_marks"
           help="Ex: 81/100"
         />
 
@@ -259,6 +272,7 @@
           placeholder="Medium of Language"
           :options="['English', 'Hindi']"
           validation="required"
+          v-model="language_medium"
           name="language_medium"
         />
 
@@ -269,6 +283,7 @@
           placeholder="Student's Choice of Subjects"
           :options="['PCB', 'PCM', 'PCMB']"
           validation="required"
+          v-model="choice_of_subjects"
           name="choice_of_subjects"
           help="Medical | PCB (Physics, Chemistry, Biology) Non-Medical | PCM (Physics, Chemistry, Mathematics) Both | PCMB"
         />
@@ -279,6 +294,7 @@
           placeholder="Enrollment in Other Coaching /  Tuition"
           :options="['Yes', 'No']"
           validation="required"
+          v-model="enrollment_in_tuition"
           name="enrollment_in_tuition"
         />
 
@@ -288,6 +304,7 @@
           placeholder="Area of Interests"
           :options="getAreasOfInterests"
           validation="required"
+          v-model="area_of_interest"
           name="area_of_interest"
         />
 
@@ -307,6 +324,7 @@
             'Diploma course',
           ]"
           validation="required"
+          v-model="father_education_level"
           name="father_education_level"
         />
 
@@ -324,6 +342,7 @@
             'Not applicable/Father passed away',
           ]"
           validation="required"
+          v-model="father_profession"
           name="father_profession"
         />
 
@@ -343,6 +362,7 @@
             'Diploma course',
           ]"
           validation="required"
+          v-model="mother_education_level"
           name="mother_education_level"
         />
 
@@ -360,6 +380,7 @@
             'Not applicable/Mother passed away',
           ]"
           validation="required"
+          v-model="mother_profession"
           name="mother_profession"
         />
 
@@ -381,6 +402,7 @@
             'More than Rs. 100,000',
           ]"
           validation="required"
+          v-model="monthly_family_income"
           name="monthly_family_income"
         />
 
@@ -395,6 +417,7 @@
             'I currently go for in-person (offline) coaching classes to prepare for competitive exams',
           ]"
           validation="required"
+          v-model="goes_for_tuition_or_other_coaching"
           name="goes_for_tuition_or_other_coaching"
         />
       </FormKit>
@@ -404,7 +427,6 @@
 
 <script>
 import "@formkit/themes/genesis";
-import { jnvState, regionState } from "@/services/regionToJnvMapping.js";
 import UserAPI from "@/services/API/user.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { redirectToDestination } from "@/services/redirectToDestination.js";

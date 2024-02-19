@@ -125,6 +125,7 @@
         />
 
         <FormKit
+          v-if="grade == '11'"
           type="select"
           label="*Stream"
           placeholder="Select your stream"

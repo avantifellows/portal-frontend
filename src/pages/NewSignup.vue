@@ -31,13 +31,13 @@
         :show="formField.show"
         :key="index"
         :is="formField.component"
-        :label="formField.label[locale]"
+        :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :options="formField.options[locale]"
+        :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText[locale]"
+        :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
         class="mt-[25px]"
       />
@@ -66,14 +66,15 @@
     v-if="formSubmitted"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <div class="bg-primary-hover py-10 rounded-md shadow-sm">
-      <p>
-        <b>Your ID is {{ userData["user_id"] }}</b>
-      </p>
-      <p>
-        Kindly make a note of it. You will need this to log in to all your
-        future sessions.
-      </p>
+    <div
+      v-if="
+        userData['user_id'] != '' ||
+        userData['user_id'] != undefined ||
+        userData['user_id'] != 'undefined'
+      "
+      class="bg-primary-hover py-10 rounded-md shadow-sm"
+    >
+      <p v-html="idGeneratedText" />
     </div>
 
     <button
@@ -114,6 +115,7 @@ export default {
     this.formData = await FormSchemaAPI.getFormSchema(
       this.$store.state.sessionData.form_schema_id
     );
+
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
@@ -136,7 +138,7 @@ export default {
   computed: {
     /** Returns button text */
     signUpButtonLabel() {
-      return this.locale == "en" ? "Sign Up" : "साइन अप";
+      return this.getLocale == "en" ? "Sign Up" : "साइन अप";
     },
 
     /** Returns button text */
@@ -151,11 +153,18 @@ export default {
 
     /** Returns text based on locale */
     signInText() {
-      return this.locale == "en"
+      return this.getLocale == "en"
         ? "Already Registered? <b> Sign In</b>"
         : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
     },
 
+    /** Returns text based on locale */
+    idGeneratedText() {
+      return this.getLocale == "en"
+        ? `Your ID is <b> ${this.userData["user_id"]}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
+        future sessions.`
+        : `आपकी आईडी <b> ${this.userData["user_id"]}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
+    },
     /** returns title for the form */
     formTitle() {
       return this.formData.name;
@@ -182,6 +191,7 @@ export default {
       return Object.keys(this.formData.attributes).forEach((field) => {
         let fieldAttributes = this.formData.attributes[field];
         let showBasedOn = fieldAttributes.showBasedOn;
+        let showBasedOnCondition = fieldAttributes.showBasedOnCondition;
 
         if (fieldAttributes.showBasedOn != "") {
           if (
@@ -190,6 +200,16 @@ export default {
           ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
+        }
+        if (fieldAttributes.dependant) {
+          if (
+            fieldAttributes.dependantField in this.userData &&
+            this.userData[fieldAttributes.dependantField] != ""
+          ) {
+            fieldAttributes["show"] = true;
+          } else {
+            fieldAttributes["show"] = false;
+          }
         }
       });
     },
@@ -205,9 +225,9 @@ export default {
               fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
-            return fieldAttributes.options[this.locale];
           }
         }
+        return fieldAttributes.options[this.getLocale];
       });
     },
 

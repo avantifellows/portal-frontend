@@ -16,6 +16,7 @@
         :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
+        :defaultValue="formField.defaultValue"
         :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
@@ -129,16 +130,24 @@ export default {
       return Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         let showBasedOn = fieldAttributes.showBasedOn;
+        let showBasedOnCondition = fieldAttributes.showBasedOnCondition;
 
         if (fieldAttributes.showBasedOn != "") {
           if (
             this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-            Object.values(JSON.parse(showBasedOn))[0]
+            Object.values(JSON.parse(showBasedOn))
+          ) {
+            fieldAttributes["show"] = true;
+          } else fieldAttributes["show"] = false;
+        }
+        if (fieldAttributes.dependant) {
+          if (
+            fieldAttributes.dependantField in this.userData &&
+            this.userData[fieldAttributes.dependantField] != ""
           ) {
             fieldAttributes["show"] = true;
           } else {
             fieldAttributes["show"] = false;
-            this.userData[fieldAttributes.key] = "";
           }
         }
       });

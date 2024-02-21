@@ -55,6 +55,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    defaultValue: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -62,9 +66,6 @@ export default {
     };
   },
   watch: {
-    options() {
-      this.value = this.options[0];
-    },
     /**
      * Emits 'update' event whenever the dropdown value is changed
      */

@@ -55,7 +55,10 @@
         'NITK Surathkal',
         'NIT Trichy',
         'NIT Uttarakhand',
-        'NIT Warangal'
+        'NIT Warangal',
+        'IIT Jammu',
+        'Hindu College Delhi',
+        'PEC Chandigarh'
       ]"
       validation="required"
       name="college"

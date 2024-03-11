@@ -441,7 +441,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId.startsWith("EnableStudents")) {
+      if (this.sessionId.startsWith("Test")) {
         this.oldFlow = false;
         this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId

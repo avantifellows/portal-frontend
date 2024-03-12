@@ -58,7 +58,8 @@
         'NIT Warangal',
         'IIT Jammu',
         'Hindu College Delhi',
-        'PEC Chandigarh'
+        'PEC Chandigarh',
+        'Central University of Karnataka'
       ]"
       validation="required"
       name="college"

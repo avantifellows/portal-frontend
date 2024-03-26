@@ -208,7 +208,7 @@ export default {
           this.id,
           this.$store.state.platform_id,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.groupData.input_schema.user_type
         )
       ) {
         sendSQSMessage(
@@ -219,7 +219,7 @@ export default {
           this.id,
           "",
           this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.groupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",

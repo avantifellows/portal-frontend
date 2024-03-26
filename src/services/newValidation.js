@@ -9,6 +9,7 @@ export async function validateUser(
   let user = {};
 
   if (authTypes.includes("ID")) {
+    console.log(userType);
     if (userType == "student") {
       user["isUserIdValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],

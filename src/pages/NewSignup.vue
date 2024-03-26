@@ -113,7 +113,7 @@ export default {
   },
   async created() {
     this.formData = await FormSchemaAPI.getFormSchema(
-      this.$store.state.sessionData.form_schema_id
+      this.$store.state.sessionData.signup_form_id
     );
 
     Object.keys(this.formData.attributes).forEach((field) => {
@@ -264,8 +264,8 @@ export default {
         this.platform_id,
         this.userData["student_id"],
         "", // list of authentication methods
-        this.$store.state.groupData.name,
-        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.authGroupData.name,
+        this.$store.state.authGroupData.input_schema.user_type,
         this.$store.state.sessionData.session_id,
         "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
@@ -278,8 +278,8 @@ export default {
       let createdUserId = await UserAPI.newUserSignup(
         this.userData,
         this.$store.state.id_generation,
-        this.$store.state.groupData.input_schema.userType,
-        this.$store.state.groupData.name
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name
       );
 
       if (createdUserId == "" || createdUserId.error) {
@@ -303,7 +303,7 @@ export default {
           this.userData["user_id"],
           this.$store.state.platform_id,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
         sendSQSMessage(
@@ -313,8 +313,8 @@ export default {
           this.$store.state.platform_id,
           this.userData["user_id"],
           "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",

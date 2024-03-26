@@ -17,6 +17,7 @@ const allowedQueryParams = [
   "redirectTo",
   "redirectID",
   "group",
+  "authGroup",
   "redirectId",
   "authType",
   "session_type",
@@ -35,7 +36,7 @@ const routes = [
     name: "NewHome",
     component: NewHome,
     props: (route) => ({
-      group: route.query.group,
+      authGroup: route.query.group || route.query.authGroup,
       sessionId: route.query.sessionId,
       type: route.query.type || route.query.purpose,
       sub_type: route.query.sub_type || route.query.subPurpose,

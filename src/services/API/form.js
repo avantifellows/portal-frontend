@@ -13,7 +13,7 @@ export default {
           },
         })
         .then((response) => {
-          resolve(response.data[0]);
+          resolve(response.data);
         })
         .catch((error) => {
           resolve({ error: error });

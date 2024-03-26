@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/pages/Home.vue";
+import NewHome from "@/pages/NewHome.vue";
 import Sentry from "@/pages/Sentry.vue";
 import Error from "@/pages/Error.vue";
 import Signup from "@/components/Signup.vue";
@@ -21,8 +21,8 @@ const allowedQueryParams = [
   "authType",
   "session_type",
   "auth_type",
-  "enable_signup",
-  "enable_pop_up_form",
+  "signup_form",
+  "popup_form",
   "id_generation",
   "redirection",
   "platform",
@@ -32,25 +32,23 @@ const allowedQueryParams = [
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "NewHome",
+    component: NewHome,
     props: (route) => ({
-      purpose: route.query.purpose,
-      purposeParams: route.query.subPurpose,
-      redirectTo: route.query.redirectTo,
-      // legacy URLs support redirectID, new URLs must use redirectId
-      redirectId: route.query.redirectID || route.query.redirectId,
       group: route.query.group,
       sessionId: route.query.sessionId,
       type: route.query.type || route.query.purpose,
       sub_type: route.query.sub_type || route.query.subPurpose,
       auth_type: route.query.auth_type,
-      enable_signup: route.query.enable_signup,
-      enable_pop_up_form: route.query.enable_pop_up_form,
+      signup_form: route.query.signup_form,
+      popup_form: route.query.popup_form,
       id_generation: route.query.id_generation,
       redirection: route.query.redirection,
       platform: route.query.platform || route.query.redirectTo,
-      platform_id: route.query.platform_id || route.query.redirectId,
+      platform_id:
+        route.query.platform_id ||
+        route.query.redirectId ||
+        route.query.redirectID,
     }),
   },
   {

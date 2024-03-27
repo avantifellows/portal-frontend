@@ -69,8 +69,8 @@ export default {
     /* Also, maps each field to its input component
     */
     this.formSchemaData = await FormSchemaAPI.getFormFields(
-      this.$store.state.sessionData.number_of_fields_in_pop_form,
-      this.$store.state.groupData.name,
+      this.$store.state.sessionData.meta_data.number_of_fields_in_popup_form,
+      this.$store.state.sessionData.popup_form_id,
       this.id
     );
     if (this.formSchemaData.error) {
@@ -208,18 +208,18 @@ export default {
           this.id,
           this.$store.state.platform_id,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.user_type
+          this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
         sendSQSMessage(
-          "attendance-sign-in",
+          "popup_form",
           this.$store.state.sessionData.purpose["sub-type"],
           this.$store.platform,
           this.$store.platform_id,
           this.id,
           "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.user_type,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",

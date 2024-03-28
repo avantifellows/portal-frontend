@@ -136,12 +136,11 @@ export default {
       return Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         let showBasedOn = fieldAttributes.showBasedOn;
-        let showBasedOnCondition = fieldAttributes.showBasedOnCondition;
 
         if (fieldAttributes.showBasedOn != "") {
           if (
-            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-            Object.values(JSON.parse(showBasedOn))
+            this.userData[showBasedOn.split("==")[0]] ==
+            showBasedOn.split("==")[1]
           ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
@@ -164,6 +163,7 @@ export default {
       Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         if (fieldAttributes.dependant) {
+          console.log(this.userData);
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
               fieldAttributes.dependantFieldMapping[

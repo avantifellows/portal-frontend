@@ -241,6 +241,7 @@ export default {
           this.formData.attributes[field].required &&
           this.formData.attributes[field].show
         ) {
+          console.log(this.userData)
           isUserDataComplete = false;
         }
       });

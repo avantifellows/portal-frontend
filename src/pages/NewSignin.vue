@@ -127,7 +127,6 @@ export default {
   },
   data() {
     return {
-      locale: this.$store.state.locale,
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       invalidLoginMessage: "", // message to display when login is invalid
@@ -156,6 +155,9 @@ export default {
     this.mounted = true;
   },
   computed: {
+    locale() {
+      return this.$store.state.locale;
+    },
     /** Returns button text */
     signInButtonLabel() {
       return this.locale == "en" ? "Sign In" : "साइन इन";

@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <LocalePicker />
+    <LocalePicker :options="getLocaleOptions" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-black font-bold">
         {{ getFormHeading }}
@@ -106,6 +106,12 @@ export default {
     },
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     /** Returns the locale selected by user */
     getLocale() {
       return this.$store.state.locale;

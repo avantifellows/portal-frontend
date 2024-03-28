@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-  <LocalePicker />
+  <LocalePicker :options="getLocaleOptions" />
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
@@ -136,6 +136,12 @@ export default {
     },
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     /** Returns button text */
     signUpButtonLabel() {
       return this.getLocale == "en" ? "Sign Up" : "साइन अप";

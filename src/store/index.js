@@ -7,7 +7,7 @@ let localStorage = new SecureLS({ isCompression: true });
 
 export default createStore({
   state: {
-    groupData: {},
+    authGroupData: {},
     sessionData: {},
     locale: "en",
     id_generation: false,
@@ -17,8 +17,8 @@ export default createStore({
     images: [],
   },
   actions: {
-    setGroupData({ commit }, groupData) {
-      commit("setGroupData", groupData);
+    setAuthGroupData({ commit }, authGroupData) {
+      commit("setAuthGroupData", authGroupData);
     },
     setSessionData({ commit }, sessionData) {
       commit("setSessionData", sessionData);
@@ -43,8 +43,8 @@ export default createStore({
     },
   },
   mutations: {
-    setGroupData(state, groupData) {
-      state.groupData = Object.assign({}, groupData);
+    setAuthGroupData(state, authGroupData) {
+      state.authGroupData = Object.assign({}, authGroupData);
     },
     setSessionData(state, sessionData) {
       state.sessionData = Object.assign({}, sessionData);

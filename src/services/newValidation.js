@@ -4,7 +4,7 @@ export async function validateUser(
   authTypes,
   userInformation,
   userType,
-  groupId
+  authGroupId
 ) {
   let user = {};
 
@@ -12,7 +12,7 @@ export async function validateUser(
     if (userType == "student") {
       user["isUserIdValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
-        group_id: groupId,
+        auth_group_id: authGroupId,
       });
     }
     if (userType == "teacher") {
@@ -26,7 +26,7 @@ export async function validateUser(
       user["isDateOfBirthValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
         date_of_birth: userInformation["date_of_birth"],
-        group_id: groupId,
+        auth_group_id: authGroupId,
       });
     }
   }
@@ -35,7 +35,7 @@ export async function validateUser(
       user["isPhoneNumberValid"] = await userAPI.verifyStudent({
         student_id: userInformation["student_id"],
         phone: userInformation["phone"],
-        group_id: groupId,
+        auth_group_id: authGroupId,
       });
     }
   }

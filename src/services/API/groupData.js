@@ -27,7 +27,7 @@ export default {
    * Returns name of a group associated with a session
    * @param {String} sessionId - ID of the session whose group name needs to be returned
    */
-  getGroupName(sessionId) {
+  getAuthGroupName(sessionId) {
     return new Promise((resolve) => {
       dbClient
         .get("/session-group/" + sessionId)
@@ -36,7 +36,7 @@ export default {
         })
         .catch((error) => {
           resolve({ error: error });
-          throw new Error("Group API returned an error:", error);
+          throw new Error("Session Group API returned an error:", error);
         });
     });
   },
@@ -44,19 +44,19 @@ export default {
    * Returns name of a group associated with a session
    * @param {String} sessionId - ID of the session whose group name needs to be returned
    */
-  getNewGroupData(group) {
+  getAuthGroupData(authGroup) {
     const params = {
-      name: group,
+      name: authGroup,
     };
     return new Promise((resolve) => {
       dbClient
-        .get("/group/", { params })
+        .get("/auth-group/", { params })
         .then((response) => {
           resolve(response.data);
         })
         .catch((error) => {
           resolve({ error: error });
-          throw new Error("Group API returned an error:", error);
+          throw new Error("Auth Group API returned an error:", error);
         });
     });
   },

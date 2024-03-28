@@ -247,7 +247,7 @@ export default {
           this.formData.attributes[field].required &&
           this.formData.attributes[field].show
         ) {
-          console.log(this.userData)
+          console.log(this.userData);
           isUserDataComplete = false;
         }
       });
@@ -259,7 +259,7 @@ export default {
 
     /** updates user data based on user input */
     updateUserData(value, key) {
-      console.log(value, key)
+      console.log(value, key);
       this.userData[key] = value;
     },
 
@@ -336,9 +336,7 @@ export default {
      * Redirects the user to the sign-in page.
      */
     redirectToSignIn() {
-      this.$router.push({
-        name: "NewSignin",
-      });
+      this.$router.go(-1);
     },
   },
 };

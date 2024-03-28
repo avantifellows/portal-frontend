@@ -253,6 +253,7 @@ export default {
 
     /** updates user data based on user input */
     updateUserData(value, key) {
+      console.log(value, key)
       this.userData[key] = value;
     },
 

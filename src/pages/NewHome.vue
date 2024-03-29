@@ -291,6 +291,12 @@ export default {
         this.sessionId == ""
       );
     },
+    setAuthGroupImages() {
+      this.$store.dispatch(
+        "setImages",
+        this.authGroupData && this.authGroupData.input_schema.images.split(",")
+      );
+    },
   },
   async created() {
     this.$store.dispatch("setLocale", "en");
@@ -376,7 +382,7 @@ export default {
     this.isRedirectionEnabled;
     this.setPlatform;
     this.setPlatformId;
-    this.getAuthGroupImages;
+    this.setAuthGroupImages;
   },
 };
 </script>

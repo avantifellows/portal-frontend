@@ -3,31 +3,23 @@
     <p class="text-base mb-[10px] text-left">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
-    <FormKit
+    <input
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
+      :class="invalid ? 'border-red' : 'border-grey'"
       type="tel"
       placeholder="xxxxxxxxxx"
       v-model="phoneNumber"
       @keypress="isValidPhoneNumberEntry($event)"
       @input="updatePhoneNumberEntry($event)"
-      :help="helpText"
-      :wrapper-class="{
-        'mx-auto': true,
-      }"
-      :inner-class="{
-        'border py-2 px-2 rounded mx-auto': true,
-        'border-red': this.invalid,
-        'border-grey': !this.invalid,
-      }"
-      :help-class="{
-        'mt-[10px] text-sm text-grey italic': true,
-      }"
     />
+    <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
-    <span
+    <p
       v-if="isInvalidPhoneNumberMessageShown"
       class="text-red text-sm text-center mt-[10px]"
-      >{{ invalidPhoneNumberMessage }}</span
     >
+      {{ invalidPhoneNumberMessage }}
+    </p>
   </div>
 </template>
 <script>
@@ -94,16 +86,13 @@ export default {
   methods: {
     /**
      * Updates the phone number value based on user entry
-     * @param {Event} event - The input event.
      */
-    updatePhoneNumberEntry(event) {
-      if (event.length == 0) {
+    updatePhoneNumberEntry() {
+      if (this.phoneNumber.length == 0) {
         this.invalidPhoneNumberMessage = "";
-      } else if (event.length > 10) {
-        console.log("1:", this.phoneNumber);
-        this.phoneNumber = event.slice(0, 10).toString();
-        console.log("2:", this.phoneNumber, event.slice(0, 10).toString());
-      } else if (event.length < 10) {
+      } else if (this.phoneNumber.length > 10) {
+        this.phoneNumber = this.phoneNumber.slice(0, 10).toString();
+      } else if (this.phoneNumber.length < 10) {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
       } else {
         this.invalidPhoneNumberMessage = "";

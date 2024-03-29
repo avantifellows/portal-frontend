@@ -73,13 +73,13 @@ export default createStore({
       storage: {
         getItem: (key) => {
           try {
-            return sessionStorage.get(key);
+            return localStorage.get(key);
           } catch (error) {
             console.log(error);
           }
         },
-        setItem: (key, value) => sessionStorage.set(key, value),
-        removeItem: (key) => sessionStorage.remove(key),
+        setItem: (key, value) => localStorage.set(key, value),
+        removeItem: (key) => localStorage.remove(key),
       },
     }),
   ],

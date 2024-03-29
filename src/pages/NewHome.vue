@@ -299,6 +299,10 @@ export default {
     },
   },
   async created() {
+    this.$store.dispatch("setSessionData", {});
+    this.$store.dispatch("setAuthGroupData", {});
+
+    console.log(this.$store.state);
     this.$store.dispatch("setLocale", "en");
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.

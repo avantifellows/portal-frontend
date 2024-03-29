@@ -98,7 +98,7 @@ import LocalePicker from "../components/LocalePicker.vue";
 const assets = useAssets();
 
 export default {
-  name: "SignUp",
+  name: "NewSignup",
   components: { LocalePicker },
   data() {
     return {

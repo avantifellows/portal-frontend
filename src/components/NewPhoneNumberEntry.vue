@@ -100,7 +100,9 @@ export default {
       if (event.length == 0) {
         this.invalidPhoneNumberMessage = "";
       } else if (event.length > 10) {
+        console.log(this.phoneNumber);
         this.phoneNumber = event.slice(0, 10).toString();
+        console.log(this.phoneNumber, event.slice(0, 10).toString());
       } else if (event.length < 10) {
         this.invalidPhoneNumberMessage = "Please enter valid phone number";
       } else {

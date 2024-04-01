@@ -24,7 +24,7 @@
         :sub_type="getSubType"
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
-        :enable_pop_up_form="isPopUpFormEnabled"
+        :enable_popup="isPopUpFormEnabled"
       />
       <NewSignUp v-if="isTypeSignUp && doesGroupExist" />
     </div>
@@ -62,7 +62,7 @@
 <script>
 import { useToast } from "vue-toastification";
 
-import groupAPIService from "@/services/API/groupData.js";
+import authGroupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 
 import NoClassMessage from "@/components/NoClassMessage.vue";
@@ -91,22 +91,6 @@ export default {
     LocalePicker,
   },
   props: {
-    /** The resource we are redirecting to.
-     * (WILL BE DEPRECATED IN V2)
-     */
-    redirectTo: {
-      default: "",
-      type: String,
-    },
-
-    /** ID of the resource.
-     * (WILL BE DEPRECATED IN V2)
-     */
-    redirectId: {
-      default: "",
-      type: String,
-    },
-
     /** General category of why the data is being captured. Eg: attendance
      * (WILL BE DEPRECATED IN V2)
      */
@@ -122,7 +106,7 @@ export default {
     },
 
     /** The group the user falls under. Eg: HaryanaStudents, DelhiStudents */
-    group: {
+    authGroup: {
       default: "HaryanaStudents",
       type: String,
     },
@@ -152,15 +136,15 @@ export default {
     },
 
     /** Whether the sign-up flow will be enabled for the user. */
-    enable_signup: {
-      default: false,
-      type: Boolean,
+    signup_form: {
+      default: "false",
+      type: String,
     },
 
     /** Whether any additional form is to be displayed to the user after authentication. */
-    enable_pop_up_form: {
-      default: false,
-      type: Boolean,
+    popup_form: {
+      default: "false",
+      type: String,
     },
 
     /** Whether an ID needs to be generated when the user signs up. */
@@ -189,18 +173,20 @@ export default {
   },
   data() {
     return {
-      groupData: null, // stores details about a group
+      authGroupData: null, // stores details about a group
       sessionData: null, // stores details about a session
       sessionEnabled: true, // whether a session is enabled
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
-      oldFlow: true, // oldFlow refers to user using V1
+      oldFlow: false, // oldFlow refers to user using V1
     };
   },
   computed: {
     getLocale() {
-      return this.groupData ? this.groupData.locale.split(",") : ["English"];
+      return this.authGroupData
+        ? this.authGroupData.locale.split(",")
+        : ["English"];
     },
     /** Returns if the purpose is registration.
      * (THIS METHOD WILL BE DEPRECATED IN V2)
@@ -266,7 +252,8 @@ export default {
       return (
         (this.sessionData && this.sessionData.auth_type.split(",")) ||
         (this.auth_type && this.auth_type.split(",")) ||
-        (this.groupData && this.groupData.input_schema.auth_type.split(","))
+        (this.authGroupData &&
+          this.authGroupData.input_schema.auth_type.split(","))
       );
     },
 
@@ -281,16 +268,16 @@ export default {
     /** Returns if sign up flow should be enabled */
     isSignupEnabled() {
       return (
-        (this.sessionData && this.sessionData.activate_signup == "True") ||
-        this.enable_signup == "True"
+        (this.sessionData && this.sessionData.signup_form == "True") ||
+        this.signup_form == "true"
       );
     },
 
     /** Returns if any additional form is to be displayed to the user after authentication. */
     isPopUpFormEnabled() {
       return (
-        (this.sessionData && this.sessionData.pop_up_form == "True") ||
-        this.enable_pop_up_form == "True"
+        (this.sessionData && this.sessionData.popup_form == "True") ||
+        this.popup_form == "true"
       );
     },
 
@@ -299,7 +286,7 @@ export default {
       this.$store.dispatch(
         "setIdGeneration",
         (this.sessionData && this.sessionData.id_generation == "True") ||
-          this.id_generation == "True"
+          this.id_generation == "true"
       );
     },
 
@@ -308,7 +295,7 @@ export default {
       this.$store.dispatch(
         "setRedirection",
         (this.sessionData && this.sessionData.redirection == "True") ||
-          this.redirection == "True"
+          this.redirection == "true"
       );
     },
 
@@ -356,7 +343,7 @@ export default {
      * @returns {boolean} True if the group exists, false otherwise.
      */
     doesGroupExist() {
-      return this.groupData;
+      return this.authGroupData;
     },
 
     /**
@@ -424,14 +411,16 @@ export default {
      * */
     isLandingPage() {
       return (
-        this.purpose == "" &&
-        this.purposeParams == "" &&
-        this.redirectId == "" &&
-        this.redirectTo == "" &&
-        this.platform == "" &&
         this.platform_id == "" &&
+        this.platform == "" &&
         this.sub_type == "" &&
         this.sessionId == ""
+      );
+    },
+    setAuthGroupImages() {
+      this.$store.dispatch(
+        "setImages",
+        this.authGroupData && this.authGroupData.input_schema.images.split(",")
       );
     },
   },
@@ -441,13 +430,13 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId.startsWith("Test")) {
-        this.oldFlow = false;
-        this.sessionData = await sessionAPIService.getSessionData(
+      if (!this.sessionId.startsWith("Test")) {
+        this.oldFlow = true;
+        this.sessionData = await sessionAPIService.getOldSessionData(
           this.sessionId
         );
       } else {
-        this.sessionData = await sessionAPIService.getOldSessionData(
+        this.sessionData = await sessionAPIService.getSessionData(
           this.sessionId
         );
       }
@@ -491,16 +480,20 @@ export default {
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
         if (!this.oldFlow) {
-          this.groupData = await groupAPIService.getGroupName(
+          this.authGroupData = await authGroupAPIService.getGroupName(
             this.sessionData.id
           );
         } else {
-          this.groupData = await groupAPIService.getGroupData(
+          this.authGroupData = await authGroupAPIService.getGroupData(
             this.sessionData.group
           );
         }
-        this.$store.dispatch("setGroupData", this.groupData);
-        if (!this.sessionData.error && this.groupData && this.groupData.error) {
+        this.$store.dispatch("setAuthGroupData", this.authGroupData);
+        if (
+          !this.sessionData.error &&
+          this.authGroupData &&
+          this.authGroupData.error
+        ) {
           /** Group API returns an error*/
           this.toast.error("Network Error, please try again!", {
             position: "top-center",
@@ -519,12 +512,17 @@ export default {
        * If sessionId does not exist in route, then retrieve group data directly
        */
       if (!this.oldFlow) {
-        this.groupData = await groupAPIService.getNewGroupData(this.group);
+        this.authGroupData = await authGroupAPIService.getAuthGroupData(
+          this.group
+        );
       } else {
-        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+        this.authGroupData = await authGroupAPIService.getGroupData(
+          this.getGroup
+        );
       }
-      this.$store.dispatch("setGroupData", this.groupData);
-      if (this.groupData && this.groupData.error) {
+
+      this.$store.dispatch("setAuthGroupData", this.authGroupData);
+      if (this.authGroupData && this.authGroupData.error) {
         /** Group API returns an error*/
         this.toast.error("Network Error, please try again!", {
           position: "top-center",
@@ -541,7 +539,7 @@ export default {
     this.isRedirectionEnabled;
     this.setPlatform;
     this.setPlatformId;
-    this.getGroupImages;
+    this.setAuthGroupImages;
   },
 };
 </script>

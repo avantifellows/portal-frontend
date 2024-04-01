@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import NewHome from "@/pages/NewHome.vue";
+import Home from "@/pages/Home.vue";
 import Sentry from "@/pages/Sentry.vue";
 import Error from "@/pages/Error.vue";
 import Signup from "@/components/Signup.vue";
@@ -33,8 +33,8 @@ const allowedQueryParams = [
 const routes = [
   {
     path: "/",
-    name: "NewHome",
-    component: NewHome,
+    name: "Home",
+    component: Home,
     props: (route) => ({
       authGroup: route.query.group || route.query.authGroup,
       sessionId: route.query.sessionId,

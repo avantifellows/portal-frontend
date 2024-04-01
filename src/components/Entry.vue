@@ -187,7 +187,8 @@ import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
-
+import '@formkit/themes/genesis'
+  
 const assets = useAssets();
 export default {
   name: "Entry",

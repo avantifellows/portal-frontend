@@ -483,7 +483,7 @@ export default {
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
         if (!this.oldFlow) {
-          this.authGroupData = await authGroupAPIService.getGroupName(
+          this.authGroupData = await authGroupAPIService.getAuthGroupName(
             this.sessionData.id
           );
         } else {

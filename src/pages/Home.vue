@@ -239,8 +239,8 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2)
      */
     getAuthType() {
-      return this.groupData && this.groupData.authType
-        ? this.groupData.authType
+      return this.authGroupData && this.authGroupData.authType
+        ? this.authGroupData.authType
         : "ID";
     },
 
@@ -379,7 +379,7 @@ export default {
     getGroup() {
       return this.sessionData && this.sessionData.group
         ? this.sessionData.group
-        : this.group;
+        : this.authGroup;
     },
 
     /**
@@ -505,16 +505,14 @@ export default {
         }
       }
     } else {
-      if (this.platform == "gurukul") {
-        this.oldFlow = false;
-      }
       /**
        * If sessionId does not exist in route, then retrieve group data directly
        */
       if (!this.oldFlow) {
         this.authGroupData = await authGroupAPIService.getAuthGroupData(
-          this.group
+          this.authGroup
         );
+        console.log(this.authGroup, this.authGroupData);
       } else {
         this.authGroupData = await authGroupAPIService.getGroupData(
           this.getGroup

@@ -120,14 +120,13 @@ export default {
       default: false,
       type: Boolean,
     },
-    enable_pop_up_form: {
+    enable_popup: {
       default: false,
       type: Boolean,
     },
   },
   data() {
     return {
-      locale: this.$store.state.locale,
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       invalidLoginMessage: "", // message to display when login is invalid
@@ -156,6 +155,9 @@ export default {
     this.mounted = true;
   },
   computed: {
+    locale() {
+      return this.$store.state.locale;
+    },
     /** Returns button text */
     signInButtonLabel() {
       return this.locale == "en" ? "Sign In" : "साइन इन";
@@ -259,16 +261,16 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData.locale_data[this.locale]).find(
-        (key) => {
-          if (key == authType) {
-            UIParameters =
-              this.$store.state.groupData.locale_data[this.locale][
-                key.toString()
-              ];
-          }
+      Object.keys(
+        this.$store.state.authGroupData.locale_data[this.locale]
+      ).find((key) => {
+        if (key == authType) {
+          UIParameters =
+            this.$store.state.authGroupData.locale_data[this.locale][
+              key.toString()
+            ];
         }
-      );
+      });
       return UIParameters;
     },
 
@@ -328,8 +330,8 @@ export default {
       let isUserValid = await validateUser(
         this.auth_type,
         this.userInformation,
-        this.$store.state.groupData.input_schema.userType,
-        this.$store.state.groupData.id
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.id
       );
 
       if (!isUserValid.isUserIdValid) {
@@ -350,7 +352,7 @@ export default {
       } else {
         createAccessToken(this.userInformation["student_id"]);
 
-        if (this.enable_pop_up_form) {
+        if (this.enable_popup) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           sendSQSMessage(
             "sign-in",
@@ -359,8 +361,8 @@ export default {
             this.$store.state.platform_id,
             this.userInformation["student_id"],
             this.auth_type.toString(),
-            this.$store.state.groupData.name,
-            this.$store.state.groupData.input_schema.userType,
+            this.$store.state.authGroupData.name,
+            this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_id,
             "",
             "phone" in this.userInformation
@@ -378,7 +380,7 @@ export default {
               this.userInformation["student_id"],
               this.$store.state.platform_id,
               this.$store.state.platform,
-              this.$store.state.groupData.input_schema.userType
+              this.$store.state.authGroupData.input_schema.user_type
             )
           ) {
             sendSQSMessage(
@@ -390,8 +392,8 @@ export default {
                 ? this.userInformation["student_id"]
                 : this.userInformation["teacher_id"],
               this.auth_type.toString(),
-              this.$store.state.groupData.name,
-              this.$store.state.groupData.input_schema.userType,
+              this.$store.state.authGroupData.name,
+              this.$store.state.authGroupData.input_schema.user_type,
               "sessionData" in this.$store.state &&
                 "session_id" in this.$store.state.sessionData
                 ? this.$store.state.sessionData.session_id

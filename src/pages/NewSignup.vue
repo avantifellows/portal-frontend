@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-  <LocalePicker />
+  <LocalePicker :options="getLocaleOptions" />
   <div
     class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
   >
@@ -98,7 +98,7 @@ import LocalePicker from "../components/LocalePicker.vue";
 const assets = useAssets();
 
 export default {
-  name: "SignUp",
+  name: "NewSignup",
   components: { LocalePicker },
   data() {
     return {
@@ -113,7 +113,7 @@ export default {
   },
   async created() {
     this.formData = await FormSchemaAPI.getFormSchema(
-      this.$store.state.sessionData.form_schema_id
+      this.$store.state.sessionData.signup_form_id
     );
 
     Object.keys(this.formData.attributes).forEach((field) => {
@@ -136,6 +136,12 @@ export default {
     },
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     /** Returns button text */
     signUpButtonLabel() {
       return this.getLocale == "en" ? "Sign Up" : "साइन अप";
@@ -264,8 +270,8 @@ export default {
         this.platform_id,
         this.userData["student_id"],
         "", // list of authentication methods
-        this.$store.state.groupData.name,
-        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.authGroupData.name,
+        this.$store.state.authGroupData.input_schema.user_type,
         this.$store.state.sessionData.session_id,
         "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
@@ -278,8 +284,8 @@ export default {
       let createdUserId = await UserAPI.newUserSignup(
         this.userData,
         this.$store.state.id_generation,
-        this.$store.state.groupData.input_schema.userType,
-        this.$store.state.groupData.name
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name
       );
 
       if (createdUserId == "" || createdUserId.error) {
@@ -303,7 +309,7 @@ export default {
           this.userData["user_id"],
           this.$store.state.platform_id,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
         sendSQSMessage(
@@ -313,8 +319,8 @@ export default {
           this.$store.state.platform_id,
           this.userData["user_id"],
           "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",
@@ -328,9 +334,7 @@ export default {
      * Redirects the user to the sign-in page.
      */
     redirectToSignIn() {
-      this.$router.push({
-        name: "NewSignin",
-      });
+      this.$router.go(-1);
     },
   },
 };

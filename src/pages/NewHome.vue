@@ -8,54 +8,22 @@
     </div>
   </div>
 
-  <div v-if="!sessionEnabled">
-    <NoClassMessage />
-  </div>
+  <NoClassMessage v-if="!sessionEnabled" />
 
   <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
 
   <div v-else>
-    <div v-if="!oldFlow">
-      <LocalePicker :options="getLocale" />
-      <NewSignIn
-        v-if="isTypeSignIn && doesGroupExist"
-        :sub_type="getSubType"
-        :auth_type="getAuthTypes"
-        :enable_signup="isSignupEnabled"
-        :enable_popup="isPopUpFormEnabled"
-      />
-      <NewSignUp v-if="isTypeSignUp && doesGroupExist" />
-    </div>
-
-    <div v-else>
-      <div
-        v-if="
-          !isPurposeRegistration &&
-          !isLandingPage &&
-          isAuthTypeID &&
-          doesGroupExist
-        "
-      >
-        <Entry
-          :redirectTo="getRedirectTo"
-          :redirectId="getRedirectId"
-          :purpose="getPurpose"
-          :purposeParams="getPurposeParams"
-          :groupData="groupData"
-          :group="getGroup"
-          :authType="getAuthType"
-          :sessionId="sessionId"
-          :userIpAddress="getUserIpAddress"
-          :isExtraInputValidationRequired="isExtraInputValidationsRequired"
-        />
-      </div>
-
-      <div v-if="isPurposeRegistration && !isTypeSignIn && !isTypeSignUp">
-        <Signup />
-      </div>
-    </div>
+    <LocalePicker :options="getLocale" />
+    <NewSignIn
+      v-if="isTypeSignIn && doesGroupExist"
+      :sub_type="getSubType"
+      :auth_type="getAuthTypes"
+      :enable_signup="isSignupEnabled"
+      :enable_popup="isPopUpFormEnabled"
+    />
+    <NewSignUp v-if="isTypeSignUp && doesGroupExist" />
   </div>
 </template>
 
@@ -80,7 +48,7 @@ const validAuthTypes = ["DOB", "ID", "PH"];
 const assets = useAssets();
 
 export default {
-  name: "Home",
+  name: "NewHome",
   components: {
     NoClassMessage,
     NewSignUp,
@@ -179,7 +147,6 @@ export default {
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
-      oldFlow: false, // oldFlow refers to user using V1
     };
   },
   computed: {
@@ -187,61 +154,6 @@ export default {
       return this.authGroupData
         ? this.authGroupData.locale.split(",")
         : ["English"];
-    },
-    /** Returns if the purpose is registration.
-     * (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    isPurposeRegistration() {
-      return this.sessionData ? this.getPurpose == "registration" : false;
-    },
-
-    /** Returns IP address of user.
-     *  (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    getUserIpAddress() {
-      return this.sessionData ? this.sessionData.userIp : "";
-    },
-
-    /** Whether authentication method chosen is an ID entry.
-     *  (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    isAuthTypeID() {
-      return this.getAuthType.includes("ID");
-    },
-
-    /** Returns how many authentication methods should be used.
-     * (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    getLengthOfAuthType() {
-      return this.getAuthType.split(",").length;
-    },
-
-    /** Checks if the authentication methods mentioned are valid.
-     * (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    areAuthTypesValid() {
-      let validCount = 0;
-      this.getAuthType.split(",").every((authType) => {
-        validCount += validAuthTypes.includes(authType.toString()) ? 1 : 0;
-        return validCount;
-      });
-      return validCount == this.getLengthOfAuthType;
-    },
-
-    /** Apart from ID, are any extra inputs being validated.
-     * (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    isExtraInputValidationsRequired() {
-      return this.getLengthOfAuthType > 1 && this.areAuthTypesValid;
-    },
-
-    /** Returns the auth methods used by each group.
-     * (THIS METHOD WILL BE DEPRECATED IN V2)
-     */
-    getAuthType() {
-      return this.authGroupData && this.authGroupData.authType
-        ? this.authGroupData.authType
-        : "ID";
     },
 
     /**
@@ -322,8 +234,7 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && this.sessionData.type == "sign-in") ||
-        (this.type == "sign-in" && this.oldFlow == false) ||
-        this.purpose == "attendance"
+        this.type == "sign-in"
       );
     },
 
@@ -347,50 +258,13 @@ export default {
     },
 
     /**
-     * Retrieves the redirect destination.
-     * @returns {string} The redirect destination.
-     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatform)
-     */
-    getRedirectTo() {
-      return this.redirectTo == "" && this.sessionData != null
-        ? this.oldFlow
-          ? this.sessionData.redirectPlatform
-          : this.sessionData.platform
-        : this.redirectTo;
-    },
-
-    /**
-     * Retrieves the redirect ID.
-     * @returns {string} The redirect ID.
-     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatformId)
-     */
-    getRedirectId() {
-      return this.redirectId == "" && this.sessionData != null
-        ? this.oldFlow
-          ? this.sessionData.redirectPlatformParams.id
-          : this.sessionData.platform_id
-        : this.redirectId;
-    },
-
-    /**
      * Retrieves the group.
      * @returns {string} The group.
      */
     getGroup() {
       return this.sessionData && this.sessionData.group
         ? this.sessionData.group
-        : this.authGroup;
-    },
-
-    /**
-     * Retrieves the purpose.
-     * @returns {string} The purpose.
-     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with type.)
-     */
-    getPurpose() {
-      return this.purpose == "" && this.sessionData != null
-        ? this.sessionData.purpose
-        : this.purpose;
+        : this.group;
     },
 
     /**
@@ -399,10 +273,8 @@ export default {
      */
     getPurposeParams() {
       return this.purposeParams == "" && this.sessionData != null
-        ? this.oldFlow
-          ? this.sessionData.purposeParams
-          : this.sessionData.purpose["sub_type"]
-        : this.purposeParams;
+        ? this.sessionData.purposeParams
+        : this.sessionData.purpose["sub_type"];
     },
 
     /**
@@ -411,8 +283,10 @@ export default {
      * */
     isLandingPage() {
       return (
-        this.platform_id == "" &&
+        this.purpose == "" &&
+        this.purposeParams == "" &&
         this.platform == "" &&
+        this.platform_id == "" &&
         this.sub_type == "" &&
         this.sessionId == ""
       );
@@ -430,19 +304,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (
-        !this.sessionId.startsWith("DelhiStudents") &&
-        !this.sessionId.startsWith("HaryanaStudents")
-      ) {
-        this.oldFlow = true;
-        this.sessionData = await sessionAPIService.getOldSessionData(
-          this.sessionId
-        );
-      } else {
-        this.sessionData = await sessionAPIService.getSessionData(
-          this.sessionId
-        );
-      }
+      this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
 
       /** SessionId does not exist */
       if (Object.keys(this.sessionData).length == 0) {
@@ -469,59 +331,39 @@ export default {
         this.sessionData["sessionId"] = this.sessionId;
         this.$store.dispatch("setSessionData", this.sessionData);
 
-        if (this.oldFlow) {
-          if ("sessionActive" in this.sessionData) {
-            this.sessionEnabled = this.sessionData.sessionActive;
-          }
-        } else {
-          if ("is_session_open" in this.sessionData) {
-            this.sessionEnabled = this.sessionData.is_session_open;
-          }
+        if ("is_session_open" in this.sessionData) {
+          this.sessionEnabled = this.sessionData.is_session_open;
         }
       }
 
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
-        if (!this.oldFlow) {
-          this.authGroupData = await authGroupAPIService.getAuthGroupName(
-            this.sessionData.id
-          );
-        } else {
-          this.authGroupData = await authGroupAPIService.getGroupData(
-            this.sessionData.group
-          );
-        }
-        this.$store.dispatch("setAuthGroupData", this.authGroupData);
-        if (
-          !this.sessionData.error &&
-          this.authGroupData &&
-          this.authGroupData.error
-        ) {
-          /** Group API returns an error*/
-          this.toast.error("Network Error, please try again!", {
-            position: "top-center",
-            timeout: false,
-            closeOnClick: false,
-            draggable: false,
-            closeButton: false,
-          });
-        }
+        this.authGroupData = await authGroupAPIService.getAuthGroupName(
+          this.sessionData.id
+        );
+      }
+      this.$store.dispatch("setAuthGroupData", this.authGroupData);
+      if (
+        !this.sessionData.error &&
+        this.authGroupData &&
+        this.authGroupData.error
+      ) {
+        /** Group API returns an error*/
+        this.toast.error("Network Error, please try again!", {
+          position: "top-center",
+          timeout: false,
+          closeOnClick: false,
+          draggable: false,
+          closeButton: false,
+        });
       }
     } else {
       /**
        * If sessionId does not exist in route, then retrieve group data directly
        */
-      if (!this.oldFlow) {
-        this.authGroupData = await authGroupAPIService.getAuthGroupData(
-          this.authGroup
-        );
-        console.log(this.authGroup, this.authGroupData);
-      } else {
-        this.authGroupData = await authGroupAPIService.getGroupData(
-          this.getGroup
-        );
-      }
-
+      this.authGroupData = await authGroupAPIService.getAuthGroupData(
+        this.authGroup
+      );
       this.$store.dispatch("setAuthGroupData", this.authGroupData);
       if (this.authGroupData && this.authGroupData.error) {
         /** Group API returns an error*/

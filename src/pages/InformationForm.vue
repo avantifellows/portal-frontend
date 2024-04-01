@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <LocalePicker />
+    <LocalePicker :options="getLocaleOptions" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-black font-bold">
         {{ getFormHeading }}
@@ -69,8 +69,8 @@ export default {
     /* Also, maps each field to its input component
     */
     this.formSchemaData = await FormSchemaAPI.getFormFields(
-      this.$store.state.sessionData.number_of_fields_in_pop_form,
-      this.$store.state.groupData.name,
+      this.$store.state.sessionData.meta_data.number_of_fields_in_popup_form,
+      this.$store.state.sessionData.popup_form_id,
       this.id
     );
     if (this.formSchemaData.error) {
@@ -106,6 +106,12 @@ export default {
     },
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     /** Returns the locale selected by user */
     getLocale() {
       return this.$store.state.locale;
@@ -130,12 +136,11 @@ export default {
       return Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         let showBasedOn = fieldAttributes.showBasedOn;
-        let showBasedOnCondition = fieldAttributes.showBasedOnCondition;
 
         if (fieldAttributes.showBasedOn != "") {
           if (
-            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-            Object.values(JSON.parse(showBasedOn))
+            this.userData[showBasedOn.split("==")[0]] ==
+            showBasedOn.split("==")[1]
           ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
@@ -158,6 +163,7 @@ export default {
       Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         if (fieldAttributes.dependant) {
+          console.log(this.userData);
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
               fieldAttributes.dependantFieldMapping[
@@ -208,18 +214,18 @@ export default {
           this.id,
           this.$store.state.platform_id,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
         sendSQSMessage(
-          "attendance-sign-in",
+          "popup_form",
           this.$store.state.sessionData.purpose["sub-type"],
           this.$store.platform,
           this.$store.platform_id,
           this.id,
           "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",

@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      locale: "",
+      locale: this.$store.state.locale,
     };
   },
   mounted() {

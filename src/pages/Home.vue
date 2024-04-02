@@ -482,6 +482,7 @@ export default {
 
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
+        console.log(this.oldFlow)
         if (!this.oldFlow) {
           this.authGroupData = await authGroupAPIService.getAuthGroupName(
             this.sessionData.id

@@ -43,7 +43,7 @@
           :redirectId="getRedirectId"
           :purpose="getPurpose"
           :purposeParams="getPurposeParams"
-          :groupData="groupData"
+          :groupData="authGroupData"
           :group="getGroup"
           :authType="getAuthType"
           :sessionId="sessionId"
@@ -421,7 +421,7 @@ export default {
       this.$store.dispatch(
         "setImages",
         this.oldFlow
-          ? this.authGroupData.images.split(",")
+          ? this.authGroupData.images[0]
           : this.authGroupData &&
               this.authGroupData.input_schema.images.split(",")
       );

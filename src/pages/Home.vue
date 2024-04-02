@@ -352,12 +352,12 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatform)
      */
     getRedirectTo() {
-      console.log(this.redirectTo, this.sessionData, this.oldFlow);
-      return this.redirectTo == "" && this.sessionData != null
+      console.log(this.platform, this.sessionData, this.oldFlow);
+      return this.platform == "" && this.sessionData != null
         ? this.oldFlow
           ? this.sessionData.redirectPlatform
           : this.sessionData.platform
-        : this.redirectTo;
+        : this.platform;
     },
 
     /**
@@ -366,11 +366,11 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatformId)
      */
     getRedirectId() {
-      return this.redirectId == "" && this.sessionData != null
+      return this.platform_id == "" && this.sessionData != null
         ? this.oldFlow
           ? this.sessionData.redirectPlatformParams.id
           : this.sessionData.platform_id
-        : this.redirectId;
+        : this.platform_id;
     },
 
     /**

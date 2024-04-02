@@ -420,7 +420,10 @@ export default {
     setAuthGroupImages() {
       this.$store.dispatch(
         "setImages",
-        this.authGroupData && this.authGroupData.input_schema.images.split(",")
+        this.oldFlow
+          ? this.authGroupData.images.split(",")
+          : this.authGroupData &&
+              this.authGroupData.input_schema.images.split(",")
       );
     },
   },
@@ -482,7 +485,7 @@ export default {
 
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
-        console.log(this.oldFlow)
+        console.log(this.oldFlow);
         if (!this.oldFlow) {
           this.authGroupData = await authGroupAPIService.getAuthGroupName(
             this.sessionData.id

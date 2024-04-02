@@ -187,8 +187,8 @@ import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
 import useAssets from "@/assets/assets.js";
 import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
-import '@formkit/themes/genesis'
-  
+import "@formkit/themes/genesis";
+
 const assets = useAssets();
 export default {
   name: "Entry",
@@ -620,6 +620,14 @@ export default {
             path: `aiet-reporting/${this.redirectId}/${latestUserID}/${this.formatDateOfBirth}`,
           });
         } else {
+          console.log(
+            this.purposeParams,
+            this.userIDList[0]["userID"],
+            this.redirectId,
+            this.redirectTo,
+            this.authType,
+            this.group
+          );
           if (
             redirectToDestination(
               this.purposeParams,

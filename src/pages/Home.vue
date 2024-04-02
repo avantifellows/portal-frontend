@@ -434,7 +434,6 @@ export default {
      */
     if (this.sessionId != "") {
       if (
-        !this.sessionId.startsWith("DelhiStudents") &&
         !this.sessionId.startsWith("HaryanaStudents")
       ) {
         this.oldFlow = true;

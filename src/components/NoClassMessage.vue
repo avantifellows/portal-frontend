@@ -17,7 +17,7 @@
 <script>
 import useAssets from "@/assets/assets.js";
 import '@formkit/themes/genesis'
-  
+
 const assets = useAssets();
 
 export default {

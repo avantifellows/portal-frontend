@@ -352,7 +352,6 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatform)
      */
     getRedirectTo() {
-      console.log(this.platform, this.sessionData, this.oldFlow);
       return this.platform == "" && this.sessionData != null
         ? this.oldFlow
           ? this.sessionData.redirectPlatform
@@ -486,7 +485,6 @@ export default {
 
       /** If session is open, retrieve group data and store it */
       if (!this.sessionData.error && this.sessionEnabled) {
-        console.log(this.oldFlow);
         if (!this.oldFlow) {
           this.authGroupData = await authGroupAPIService.getAuthGroupName(
             this.sessionData.id
@@ -520,7 +518,6 @@ export default {
         this.authGroupData = await authGroupAPIService.getAuthGroupData(
           this.authGroup
         );
-        console.log(this.authGroup, this.authGroupData);
       } else {
         this.authGroupData = await authGroupAPIService.getGroupData(
           this.getGroup

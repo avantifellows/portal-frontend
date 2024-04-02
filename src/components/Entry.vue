@@ -620,14 +620,6 @@ export default {
             path: `aiet-reporting/${this.redirectId}/${latestUserID}/${this.formatDateOfBirth}`,
           });
         } else {
-          console.log(
-            this.purposeParams,
-            this.userIDList[0]["userID"],
-            this.redirectId,
-            this.redirectTo,
-            this.authType,
-            this.group
-          );
           if (
             redirectToDestination(
               this.purposeParams,

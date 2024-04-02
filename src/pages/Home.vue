@@ -352,6 +352,7 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatform)
      */
     getRedirectTo() {
+      console.log(this.redirectTo, this.sessionData, this.oldFlow);
       return this.redirectTo == "" && this.sessionData != null
         ? this.oldFlow
           ? this.sessionData.redirectPlatform

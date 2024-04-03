@@ -4,25 +4,14 @@
       {{ label }}<span v-if="isRequired">*</span>
     </p>
 
-    <FormKit
+    <input
       type="text"
-      :help="helpText"
       v-model="text"
-      :name="dbKey"
       @keypress="isValidTextEntry($event)"
       @input="updateTextEntry($event)"
-      ondrop="return false"
-      onpaste="return false"
-      :input-class="{
-        'w-full': true,
-      }"
-      :inner-class="{
-        'border py-2 px-2 rounded border-grey overflow-hidden': true,
-      }"
-      :help-class="{
-        'mt-[10px] text-sm text-grey italic': true,
-      }"
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
     />
+    <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
     <span
       v-if="isInvalidTextEntryMessageShown"
@@ -83,11 +72,9 @@ export default {
      * Updates the text value based on user entry
      * @param {Event} event - The input event.
      */
-    updateTextEntry(event) {
-      if (event.length == 0) {
+    updateTextEntry() {
+      if (this.text.length == 0) {
         this.invalidTextEntryMessage = "";
-      } else {
-        this.text = event.toString();
       }
       this.$emit("update", this.text, this.dbKey);
     },

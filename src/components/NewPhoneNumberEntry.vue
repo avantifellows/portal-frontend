@@ -4,19 +4,19 @@
       {{ label }}<span v-if="isRequired">*</span>
     </p>
     <input
-      class="border py-2 px-2 w-full rounded mx-auto border-grey"
-      :class="invalid ? 'border-red' : 'border-grey'"
       type="tel"
-      placeholder="xxxxxxxxxx"
       v-model="phoneNumber"
+      placeholder="xxxxxxxxxx"
       @keypress="isValidPhoneNumberEntry($event)"
       @input="updatePhoneNumberEntry($event)"
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
+      :class="invalid ? 'border-red' : 'border-grey'"
     />
     <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
     <p
       v-if="isInvalidPhoneNumberMessageShown"
-      class="text-red text-sm text-center mt-[10px]"
+      class="text-red text-sm mt-[10px]"
     >
       {{ invalidPhoneNumberMessage }}
     </p>

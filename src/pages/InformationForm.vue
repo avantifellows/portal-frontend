@@ -89,7 +89,10 @@ export default {
       this.formSchemaData[field]["component"] =
         typeToInputParameters[this.formSchemaData[field].type];
       this.formSchemaData[field]["show"] =
-        this.formSchemaData[field].showBasedOn == "" ? true : false;
+        this.formSchemaData[field].showBasedOn == "" &&
+        !this.formSchemaData[field].dependant
+          ? true
+          : false;
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
@@ -142,6 +145,7 @@ export default {
             this.userData[showBasedOn.split("==")[0]] ==
             showBasedOn.split("==")[1]
           ) {
+            console.log(fieldAttributes);
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
         }

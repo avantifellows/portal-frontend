@@ -120,7 +120,10 @@ export default {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
       this.formData.attributes[field]["show"] =
-        this.formData.attributes[field].showBasedOn == "" ? true : false;
+        this.formData.attributes[field].showBasedOn == "" &&
+        !this.formData.attributes[field].dependant
+          ? true
+          : false;
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });

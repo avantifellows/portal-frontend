@@ -21,11 +21,8 @@ export default {
   },
   data() {
     return {
-      locale: this.$store.state.locale,
+      locale: "English",
     };
-  },
-  mounted() {
-    this.locale = this.$store.state.locale;
   },
   watch: {
     /**

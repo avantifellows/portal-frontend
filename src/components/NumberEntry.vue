@@ -45,11 +45,11 @@ export default {
     },
     maxLengthOfEntry: {
       type: Number,
-      default: 1,
+      default: null,
     },
     dbKey: {
       type: String,
-      default: "",
+      defanult: "",
     },
     helpText: {
       type: String,
@@ -109,9 +109,15 @@ export default {
     updateNumberEntry() {
       if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (this.number.length > this.maxLengthOfEntry) {
+      } else if (
+        this.maxLengthOfEntry != null &&
+        this.number.length > this.maxLengthOfEntry
+      ) {
         this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
-      } else if (this.number.length < this.maxLengthOfEntry) {
+      } else if (
+        this.maxLengthOfEntry != null &&
+        this.number.length < this.maxLengthOfEntry
+      ) {
         this.invalidNumberEntryMessage =
           this.invalidEntryMessage[this.getLocale];
       } else {

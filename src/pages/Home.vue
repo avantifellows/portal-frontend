@@ -434,9 +434,7 @@ export default {
      */
     if (this.sessionId != "") {
       if (
-        !this.sessionId.startsWith("HaryanaStudents") &&
-        !this.sessionId.startsWith("DelhiStudents") &&
-        !this.sessionId.startsWith("FeedingIndiaStudents")
+        !this.sessionId.startsWith("HaryanaStudents")
       ) {
         this.oldFlow = true;
         this.sessionData = await sessionAPIService.getOldSessionData(

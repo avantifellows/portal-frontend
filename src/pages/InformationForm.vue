@@ -145,7 +145,6 @@ export default {
             this.userData[showBasedOn.split("==")[0]] ==
             showBasedOn.split("==")[1]
           ) {
-            console.log(fieldAttributes);
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
         }
@@ -167,7 +166,6 @@ export default {
       Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         if (fieldAttributes.dependant) {
-          console.log(this.userData);
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
               fieldAttributes.dependantFieldMapping[

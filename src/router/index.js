@@ -29,7 +29,7 @@ const allowedQueryParams = [
   "platform",
   "platform_id",
   "type",
-  "sub_type"
+  "sub_type",
 ];
 
 const routes = [

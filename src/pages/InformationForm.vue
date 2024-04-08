@@ -126,12 +126,6 @@ export default {
         en: "Complete your Profile",
         hi: "अपनी प्रोफाइल पूर्ण करें",
       };
-      if (Object.keys(this.formSchemaData).length == 0) {
-        const formHeading = {
-          en: "Good job! You have filled all your Profile Details!",
-          hi: "बहुत खूब ! आपने अपना प्रोफ़ाइल विवरण पूरा कर लिया है",
-        };
-      }
 
       return formHeading[this.getLocale];
     },

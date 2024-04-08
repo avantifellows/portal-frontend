@@ -51,6 +51,10 @@ export default {
     return {
       date: "",
       invalidDateEntryMessage: "",
+      invalidEntryMessage: {
+        en: `Please enter a valid date`,
+        hi: `कृपया कोई मान्य दिनांक दर्ज करें`,
+      },
     };
   },
   watch: {
@@ -62,7 +66,8 @@ export default {
         new Date(this.date) < new Date("01-01-1990") ||
         new Date(this.date) > new Date()
       ) {
-        this.invalidDateEntryMessage = "Please enter a valid date";
+        this.invalidDateEntryMessage = this.invalidEntryMessage[this.getLocale];
+        this.$emit("update", "", this.dbKey);
       } else {
         this.invalidDateEntryMessage = "";
         this.$emit("update", this.date, this.dbKey);
@@ -70,6 +75,10 @@ export default {
     },
   },
   computed: {
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.locale;
+    },
     /**
      * Checks if the invalid text entry message is shown.
      * @returns {boolean} True if the invalid text entry message is not null, false otherwise.

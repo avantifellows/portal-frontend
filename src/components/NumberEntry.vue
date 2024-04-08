@@ -41,7 +41,7 @@ export default {
     },
     dbKey: {
       type: String,
-      defanult: "",
+      default: "",
     },
     helpText: {
       type: String,

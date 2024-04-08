@@ -1,8 +1,6 @@
 <template>
   <div v-if="show">
-    <p class="text-base mb-[10px]">
-      {{ label }}<span v-if="isRequired">*</span>
-    </p>
+    <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
 
     <input
       type="email"
@@ -12,11 +10,9 @@
     />
     <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
-    <span
-      v-if="isInvalidTextEntryMessageShown"
-      class="text-red text-sm mt-[10px]"
-      >{{ invalidTextEntryMessage }}</span
-    >
+    <span v-if="isInvalidTextEntryMessageShown" class="text-red text-sm mt-[10px]">{{
+      invalidTextEntryMessage
+    }}</span>
   </div>
 </template>
 <script>
@@ -31,10 +27,6 @@ export default {
     label: {
       type: String,
       default: "",
-    },
-    placeholder: {
-      type: String,
-      defult: "",
     },
     isRequired: {
       type: Boolean,

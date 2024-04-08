@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      locale: "English",
+      locale: this.$store.state.locale == "en" ? "English" : "Hindi",
     };
   },
   watch: {

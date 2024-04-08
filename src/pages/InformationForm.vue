@@ -84,6 +84,7 @@ export default {
     }
     if (Object.keys(this.formSchemaData).length == 0) {
       this.buttonDisabled = false;
+      this.redirect();
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
@@ -125,6 +126,13 @@ export default {
         en: "Complete your Profile",
         hi: "अपनी प्रोफाइल पूर्ण करें",
       };
+      if (Object.keys(this.formSchemaData).length == 0) {
+        const formHeading = {
+          en: "Good job! You have filled all your Profile Details!",
+          hi: "बहुत खूब ! आपने अपना प्रोफ़ाइल विवरण पूरा कर लिया है",
+        };
+      }
+
       return formHeading[this.getLocale];
     },
 
@@ -141,10 +149,7 @@ export default {
         let showBasedOn = fieldAttributes.showBasedOn;
 
         if (fieldAttributes.showBasedOn != "") {
-          if (
-            this.userData[showBasedOn.split("==")[0]] ==
-            showBasedOn.split("==")[1]
-          ) {
+          if (this.userData[showBasedOn.split("==")[0]] == showBasedOn.split("==")[1]) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
         }
@@ -201,10 +206,7 @@ export default {
       this.userData[key] = value;
     },
     async profileDetails() {
-      await UserAPI.studentData(
-        this.userData,
-        (this.userData["student_id"] = this.id)
-      );
+      await UserAPI.studentData(this.userData, (this.userData["student_id"] = this.id));
       this.redirect();
     },
 

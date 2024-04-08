@@ -418,10 +418,6 @@ export default {
     },
   },
   async created() {
-    this.$store.dispatch(
-      "setLocale",
-      this.$store.state.authGroupData.input_schema.default_locale
-    );
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
@@ -519,7 +515,7 @@ export default {
         });
       }
     }
-
+    this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
     this.isLoading = false;
     this.isIdGenerationEnabled;
     this.isRedirectionEnabled;

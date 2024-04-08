@@ -96,7 +96,7 @@ import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
-import { createAccessToken } from "@/services/API/token";
+import TokenAPI from "@/services/API/token";
 
 const assets = useAssets();
 
@@ -350,7 +350,10 @@ export default {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
-        createAccessToken(this.userInformation["student_id"]);
+        TokenAPI.createAccessToken(
+          this.userInformation["student_id"],
+          this.$store.state.groupData.name
+        );
 
         if (this.enable_popup) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);

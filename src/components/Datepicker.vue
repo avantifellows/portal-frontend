@@ -91,7 +91,9 @@ export default {
      * @returns {boolean} True if the number entry is valid, or if it is not required. False otherwise.
      */
     isDateEntryValid() {
-      return this.isRequired ? this.date != "" : true;
+      return this.isRequired
+        ? this.date != "" && this.invalidDateEntryMessage
+        : this.invalidDateEntryMessage == "";
     },
   },
 };

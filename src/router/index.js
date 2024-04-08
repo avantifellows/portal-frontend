@@ -28,6 +28,8 @@ const allowedQueryParams = [
   "redirection",
   "platform",
   "platform_id",
+  "type",
+  "sub_type",
 ];
 
 const routes = [

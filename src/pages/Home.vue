@@ -428,6 +428,9 @@ export default {
     },
   },
   async created() {
+    if (this.platform == "report") {
+      this.oldFlow = true;
+    }
     this.$store.dispatch("setLocale", "en");
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.

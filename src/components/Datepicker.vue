@@ -92,7 +92,7 @@ export default {
      */
     isDateEntryValid() {
       return this.isRequired
-        ? this.date != "" && this.invalidDateEntryMessage
+        ? this.date != "" && this.invalidDateEntryMessage == ""
         : this.invalidDateEntryMessage == "";
     },
   },

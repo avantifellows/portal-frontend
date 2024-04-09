@@ -439,7 +439,8 @@ export default {
       if (
         !this.sessionId.startsWith("HaryanaStudents") &&
         !this.sessionId.startsWith("FeedingIndiaStudents") &&
-        !this.sessionId.startsWith("UttarakhandStudents")
+        !this.sessionId.startsWith("UttarakhandStudents") &&
+        !this.sessionId.startsWith("DelhiStudents")
       ) {
         this.oldFlow = true;
         this.sessionData = await sessionAPIService.getOldSessionData(

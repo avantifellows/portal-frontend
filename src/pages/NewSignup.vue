@@ -8,18 +8,13 @@
     </div>
   </div>
   <LocalePicker :options="getLocaleOptions" />
-  <div
-    class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
-  >
+  <div class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
 
-  <div
-    v-if="!formSubmitted"
-    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
-  >
+  <div v-if="!formSubmitted" class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
     <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
@@ -120,7 +115,10 @@ export default {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
       this.formData.attributes[field]["show"] =
-        this.formData.attributes[field].showBasedOn == "" ? true : false;
+        this.formData.attributes[field].showBasedOn == "" &&
+        !this.formData.attributes[field].dependant
+          ? true
+          : false;
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
@@ -144,7 +142,7 @@ export default {
 
     /** Returns button text */
     signUpButtonLabel() {
-      return this.getLocale == "en" ? "Sign Up" : "साइन अप";
+      return this.getLocale == "en" ? "Register" : "रजिस्टर";
     },
 
     /** Returns button text */
@@ -160,8 +158,8 @@ export default {
     /** Returns text based on locale */
     signInText() {
       return this.getLocale == "en"
-        ? "Already Registered? <b> Sign In</b>"
-        : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
+        ? "Already Registered? <b> Login</b>"
+        : "पहले ही रजिस्टर्ड हैं? <b>लॉग इन करें। </b>";
     },
 
     /** Returns text based on locale */

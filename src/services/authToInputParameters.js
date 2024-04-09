@@ -1,4 +1,5 @@
 import TextEntry from "@/components/TextEntry.vue";
+import EmailEntry from "@/components/EmailEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import Dropdown from "@/components/Dropdown.vue";
 import NumberEntry from "@/components/NumberEntry.vue";
@@ -15,6 +16,7 @@ export const authToInputParameters = {
 
 export const typeToInputParameters = {
   text: shallowRef(TextEntry),
+  email: shallowRef(EmailEntry),
   number: shallowRef(NumberEntry),
   dropdown: shallowRef(Dropdown),
   date: shallowRef(Datepicker),

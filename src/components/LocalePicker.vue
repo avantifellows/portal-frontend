@@ -21,11 +21,8 @@ export default {
   },
   data() {
     return {
-      locale: this.$store.state.locale,
+      locale: this.$store.state.locale == "en" ? "English" : "Hindi",
     };
-  },
-  mounted() {
-    this.locale = this.$store.state.locale;
   },
   watch: {
     /**

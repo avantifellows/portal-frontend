@@ -1,33 +1,19 @@
 <template>
   <div class="flex flex-col justify-center" v-if="show">
-    <p class="text-base mb-[10px]">
-      {{ label }}<span v-if="isRequired">*</span>
-    </p>
-    <FormKit
-      type="number"
+    <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
+    <input
+      type="tel"
       v-model="number"
-      :help="helpText"
-      :name="dbKey"
       @keypress="isValidNumberEntry($event)"
       @input="updateNumberEntry($event)"
-      :wrapper-class="{
-        'mx-auto': true,
-      }"
-      :inner-class="{
-        'border py-2 px-2 rounded mx-auto': true,
-        'border-red': this.invalid,
-        'border-grey': !this.invalid,
-      }"
-      :help-class="{
-        'mt-[10px] text-sm text-grey italic': true,
-      }"
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
+      :class="invalid ? 'border-red' : 'border-grey'"
     />
+    <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
-    <span
-      v-if="isInvalidNumberEntryMessageShown"
-      class="text-red text-sm mt-[10px]"
-      >{{ invalidNumberEntryMessage }}</span
-    >
+    <span v-if="isInvalidNumberEntryMessageShown" class="text-red text-sm mt-[10px]">{{
+      invalidNumberEntryMessage
+    }}</span>
   </div>
 </template>
 <script>
@@ -45,17 +31,13 @@ export default {
       type: String,
       default: "",
     },
-    placeholder: {
-      type: String,
-      defult: "",
-    },
     isRequired: {
       type: Boolean,
       default: false,
     },
     maxLengthOfEntry: {
       type: Number,
-      default: 1,
+      default: null,
     },
     dbKey: {
       type: String,
@@ -116,18 +98,22 @@ export default {
      * Updates the number value based on user entry
      * @param {Event} event - The input event.
      */
-    updateNumberEntry(event) {
-      if (event.length == 0) {
+    updateNumberEntry() {
+      if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (event.length > this.maxLengthOfEntry) {
-        event = event.slice(0, this.maxLengthOfEntry).toString();
-      } else if (event.length < this.maxLengthOfEntry) {
-        this.invalidNumberEntryMessage =
-          this.invalidEntryMessage[this.getLocale];
+      } else if (
+        this.maxLengthOfEntry != null &&
+        this.number.length > this.maxLengthOfEntry
+      ) {
+        this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
+      } else if (
+        this.maxLengthOfEntry != null &&
+        this.number.length < this.maxLengthOfEntry
+      ) {
+        this.invalidNumberEntryMessage = this.invalidEntryMessage[this.getLocale];
       } else {
         this.invalidNumberEntryMessage = "";
       }
-      this.number = event;
       this.$emit("update", this.number, this.dbKey);
     },
 

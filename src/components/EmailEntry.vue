@@ -3,9 +3,8 @@
     <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
 
     <input
-      type="text"
-      v-model="text"
-      @keypress="isValidTextEntry($event)"
+      type="email"
+      v-model="email"
       @input="updateTextEntry($event)"
       class="border py-2 px-2 w-full rounded mx-auto border-grey"
     />
@@ -17,10 +16,8 @@
   </div>
 </template>
 <script>
-import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-
 export default {
-  name: "TextEntry",
+  name: "EmailEntry",
   emits: ["update"],
   props: {
     show: {
@@ -46,7 +43,7 @@ export default {
   },
   data() {
     return {
-      text: "",
+      email: "",
       invalidTextEntryMessage: "",
     };
   },
@@ -65,21 +62,10 @@ export default {
      * @param {Event} event - The input event.
      */
     updateTextEntry() {
-      if (this.text.length == 0) {
+      if (this.email.length == 0) {
         this.invalidTextEntryMessage = "";
       }
-      this.$emit("update", this.text, this.dbKey);
-    },
-
-    /**
-     * Checks if the text entry is valid
-     * @param {Event} event - The input event.
-     * @returns {boolean} True if the text entry is valid, prevent user entry otherwise.
-     */
-    isValidTextEntry(event) {
-      if (validationTypeToFunctionMap["text"](event)) {
-        return true;
-      } else event.preventDefault();
+      this.$emit("update", this.email, this.dbKey);
     },
   },
 };

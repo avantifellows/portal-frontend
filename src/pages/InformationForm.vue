@@ -84,12 +84,16 @@ export default {
     }
     if (Object.keys(this.formSchemaData).length == 0) {
       this.buttonDisabled = false;
+      this.redirect();
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
         typeToInputParameters[this.formSchemaData[field].type];
       this.formSchemaData[field]["show"] =
-        this.formSchemaData[field].showBasedOn == "" ? true : false;
+        this.formSchemaData[field].showBasedOn == "" &&
+        !this.formSchemaData[field].dependant
+          ? true
+          : false;
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
@@ -122,6 +126,7 @@ export default {
         en: "Complete your Profile",
         hi: "अपनी प्रोफाइल पूर्ण करें",
       };
+
       return formHeading[this.getLocale];
     },
 
@@ -138,10 +143,7 @@ export default {
         let showBasedOn = fieldAttributes.showBasedOn;
 
         if (fieldAttributes.showBasedOn != "") {
-          if (
-            this.userData[showBasedOn.split("==")[0]] ==
-            showBasedOn.split("==")[1]
-          ) {
+          if (this.userData[showBasedOn.split("==")[0]] == showBasedOn.split("==")[1]) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
         }
@@ -163,7 +165,6 @@ export default {
       Object.keys(this.formSchemaData).forEach((field) => {
         let fieldAttributes = this.formSchemaData[field];
         if (fieldAttributes.dependant) {
-          console.log(this.userData);
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
               fieldAttributes.dependantFieldMapping[
@@ -199,10 +200,7 @@ export default {
       this.userData[key] = value;
     },
     async profileDetails() {
-      await UserAPI.studentData(
-        this.userData,
-        (this.userData["student_id"] = this.id)
-      );
+      await UserAPI.studentData(this.userData, (this.userData["student_id"] = this.id));
       this.redirect();
     },
 

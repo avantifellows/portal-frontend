@@ -1,8 +1,6 @@
 <template>
   <div class="" v-if="show">
-    <p class="text-base mb-[10px]">
-      {{ label }}<span v-if="isRequired">*</span>
-    </p>
+    <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
 
     <FormKit
       type="select"
@@ -48,14 +46,6 @@ export default {
       default: "",
     },
     dbKey: {
-      type: String,
-      default: "",
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
-    defaultValue: {
       type: String,
       default: "",
     },

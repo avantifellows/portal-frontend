@@ -80,7 +80,7 @@
     <button
       v-show="enable_signup"
       @click="redirectToSignUp"
-      class="mt-[20px] mx-auto pt-2 text-primary text-base"
+      class="mt-[20px] mx-auto pt-2 text-primary text-base text"
       v-html="signUpText"
     />
   </div>
@@ -160,7 +160,7 @@ export default {
     },
     /** Returns button text */
     signInButtonLabel() {
-      return this.locale == "en" ? "Sign In" : "साइन इन";
+      return this.locale == "en" ? "Login" : "लॉग इन";
     },
 
     /** Retutns if sign up flow should be activated */
@@ -171,8 +171,8 @@ export default {
     /** Returns text based on locale */
     signUpText() {
       return this.locale == "en"
-        ? "New Student? <b> Register Now</b>"
-        : "नया छात्र? <b>अब रजिस्टर करें। </b>";
+        ? "<span>New Student?</span> <b> Register Now</b>"
+        : "<span>नया छात्र?</span><b>अब रजिस्टर करें। </b>";
     },
 
     /**
@@ -261,16 +261,15 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(
-        this.$store.state.authGroupData.locale_data[this.locale]
-      ).find((key) => {
-        if (key == authType) {
-          UIParameters =
-            this.$store.state.authGroupData.locale_data[this.locale][
+      Object.keys(this.$store.state.authGroupData.locale_data[this.locale]).find(
+        (key) => {
+          if (key == authType) {
+            UIParameters = this.$store.state.authGroupData.locale_data[this.locale][
               key.toString()
             ];
+          }
         }
-      });
+      );
       return UIParameters;
     },
 
@@ -335,20 +334,17 @@ export default {
       );
 
       if (!isUserValid.isUserIdValid) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["ID"][this.locale];
-      } else if (
-        this.auth_type.includes("DOB") &&
-        !isUserValid.isDateOfBirthValid
-      ) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["DOB"][this.locale];
-      } else if (
-        this.auth_type.includes("PH") &&
-        !isUserValid.isPhoneNumberValid
-      ) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["PH"][this.locale];
+        this.invalidLoginMessage = this.invalidLoginMessageTranslations["ID"][
+          this.locale
+        ];
+      } else if (this.auth_type.includes("DOB") && !isUserValid.isDateOfBirthValid) {
+        this.invalidLoginMessage = this.invalidLoginMessageTranslations["DOB"][
+          this.locale
+        ];
+      } else if (this.auth_type.includes("PH") && !isUserValid.isPhoneNumberValid) {
+        this.invalidLoginMessage = this.invalidLoginMessageTranslations["PH"][
+          this.locale
+        ];
       } else {
         createAccessToken(this.userInformation["student_id"]);
 
@@ -365,9 +361,7 @@ export default {
             this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_id,
             "",
-            "phone" in this.userInformation
-              ? this.userInformation["phone"]
-              : "",
+            "phone" in this.userInformation ? this.userInformation["phone"] : "",
             this.getBatch,
             "date_of_birth" in this.userInformation
               ? this.userInformation["date_of_birth"]
@@ -399,9 +393,7 @@ export default {
                 ? this.$store.state.sessionData.session_id
                 : "",
               "",
-              "phone" in this.userInformation
-                ? this.userInformation["phone"]
-                : "",
+              "phone" in this.userInformation ? this.userInformation["phone"] : "",
               this.getBatch,
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]
@@ -423,3 +415,8 @@ export default {
   },
 };
 </script>
+<style>
+text b {
+  @apply underline;
+}
+</style>

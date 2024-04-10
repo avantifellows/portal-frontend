@@ -311,7 +311,7 @@ export default {
         )
       ) {
         sendSQSMessage(
-          "attendance-sign-up",
+          "attendance-on-sign-up",
           this.sub_type,
           this.$store.state.platform,
           this.$store.state.platform_id,

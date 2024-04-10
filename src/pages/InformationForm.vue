@@ -143,7 +143,10 @@ export default {
         let showBasedOn = fieldAttributes.showBasedOn;
 
         if (fieldAttributes.showBasedOn != "") {
-          if (this.userData[showBasedOn.split("==")[0]] == showBasedOn.split("==")[1]) {
+          if (
+            this.userData[showBasedOn.split("==")[0]] ==
+            showBasedOn.split("==")[1]
+          ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
         }
@@ -200,7 +203,10 @@ export default {
       this.userData[key] = value;
     },
     async profileDetails() {
-      await UserAPI.studentData(this.userData, (this.userData["student_id"] = this.id));
+      await UserAPI.studentData(
+        this.userData,
+        (this.userData["student_id"] = this.id)
+      );
       this.redirect();
     },
 
@@ -218,8 +224,8 @@ export default {
         sendSQSMessage(
           "popup_form",
           this.$store.state.sessionData.purpose["sub-type"],
-          this.$store.platform,
-          this.$store.platform_id,
+          this.$store.state.sessionData.platform,
+          this.$store.state.sessionData.platform_id,
           this.id,
           "",
           this.$store.state.authGroupData.name,

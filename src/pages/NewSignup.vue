@@ -8,13 +8,18 @@
     </div>
   </div>
   <LocalePicker :options="getLocaleOptions" />
-  <div class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
 
-  <div v-if="!formSubmitted" class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
+  <div
+    v-if="!formSubmitted"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
+  >
     <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
@@ -264,8 +269,8 @@ export default {
       sendSQSMessage(
         "sign-up",
         this.$store.state.sessionData.purpose["sub-type"],
-        this.platform,
-        this.platform_id,
+        this.$store.state.sessionData.platform,
+        this.$store.state.sessionData.platform_id,
         this.userData["student_id"],
         "", // list of authentication methods
         this.$store.state.authGroupData.name,

@@ -20,11 +20,21 @@ export function redirectToDestination(
   let finalURLQueryParams = "";
 
   switch (redirectTo) {
-    case "plio": {
+    case "AF-plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
+        unique_id: userId,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
+    case "SCERT-plio": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
+      let url = new URL(redirectURL + redirectId);
+      finalURLQueryParams = new URLSearchParams({
+        api_key: import.meta.env.VITE_APP_PLIO_SCERT_API_KEY,
         unique_id: userId,
       });
       fullURL = url + "?" + finalURLQueryParams;

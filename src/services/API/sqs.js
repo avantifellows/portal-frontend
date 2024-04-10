@@ -27,13 +27,13 @@ const sqsClient = new SQSClient({
  */
 
 export async function sendSQSMessage(
-  purpose,
-  purposeParams,
-  redirectTo,
-  redirectId,
-  userIDList,
+  type,
+  sub_type,
+  platform,
+  platformId,
+  userId,
   authType,
-  groupName,
+  authGroup,
   userType,
   sessionId,
   userIpAddress,
@@ -43,19 +43,14 @@ export async function sendSQSMessage(
 ) {
   const messageBody = [
     {
-      purpose: {
-        type: purpose,
-        subType: purposeParams,
-        params: {
-          platform: redirectTo,
-          id: redirectId,
-        },
-      },
+      type: type,
+      sub_type: sub_type,
+      platform: platform,
+      platformId: platformId,
       authType: authType,
-      user: {
-        values: userIDList,
-      },
-      group: groupName,
+      userId: userId,
+      userValidated: true,
+      authGroup: authGroup,
       userType: userType,
       sessionId: sessionId,
       userIpAddress: userIpAddress,

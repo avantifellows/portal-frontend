@@ -634,7 +634,7 @@ export default {
               this.purposeParams,
               this.redirectTo,
               this.redirectId,
-              this.userIDList,
+              this.userIDList[0]["userID"],
               this.authType,
               this.group,
               this.$store.state.authGroupData.userType,

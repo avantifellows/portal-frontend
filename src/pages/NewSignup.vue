@@ -317,7 +317,7 @@ export default {
       ) {
         sendSQSMessage(
           "attendance-on-sign-up",
-          this.sub_type,
+          this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.platform,
           this.$store.state.platform_id,
           this.userData["user_id"],

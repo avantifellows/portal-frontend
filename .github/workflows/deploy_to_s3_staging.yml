@@ -28,7 +28,7 @@ jobs:
           NODE_ENV: staging
           VITE_APP_PLIO_AF_API_KEY: ${{ secrets.VITE_APP_PLIO_AF_API_KEY }}
           VITE_APP_BASE_URL_AF_PLIO: "https://app.plio.in/#/af/play/"
-          VITE_APP_BASE_URL_SCERT_PLIO: "https://app.plio.in/play/"
+          VITE_APP_BASE_URL_SCERT_PLIO: "https://app.plio.in/scertH/play/"
           VITE_APP_PLIO_SCERT_API_KEY: ${{ secrets.VITE_APP_PLIO_SCERT_API_KEY }}
           VITE_APP_QUIZ_AF_API_KEY: ${{ secrets.VITE_APP_QUIZ_AF_API_KEY }}
           VITE_APP_BASE_URL_QUIZ: "https://staging-quiz.avantifellows.org/quiz/"

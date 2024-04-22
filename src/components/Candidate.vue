@@ -94,11 +94,13 @@
       :options="[
         'Central University of Kerala',
         'Delhi University',
+        'Jadavpur University',
         'NIT Delhi',
         'NIT Hamirpur',
         'NIT Jalandhar',
         'NIT Kurukshetra',
         'NIT Rourkela',
+        'NIT Silchar',
         'NIT Srinagar',
         'NITK Surathkal',
         'NIT Trichy',

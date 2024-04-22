@@ -118,6 +118,7 @@
   </FormKit>
 </template>
 <script>
+import "@formkit/themes/genesis";
 export default {
   name: "CandidateHiring",
   props: {

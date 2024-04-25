@@ -58,7 +58,7 @@
       <p class="text-grey font-roboto text-sm opacity-40">or</p>
       <hr class="w-20 text-grey" />
     </div>
-    <!-- signup button -->
+
     <button
       v-if="$store.state.sessionData.type == 'sign-in'"
       @click="redirectToSignIn"

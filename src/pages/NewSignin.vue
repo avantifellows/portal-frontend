@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-
+  <LocalePicker :options="getLocaleOptions" />
   <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
@@ -91,6 +91,7 @@ import useAssets from "@/assets/assets.js";
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
+import LocalePicker from "@/components/LocalePicker.vue";
 
 import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
@@ -106,6 +107,7 @@ export default {
     NumberEntry,
     Datepicker,
     PhoneNumberEntry,
+    LocalePicker,
   },
   props: {
     sub_type: {
@@ -155,6 +157,12 @@ export default {
     this.mounted = true;
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     locale() {
       return this.$store.state.locale;
     },
@@ -261,15 +269,16 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.authGroupData.locale_data[this.locale]).find(
-        (key) => {
-          if (key == authType) {
-            UIParameters = this.$store.state.authGroupData.locale_data[this.locale][
+      Object.keys(
+        this.$store.state.authGroupData.locale_data[this.locale]
+      ).find((key) => {
+        if (key == authType) {
+          UIParameters =
+            this.$store.state.authGroupData.locale_data[this.locale][
               key.toString()
             ];
-          }
         }
-      );
+      });
       return UIParameters;
     },
 
@@ -334,17 +343,20 @@ export default {
       );
 
       if (!isUserValid.isUserIdValid) {
-        this.invalidLoginMessage = this.invalidLoginMessageTranslations["ID"][
-          this.locale
-        ];
-      } else if (this.auth_type.includes("DOB") && !isUserValid.isDateOfBirthValid) {
-        this.invalidLoginMessage = this.invalidLoginMessageTranslations["DOB"][
-          this.locale
-        ];
-      } else if (this.auth_type.includes("PH") && !isUserValid.isPhoneNumberValid) {
-        this.invalidLoginMessage = this.invalidLoginMessageTranslations["PH"][
-          this.locale
-        ];
+        this.invalidLoginMessage =
+          this.invalidLoginMessageTranslations["ID"][this.locale];
+      } else if (
+        this.auth_type.includes("DOB") &&
+        !isUserValid.isDateOfBirthValid
+      ) {
+        this.invalidLoginMessage =
+          this.invalidLoginMessageTranslations["DOB"][this.locale];
+      } else if (
+        this.auth_type.includes("PH") &&
+        !isUserValid.isPhoneNumberValid
+      ) {
+        this.invalidLoginMessage =
+          this.invalidLoginMessageTranslations["PH"][this.locale];
       } else {
         createAccessToken(this.userInformation["student_id"]);
 
@@ -361,7 +373,9 @@ export default {
             this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_id,
             "",
-            "phone" in this.userInformation ? this.userInformation["phone"] : "",
+            "phone" in this.userInformation
+              ? this.userInformation["phone"]
+              : "",
             this.getBatch,
             "date_of_birth" in this.userInformation
               ? this.userInformation["date_of_birth"]
@@ -393,7 +407,9 @@ export default {
                 ? this.$store.state.sessionData.session_id
                 : "",
               "",
-              "phone" in this.userInformation ? this.userInformation["phone"] : "",
+              "phone" in this.userInformation
+                ? this.userInformation["phone"]
+                : "",
               this.getBatch,
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]

@@ -50,13 +50,17 @@
         v-html="signUpButtonLabel"
       />
     </div>
-    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+    <div
+      v-if="$store.state.sessionData.type == 'sign-in'"
+      class="mt-[30px] flex w-48 mx-auto justify-between items-center"
+    >
       <hr class="w-20 text-grey" />
       <p class="text-grey font-roboto text-sm opacity-40">or</p>
       <hr class="w-20 text-grey" />
     </div>
-    <!-- signup button -->
+
     <button
+      v-if="$store.state.sessionData.type == 'sign-in'"
       @click="redirectToSignIn"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signInText"

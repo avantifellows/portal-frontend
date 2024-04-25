@@ -18,7 +18,6 @@
 
   <div v-else>
     <div v-if="!oldFlow">
-      <LocalePicker :options="getLocale" />
       <NewSignIn
         v-if="isTypeSignIn && doesGroupExist"
         :sub_type="getSubType"
@@ -68,7 +67,6 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
-import LocalePicker from "@/components/LocalePicker.vue";
 
 import useAssets from "@/assets/assets.js";
 
@@ -88,7 +86,6 @@ export default {
     LandingPage,
     Entry,
     Signup,
-    LocalePicker,
   },
   props: {
     /** General category of why the data is being captured. Eg: attendance
@@ -183,11 +180,6 @@ export default {
     };
   },
   computed: {
-    getLocale() {
-      return this.authGroupData
-        ? this.authGroupData.locale.split(",")
-        : ["English"];
-    },
     /** Returns if the purpose is registration.
      * (THIS METHOD WILL BE DEPRECATED IN V2)
      */
@@ -322,7 +314,9 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && this.sessionData.type == "sign-in") ||
-        (this.type == "sign-in" && this.oldFlow == false) ||
+        (!this.sessionData &&
+          this.type == "sign-in" &&
+          this.oldFlow == false) ||
         this.purpose == "attendance"
       );
     },

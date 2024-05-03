@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col justify-center" v-if="show">
-    <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
+    <p class="text-base mb-[10px]">
+      {{ label }}<span v-if="isRequired">*</span>
+    </p>
     <input
       type="tel"
       v-model="number"
@@ -11,9 +13,11 @@
     />
     <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
-    <span v-if="isInvalidNumberEntryMessageShown" class="text-red text-sm mt-[10px]">{{
-      invalidNumberEntryMessage
-    }}</span>
+    <span
+      v-if="isInvalidNumberEntryMessageShown"
+      class="text-red text-sm mt-[10px]"
+      >{{ invalidNumberEntryMessage }}</span
+    >
   </div>
 </template>
 <script>
@@ -110,11 +114,14 @@ export default {
         this.maxLengthOfEntry != null &&
         this.number.length < this.maxLengthOfEntry
       ) {
-        this.invalidNumberEntryMessage = this.invalidEntryMessage[this.getLocale];
+        this.invalidNumberEntryMessage =
+          this.invalidEntryMessage[this.getLocale];
       } else {
         this.invalidNumberEntryMessage = "";
       }
-      this.$emit("update", this.number, this.dbKey);
+      if (this.invalidNumberEntryMessage == "") {
+        this.$emit("update", this.number, this.dbKey);
+      }
     },
 
     /**

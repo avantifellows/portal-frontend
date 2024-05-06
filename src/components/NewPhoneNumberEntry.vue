@@ -14,7 +14,10 @@
     />
     <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
-    <p v-if="isInvalidPhoneNumberMessageShown" class="text-red text-sm mt-[10px]">
+    <p
+      v-if="isInvalidPhoneNumberMessageShown"
+      class="text-red text-sm mt-[10px]"
+    >
       {{ invalidPhoneNumberMessage }}
     </p>
   </div>
@@ -98,7 +101,9 @@ export default {
       } else if (this.phoneNumber.length > 10) {
         this.phoneNumber = this.phoneNumber.slice(0, 10).toString();
       } else if (this.phoneNumber.length < 10) {
-        this.invalidPhoneNumberMessage = this.invalidEntryMessage[this.getLocale];
+        this.invalidPhoneNumberMessage =
+          this.invalidEntryMessage[this.getLocale];
+        this.$emit("update", "", this.dbKey);
       } else {
         this.invalidPhoneNumberMessage = "";
         this.$emit("update", this.phoneNumber, this.dbKey);
@@ -113,7 +118,12 @@ export default {
     isValidPhoneNumberEntry(event) {
       if (this.phoneNumber.length < 1) {
         if (
-          !(event.key == "6" || event.key == "7" || event.key == "8" || event.key == "9")
+          !(
+            event.key == "6" ||
+            event.key == "7" ||
+            event.key == "8" ||
+            event.key == "9"
+          )
         )
           event.preventDefault();
       } else {

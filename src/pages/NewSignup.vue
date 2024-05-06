@@ -265,7 +265,9 @@ export default {
 
     /** updates user data based on user input */
     updateUserData(value, key) {
-      this.userData[key] = value;
+      if (value === "" || value === undefined) {
+        delete this.userData[key];
+      } else this.userData[key] = value;
     },
 
     /** creates user ID based on information */

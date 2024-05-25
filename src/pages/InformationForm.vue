@@ -43,7 +43,6 @@ import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LocalePicker from "../components/LocalePicker.vue";
 import { useToast } from "vue-toastification";
-import { postUserSessionActivity } from "@/services/API/user";
 
 const assets = useAssets();
 
@@ -222,10 +221,11 @@ export default {
           this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
-        postUserSessionActivity(
+        UserAPI.postUserSessionActivity(
           this.id,
           "popup_form",
-          this.$store.state.sessionData.session_id
+          this.$store.state.sessionData.session_id,
+          this.$store.state.authGroupData.input_schema.user_type
         );
         sendSQSMessage(
           "popup_form",

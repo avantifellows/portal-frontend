@@ -179,17 +179,15 @@ export default {
     });
   },
 
-  postUserSessionActivity(userId, userActivityType, sessionId) {
+  postUserSessionActivity(userId, userActivityType, sessionId, userType) {
     return new Promise((resolve) => {
       dbClient
-        .post(
-          "/user-session",
-          JSON.stringify({
-            user_id: userId,
-            user_activity_type: userActivityType,
-            session_id: sessionId,
-          })
-        )
+        .post("/user-session", {
+          user_id: userId,
+          user_activity_type: userActivityType,
+          session_id: sessionId,
+          user_type: userType,
+        })
         .then((response) => {
           resolve(response.data);
         })

@@ -98,7 +98,6 @@ import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LocalePicker from "../components/LocalePicker.vue";
-import { postUserSessionActivity } from "@/services/API/user";
 
 const assets = useAssets();
 
@@ -273,10 +272,11 @@ export default {
 
     /** creates user ID based on information */
     async signUp() {
-      postUserSessionActivity(
+      UserAPI.postUserSessionActivity(
         this.userData["student_id"],
         "sign-up",
-        this.$store.state.sessionData.session_id
+        this.$store.state.sessionData.session_id,
+        this.$store.state.authGroupData.input_schema.user_type
       );
       sendSQSMessage(
         "sign-up",

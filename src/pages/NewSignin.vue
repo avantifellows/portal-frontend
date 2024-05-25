@@ -98,7 +98,7 @@ import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { createAccessToken } from "@/services/API/token";
-import { postUserSessionActivity } from "@/services/API/user";
+import UserAPI from "@/services/API/user.js";
 
 const assets = useAssets();
 
@@ -363,10 +363,11 @@ export default {
 
         if (this.enable_popup) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
-          postUserSessionActivity(
+          UserAPI.postUserSessionActivity(
             this.userInformation["student_id"],
             "sign-in",
-            this.$store.state.sessionData.session_id
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type
           );
           sendSQSMessage(
             "sign-in",
@@ -397,10 +398,11 @@ export default {
               this.$store.state.authGroupData.input_schema.user_type
             )
           ) {
-            postUserSessionActivity(
+            UserAPI.postUserSessionActivity(
               this.userInformation["student_id"],
               "sign-in",
-              this.$store.state.sessionData.session_id
+              this.$store.state.sessionData.session_id,
+              this.$store.state.authGroupData.input_schema.user_type
             );
             sendSQSMessage(
               "sign-in",

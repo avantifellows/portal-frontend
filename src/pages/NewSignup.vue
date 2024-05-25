@@ -98,6 +98,7 @@ import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LocalePicker from "../components/LocalePicker.vue";
+import { postUserSessionActivity } from "@/services/API/user";
 
 const assets = useAssets();
 

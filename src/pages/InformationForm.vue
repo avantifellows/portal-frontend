@@ -43,6 +43,7 @@ import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LocalePicker from "../components/LocalePicker.vue";
 import { useToast } from "vue-toastification";
+import { postUserSessionActivity } from "@/services/API/user";
 
 const assets = useAssets();
 

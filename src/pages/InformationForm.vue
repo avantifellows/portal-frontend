@@ -221,6 +221,11 @@ export default {
           this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
+        postUserSessionActivity(
+          this.id,
+          "popup_form",
+          this.$store.state.sessionData.session_id
+        );
         sendSQSMessage(
           "popup_form",
           this.$store.state.sessionData.purpose["sub-type"],

@@ -272,6 +272,11 @@ export default {
 
     /** creates user ID based on information */
     async signUp() {
+      postUserSessionActivity(
+        this.userData["student_id"],
+        "sign-up",
+        this.$store.state.sessionData.session_id
+      );
       sendSQSMessage(
         "sign-up",
         this.$store.state.sessionData.purpose["sub-type"],
@@ -321,6 +326,11 @@ export default {
           this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
+        postUserSessionActivity(
+          this.userData["student_id"],
+          "attendance-on-sign-up",
+          this.$store.state.sessionData.session_id
+        );
         sendSQSMessage(
           "attendance-on-sign-up",
           this.$store.state.sessionData.purpose["sub-type"],

@@ -124,6 +124,7 @@ export default {
         });
     });
   },
+
   verifyUser(userId, collectionName) {
     const params = {
       userID: userId,
@@ -141,6 +142,7 @@ export default {
         });
     });
   },
+
   doesBirthdateMatch(birthdate, userID, collectionName) {
     const params = {
       userID: userID,
@@ -160,6 +162,7 @@ export default {
         });
     });
   },
+
   verifyAIETStudent(data) {
     return new Promise((resolve) => {
       client
@@ -172,6 +175,27 @@ export default {
           else {
             throw new Error("User API returned an error:", error);
           }
+        });
+    });
+  },
+
+  postUserSessionActivity(userId, userActivityType, sessionId) {
+    return new Promise((resolve) => {
+      dbClient
+        .post(
+          "/user-session",
+          JSON.stringify({
+            user_id: userId,
+            user_activity_type: userActivityType,
+            session_id: sessionId,
+          })
+        )
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          resolve({ error: error });
+          throw new Error("User API returned an error:", error);
         });
     });
   },

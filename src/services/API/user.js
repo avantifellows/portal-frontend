@@ -179,7 +179,13 @@ export default {
     });
   },
 
-  postUserSessionActivity(userId, userActivityType, sessionId, userType) {
+  postUserSessionActivity(
+    userId,
+    userActivityType,
+    sessionId,
+    userType,
+    sessionOccurrenceId
+  ) {
     return new Promise((resolve) => {
       dbClient
         .post("/user-session", {
@@ -187,6 +193,7 @@ export default {
           user_activity_type: userActivityType,
           session_id: sessionId,
           user_type: userType,
+          session_occurrence_id: sessionOccurrenceId,
         })
         .then((response) => {
           resolve(response.data);

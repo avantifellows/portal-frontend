@@ -367,7 +367,8 @@ export default {
             this.userInformation["student_id"],
             "sign-in",
             this.$store.state.sessionData.session_id,
-            this.$store.state.authGroupData.input_schema.user_type
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
           );
           sendSQSMessage(
             "sign-in",
@@ -402,7 +403,8 @@ export default {
               this.userInformation["student_id"],
               "sign-in",
               this.$store.state.sessionData.session_id,
-              this.$store.state.authGroupData.input_schema.user_type
+              this.$store.state.authGroupData.input_schema.user_type,
+              this.$store.state.sessionData.session_occurrence_id
             );
             sendSQSMessage(
               "sign-in",

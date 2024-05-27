@@ -276,7 +276,8 @@ export default {
         this.userData["student_id"],
         "sign-up",
         this.$store.state.sessionData.session_id,
-        this.$store.state.authGroupData.input_schema.user_type
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.sessionData.session_occurrence_id
       );
       sendSQSMessage(
         "sign-up",
@@ -330,7 +331,8 @@ export default {
         postUserSessionActivity(
           this.userData["student_id"],
           "attendance-on-sign-up",
-          this.$store.state.sessionData.session_id
+          this.$store.state.sessionData.session_id,
+          this.$store.state.sessionData.session_occurrence_id
         );
         sendSQSMessage(
           "attendance-on-sign-up",

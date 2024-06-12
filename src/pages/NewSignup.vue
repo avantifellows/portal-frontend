@@ -8,18 +8,13 @@
     </div>
   </div>
   <LocalePicker :options="getLocaleOptions" />
-  <div
-    class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
-  >
+  <div class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
 
-  <div
-    v-if="!formSubmitted"
-    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
-  >
+  <div v-if="!formSubmitted" class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
     <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
@@ -272,13 +267,6 @@ export default {
 
     /** creates user ID based on information */
     async signUp() {
-      UserAPI.postUserSessionActivity(
-        this.userData["student_id"],
-        "sign-up",
-        this.$store.state.sessionData.session_id,
-        this.$store.state.authGroupData.input_schema.user_type,
-        this.$store.state.sessionData.session_occurrence_id
-      );
       sendSQSMessage(
         "sign-up",
         this.$store.state.sessionData.purpose["sub-type"],
@@ -315,6 +303,13 @@ export default {
       }
       this.isLoading = false;
       this.userData["user_id"] = createdUserId ? createdUserId : "";
+      UserAPI.postUserSessionActivity(
+        this.userData["user_id"],
+        "sign-up",
+        this.$store.state.sessionData.session_id,
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.sessionData.session_occurrence_id
+      );
     },
 
     /** redirects to destination */

@@ -62,7 +62,7 @@
     />
   </div>
   <div
-    v-if="formSubmitted"
+    v-if="formSubmitted && !isLoading"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
     <div

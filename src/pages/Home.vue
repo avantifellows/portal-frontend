@@ -30,12 +30,7 @@
 
     <div v-else>
       <div
-        v-if="
-          !isPurposeRegistration &&
-          !isLandingPage &&
-          isAuthTypeID &&
-          doesGroupExist
-        "
+        v-if="!isPurposeRegistration && !isLandingPage && isAuthTypeID && doesGroupExist"
       >
         <Entry
           :redirectTo="getRedirectTo"
@@ -244,8 +239,7 @@ export default {
       return (
         (this.sessionData && this.sessionData.auth_type.split(",")) ||
         (this.auth_type && this.auth_type.split(",")) ||
-        (this.authGroupData &&
-          this.authGroupData.input_schema.auth_type.split(","))
+        (this.authGroupData && this.authGroupData.input_schema.auth_type.split(","))
       );
     },
 
@@ -314,9 +308,7 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && this.sessionData.type == "sign-in") ||
-        (!this.sessionData &&
-          this.type == "sign-in" &&
-          this.oldFlow == false) ||
+        (!this.sessionData && this.type == "sign-in" && this.oldFlow == false) ||
         this.purpose == "attendance"
       );
     },
@@ -327,8 +319,7 @@ export default {
      */
     isTypeSignUp() {
       return (
-        (this.sessionData && this.sessionData.type == "sign-up") ||
-        this.type == "sign-up"
+        (this.sessionData && this.sessionData.type == "sign-up") || this.type == "sign-up"
       );
     },
 
@@ -416,8 +407,7 @@ export default {
         "setImages",
         this.oldFlow
           ? this.authGroupData.images[0]
-          : this.authGroupData &&
-              this.authGroupData.input_schema.images.split(",")
+          : this.authGroupData && this.authGroupData.input_schema.images.split(",")
       );
     },
   },
@@ -432,13 +422,9 @@ export default {
     if (this.sessionId != "") {
       if (this.sessionId.startsWith("PunjabStudents")) {
         this.oldFlow = true;
-        this.sessionData = await sessionAPIService.getOldSessionData(
-          this.sessionId
-        );
+        this.sessionData = await sessionAPIService.getOldSessionData(this.sessionId);
       } else {
-        this.sessionData = await sessionAPIService.getSessionData(
-          this.sessionId
-        );
+        this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       }
 
       /** SessionId does not exist */
@@ -446,7 +432,8 @@ export default {
         this.$router.push({
           name: "Error",
           params: {
-            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text:
+              "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }
@@ -489,11 +476,7 @@ export default {
           );
         }
         this.$store.dispatch("setAuthGroupData", this.authGroupData);
-        if (
-          !this.sessionData.error &&
-          this.authGroupData &&
-          this.authGroupData.error
-        ) {
+        if (!this.sessionData.error && this.authGroupData && this.authGroupData.error) {
           /** Group API returns an error*/
           this.toast.error("Network Error, please try again!", {
             position: "top-center",
@@ -509,13 +492,9 @@ export default {
        * If sessionId does not exist in route, then retrieve group data directly
        */
       if (!this.oldFlow) {
-        this.authGroupData = await authGroupAPIService.getAuthGroupData(
-          this.authGroup
-        );
+        this.authGroupData = await authGroupAPIService.getAuthGroupData(this.authGroup);
       } else {
-        this.authGroupData = await authGroupAPIService.getGroupData(
-          this.getGroup
-        );
+        this.authGroupData = await authGroupAPIService.getGroupData(this.getGroup);
       }
 
       this.$store.dispatch("setAuthGroupData", this.authGroupData);
@@ -531,10 +510,7 @@ export default {
       }
     }
     if ("input_schema" in this.authGroupData) {
-      this.$store.dispatch(
-        "setLocale",
-        this.authGroupData.input_schema.default_locale
-      );
+      this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
     }
     this.isLoading = false;
     this.isIdGenerationEnabled;

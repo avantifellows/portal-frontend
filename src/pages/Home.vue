@@ -307,7 +307,7 @@ export default {
      */
     isTypeSignIn() {
       return (
-        (this.sessionData && this.sessionData.type == "sign-in") ||
+        (this.sessionData && (this.sessionData.type == "sign-in" || this.sessionData.type == "broadcast")) ||
         (!this.sessionData && this.type == "sign-in" && this.oldFlow == false) ||
         this.purpose == "attendance"
       );
@@ -362,9 +362,15 @@ export default {
      * @returns {string} The group.
      */
     getGroup() {
-      return this.sessionData && this.sessionData.group
-        ? this.sessionData.group
-        : this.authGroup;
+      if (this.sessionData && this.sessionData.group) {
+        return this.sessionData.group;
+      }
+      else if (this.sessionData && this.sessionData.meta_data && this.sessionData.meta_data.group) {
+        return this.sessionData.meta_data.group;
+      }
+      else {
+        return this.authGroup;
+      }
     },
 
     /**
@@ -465,11 +471,14 @@ export default {
       }
 
       /** If session is open, retrieve group data and store it */
-      if (!this.sessionData.error && this.sessionEnabled) {
+      if (!this.sessionData.error) {
         if (!this.oldFlow) {
-          this.authGroupData = await authGroupAPIService.getAuthGroupName(
-            this.sessionData.id
-          );
+          if (this.sessionData.type == "broadcast") {
+            this.authGroupData = await authGroupAPIService.getAuthGroupData(this.sessionData.meta_data.group);
+          }
+          else {
+            this.authGroupData = await authGroupAPIService.getAuthGroupName(this.sessionData.id);
+          }
         } else {
           this.authGroupData = await authGroupAPIService.getGroupData(
             this.sessionData.group
@@ -492,6 +501,7 @@ export default {
        * If sessionId does not exist in route, then retrieve group data directly
        */
       if (!this.oldFlow) {
+        // this is wrong
         this.authGroupData = await authGroupAPIService.getAuthGroupData(this.authGroup);
       } else {
         this.authGroupData = await authGroupAPIService.getGroupData(this.getGroup);

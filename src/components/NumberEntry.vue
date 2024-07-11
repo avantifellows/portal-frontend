@@ -110,15 +110,16 @@ export default {
         this.number.length > this.maxLengthOfEntry
       ) {
         this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
-      } else if (
-        this.maxLengthOfEntry != null &&
-        this.number.length < this.maxLengthOfEntry
-      ) {
-        this.invalidNumberEntryMessage =
-          this.invalidEntryMessage[this.getLocale];
-      } else {
-        this.invalidNumberEntryMessage = "";
       }
+      // else if (
+      //   this.maxLengthOfEntry != null &&
+      //   this.number.length < this.maxLengthOfEntry
+      // ) {
+      //   this.invalidNumberEntryMessage =
+      //     this.invalidEntryMessage[this.getLocale];
+      // } else {
+      //   this.invalidNumberEntryMessage = "";
+      // }
       if (this.invalidNumberEntryMessage == "") {
         this.$emit("update", this.number, this.dbKey);
       } else {

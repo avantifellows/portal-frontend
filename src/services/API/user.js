@@ -7,6 +7,7 @@ import {
   checkBirthdateEndpoint,
   verifyAIETStudentEndpoint,
   verifyTeacherEndpoint,
+  verifySchoolEndpoint,
 } from "@/services/API/endpoints.js";
 
 export default {
@@ -45,6 +46,26 @@ export default {
           if (error.response.status == 404) resolve(false);
           else {
             throw new Error("User API returned an error:", error);
+          }
+        });
+    });
+  },
+
+  /**
+   * Validates that the code exists
+   * @param {String} schoolCode - the code that needs to be validated
+   */
+  verifySchool(schoolData) {
+    return new Promise((resolve) => {
+      dbClient
+        .get(verifySchoolEndpoint, { params: schoolData })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("School API returned an error:", error);
           }
         });
     });

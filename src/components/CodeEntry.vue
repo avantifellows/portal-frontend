@@ -1,7 +1,7 @@
 <template>
     <div v-if="show">
       <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
-  
+
       <input
         type="text"
         v-model="code"
@@ -10,7 +10,7 @@
         class="border py-2 px-2 w-full rounded mx-auto border-grey"
       />
       <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
-  
+
       <span v-if="isInvalidCodeEntryMessageShown" class="text-red text-sm mt-[10px]">{{
         invalidCodeEntryMessage
       }}</span>
@@ -18,7 +18,7 @@
   </template>
   <script>
   import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
-  
+
   export default {
     name: "CodeEntry",
     emits: ["update"],
@@ -95,11 +95,11 @@
         this.code.length > this.maxLengthOfEntry
       ) {
         this.code = this.code.slice(0, this.maxLengthOfEntry).toString();
-      } 
+      }
 
         this.$emit("update", this.code, this.dbKey);
       },
-  
+
       /**
        * Checks if the code entry is valid
        * @param {Event} event - The input event.
@@ -113,4 +113,3 @@
     },
   };
   </script>
-  

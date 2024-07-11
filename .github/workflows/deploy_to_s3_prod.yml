@@ -1,22 +1,33 @@
 # This workflow will build the static files
 # and upload them to the given s3 bucket
-name: Deploy to prod
 
 on:
   push:
     branches: ["release"]
 
+name: Deploy to production
+
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    name: Deploy
 
     environment:
       name: Production
       url: "https://auth.avantifellows.org"
 
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
 
       - name: Install
         run: npm install
@@ -44,7 +55,6 @@ jobs:
           VITE_APP_PORTAL_BACKEND: "https://uza9ixusuh.execute-api.ap-south-1.amazonaws.com/"
           VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL: "https://reports.avantifellows.org/reports/student_quiz_report"
           VITE_APP_GURUKUL_BASE_URL: "https://gurukul.avantifellows.org/"
-
         run: npm run build
 
       - name: Configure AWS Credentials
@@ -54,6 +64,5 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # sync with the given S3 bucket
       - name: Deploy static site to S3 bucket
         run: aws s3 sync ./dist s3://af-auth-layer --delete --acl public-read

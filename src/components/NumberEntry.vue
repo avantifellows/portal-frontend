@@ -119,6 +119,11 @@ export default {
       ) {
         this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
       }
+      else if (
+        this.number.length <= this.maxLengthOfEntry
+      ) {
+        this.invalidNumberEntryMessage = "";
+      }
       // else if (
       //   this.maxLengthOfEntry != null &&
       //   this.number.length < this.maxLengthOfEntry

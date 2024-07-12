@@ -14,6 +14,7 @@ export default createStore({
     redirection: true,
     platform: "",
     platform_id: "",
+    platform_link: "",
     images: [],
   },
   actions: {
@@ -34,6 +35,9 @@ export default createStore({
     },
     setPlatformId({ commit }, platform_id) {
       commit("setPlatformId", platform_id);
+    },
+    setPlatformLink({ commit }, platform_link) {
+      commit("setPlatformLink", platform_link);
     },
     setLocale({ commit }, locale) {
       commit("setLocale", locale);
@@ -60,6 +64,9 @@ export default createStore({
     },
     setPlatformId(state, platform_id) {
       state.platform_id = platform_id;
+    },
+    setPlatformLink(state, platform_link) {
+      state.platform_link = platform_link;
     },
     setLocale(state, locale) {
       state.locale = locale;

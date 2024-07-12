@@ -162,6 +162,11 @@ export default {
       default: "",
       type: String,
     },
+    /** What the external platform link is. */
+    platform_link: {
+      default: "",
+      type: String,
+    },
   },
   data() {
     return {
@@ -301,6 +306,14 @@ export default {
       );
     },
 
+    /** Returns the external platform link the user should be redirected to. */
+    setPlatformLink() {
+      this.$store.dispatch(
+        "setPlatformLink",
+        (this.sessionData && this.sessionData.platform_link) || this.platform_link
+      );
+    },
+
     /**
      * Checks if the authentication flow type is a sign-in.
      * @returns {boolean} True if the type is a sign-in, false otherwise.
@@ -405,7 +418,8 @@ export default {
         this.platform_id == "" &&
         this.platform == "" &&
         this.sub_type == "" &&
-        this.sessionId == ""
+        this.sessionId == "" &&
+        this.platform_link == ""
       );
     },
     setAuthGroupImages() {
@@ -527,6 +541,7 @@ export default {
     this.isRedirectionEnabled;
     this.setPlatform;
     this.setPlatformId;
+    this.setPlatformLink;
     this.setAuthGroupImages;
   },
 };

@@ -1,12 +1,14 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
-  purge: ["./public/index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  darkMode: false, // or 'media' or 'class'
+  content: ["./public/index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     screens: {
       sm: "640px",
       md: "768px",
       lg: "1024px",
       xl: "1280px",
+      ...defaultTheme.screens,
     },
     fontSize: {
       base: "14px",

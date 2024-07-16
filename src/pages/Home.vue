@@ -21,6 +21,7 @@
       <NewSignIn
         v-if="isTypeSignIn && doesGroupExist"
         :sub_type="getSubType"
+        :is_type_signin="isTypeSignIn"
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
         :enable_popup="isPopUpFormEnabled"
@@ -159,6 +160,11 @@ export default {
 
     /** What the external platform ID is. */
     platform_id: {
+      default: "",
+      type: String,
+    },
+    /** What the external platform link is. */
+    platform_link: {
       default: "",
       type: String,
     },
@@ -301,13 +307,21 @@ export default {
       );
     },
 
+    /** Returns the external platform link the user should be redirected to. */
+    setPlatformLink() {
+      this.$store.dispatch(
+        "setPlatformLink",
+        (this.sessionData && this.sessionData.platform_link) || this.platform_link
+      );
+    },
+
     /**
      * Checks if the authentication flow type is a sign-in.
      * @returns {boolean} True if the type is a sign-in, false otherwise.
      */
     isTypeSignIn() {
       return (
-        (this.sessionData && this.sessionData.type == "sign-in") ||
+        (this.sessionData && (this.sessionData.type == "sign-in" || this.sessionData.type == "broadcast")) ||
         (!this.sessionData && this.type == "sign-in" && this.oldFlow == false) ||
         this.purpose == "attendance"
       );
@@ -362,9 +376,15 @@ export default {
      * @returns {string} The group.
      */
     getGroup() {
-      return this.sessionData && this.sessionData.group
-        ? this.sessionData.group
-        : this.authGroup;
+      if (this.sessionData && this.sessionData.group) {
+        return this.sessionData.group;
+      }
+      else if (this.sessionData && this.sessionData.meta_data && this.sessionData.meta_data.group) {
+        return this.sessionData.meta_data.group;
+      }
+      else {
+        return this.authGroup;
+      }
     },
 
     /**
@@ -399,7 +419,8 @@ export default {
         this.platform_id == "" &&
         this.platform == "" &&
         this.sub_type == "" &&
-        this.sessionId == ""
+        this.sessionId == "" &&
+        this.platform_link == ""
       );
     },
     setAuthGroupImages() {
@@ -465,11 +486,14 @@ export default {
       }
 
       /** If session is open, retrieve group data and store it */
-      if (!this.sessionData.error && this.sessionEnabled) {
+      if (!this.sessionData.error) {
         if (!this.oldFlow) {
-          this.authGroupData = await authGroupAPIService.getAuthGroupName(
-            this.sessionData.id
-          );
+          if (this.sessionData.type == "broadcast") {
+            this.authGroupData = await authGroupAPIService.getAuthGroupData(this.sessionData.meta_data.group);
+          }
+          else {
+            this.authGroupData = await authGroupAPIService.getAuthGroupName(this.sessionData.id);
+          }
         } else {
           this.authGroupData = await authGroupAPIService.getGroupData(
             this.sessionData.group
@@ -492,6 +516,7 @@ export default {
        * If sessionId does not exist in route, then retrieve group data directly
        */
       if (!this.oldFlow) {
+        // this is wrong
         this.authGroupData = await authGroupAPIService.getAuthGroupData(this.authGroup);
       } else {
         this.authGroupData = await authGroupAPIService.getGroupData(this.getGroup);
@@ -517,6 +542,7 @@ export default {
     this.isRedirectionEnabled;
     this.setPlatform;
     this.setPlatformId;
+    this.setPlatformLink;
     this.setAuthGroupImages;
   },
 };

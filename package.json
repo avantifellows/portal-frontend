@@ -6,9 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite build && vite preview",
-    "lint": "vite lint",
-    "deploy-staging": "vite build --mode staging && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer-staging --delete --acl public-read",
-    "deploy": "vite build && aws --profile af-s3-bot --region ap-south-1 s3 sync ./dist s3://af-auth-layer --delete --acl public-read"
+    "lint": "vite lint"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.30.0",

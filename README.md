@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/github/license/avantifellows/auth-layer?color=blue&style=flat-square)](LICENSE)
+[![License: MIT](https://img.shields.io/github/license/avantifellows/portal-frontend?color=blue&style=flat-square)](LICENSE)
 [![Discord](https://img.shields.io/discord/717975833226248303.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.gg/29qYD7fZtZ)
 
 # Authentication Layer

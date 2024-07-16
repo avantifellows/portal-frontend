@@ -1,4 +1,5 @@
 import TextEntry from "@/components/TextEntry.vue";
+import CodeEntry from "@/components/CodeEntry.vue";
 import EmailEntry from "@/components/EmailEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import Dropdown from "@/components/Dropdown.vue";
@@ -12,6 +13,7 @@ export const authToInputParameters = {
   number: ["ID"],
   phoneNumber: ["PH"],
   date: ["DOB"],
+  code: ["CODE"],
 };
 
 export const typeToInputParameters = {
@@ -23,4 +25,5 @@ export const typeToInputParameters = {
   phone: shallowRef(NewPhoneNumberEntry),
   upload: shallowRef(Upload),
   checkbox: shallowRef(Checkbox),
+  code: shallowRef(CodeEntry),
 };

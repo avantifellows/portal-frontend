@@ -39,5 +39,12 @@ export async function validateUser(
       });
     }
   }
+  if (authTypes.includes("CODE")) {
+    if (userType == "school") {
+      user["isCodeValid"] = await userAPI.verifySchool({
+        code: userInformation["code"],
+      });
+    }
+  }
   return user;
 }

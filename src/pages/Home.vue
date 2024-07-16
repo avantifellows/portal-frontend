@@ -21,6 +21,7 @@
       <NewSignIn
         v-if="isTypeSignIn && doesGroupExist"
         :sub_type="getSubType"
+        :is_type_signin="isTypeSignIn"
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
         :enable_popup="isPopUpFormEnabled"

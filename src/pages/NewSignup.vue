@@ -30,6 +30,7 @@
         :isRequired="formField.required"
         :dbKey="formField.key"
         :options="formField.options[getLocale]"
+        :isTypeSignIn=false
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"

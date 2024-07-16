@@ -24,6 +24,7 @@
       <NumberEntry
         v-if="isEntryNumber(authType)"
         ref="numberEntry"
+        :isTypeSignIn="is_type_signin"
         :label="numberEntryParameters.label"
         :placeholder="numberEntryParameters.placeholder"
         :isRequired="numberEntryParameters.required"
@@ -127,6 +128,10 @@ export default {
     sub_type: {
       default: "",
       type: String,
+    },
+    is_type_signin: {
+      default: true,
+      type: Boolean,
     },
     auth_type: {
       default: [],

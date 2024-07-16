@@ -31,7 +31,6 @@ async function checkUserIDInDB(
       closeButton: false,
     });
   }
-  console.log("extra:", isExtraInputValidationRequired);
   if (!isExtraInputValidationRequired) {
     if (isCurrentUserValid) {
       return {
@@ -105,7 +104,6 @@ export async function validateID(
         "date_of_birth"
       );
     }
-    console.log(isCurrentUserValid, isBirthdateValid);
     return {
       isCurrentUserValid: isCurrentUserValid && isBirthdateValid,
       validateCount: 0,
@@ -113,7 +111,6 @@ export async function validateID(
   }
   {
     if (authType.includes("ID")) {
-      console.log("here");
       let userValidationResponse = await checkUserIDInDB(
         userID,
         validateCount,

@@ -12,6 +12,7 @@ export function redirectToDestination(
   purposeParams,
   userId,
   redirectId,
+  redirectLink,
   redirectTo,
   group
 ) {
@@ -61,11 +62,11 @@ export function redirectToDestination(
       break;
     }
     case "zoom": {
-      fullURL = redirectId;
+      fullURL = redirectLink;
       break;
     }
     case "teams": {
-      fullURL = redirectId;
+      fullURL = redirectLink;
       break;
     }
     case "youtube": {
@@ -82,11 +83,15 @@ export function redirectToDestination(
       break;
     }
     case "google-forms": {
-      fullURL = redirectId;
+      fullURL = redirectLink;
       break;
     }
     case "gurukul": {
       fullURL = import.meta.env.VITE_APP_GURUKUL_BASE_URL;
+      break;
+    }
+    case "others": {
+      fullURL = redirectLink;
       break;
     }
     default: {

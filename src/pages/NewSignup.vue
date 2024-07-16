@@ -30,6 +30,7 @@
         :isRequired="formField.required"
         :dbKey="formField.key"
         :options="formField.options[getLocale]"
+        :isTypeSignIn=false
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -319,6 +320,7 @@ export default {
           this.sub_type,
           this.userData["user_id"],
           this.$store.state.platform_id,
+          this.$store.state.platform_link,
           this.$store.state.platform,
           this.$store.state.authGroupData.input_schema.user_type
         )

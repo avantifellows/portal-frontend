@@ -31,6 +31,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    isTypeSignIn: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",
@@ -96,6 +100,11 @@ export default {
     getLocale() {
       return this.$store.state.locale;
     },
+
+    /** Checks if input entry is percentage */
+    isPercentageLabel() {
+      return this.label.includes("%");
+    }
   },
   methods: {
     /**
@@ -105,14 +114,25 @@ export default {
     updateNumberEntry() {
       if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
+      } else if (this.isPercentageLabel && (this.number < 0 || this.number > 100)) {
+        this.invalidNumberEntryMessage = "Percentage must be between 0 and 100";
+        this.number = this.number.slice(0, 3).toString();
       } else if (
         this.maxLengthOfEntry != null &&
         this.number.length > this.maxLengthOfEntry
       ) {
         this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
-      } else if (
+      }
+      else if (
+        this.number.length <= this.maxLengthOfEntry &&
+        this.$props.isTypeSignIn == true
+      ) {
+        this.invalidNumberEntryMessage = "";
+      }
+      else if (
         this.maxLengthOfEntry != null &&
-        this.number.length < this.maxLengthOfEntry
+        this.number.length < this.maxLengthOfEntry &&
+        this.$props.isTypeSignIn == false
       ) {
         this.invalidNumberEntryMessage =
           this.invalidEntryMessage[this.getLocale];
@@ -133,9 +153,15 @@ export default {
      */
     isValidNumberEntry(event) {
       if (validationTypeToFunctionMap["numeric"](event)) {
-        return true;
-      } else event.preventDefault();
-    },
+        if (this.isPercentageLabel && this.number.length >= 3) {
+          event.preventDefault();
+        } else {
+          return true;
+        }
+      } else {
+        event.preventDefault();
+      }
+  },
   },
 };
 </script>

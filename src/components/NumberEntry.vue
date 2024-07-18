@@ -132,7 +132,8 @@ export default {
       else if (
         this.maxLengthOfEntry != null &&
         this.number.length < this.maxLengthOfEntry &&
-        this.$props.isTypeSignIn == false
+        this.$props.isTypeSignIn == false &&
+        !this.isPercentageLabel
       ) {
         this.invalidNumberEntryMessage =
           this.invalidEntryMessage[this.getLocale];

@@ -8,12 +8,12 @@
     </div>
   </div>
 
-  <div v-if="!sessionEnabled">
-    <NoClassMessage />
-  </div>
-
   <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
+  </div>
+
+  <div v-if="!sessionEnabled">
+    <NoClassMessage />
   </div>
 
   <div v-else>

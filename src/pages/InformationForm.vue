@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <LocalePicker />
+    <LocalePicker :options="getLocaleOptions" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-black font-bold">
         {{ getFormHeading }}
@@ -16,6 +16,7 @@
         :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
+        :defaultValue="formField.defaultValue"
         :options="formField.options[getLocale]"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
@@ -68,8 +69,8 @@ export default {
     /* Also, maps each field to its input component
     */
     this.formSchemaData = await FormSchemaAPI.getFormFields(
-      this.$store.state.sessionData.number_of_fields_in_pop_form,
-      this.$store.state.groupData.name,
+      this.$store.state.sessionData.meta_data.number_of_fields_in_popup_form,
+      this.$store.state.sessionData.popup_form_id,
       this.id
     );
     if (this.formSchemaData.error) {
@@ -83,12 +84,16 @@ export default {
     }
     if (Object.keys(this.formSchemaData).length == 0) {
       this.buttonDisabled = false;
+      this.redirect();
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
         typeToInputParameters[this.formSchemaData[field].type];
       this.formSchemaData[field]["show"] =
-        this.formSchemaData[field].showBasedOn == "" ? true : false;
+        this.formSchemaData[field].showBasedOn == "" &&
+        !this.formSchemaData[field].dependant
+          ? true
+          : false;
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
     });
@@ -105,6 +110,12 @@ export default {
     },
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     /** Returns the locale selected by user */
     getLocale() {
       return this.$store.state.locale;
@@ -115,6 +126,7 @@ export default {
         en: "Complete your Profile",
         hi: "अपनी प्रोफाइल पूर्ण करें",
       };
+
       return formHeading[this.getLocale];
     },
 
@@ -132,13 +144,20 @@ export default {
 
         if (fieldAttributes.showBasedOn != "") {
           if (
-            this.userData[Object.keys(JSON.parse(showBasedOn))] ==
-            Object.values(JSON.parse(showBasedOn))[0]
+            this.userData[showBasedOn.split("==")[0]] ==
+            showBasedOn.split("==")[1]
+          ) {
+            fieldAttributes["show"] = true;
+          } else fieldAttributes["show"] = false;
+        }
+        if (fieldAttributes.dependant) {
+          if (
+            fieldAttributes.dependantField in this.userData &&
+            this.userData[fieldAttributes.dependantField] != ""
           ) {
             fieldAttributes["show"] = true;
           } else {
             fieldAttributes["show"] = false;
-            this.userData[fieldAttributes.key] = "";
           }
         }
       });
@@ -199,18 +218,25 @@ export default {
           this.id,
           this.$store.state.platform_id,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
+        UserAPI.postUserSessionActivity(
+          this.id,
+          "popup_form",
+          this.$store.state.sessionData.session_id,
+          this.$store.state.authGroupData.input_schema.user_type,
+          this.$store.state.sessionData.session_occurrence_id
+        );
         sendSQSMessage(
-          "attendance-sign-in",
+          "popup_form",
           this.$store.state.sessionData.purpose["sub-type"],
-          this.$store.platform,
-          this.$store.platform_id,
+          this.$store.state.sessionData.platform,
+          this.$store.state.sessionData.platform_id,
           this.id,
           "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",

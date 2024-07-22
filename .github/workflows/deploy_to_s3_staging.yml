@@ -9,25 +9,36 @@ on:
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    name: Deploy
 
     environment:
       name: staging
       url: "https://staging-auth.avantifellows.org"
 
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
 
       - name: Install
         run: npm install
 
-      # build the vuepress docs
       - name: Build
         env:
           NODE_ENV: staging
           VITE_APP_PLIO_AF_API_KEY: ${{ secrets.VITE_APP_PLIO_AF_API_KEY }}
-          VITE_APP_BASE_URL_PLIO: "https://staging-app.plio.in/#/af/play/"
+          VITE_APP_BASE_URL_AF_PLIO: "https://app.plio.in/#/af/play/"
+          VITE_APP_BASE_URL_SCERT_PLIO: "https://app.plio.in/scertH/play/"
+          VITE_APP_PLIO_SCERT_API_KEY: ${{ secrets.VITE_APP_PLIO_SCERT_API_KEY }}
           VITE_APP_QUIZ_AF_API_KEY: ${{ secrets.VITE_APP_QUIZ_AF_API_KEY }}
           VITE_APP_BASE_URL_QUIZ: "https://staging-quiz.avantifellows.org/quiz/"
           VITE_APP_AWS_ACCESS_KEY_ID: ${{ secrets.VITE_APP_AWS_SQS_ACCESS_KEY }}
@@ -43,7 +54,6 @@ jobs:
           VITE_APP_PORTAL_BACKEND: " https://b93ddkdz0g.execute-api.ap-south-1.amazonaws.com/"
           VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/student_quiz_report"
           VITE_APP_GURUKUL_BASE_URL: "https://staging-gurukul.avantifellows.org/"
-
         run: npm run build
 
       - name: Configure AWS Credentials
@@ -53,6 +63,5 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # sync with the given S3 bucket
       - name: Deploy static site to S3 bucket
         run: aws s3 sync ./dist s3://af-auth-layer-staging --delete --acl public-read

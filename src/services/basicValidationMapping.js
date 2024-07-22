@@ -31,6 +31,7 @@ export const validationTypeToFunctionMap = {
   numeric: isNumeric,
   alphanumeric: isAlphanumeric,
   text: isText,
+  code: isAlphanumeric,
   undefined: function () {
     return false;
   },

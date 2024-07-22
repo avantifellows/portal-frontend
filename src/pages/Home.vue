@@ -8,42 +8,37 @@
     </div>
   </div>
 
-  <div v-if="!sessionEnabled">
-    <NoClassMessage />
-  </div>
-
   <div v-if="isLandingPage" class="flex h-screen flex-col">
     <LandingPage />
   </div>
 
+  <div v-if="!sessionEnabled">
+    <NoClassMessage />
+  </div>
+
   <div v-else>
     <div v-if="!oldFlow">
-      <LocalePicker :options="getLocale" />
       <NewSignIn
         v-if="isTypeSignIn && doesGroupExist"
         :sub_type="getSubType"
+        :is_type_signin="isTypeSignIn"
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
-        :enable_pop_up_form="isPopUpFormEnabled"
+        :enable_popup="isPopUpFormEnabled"
       />
       <NewSignUp v-if="isTypeSignUp && doesGroupExist" />
     </div>
 
     <div v-else>
       <div
-        v-if="
-          !isPurposeRegistration &&
-          !isLandingPage &&
-          isAuthTypeID &&
-          doesGroupExist
-        "
+        v-if="!isPurposeRegistration && !isLandingPage && isAuthTypeID && doesGroupExist"
       >
         <Entry
           :redirectTo="getRedirectTo"
           :redirectId="getRedirectId"
           :purpose="getPurpose"
           :purposeParams="getPurposeParams"
-          :groupData="groupData"
+          :groupData="authGroupData"
           :group="getGroup"
           :authType="getAuthType"
           :sessionId="sessionId"
@@ -62,7 +57,7 @@
 <script>
 import { useToast } from "vue-toastification";
 
-import groupAPIService from "@/services/API/groupData.js";
+import authGroupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 
 import NoClassMessage from "@/components/NoClassMessage.vue";
@@ -91,25 +86,8 @@ export default {
     LandingPage,
     Entry,
     Signup,
-    LocalePicker,
   },
   props: {
-    /** The resource we are redirecting to.
-     * (WILL BE DEPRECATED IN V2)
-     */
-    redirectTo: {
-      default: "",
-      type: String,
-    },
-
-    /** ID of the resource.
-     * (WILL BE DEPRECATED IN V2)
-     */
-    redirectId: {
-      default: "",
-      type: String,
-    },
-
     /** General category of why the data is being captured. Eg: attendance
      * (WILL BE DEPRECATED IN V2)
      */
@@ -125,7 +103,7 @@ export default {
     },
 
     /** The group the user falls under. Eg: HaryanaStudents, DelhiStudents */
-    group: {
+    authGroup: {
       default: "HaryanaStudents",
       type: String,
     },
@@ -155,15 +133,15 @@ export default {
     },
 
     /** Whether the sign-up flow will be enabled for the user. */
-    enable_signup: {
-      default: false,
-      type: Boolean,
+    signup_form: {
+      default: "false",
+      type: String,
     },
 
     /** Whether any additional form is to be displayed to the user after authentication. */
-    enable_pop_up_form: {
-      default: false,
-      type: Boolean,
+    popup_form: {
+      default: "false",
+      type: String,
     },
 
     /** Whether an ID needs to be generated when the user signs up. */
@@ -189,22 +167,24 @@ export default {
       default: "",
       type: String,
     },
+    /** What the external platform link is. */
+    platform_link: {
+      default: "",
+      type: String,
+    },
   },
   data() {
     return {
-      groupData: null, // stores details about a group
+      authGroupData: null, // stores details about a group
       sessionData: null, // stores details about a session
       sessionEnabled: true, // whether a session is enabled
       isLoading: true,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
-      oldFlow: true, // oldFlow refers to user using V1
+      oldFlow: false, // oldFlow refers to user using V1
     };
   },
   computed: {
-    getLocale() {
-      return this.groupData ? this.groupData.locale.split(",") : ["English"];
-    },
     /** Returns if the purpose is registration.
      * (THIS METHOD WILL BE DEPRECATED IN V2)
      */
@@ -256,8 +236,8 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2)
      */
     getAuthType() {
-      return this.groupData && this.groupData.authType
-        ? this.groupData.authType
+      return this.authGroupData && this.authGroupData.authType
+        ? this.authGroupData.authType
         : "ID";
     },
 
@@ -269,7 +249,7 @@ export default {
       return (
         (this.sessionData && this.sessionData.auth_type.split(",")) ||
         (this.auth_type && this.auth_type.split(",")) ||
-        (this.groupData && this.groupData.input_schema.auth_type.split(","))
+        (this.authGroupData && this.authGroupData.input_schema.auth_type.split(","))
       );
     },
 
@@ -284,16 +264,16 @@ export default {
     /** Returns if sign up flow should be enabled */
     isSignupEnabled() {
       return (
-        (this.sessionData && this.sessionData.activate_signup == "True") ||
-        this.enable_signup == "True"
+        (this.sessionData && this.sessionData.signup_form == "True") ||
+        this.signup_form == "true"
       );
     },
 
     /** Returns if any additional form is to be displayed to the user after authentication. */
     isPopUpFormEnabled() {
       return (
-        (this.sessionData && this.sessionData.pop_up_form == "True") ||
-        this.enable_pop_up_form == "True"
+        (this.sessionData && this.sessionData.popup_form == "True") ||
+        this.popup_form == "true"
       );
     },
 
@@ -302,7 +282,7 @@ export default {
       this.$store.dispatch(
         "setIdGeneration",
         (this.sessionData && this.sessionData.id_generation == "True") ||
-          this.id_generation == "True"
+          this.id_generation == "true"
       );
     },
 
@@ -311,7 +291,7 @@ export default {
       this.$store.dispatch(
         "setRedirection",
         (this.sessionData && this.sessionData.redirection == "True") ||
-          this.redirection == "True"
+          this.redirection == "true" || this.platform == "report" || this.platform == "gurukul"
       );
     },
 
@@ -331,15 +311,23 @@ export default {
       );
     },
 
+    /** Returns the external platform link the user should be redirected to. */
+    setPlatformLink() {
+      this.$store.dispatch(
+        "setPlatformLink",
+        (this.sessionData && this.sessionData.platform_link) || this.platform_link
+      );
+    },
+
     /**
      * Checks if the authentication flow type is a sign-in.
      * @returns {boolean} True if the type is a sign-in, false otherwise.
      */
     isTypeSignIn() {
       return (
-        (this.sessionData && this.sessionData.type == "sign-in") ||
-        (this.type == "sign-in" && this.oldFlow == false) ||
-        this.purpose == "attendance"
+        (this.sessionData && (this.sessionData.type == "sign-in" || this.sessionData.type == "broadcast")) ||
+        (!this.sessionData && this.type == "sign-in" && this.oldFlow == false) || // gurukul
+        this.purpose == "attendance" || this.type == "attendance" // report
       );
     },
 
@@ -349,8 +337,7 @@ export default {
      */
     isTypeSignUp() {
       return (
-        (this.sessionData && this.sessionData.type == "sign-up") ||
-        this.type == "sign-up"
+        (this.sessionData && this.sessionData.type == "sign-up") || this.type == "sign-up"
       );
     },
 
@@ -359,7 +346,7 @@ export default {
      * @returns {boolean} True if the group exists, false otherwise.
      */
     doesGroupExist() {
-      return this.groupData;
+      return this.authGroupData;
     },
 
     /**
@@ -368,11 +355,11 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatform)
      */
     getRedirectTo() {
-      return this.redirectTo == "" && this.sessionData != null
+      return this.platform == "" && this.sessionData != null
         ? this.oldFlow
           ? this.sessionData.redirectPlatform
           : this.sessionData.platform
-        : this.redirectTo;
+        : this.platform;
     },
 
     /**
@@ -381,11 +368,11 @@ export default {
      * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatformId)
      */
     getRedirectId() {
-      return this.redirectId == "" && this.sessionData != null
+      return this.platform_id == "" && this.sessionData != null
         ? this.oldFlow
           ? this.sessionData.redirectPlatformParams.id
           : this.sessionData.platform_id
-        : this.redirectId;
+        : this.platform_id;
     },
 
     /**
@@ -393,9 +380,15 @@ export default {
      * @returns {string} The group.
      */
     getGroup() {
-      return this.sessionData && this.sessionData.group
-        ? this.sessionData.group
-        : this.group;
+      if (this.sessionData && this.sessionData.group) {
+        return this.sessionData.group;
+      }
+      else if (this.sessionData && this.sessionData.meta_data && this.sessionData.meta_data.group) {
+        return this.sessionData.meta_data.group;
+      }
+      else {
+        return this.authGroup;
+      }
     },
 
     /**
@@ -427,33 +420,36 @@ export default {
      * */
     isLandingPage() {
       return (
-        this.purpose == "" &&
-        this.purposeParams == "" &&
-        this.redirectId == "" &&
-        this.redirectTo == "" &&
-        this.platform == "" &&
         this.platform_id == "" &&
+        this.platform == "" &&
         this.sub_type == "" &&
-        this.sessionId == ""
+        this.sessionId == "" &&
+        this.platform_link == ""
+      );
+    },
+    setAuthGroupImages() {
+      this.$store.dispatch(
+        "setImages",
+        this.oldFlow
+          ? this.authGroupData.images[0]
+          : this.authGroupData && this.authGroupData.input_schema.images.split(",")
       );
     },
   },
   async created() {
-    this.$store.dispatch("setLocale", "en");
+    // if (this.platform == "report") {
+    //   this.oldFlow = true;
+    // }
 
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId == "Test") {
-        this.oldFlow = false;
-        this.sessionData = await sessionAPIService.getSessionData(
-          this.sessionId
-        );
+      if (this.sessionId.startsWith("PunjabStudents") || this.sessionId.startsWith("CD_Hiring") || this.sessionId.startsWith("AFTesting")) {
+        this.oldFlow = true;
+        this.sessionData = await sessionAPIService.getOldSessionData(this.sessionId);
       } else {
-        this.sessionData = await sessionAPIService.getOldSessionData(
-          this.sessionId
-        );
+        this.sessionData = await sessionAPIService.getSessionData(this.sessionId);
       }
 
       /** SessionId does not exist */
@@ -461,7 +457,8 @@ export default {
         this.$router.push({
           name: "Error",
           params: {
-            text: "There is no session scheduled with this ID. Please contact your Program Manager.",
+            text:
+              "There is no session scheduled with this ID. Please contact your Program Manager.",
           },
         });
       }
@@ -493,18 +490,21 @@ export default {
       }
 
       /** If session is open, retrieve group data and store it */
-      if (!this.sessionData.error && this.sessionEnabled) {
+      if (!this.sessionData.error) {
         if (!this.oldFlow) {
-          this.groupData = await groupAPIService.getGroupName(
-            this.sessionData.id
-          );
+          if (this.sessionData.type == "broadcast") {
+            this.authGroupData = await authGroupAPIService.getAuthGroupData(this.sessionData.meta_data.group);
+          }
+          else {
+            this.authGroupData = await authGroupAPIService.getAuthGroupName(this.sessionData.id);
+          }
         } else {
-          this.groupData = await groupAPIService.getGroupData(
+          this.authGroupData = await authGroupAPIService.getGroupData(
             this.sessionData.group
           );
         }
-        this.$store.dispatch("setGroupData", this.groupData);
-        if (!this.sessionData.error && this.groupData && this.groupData.error) {
+        this.$store.dispatch("setAuthGroupData", this.authGroupData);
+        if (!this.sessionData.error && this.authGroupData && this.authGroupData.error) {
           /** Group API returns an error*/
           this.toast.error("Network Error, please try again!", {
             position: "top-center",
@@ -516,19 +516,18 @@ export default {
         }
       }
     } else {
-      if (this.platform == "gurukul") {
-        this.oldFlow = false;
-      }
       /**
        * If sessionId does not exist in route, then retrieve group data directly
        */
       if (!this.oldFlow) {
-        this.groupData = await groupAPIService.getNewGroupData(this.group);
+        // this is wrong
+        this.authGroupData = await authGroupAPIService.getAuthGroupData(this.authGroup);
       } else {
-        this.groupData = await groupAPIService.getGroupData(this.getGroup);
+        this.authGroupData = await authGroupAPIService.getGroupData(this.getGroup);
       }
-      this.$store.dispatch("setGroupData", this.groupData);
-      if (this.groupData && this.groupData.error) {
+
+      this.$store.dispatch("setAuthGroupData", this.authGroupData);
+      if (this.authGroupData && this.authGroupData.error) {
         /** Group API returns an error*/
         this.toast.error("Network Error, please try again!", {
           position: "top-center",
@@ -574,13 +573,16 @@ export default {
           "" // date of birth
         );
       }
+    }    if ("input_schema" in this.authGroupData) {
+      this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
     }
     this.isLoading = false;
     this.isIdGenerationEnabled;
     this.isRedirectionEnabled;
     this.setPlatform;
     this.setPlatformId;
-    this.getGroupImages;
+    this.setPlatformLink;
+    this.setAuthGroupImages;
   },
 };
 </script>

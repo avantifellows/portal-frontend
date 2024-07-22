@@ -10,6 +10,7 @@ export const verifyStudentEndpoint = "/student/verify";
 export const checkForUserEndpoint = "/checkForUser";
 export const verifyAIETStudentEndpoint = "/checkForAIETStudent";
 export const verifyTeacherEndpoint = "/teacher/verify";
+export const verifySchoolEndpoint = "/school/verify";
 export const createAccessTokenEndpoint = "/auth/create-access-token";
 export const verifyTokenEndpoint = "/auth/verify";
 export const refreshTokenEndpoint = "/auth/refresh-token";

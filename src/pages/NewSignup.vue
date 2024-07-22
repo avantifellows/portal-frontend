@@ -7,19 +7,14 @@
       />
     </div>
   </div>
-  <LocalePicker />
-  <div
-    class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
-  >
+  <LocalePicker :options="getLocaleOptions" />
+  <div class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
 
-  <div
-    v-if="!formSubmitted"
-    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
-  >
+  <div v-if="!formSubmitted" class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
     <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
@@ -31,13 +26,14 @@
         :show="formField.show"
         :key="index"
         :is="formField.component"
-        :label="formField.label[locale]"
+        :label="formField.label[getLocale]"
         :isRequired="formField.required"
         :dbKey="formField.key"
-        :options="formField.options[locale]"
+        :options="formField.options[getLocale]"
+        :isTypeSignIn=false
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
-        :helpText="formField.helpText[locale]"
+        :helpText="formField.helpText[getLocale]"
         @update="updateUserData"
         class="mt-[25px]"
       />
@@ -50,30 +46,35 @@
         v-html="signUpButtonLabel"
       />
     </div>
-    <div class="mt-[30px] flex w-48 mx-auto justify-between items-center">
+    <div
+      v-if="$store.state.sessionData.type == 'sign-in'"
+      class="mt-[30px] flex w-48 mx-auto justify-between items-center"
+    >
       <hr class="w-20 text-grey" />
       <p class="text-grey font-roboto text-sm opacity-40">or</p>
       <hr class="w-20 text-grey" />
     </div>
-    <!-- signup button -->
+
     <button
+      v-if="$store.state.sessionData.type == 'sign-in'"
       @click="redirectToSignIn"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signInText"
     />
   </div>
   <div
-    v-if="formSubmitted"
+    v-if="formSubmitted && !isLoading"
     class="w-5/6 lg:w-1/2 mx-auto flex flex-col text-center mt-20 justify-evenly text-lg md:text-xl p-6 space-y-6"
   >
-    <div class="bg-primary-hover py-10 rounded-md shadow-sm">
-      <p>
-        <b>Your ID is {{ userData["user_id"] }}</b>
-      </p>
-      <p>
-        Kindly make a note of it. You will need this to log in to all your
-        future sessions.
-      </p>
+    <div
+      v-if="
+        userData['user_id'] != '' ||
+        userData['user_id'] != undefined ||
+        userData['user_id'] != 'undefined'
+      "
+      class="bg-primary-hover py-10 rounded-md shadow-sm"
+    >
+      <p v-html="idGeneratedText" />
     </div>
 
     <button
@@ -97,7 +98,7 @@ import LocalePicker from "../components/LocalePicker.vue";
 const assets = useAssets();
 
 export default {
-  name: "SignUp",
+  name: "NewSignup",
   components: { LocalePicker },
   data() {
     return {
@@ -112,13 +113,17 @@ export default {
   },
   async created() {
     this.formData = await FormSchemaAPI.getFormSchema(
-      this.$store.state.sessionData.form_schema_id
+      this.$store.state.sessionData.signup_form_id
     );
+
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
       this.formData.attributes[field]["show"] =
-        this.formData.attributes[field].showBasedOn == "" ? true : false;
+        this.formData.attributes[field].showBasedOn == "" &&
+        !this.formData.attributes[field].dependant
+          ? true
+          : false;
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
     });
@@ -134,9 +139,15 @@ export default {
     },
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
     /** Returns button text */
     signUpButtonLabel() {
-      return this.locale == "en" ? "Sign Up" : "साइन अप";
+      return this.getLocale == "en" ? "Register" : "रजिस्टर";
     },
 
     /** Returns button text */
@@ -151,11 +162,18 @@ export default {
 
     /** Returns text based on locale */
     signInText() {
-      return this.locale == "en"
-        ? "Already Registered? <b> Sign In</b>"
-        : "पहले ही रजिस्टर्ड हैं? <b>साइन इन करें। </b>";
+      return this.getLocale == "en"
+        ? "Already Registered? <b> Login</b>"
+        : "पहले ही रजिस्टर्ड हैं? <b>लॉग इन करें। </b>";
     },
 
+    /** Returns text based on locale */
+    idGeneratedText() {
+      return this.getLocale == "en"
+        ? `Your ID is <b> ${this.userData["user_id"]}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
+        future sessions.`
+        : `आपकी आईडी <b> ${this.userData["user_id"]}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
+    },
     /** returns title for the form */
     formTitle() {
       return this.formData.name;
@@ -182,6 +200,7 @@ export default {
       return Object.keys(this.formData.attributes).forEach((field) => {
         let fieldAttributes = this.formData.attributes[field];
         let showBasedOn = fieldAttributes.showBasedOn;
+        let showBasedOnCondition = fieldAttributes.showBasedOnCondition;
 
         if (fieldAttributes.showBasedOn != "") {
           if (
@@ -190,6 +209,16 @@ export default {
           ) {
             fieldAttributes["show"] = true;
           } else fieldAttributes["show"] = false;
+        }
+        if (fieldAttributes.dependant) {
+          if (
+            fieldAttributes.dependantField in this.userData &&
+            this.userData[fieldAttributes.dependantField] != ""
+          ) {
+            fieldAttributes["show"] = true;
+          } else {
+            fieldAttributes["show"] = false;
+          }
         }
       });
     },
@@ -205,9 +234,9 @@ export default {
               fieldAttributes.dependantFieldMapping[
                 this.userData[fieldAttributes.dependantField]
               ];
-            return fieldAttributes.options[this.locale];
           }
         }
+        return fieldAttributes.options[this.getLocale];
       });
     },
 
@@ -232,7 +261,9 @@ export default {
 
     /** updates user data based on user input */
     updateUserData(value, key) {
-      this.userData[key] = value;
+      if (value === "" || value === undefined) {
+        delete this.userData[key];
+      } else this.userData[key] = value;
     },
 
     /** creates user ID based on information */
@@ -240,12 +271,12 @@ export default {
       sendSQSMessage(
         "sign-up",
         this.$store.state.sessionData.purpose["sub-type"],
-        this.platform,
-        this.platform_id,
+        this.$store.state.sessionData.platform,
+        this.$store.state.sessionData.platform_id,
         this.userData["student_id"],
         "", // list of authentication methods
-        this.$store.state.groupData.name,
-        this.$store.state.groupData.input_schema.userType,
+        this.$store.state.authGroupData.name,
+        this.$store.state.authGroupData.input_schema.user_type,
         this.$store.state.sessionData.session_id,
         "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
@@ -258,8 +289,8 @@ export default {
       let createdUserId = await UserAPI.newUserSignup(
         this.userData,
         this.$store.state.id_generation,
-        this.$store.state.groupData.input_schema.userType,
-        this.$store.state.groupData.name
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name
       );
 
       if (createdUserId == "" || createdUserId.error) {
@@ -273,6 +304,13 @@ export default {
       }
       this.isLoading = false;
       this.userData["user_id"] = createdUserId ? createdUserId : "";
+      UserAPI.postUserSessionActivity(
+        this.userData["user_id"],
+        "sign-up",
+        this.$store.state.sessionData.session_id,
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.sessionData.session_occurrence_id
+      );
     },
 
     /** redirects to destination */
@@ -282,19 +320,26 @@ export default {
           this.sub_type,
           this.userData["user_id"],
           this.$store.state.platform_id,
+          this.$store.state.platform_link,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
+        postUserSessionActivity(
+          this.userData["student_id"],
+          "attendance-on-sign-up",
+          this.$store.state.sessionData.session_id,
+          this.$store.state.sessionData.session_occurrence_id
+        );
         sendSQSMessage(
-          "attendance-sign-up",
-          this.sub_type,
+          "attendance-on-sign-up",
+          this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.platform,
           this.$store.state.platform_id,
           this.userData["user_id"],
           "",
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
           "",
           "phone" in this.userData ? this.userData["phone"] : "",
@@ -308,9 +353,7 @@ export default {
      * Redirects the user to the sign-in page.
      */
     redirectToSignIn() {
-      this.$router.push({
-        name: "NewSignin",
-      });
+      this.$router.go(-1);
     },
   },
 };

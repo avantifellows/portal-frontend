@@ -3,31 +3,23 @@
     <p class="text-base mb-[10px] text-left">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
-    <FormKit
+    <input
       type="tel"
-      placeholder="xxxxxxxxxx"
       v-model="phoneNumber"
+      placeholder="xxxxxxxxxx"
       @keypress="isValidPhoneNumberEntry($event)"
       @input="updatePhoneNumberEntry($event)"
-      :help="helpText"
-      :wrapper-class="{
-        'mx-auto': true,
-      }"
-      :inner-class="{
-        'border py-2 px-2 rounded mx-auto': true,
-        'border-red': this.invalid,
-        'border-grey': !this.invalid,
-      }"
-      :help-class="{
-        'mt-[10px] text-sm text-grey italic': true,
-      }"
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
+      :class="invalid ? 'border-red' : 'border-grey'"
     />
+    <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
-    <span
+    <p
       v-if="isInvalidPhoneNumberMessageShown"
-      class="text-red text-sm text-center mt-[10px]"
-      >{{ invalidPhoneNumberMessage }}</span
+      class="text-red text-sm mt-[10px]"
     >
+      {{ invalidPhoneNumberMessage }}
+    </p>
   </div>
 </template>
 <script>
@@ -70,6 +62,10 @@ export default {
     return {
       phoneNumber: "",
       invalidPhoneNumberMessage: "",
+      invalidEntryMessage: {
+        en: `Please enter a valid phone number`,
+        hi: `एक मान्य दूरभाष क्रमांक दर्ज करे`,
+      },
     };
   },
   computed: {
@@ -90,19 +86,24 @@ export default {
         ? this.phoneNumber != "" && this.invalidPhoneNumberMessage == ""
         : this.invalidPhoneNumberMessage == "";
     },
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.locale;
+    },
   },
   methods: {
     /**
      * Updates the phone number value based on user entry
-     * @param {Event} event - The input event.
      */
-    updatePhoneNumberEntry(event) {
-      if (event.length == 0) {
+    updatePhoneNumberEntry() {
+      if (this.phoneNumber.length == 0) {
         this.invalidPhoneNumberMessage = "";
-      } else if (event.length > 10) {
-        this.phoneNumber = event.slice(0, 10).toString();
-      } else if (event.length < 10) {
-        this.invalidPhoneNumberMessage = "Please enter valid phone number";
+      } else if (this.phoneNumber.length > 10) {
+        this.phoneNumber = this.phoneNumber.slice(0, 10).toString();
+      } else if (this.phoneNumber.length < 10) {
+        this.invalidPhoneNumberMessage =
+          this.invalidEntryMessage[this.getLocale];
+        this.$emit("update", "", this.dbKey);
       } else {
         this.invalidPhoneNumberMessage = "";
         this.$emit("update", this.phoneNumber, this.dbKey);

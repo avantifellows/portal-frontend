@@ -7,7 +7,7 @@
       />
     </div>
   </div>
-
+  <LocalePicker :options="getLocaleOptions" />
   <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
@@ -19,11 +19,12 @@
     <div
       v-for="(authType, index) in auth_type"
       :key="`id-${index}`"
-      class="mx-auto"
+      class="mx-auto w-56 my-2"
     >
       <NumberEntry
         v-if="isEntryNumber(authType)"
         ref="numberEntry"
+        :isTypeSignIn="is_type_signin"
         :label="numberEntryParameters.label"
         :placeholder="numberEntryParameters.placeholder"
         :isRequired="numberEntryParameters.required"
@@ -49,6 +50,17 @@
         :isRequired="dateEntryParameters.required"
         :dbKey="dateEntryParameters.key"
         @update="updateUserInformation"
+      />
+      <CodeEntry
+        v-if="isEntryCode(authType)"
+        ref="codeEntry"
+        :label="codeEntryParameters.label"
+        :isRequired="codeEntryParameters.required"
+        :maxLengthOfEntry="codeEntryParameters.maxLengthOfEntry"
+        :dbKey="codeEntryParameters.key"
+        @update="updateUserInformation"
+        @resetInvalidLoginMessage="resetInvalidLoginMessage"
+        :invalid="isInvalidLoginMessageShown"
       />
     </div>
 
@@ -80,7 +92,7 @@
     <button
       v-show="enable_signup"
       @click="redirectToSignUp"
-      class="mt-[20px] mx-auto pt-2 text-primary text-base"
+      class="mt-[20px] mx-auto pt-2 text-primary text-base text"
       v-html="signUpText"
     />
   </div>
@@ -91,12 +103,15 @@ import useAssets from "@/assets/assets.js";
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
+import CodeEntry from "@/components/CodeEntry.vue";
+import LocalePicker from "@/components/LocalePicker.vue";
 
 import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import TokenAPI from "@/services/API/token";
+import UserAPI from "@/services/API/user.js";
 
 const assets = useAssets();
 
@@ -106,11 +121,17 @@ export default {
     NumberEntry,
     Datepicker,
     PhoneNumberEntry,
+    CodeEntry,
+    LocalePicker,
   },
   props: {
     sub_type: {
       default: "",
       type: String,
+    },
+    is_type_signin: {
+      default: true,
+      type: Boolean,
     },
     auth_type: {
       default: [],
@@ -120,14 +141,13 @@ export default {
       default: false,
       type: Boolean,
     },
-    enable_pop_up_form: {
+    enable_popup: {
       default: false,
       type: Boolean,
     },
   },
   data() {
     return {
-      locale: this.$store.state.locale,
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       invalidLoginMessage: "", // message to display when login is invalid
@@ -135,6 +155,7 @@ export default {
       numberEntryParameters: {}, // stores UI parameters for number entry component
       phoneNumberEntryParameters: {}, // stores UI parameters for phone number entry component
       dateEntryParameters: {}, // stores UI parameters for date entry component
+      codeEntryParameters: {}, // stores UI parameters for code entry component
       userInformation: {}, // stores data about the user
       invalidLoginMessageTranslations: {
         ID: {
@@ -149,6 +170,10 @@ export default {
           en: "This phone number is not registered. Try again",
           hi: "यह फ़ोन नंबर पंजीकृत नहीं है। पुनः प्रयास करें",
         },
+        CODE: {
+          en: "This code is not registered. Try again",
+          hi: "यह कोड पंजीकृत नहीं है। पुनः प्रयास करें",
+        },
       },
     };
   },
@@ -156,9 +181,18 @@ export default {
     this.mounted = true;
   },
   computed: {
+    getLocaleOptions() {
+      return this.$store.state.authGroupData
+        ? this.$store.state.authGroupData.locale.split(",")
+        : ["English"];
+    },
+
+    locale() {
+      return this.$store.state.locale;
+    },
     /** Returns button text */
     signInButtonLabel() {
-      return this.locale == "en" ? "Sign In" : "साइन इन";
+      return this.locale == "en" ? "Login" : "लॉग इन";
     },
 
     /** Retutns if sign up flow should be activated */
@@ -169,8 +203,8 @@ export default {
     /** Returns text based on locale */
     signUpText() {
       return this.locale == "en"
-        ? "New Student? <b> Register Now</b>"
-        : "नया छात्र? <b>अब रजिस्टर करें। </b>";
+        ? "<span>New Student?</span> <b> Register Now</b>"
+        : "<span>नया छात्र?</span><b>अब रजिस्टर करें। </b>";
     },
 
     /**
@@ -206,6 +240,14 @@ export default {
     },
 
     /**
+     * Checks if the entry type is a code.
+     * @returns {boolean} True if the entry type is a code, false otherwise.
+     */
+     checkEntryTypeIsCode() {
+      return Object.keys(this.codeEntryParameters).length != 0;
+    },
+
+    /**
      * Checks if the submit button is disabled.
      * @returns {boolean} True if the submit button is disabled, false otherwise.
      * */
@@ -220,6 +262,9 @@ export default {
             : true) &&
           (this.checkEntryTypeIsPhoneNumber
             ? this.$refs.phoneNumberEntry["0"].isPhoneNumberEntryValid
+            : true) &&
+          (this.checkEntryTypeIsCode
+            ? this.$refs.codeEntry["0"].isCodeEntryValid
             : true)
         );
       }
@@ -259,16 +304,16 @@ export default {
      */
     getUIParameters(authType) {
       let UIParameters;
-      Object.keys(this.$store.state.groupData.locale_data[this.locale]).find(
-        (key) => {
-          if (key == authType) {
-            UIParameters =
-              this.$store.state.groupData.locale_data[this.locale][
-                key.toString()
-              ];
-          }
+      Object.keys(
+        this.$store.state.authGroupData.locale_data[this.locale]
+      ).find((key) => {
+        if (key == authType) {
+          UIParameters =
+            this.$store.state.authGroupData.locale_data[this.locale][
+              key.toString()
+            ];
         }
-      );
+      });
       return UIParameters;
     },
 
@@ -312,6 +357,19 @@ export default {
     },
 
     /**
+     * Checks if the entry type for the given authentication type is "code".
+     * @param {string} authType - The authentication type.
+     * @returns {boolean} True if the entry type is "code", false otherwise.
+     */
+     isEntryCode(authType) {
+      if (this.findEntryType(authType) == "code") {
+        this.codeEntryParameters = this.getUIParameters(authType);
+        return true;
+      }
+      return false;
+    },
+
+    /**
      * Updates the user information object with the provided value for the specified database key.
      * @param {string} value - The value to update.
      * @param {string} dbKey - The key corresponding to the user information field in the database.
@@ -328,11 +386,12 @@ export default {
       let isUserValid = await validateUser(
         this.auth_type,
         this.userInformation,
-        this.$store.state.groupData.input_schema.userType,
-        this.$store.state.groupData.id
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.id
       );
 
-      if (!isUserValid.isUserIdValid) {
+      var userId = "";
+      if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["ID"][this.locale];
       } else if (
@@ -347,14 +406,39 @@ export default {
       ) {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.locale];
+      } else if (
+        this.auth_type.includes("CODE") &&
+        !isUserValid.isCodeValid
+      ) {
+        this.invalidLoginMessage = this.invalidLoginMessageTranslations["CODE"][this.locale];
       } else {
+        if ("code" in this.userInformation) {
+          userId = this.userInformation["code"];
+          createAccessToken(this.userInformation["code"]); // school
+        }
+        else if ("teacher_id" in this.userInformation) {
+          userId = this.userInformation["teacher_id"];
+          createAccessToken(this.userInformation["teacher_id"]); // teacher
+        }
+        else {
+          userId = this.userInformation["student_id"];
+          createAccessToken(this.userInformation["student_id"]); // student
+        }
+
         TokenAPI.createAccessToken(
-          this.userInformation["student_id"],
+          userId,
           this.$store.state.groupData.name
         );
 
         if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
+          UserAPI.postUserSessionActivity(
+            this.userInformation["student_id"],
+            "sign-in",
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
+          );
           sendSQSMessage(
             "sign-in",
             this.sub_type,
@@ -362,8 +446,8 @@ export default {
             this.$store.state.platform_id,
             this.userInformation["student_id"],
             this.auth_type.toString(),
-            this.$store.state.groupData.name,
-            this.$store.state.groupData.input_schema.userType,
+            this.$store.state.authGroupData.name,
+            this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_id,
             "",
             "phone" in this.userInformation
@@ -378,23 +462,29 @@ export default {
           if (
             redirectToDestination(
               this.sub_type,
-              this.userInformation["student_id"],
+              userId,
               this.$store.state.platform_id,
+              this.$store.state.platform_link,
               this.$store.state.platform,
-              this.$store.state.groupData.input_schema.userType
+              this.$store.state.authGroupData.input_schema.user_type
             )
           ) {
+            UserAPI.postUserSessionActivity(
+              userId,
+              this.$store.state.sessionData.type,
+              this.$store.state.sessionData.session_id,
+              this.$store.state.authGroupData.input_schema.user_type,
+              this.$store.state.sessionData.session_occurrence_id
+            );
             sendSQSMessage(
-              "sign-in",
+              this.$store.state.sessionData.type,
               this.sub_type,
               this.$store.state.platform,
               this.$store.state.platform_id,
-              "student_id" in this.userInformation
-                ? this.userInformation["student_id"]
-                : this.userInformation["teacher_id"],
+              userId,
               this.auth_type.toString(),
-              this.$store.state.groupData.name,
-              this.$store.state.groupData.input_schema.userType,
+              this.$store.state.authGroupData.name,
+              this.$store.state.authGroupData.input_schema.user_type,
               "sessionData" in this.$store.state &&
                 "session_id" in this.$store.state.sessionData
                 ? this.$store.state.sessionData.session_id
@@ -424,3 +514,8 @@ export default {
   },
 };
 </script>
+<style>
+text b {
+  @apply underline;
+}
+</style>

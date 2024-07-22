@@ -12,6 +12,7 @@ export function redirectToDestination(
   purposeParams,
   userId,
   redirectId,
+  redirectLink,
   redirectTo,
   group
 ) {
@@ -20,11 +21,21 @@ export function redirectToDestination(
   let finalURLQueryParams = "";
 
   switch (redirectTo) {
-    case "plio": {
-      redirectURL = import.meta.env.VITE_APP_BASE_URL_PLIO;
+    case "AF-plio": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_AF_PLIO;
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
+        unique_id: userId,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
+    case "SCERT-plio": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_SCERT_PLIO;
+      let url = new URL(redirectURL + redirectId);
+      finalURLQueryParams = new URLSearchParams({
+        api_key: import.meta.env.VITE_APP_PLIO_SCERT_API_KEY,
         unique_id: userId,
       });
       fullURL = url + "?" + finalURLQueryParams;
@@ -51,11 +62,11 @@ export function redirectToDestination(
       break;
     }
     case "zoom": {
-      fullURL = redirectId;
+      fullURL = redirectLink;
       break;
     }
     case "teams": {
-      fullURL = redirectId;
+      fullURL = redirectLink;
       break;
     }
     case "youtube": {
@@ -72,11 +83,15 @@ export function redirectToDestination(
       break;
     }
     case "google-forms": {
-      fullURL = redirectId;
+      fullURL = redirectLink;
       break;
     }
     case "gurukul": {
       fullURL = import.meta.env.VITE_APP_GURUKUL_BASE_URL;
+      break;
+    }
+    case "others": {
+      fullURL = redirectLink;
       break;
     }
     default: {

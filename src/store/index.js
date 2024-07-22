@@ -7,18 +7,19 @@ let localStorage = new SecureLS({ isCompression: true });
 
 export default createStore({
   state: {
-    groupData: {},
+    authGroupData: {},
     sessionData: {},
     locale: "en",
     id_generation: false,
     redirection: true,
     platform: "",
     platform_id: "",
+    platform_link: "",
     images: [],
   },
   actions: {
-    setGroupData({ commit }, groupData) {
-      commit("setGroupData", groupData);
+    setAuthGroupData({ commit }, authGroupData) {
+      commit("setAuthGroupData", authGroupData);
     },
     setSessionData({ commit }, sessionData) {
       commit("setSessionData", sessionData);
@@ -35,6 +36,9 @@ export default createStore({
     setPlatformId({ commit }, platform_id) {
       commit("setPlatformId", platform_id);
     },
+    setPlatformLink({ commit }, platform_link) {
+      commit("setPlatformLink", platform_link);
+    },
     setLocale({ commit }, locale) {
       commit("setLocale", locale);
     },
@@ -43,8 +47,8 @@ export default createStore({
     },
   },
   mutations: {
-    setGroupData(state, groupData) {
-      state.groupData = Object.assign({}, groupData);
+    setAuthGroupData(state, authGroupData) {
+      state.authGroupData = Object.assign({}, authGroupData);
     },
     setSessionData(state, sessionData) {
       state.sessionData = Object.assign({}, sessionData);
@@ -60,6 +64,9 @@ export default createStore({
     },
     setPlatformId(state, platform_id) {
       state.platform_id = platform_id;
+    },
+    setPlatformLink(state, platform_link) {
+      state.platform_link = platform_link;
     },
     setLocale(state, locale) {
       state.locale = locale;

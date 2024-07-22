@@ -3,25 +3,15 @@
     <p class="text-base mb-[10px]">
       {{ label }}<span v-if="isRequired">*</span>
     </p>
-    <FormKit
-      type="number"
+    <input
+      type="tel"
       v-model="number"
-      :help="helpText"
-      :name="dbKey"
       @keypress="isValidNumberEntry($event)"
       @input="updateNumberEntry($event)"
-      :wrapper-class="{
-        'mx-auto': true,
-      }"
-      :inner-class="{
-        'border py-2 px-2 rounded mx-auto': true,
-        'border-red': this.invalid,
-        'border-grey': !this.invalid,
-      }"
-      :help-class="{
-        'mt-[10px] text-sm text-grey italic': true,
-      }"
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
+      :class="invalid ? 'border-red' : 'border-grey'"
     />
+    <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
     <span
       v-if="isInvalidNumberEntryMessageShown"
@@ -41,13 +31,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    isTypeSignIn: {
+      type: Boolean,
+      default: true,
+    },
     label: {
       type: String,
       default: "",
-    },
-    placeholder: {
-      type: String,
-      defult: "",
     },
     isRequired: {
       type: Boolean,
@@ -55,7 +45,7 @@ export default {
     },
     maxLengthOfEntry: {
       type: Number,
-      default: 1,
+      default: null,
     },
     dbKey: {
       type: String,
@@ -110,25 +100,51 @@ export default {
     getLocale() {
       return this.$store.state.locale;
     },
+
+    /** Checks if input entry is percentage */
+    isPercentageLabel() {
+      return this.label.includes("%");
+    }
   },
   methods: {
     /**
      * Updates the number value based on user entry
      * @param {Event} event - The input event.
      */
-    updateNumberEntry(event) {
-      if (event.length == 0) {
+    updateNumberEntry() {
+      if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (event.length > this.maxLengthOfEntry) {
-        event = event.slice(0, this.maxLengthOfEntry).toString();
-      } else if (event.length < this.maxLengthOfEntry) {
+      } else if (this.isPercentageLabel && (this.number < 0 || this.number > 100)) {
+        this.invalidNumberEntryMessage = "Percentage must be between 0 and 100";
+        this.number = this.number.slice(0, 3).toString();
+      } else if (
+        this.maxLengthOfEntry != null &&
+        this.number.length > this.maxLengthOfEntry
+      ) {
+        this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
+      }
+      else if (
+        this.number.length <= this.maxLengthOfEntry &&
+        this.$props.isTypeSignIn == true
+      ) {
+        this.invalidNumberEntryMessage = "";
+      }
+      else if (
+        this.maxLengthOfEntry != null &&
+        this.number.length < this.maxLengthOfEntry &&
+        this.$props.isTypeSignIn == false &&
+        !this.isPercentageLabel
+      ) {
         this.invalidNumberEntryMessage =
           this.invalidEntryMessage[this.getLocale];
       } else {
         this.invalidNumberEntryMessage = "";
       }
-      this.number = event;
-      this.$emit("update", this.number, this.dbKey);
+      if (this.invalidNumberEntryMessage == "") {
+        this.$emit("update", this.number, this.dbKey);
+      } else {
+        this.$emit("update", "", this.dbKey);
+      }
     },
 
     /**
@@ -138,9 +154,15 @@ export default {
      */
     isValidNumberEntry(event) {
       if (validationTypeToFunctionMap["numeric"](event)) {
-        return true;
-      } else event.preventDefault();
-    },
+        if (this.isPercentageLabel && this.number.length >= 3) {
+          event.preventDefault();
+        } else {
+          return true;
+        }
+      } else {
+        event.preventDefault();
+      }
+  },
   },
 };
 </script>

@@ -1,8 +1,6 @@
 <template>
   <div class="" v-if="show">
-    <p class="text-base mb-[10px]">
-      {{ label }}<span v-if="isRequired">*</span>
-    </p>
+    <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
 
     <FormKit
       type="select"
@@ -51,10 +49,6 @@ export default {
       type: String,
       default: "",
     },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -62,9 +56,6 @@ export default {
     };
   },
   watch: {
-    options() {
-      this.value = this.options[0];
-    },
     /**
      * Emits 'update' event whenever the dropdown value is changed
      */

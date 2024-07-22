@@ -32,7 +32,7 @@
       <p
         class="text-xl lg:text-2xl xl:text-3xl mx-auto font-bold md:w-3/4 text-center mb-5"
       >
-        {{ this.$store.state.groupData.signUpFormTitle }}
+        {{ this.$store.state.authGroupData.signUpFormTitle }}
       </p>
       <template v-if="isNotStudentRegistration">
         <Candidate
@@ -361,7 +361,7 @@ export default {
     },
     regionMapping() {
       return this.$store.state.sessionData.sessionId == "JNV10_Form"
-        ? ["Shillong", "Hyderabad"]
+        ? ["Shillong", "Hyderabad", "Pune"]
         : [
             "Bhopal",
             "Chandigarh",
@@ -397,7 +397,7 @@ export default {
     },
     // Returns the images stored against a group
     getGroupImages() {
-      return this.$store.state.groupData.images;
+      return this.$store.state.authGroupData.images;
     },
     isTakeTestDisabled() {
       return this.studentId == "" && this.userId == "";
@@ -440,9 +440,9 @@ export default {
               this.$store.state.sessionData.redirectPlatform,
               this.$store.state.sessionData.redirectPlatformParams.id,
               this.studentId.toString(),
-              this.$store.state.groupData.authType,
+              this.$store.state.authGroupData.authType,
               this.$store.state.sessionData.group,
-              this.$store.state.groupData.userType,
+              this.$store.state.authGroupData.userType,
               this.$store.state.sessionData.sessionId,
               this.$store.state.sessionData.userIp,
               this.phoneNumber,
@@ -467,7 +467,7 @@ export default {
             : this.studentId.toString(),
           this.$store.state.sessionData.redirectPlatformParams.id,
           this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.groupData.authType,
+          this.$store.state.authGroupData.authType,
           this.$store.state.sessionData.group
         )
       ) {
@@ -479,9 +479,9 @@ export default {
           this.isNotStudentRegistration
             ? this.userId.toString()
             : this.studentId.toString(),
-          this.$store.state.groupData.authType,
+          this.$store.state.authGroupData.authType,
           this.$store.state.sessionData.group,
-          this.$store.state.groupData.userType,
+          this.$store.state.authGroupData.userType,
           this.$store.state.sessionData.sessionId,
           this.$store.state.sessionData.userIp,
           this.phoneNumber,

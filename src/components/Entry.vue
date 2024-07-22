@@ -248,7 +248,7 @@ export default {
       invalidLoginMessage: "",
       isLoading: false,
       invalidInputMessage: null, // message to show when the input being entered does not match the ID format,
-      userType: this.$store.state.groupData.userType, // differentiates between different kinds of users
+      userType: this.$store.state.authGroupData.userType, // differentiates between different kinds of users
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       deleteSvg: assets.deleteSvg,
       addSvg: assets.addSvg,
@@ -634,10 +634,10 @@ export default {
               this.purposeParams,
               this.redirectTo,
               this.redirectId,
-              this.userIDList,
+              this.userIDList[0]["userID"],
               this.authType,
               this.group,
-              this.$store.state.groupData.userType,
+              this.$store.state.authGroupData.userType,
               this.sessionId,
               this.userIpAddress,
               this.isExtraInputValidationRequired && this.isInputPhoneNumber

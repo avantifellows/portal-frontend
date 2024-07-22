@@ -287,7 +287,7 @@ export default {
       this.$store.dispatch(
         "setRedirection",
         (this.sessionData && this.sessionData.redirection == "True") ||
-          this.redirection == "true"
+          this.redirection == "true" || this.platform == "report" || this.platform == "gurukul"
       );
     },
 
@@ -322,8 +322,8 @@ export default {
     isTypeSignIn() {
       return (
         (this.sessionData && (this.sessionData.type == "sign-in" || this.sessionData.type == "broadcast")) ||
-        (!this.sessionData && this.type == "sign-in" && this.oldFlow == false) ||
-        this.purpose == "attendance"
+        (!this.sessionData && this.type == "sign-in" && this.oldFlow == false) || // gurukul
+        this.purpose == "attendance" || this.type == "attendance" // report
       );
     },
 
@@ -433,9 +433,9 @@ export default {
     },
   },
   async created() {
-    if (this.platform == "report") {
-      this.oldFlow = true;
-    }
+    // if (this.platform == "report") {
+    //   this.oldFlow = true;
+    // }
 
     /**
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.

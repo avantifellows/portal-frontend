@@ -414,20 +414,17 @@ export default {
       } else {
         if ("code" in this.userInformation) {
           userId = this.userInformation["code"];
-          createAccessToken(this.userInformation["code"]); // school
         }
         else if ("teacher_id" in this.userInformation) {
           userId = this.userInformation["teacher_id"];
-          createAccessToken(this.userInformation["teacher_id"]); // teacher
         }
         else {
           userId = this.userInformation["student_id"];
-          createAccessToken(this.userInformation["student_id"]); // student
         }
 
         TokenAPI.createAccessToken(
           userId,
-          this.$store.state.groupData.name
+          this.$store.state.authGroupData.name
         );
 
         if (this.enable_pop_up_form) {

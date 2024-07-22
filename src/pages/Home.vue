@@ -538,16 +538,17 @@ export default {
         });
       }
     }
-    let [token_verified, user_id] = await TokenAPI.checkForTokens(this.group);
 
+    let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroup);
     if (token_verified) {
       if (
         redirectToDestination(
           this.sub_type,
           user_id,
           this.$store.state.platform_id,
+          this.$store.state.platform_link,
           this.$store.state.platform,
-          this.$store.state.groupData.input_schema.userType
+          this.$store.state.authGroupData.input_schema.userType
         )
       ) {
         sendSQSMessage(
@@ -557,8 +558,8 @@ export default {
           this.$store.state.platform_id,
           user_id,
           this.auth_type.toString(),
-          this.$store.state.groupData.name,
-          this.$store.state.groupData.input_schema.userType,
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.userType,
           "sessionData" in this.$store.state &&
             "session_id" in this.$store.state.sessionData
             ? this.$store.state.sessionData.session_id
@@ -573,18 +574,19 @@ export default {
           "" // date of birth
         );
       }
-    }
-
-    if ("input_schema" in this.authGroupData) {
+    } else {
+      if ("input_schema" in this.authGroupData) {
       this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
+      }
+
+      this.isIdGenerationEnabled;
+      this.isRedirectionEnabled;
+      this.setPlatform;
+      this.setPlatformId;
+      this.setPlatformLink;
+      this.setAuthGroupImages;
+      this.isLoading = false;
     }
-    this.isLoading = false;
-    this.isIdGenerationEnabled;
-    this.isRedirectionEnabled;
-    this.setPlatform;
-    this.setPlatformId;
-    this.setPlatformLink;
-    this.setAuthGroupImages;
   },
 };
 </script>

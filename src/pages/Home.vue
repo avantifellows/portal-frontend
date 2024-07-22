@@ -551,7 +551,7 @@ export default {
         )
       ) {
         sendSQSMessage(
-          "sign-in",
+          this.type,
           this.sub_type,
           this.$store.state.platform,
           this.$store.state.platform_id,
@@ -573,7 +573,9 @@ export default {
           "" // date of birth
         );
       }
-    }    if ("input_schema" in this.authGroupData) {
+    }
+
+    if ("input_schema" in this.authGroupData) {
       this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
     }
     this.isLoading = false;

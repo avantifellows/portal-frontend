@@ -540,7 +540,7 @@ export default {
     }
 
     let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroup);
-    if (token_verified) {
+    if (token_verified && this.isTypeSignIn) {
       if (
         redirectToDestination(
           this.sub_type,

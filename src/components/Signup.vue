@@ -8,6 +8,13 @@
     </div>
   </div>
   <div class="h-full" :class="{ 'opacity-20': isLoading }">
+    <!-- <div
+      class="flex w-full h-10 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20"
+    >
+      <template v-for="(image, index) in getGroupImages" :key="index">
+        <img :src="image" />
+      </template>
+    </div> -->
     <template v-if="!isPurposeRegistration">
       <div
         class="box-border bg-gray-100 rounded-lg p-6 mt-5 text-sm lg:text-md mx-auto w-11/12"

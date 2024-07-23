@@ -201,6 +201,10 @@ export default {
       type: String,
       default: "",
     },
+    redirectLink: {
+      type: String,
+      default: ""
+    },
     purpose: {
       type: String,
       default: "",
@@ -624,8 +628,8 @@ export default {
               this.purposeParams,
               this.userIDList[0]["userID"],
               this.redirectId,
+              this.redirectLink,
               this.redirectTo,
-              this.authType,
               this.group
             )
           ) {

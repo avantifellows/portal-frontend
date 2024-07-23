@@ -4,8 +4,8 @@ import { sendSQSMessage } from "@/services/API/sqs";
  * @param {String} purposeParams - extracted from auth layer URL
  * @param {Array} userIDList - list of userIDs wanting to go through the layer
  * @param {String} redirectId - extracted from auth layer URL
+ * @param {String} redirectLink - from auth layer
  * @param {String} redirectTo - extracted from auth layer URL
- * @param {String} authType - extracted from auth layer URL
  */
 
 export function redirectToDestination(

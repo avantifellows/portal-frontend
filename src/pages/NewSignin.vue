@@ -110,7 +110,7 @@ import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
-import { createAccessToken } from "@/services/API/token";
+import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 
 const assets = useAssets();
@@ -414,18 +414,20 @@ export default {
       } else {
         if ("code" in this.userInformation) {
           userId = this.userInformation["code"];
-          createAccessToken(this.userInformation["code"]); // school
         }
         else if ("teacher_id" in this.userInformation) {
           userId = this.userInformation["teacher_id"];
-          createAccessToken(this.userInformation["teacher_id"]); // teacher
         }
         else {
           userId = this.userInformation["student_id"];
-          createAccessToken(this.userInformation["student_id"]); // student
         }
 
-        if (this.enable_popup) {
+        await TokenAPI.createAccessToken(
+          userId,
+          this.$store.state.authGroupData.name
+        );
+
+        if (this.enable_pop_up_form) {
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
           UserAPI.postUserSessionActivity(
             this.userInformation["student_id"],

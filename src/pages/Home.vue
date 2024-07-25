@@ -63,6 +63,10 @@ import sessionAPIService from "@/services/API/sessionData.js";
 import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
+import LocalePicker from "@/components/LocalePicker.vue";
+import TokenAPI from "@/services/API/token";
+import { redirectToDestination } from "@/services/redirectToDestination";
+import { sendSQSMessage } from "@/services/API/sqs";
 
 import useAssets from "@/assets/assets.js";
 
@@ -547,16 +551,55 @@ export default {
         });
       }
     }
-    if ("input_schema" in this.authGroupData) {
+
+    let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroup);
+    if (token_verified && this.isTypeSignIn) {
+      if (
+        redirectToDestination(
+          this.sub_type,
+          user_id,
+          this.$store.state.platform_id,
+          this.$store.state.platform_link,
+          this.$store.state.platform,
+          this.$store.state.authGroupData.input_schema.userType
+        )
+      ) {
+        sendSQSMessage(
+          this.type,
+          this.sub_type,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
+          user_id,
+          this.auth_type.toString(),
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.userType,
+          "sessionData" in this.$store.state &&
+            "session_id" in this.$store.state.sessionData
+            ? this.$store.state.sessionData.session_id
+            : "",
+          "sessionData" in this.$store.state &&
+            "meta_data" in this.$store.state.sessionData &&
+            "batch" in this.$store.state.sessionData.meta_data
+            ? this.$store.state.sessionData.meta_data.batch
+            : "",
+          "", //phone number
+          "",
+          "" // date of birth
+        );
+      }
+    } else {
+      if ("input_schema" in this.authGroupData) {
       this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
+      }
+
+      this.isIdGenerationEnabled;
+      this.isRedirectionEnabled;
+      this.setPlatform;
+      this.setPlatformId;
+      this.setPlatformLink;
+      this.setAuthGroupImages;
+      this.isLoading = false;
     }
-    this.isLoading = false;
-    this.isIdGenerationEnabled;
-    this.isRedirectionEnabled;
-    this.setPlatform;
-    this.setPlatformId;
-    this.setPlatformLink;
-    this.setAuthGroupImages;
   },
 };
 </script>

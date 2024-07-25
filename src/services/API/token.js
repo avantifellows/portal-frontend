@@ -30,6 +30,7 @@ export default {
         .then((response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
           document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          resolve();
         })
         .catch((error) => {
           resolve({ error: error });

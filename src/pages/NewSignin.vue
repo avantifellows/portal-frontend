@@ -422,7 +422,7 @@ export default {
           userId = this.userInformation["student_id"];
         }
 
-        TokenAPI.createAccessToken(
+        await TokenAPI.createAccessToken(
           userId,
           this.$store.state.authGroupData.name
         );

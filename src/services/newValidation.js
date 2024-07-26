@@ -8,39 +8,36 @@ export async function validateUser(
 ) {
   let user = {};
 
-  let studentVerificationParams = {
-    student_id: userInformation["student_id"],
-    auth_group_id: authGroupId,
-  };
-
-  if (authTypes.includes("DOB")) {
-    studentVerificationParams["date_of_birth"] =
-      userInformation["date_of_birth"];
-  }
-
-  if (authTypes.includes("PH")) {
-    studentVerificationParams["phone"] = userInformation["phone"];
-  }
-
   if (userType == "student") {
-    if (
-      authTypes.includes("ID") ||
-      authTypes.includes("DOB") ||
-      authTypes.includes("PH")
-    ) {
-      let verificationResult = await userAPI.verifyStudent(
-        studentVerificationParams
-      );
+    let studentVerificationParams = {
+      auth_group_id: authGroupId,
+    };
 
-      if (authTypes.includes("ID")) {
-        user["isUserIdValid"] = verificationResult;
-      }
-      if (authTypes.includes("DOB")) {
-        user["isDateOfBirthValid"] = verificationResult;
-      }
-      if (authTypes.includes("PH")) {
-        user["isPhoneNumberValid"] = verificationResult;
-      }
+    if (authTypes.includes("ID")) {
+      studentVerificationParams["student_id"] = userInformation["student_id"];
+    }
+
+    if (authTypes.includes("DOB")) {
+      studentVerificationParams["date_of_birth"] =
+        userInformation["date_of_birth"];
+    }
+
+    if (authTypes.includes("PH")) {
+      studentVerificationParams["phone"] = userInformation["phone"];
+    }
+
+    let verificationResult = await userAPI.verifyStudent(
+      studentVerificationParams
+    );
+
+    if (authTypes.includes("ID")) {
+      user["isUserIdValid"] = verificationResult;
+    }
+    if (authTypes.includes("DOB")) {
+      user["isDateOfBirthValid"] = verificationResult;
+    }
+    if (authTypes.includes("PH")) {
+      user["isPhoneNumberValid"] = verificationResult;
     }
   }
 
@@ -57,4 +54,5 @@ export async function validateUser(
   }
 
   return user;
+  // return false;
 }

@@ -54,5 +54,4 @@ export async function validateUser(
   }
 
   return user;
-  // return false;
 }

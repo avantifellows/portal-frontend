@@ -454,7 +454,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId.startsWith("PunjabStudents") || this.sessionId.startsWith("CD_Hiring") || this.sessionId.startsWith("AFTesting") || this.sessionId.startsWith("PunjabTeachers")) {
+      if (this.sessionId.startsWith("CD_Hiring") || this.sessionId.startsWith("AFTesting") || this.sessionId.startsWith("PunjabTeachers")) {
         this.oldFlow = true;
         this.sessionData = await sessionAPIService.getOldSessionData(this.sessionId);
       } else {

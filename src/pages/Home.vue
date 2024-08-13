@@ -376,6 +376,19 @@ export default {
     },
 
     /**
+     * Retrieves the redirect link.
+     * @returns {string} The redirect link.
+     * (THIS METHOD WILL BE DEPRECATED IN V2. Will be replaced with getPlatformLink)
+     */
+     getRedirectLink() {
+      return this.platform_link == "" && this.sessionData != null
+        ? this.oldFlow
+          ? this.sessionData.redirectPlatformParams.id
+          : this.sessionData.platform_link
+        : this.platform_link;
+    },
+
+    /**
      * Retrieves the group.
      * @returns {string} The group.
      */
@@ -445,7 +458,7 @@ export default {
      * If sessionId exists in route, then retrieve session details. Otherwise, fallback to using group data.
      */
     if (this.sessionId != "") {
-      if (this.sessionId.startsWith("PunjabStudents") || this.sessionId.startsWith("CD_Hiring") || this.sessionId.startsWith("AFTesting")) {
+      if (this.sessionId.startsWith("CD_Hiring") || this.sessionId.startsWith("AFTesting") || this.sessionId.startsWith("PunjabTeachers") || this.sessionId.startsWith("Candidates")) {
         this.oldFlow = true;
         this.sessionData = await sessionAPIService.getOldSessionData(this.sessionId);
       } else {

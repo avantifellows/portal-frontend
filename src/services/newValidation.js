@@ -8,43 +8,50 @@ export async function validateUser(
 ) {
   let user = {};
 
-  if (authTypes.includes("ID")) {
-    if (userType == "student") {
-      user["isUserIdValid"] = await userAPI.verifyStudent({
-        student_id: userInformation["student_id"],
-        auth_group_id: authGroupId,
-      });
+  if (userType == "student") {
+    let studentVerificationParams = {
+      auth_group_id: authGroupId,
+    };
+
+    if (authTypes.includes("ID")) {
+      studentVerificationParams["student_id"] = userInformation["student_id"];
     }
-    if (userType == "teacher") {
-      user["isUserIdValid"] = await userAPI.verifyTeacher({
-        teacher_id: userInformation["teacher_id"],
-      });
+
+    if (authTypes.includes("DOB")) {
+      studentVerificationParams["date_of_birth"] =
+        userInformation["date_of_birth"];
     }
-  }
-  if (authTypes.includes("DOB")) {
-    if (userType == "student") {
-      user["isDateOfBirthValid"] = await userAPI.verifyStudent({
-        student_id: userInformation["student_id"],
-        date_of_birth: userInformation["date_of_birth"],
-        auth_group_id: authGroupId,
-      });
+
+    if (authTypes.includes("PH")) {
+      studentVerificationParams["phone"] = userInformation["phone"];
     }
-  }
-  if (authTypes.includes("PH")) {
-    if (userType == "student") {
-      user["isPhoneNumberValid"] = await userAPI.verifyStudent({
-        student_id: userInformation["student_id"],
-        phone: userInformation["phone"],
-        auth_group_id: authGroupId,
-      });
+
+    let verificationResult = await userAPI.verifyStudent(
+      studentVerificationParams
+    );
+
+    if (authTypes.includes("ID")) {
+      user["isUserIdValid"] = verificationResult;
     }
-  }
-  if (authTypes.includes("CODE")) {
-    if (userType == "school") {
-      user["isCodeValid"] = await userAPI.verifySchool({
-        code: userInformation["code"],
-      });
+    if (authTypes.includes("DOB")) {
+      user["isDateOfBirthValid"] = verificationResult;
+    }
+    if (authTypes.includes("PH")) {
+      user["isPhoneNumberValid"] = verificationResult;
     }
   }
+
+  if (userType == "teacher" && authTypes.includes("ID")) {
+    user["isUserIdValid"] = await userAPI.verifyTeacher({
+      teacher_id: userInformation["teacher_id"],
+    });
+  }
+
+  if (userType == "school" && authTypes.includes("CODE")) {
+    user["isCodeValid"] = await userAPI.verifySchool({
+      code: userInformation["code"],
+    });
+  }
+
   return user;
 }

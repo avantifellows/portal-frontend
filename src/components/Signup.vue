@@ -466,8 +466,8 @@ export default {
             ? this.userId.toString()
             : this.studentId.toString(),
           this.$store.state.sessionData.redirectPlatformParams.id,
+          this.$store.state.sessionData.redirectPlatformParams.id, // putting it in link for completeness
           this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.authGroupData.authType,
           this.$store.state.sessionData.group
         )
       ) {

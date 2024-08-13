@@ -28,10 +28,10 @@ export default {
       dbClient
         .post(createAccessTokenEndpoint, params)
         .then((response) => {
-          // document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-          // document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-          document.cookie = `access_token=${response.data.access_token}; Path=/; SameSite=None; Secure`;
-          document.cookie = `refresh_token=${response.data.refresh_token}; Path=/; SameSite=None; Secure`;
+          document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          // document.cookie = `access_token=${response.data.access_token}; Path=/; SameSite=None; Secure`;
+          // document.cookie = `refresh_token=${response.data.refresh_token}; Path=/; SameSite=None; Secure`;
           resolve();
         })
         .catch((error) => {

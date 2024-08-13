@@ -28,8 +28,10 @@ export default {
       dbClient
         .post(createAccessTokenEndpoint, params)
         .then((response) => {
-          document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-          document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          // document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          // document.cookie = `refresh_token=${response.data.refresh_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          document.cookie = `access_token=${response.data.access_token}; Path=/; SameSite=None; Secure`;
+          document.cookie = `refresh_token=${response.data.refresh_token}; Path=/; SameSite=None; Secure`;
           resolve();
         })
         .catch((error) => {
@@ -61,15 +63,17 @@ export default {
         )
         .then(async (response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
-          await this.verifyToken(
+          const verifyResult = await this.verifyToken(
             response.data.access_token,
             refresh_token,
             group
           );
+          resolve(verifyResult);
         })
         .catch((error) => {
-          resolve({ error: error });
-          throw new Error("Token API returned an error:", error);
+          this.deleteCookies();
+          resolve([false, ""]);
+          console.error("Token API returned an error:", error);
         });
     });
   },
@@ -98,11 +102,15 @@ export default {
         })
         .catch(async (error) => {
           if (
+            error.response &&
             error.response.status == 422 &&
             error.response.data.detail == "Signature has expired"
           ) {
-            await this.refreshToken(refresh_token, group);
+            const refreshResult = this.refreshToken(refresh_token, group);
+            resolve(refreshResult);
           }
+          // Delete cookies if verification fails
+          this.deleteCookies();
           resolve([false, ""]);
         });
     });
@@ -135,10 +143,17 @@ export default {
     for (let index = 0; index < document_cookies.length; index++) {
       const cookie = document_cookies[index];
       let [cookie_name, cookie_value] = cookie.split("=");
-      if (cookie_value == undefined || cookie_value == "undefined")
-        deleteCookies();
+      if (cookie_value == undefined || cookie_value == "undefined") {
+        return [false, ""];
+      }
       cookies[cookie_name.trim()] = cookie_value;
     }
+
+    // Check if access_token and refresh_token are present
+    if (!cookies["access_token"] || !cookies["refresh_token"]) {
+      return [false, ""];
+    }
+
     return this.verifyToken(
       cookies["access_token"],
       cookies["refresh_token"],

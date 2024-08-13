@@ -466,13 +466,16 @@ export default {
               this.$store.state.authGroupData.input_schema.user_type
             )
           ) {
-            UserAPI.postUserSessionActivity(
-              userId,
-              this.$store.state.sessionData.type,
-              this.$store.state.sessionData.session_id,
-              this.$store.state.authGroupData.input_schema.user_type,
-              this.$store.state.sessionData.session_occurrence_id
-            );
+            if (this.$store.state.sessionData.session_id != null) {
+                // do not send logs for reports, gurukul
+                UserAPI.postUserSessionActivity(
+                userId,
+                this.$store.state.sessionData.type,
+                this.$store.state.sessionData.session_id,
+                this.$store.state.authGroupData.input_schema.user_type,
+                this.$store.state.sessionData.session_occurrence_id
+              );
+            }
             sendSQSMessage(
               this.$store.state.sessionData.type,
               this.sub_type,

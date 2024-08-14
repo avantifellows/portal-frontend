@@ -64,6 +64,7 @@ import NoClassMessage from "@/components/NoClassMessage.vue";
 import Entry from "@/components/Entry.vue";
 import Signup from "@/components/Signup.vue";
 import TokenAPI from "@/services/API/token";
+import UserAPI from "@/services/API/user.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 
@@ -450,12 +451,6 @@ export default {
   },
   methods: {
     setState() {
-      this.isIdGenerationEnabled;
-      this.isRedirectionEnabled;
-      this.setPlatform;
-      this.setPlatformId;
-      this.setPlatformLink;
-      this.setAuthGroupImages;
       this.isLoading = false;
     }
   },
@@ -562,43 +557,59 @@ export default {
       this.$store.dispatch("setLocale", this.authGroupData.input_schema.default_locale);
     }
 
-    if (this.platform == "gurukul") {
-      let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroup);
+    this.isIdGenerationEnabled;
+    this.isRedirectionEnabled;
+    this.setPlatform;
+    this.setPlatformId;
+    this.setPlatformLink;
+    this.setAuthGroupImages;
+
+    if (!this.oldFlow) {
+      let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroupData.name);
       if (token_verified && this.isTypeSignIn) {
-        if (
-          redirectToDestination(
-            this.sub_type,
-            user_id,
-            this.platform_id,
-            this.platform_link,
-            this.platform,
-            this.authGroupData.input_schema.userType
-          )
-        ) {
-          sendSQSMessage(
-            this.type,
-            this.sub_type,
-            this.$store.state.platform,
-            this.$store.state.platform_id,
-            user_id,
-            this.auth_type.toString(),
-            this.$store.state.authGroupData.name,
-            this.$store.state.authGroupData.input_schema.userType,
-            "sessionData" in this.$store.state &&
-              "session_id" in this.$store.state.sessionData
-              ? this.$store.state.sessionData.session_id
-              : "",
-            "sessionData" in this.$store.state &&
-              "meta_data" in this.$store.state.sessionData &&
-              "batch" in this.$store.state.sessionData.meta_data
-              ? this.$store.state.sessionData.meta_data.batch
-              : "",
-            "", //phone number
-            "",
-            "" // date of birth
+        await sendSQSMessage(
+          this.type,
+          this.sub_type,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
+          user_id,
+          this.auth_type.toString(),
+          this.authGroupData.name,
+          this.authGroupData.input_schema.userType,
+          this.sessionData &&
+            "session_id" in this.sessionData
+            ? this.sessionData.session_id
+            : "",
+          this.sessionData &&
+            "meta_data" in this.sessionData &&
+            "batch" in this.sessionData.meta_data
+            ? this.sessionData.meta_data.batch
+            : "",
+          "", //phone number
+          "",
+          "" // date of birth
+        );
+
+        if (this.sessionId != "") {
+          // do not send logs to afdc for reports, gurukul
+          await UserAPI.postUserSessionActivity(
+          user_id,
+          this.$store.state.sessionData.type,
+          this.$store.state.sessionData.session_id,
+          this.$store.state.authGroupData.input_schema.user_type,
+          this.$store.state.sessionData.session_occurrence_id
           );
         }
-        // no user-session logs for gurukul access
+
+        redirectToDestination(
+          this.sub_type,
+          user_id,
+          this.$store.state.platform_id,
+          this.$store.state.platform_link,
+          this.$store.state.platform,
+          this.authGroupData.input_schema.userType
+        );
+
       } else {
         this.setState();
       }

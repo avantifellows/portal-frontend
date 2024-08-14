@@ -63,6 +63,7 @@ export default {
         )
         .then(async (response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
+          // document.cookie = `access_token=${response.data.access_token}; Path=/; SameSite=None; Secure`;
           const verifyResult = await this.verifyToken(
             response.data.access_token,
             refresh_token,
@@ -93,6 +94,8 @@ export default {
    */
   async verifyToken(access_token, refresh_token, group) {
     return new Promise((resolve) => {
+      // const refreshResult = this.refreshToken(refresh_token, group);
+      // resolve(refreshResult);
       dbClient
         .get(verifyTokenEndpoint, {
           headers: { Authorization: `Bearer ${access_token}` },
@@ -109,8 +112,7 @@ export default {
             const refreshResult = this.refreshToken(refresh_token, group);
             resolve(refreshResult);
           }
-          // Delete cookies if verification fails
-          this.deleteCookies();
+          console.error("Token API returned an error:", error);
           resolve([false, ""]);
         });
     });

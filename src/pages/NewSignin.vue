@@ -110,7 +110,7 @@ import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
-import { createAccessToken } from "@/services/API/token";
+import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 
 const assets = useAssets();
@@ -414,27 +414,31 @@ export default {
       } else {
         if ("code" in this.userInformation) {
           userId = this.userInformation["code"];
-          createAccessToken(this.userInformation["code"]); // school
         }
         else if ("teacher_id" in this.userInformation) {
           userId = this.userInformation["teacher_id"];
-          createAccessToken(this.userInformation["teacher_id"]); // teacher
         }
         else {
           userId = this.userInformation["student_id"];
-          createAccessToken(this.userInformation["student_id"]); // student
         }
 
-        if (this.enable_popup) {
-          this.$router.push(`/form/${this.userInformation["student_id"]}`);
-          UserAPI.postUserSessionActivity(
+        // create token only for gurukul
+        if (this.$store.state.platform == "gurukul") {
+          await TokenAPI.createAccessToken(
+          userId,
+          this.$store.state.authGroupData.name
+          );
+        }
+
+        if (this.enable_pop_up_form) {
+          await UserAPI.postUserSessionActivity(
             this.userInformation["student_id"],
             "sign-in",
             this.$store.state.sessionData.session_id,
             this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_occurrence_id
           );
-          sendSQSMessage(
+          await sendSQSMessage(
             "sign-in",
             this.sub_type,
             this.$store.state.platform,
@@ -453,47 +457,48 @@ export default {
               ? this.userInformation["date_of_birth"]
               : ""
           );
+          this.$router.push(`/form/${this.userInformation["student_id"]}`);
         } else {
-          if (
-            redirectToDestination(
-              this.sub_type,
-              userId,
-              this.$store.state.platform_id,
-              this.$store.state.platform_link,
-              this.$store.state.platform,
-              this.$store.state.authGroupData.input_schema.user_type
-            )
-          ) {
-            UserAPI.postUserSessionActivity(
-              userId,
-              this.$store.state.sessionData.type,
-              this.$store.state.sessionData.session_id,
-              this.$store.state.authGroupData.input_schema.user_type,
-              this.$store.state.sessionData.session_occurrence_id
-            );
-            sendSQSMessage(
-              this.$store.state.sessionData.type,
-              this.sub_type,
-              this.$store.state.platform,
-              this.$store.state.platform_id,
-              userId,
-              this.auth_type.toString(),
-              this.$store.state.authGroupData.name,
-              this.$store.state.authGroupData.input_schema.user_type,
-              "sessionData" in this.$store.state &&
-                "session_id" in this.$store.state.sessionData
-                ? this.$store.state.sessionData.session_id
-                : "",
-              "",
-              "phone" in this.userInformation
-                ? this.userInformation["phone"]
-                : "",
-              this.getBatch,
-              "date_of_birth" in this.userInformation
-                ? this.userInformation["date_of_birth"]
-                : ""
+          if (this.$store.state.sessionData.session_id != null) {
+              // do not send logs for reports, gurukul
+              await UserAPI.postUserSessionActivity(
+                userId,
+                this.$store.state.sessionData.type,
+                this.$store.state.sessionData.session_id,
+                this.$store.state.authGroupData.input_schema.user_type,
+                this.$store.state.sessionData.session_occurrence_id
             );
           }
+          await sendSQSMessage(
+            this.$store.state.sessionData.type,
+            this.sub_type,
+            this.$store.state.platform,
+            this.$store.state.platform_id,
+            userId,
+            this.auth_type.toString(),
+            this.$store.state.authGroupData.name,
+            this.$store.state.authGroupData.input_schema.user_type,
+            "sessionData" in this.$store.state &&
+              "session_id" in this.$store.state.sessionData
+              ? this.$store.state.sessionData.session_id
+              : "",
+            "",
+            "phone" in this.userInformation
+              ? this.userInformation["phone"]
+              : "",
+            this.getBatch,
+            "date_of_birth" in this.userInformation
+              ? this.userInformation["date_of_birth"]
+              : ""
+          );
+          redirectToDestination(
+            this.sub_type,
+            userId,
+            this.$store.state.platform_id,
+            this.$store.state.platform_link,
+            this.$store.state.platform,
+            this.$store.state.authGroupData.input_schema.user_type
+          );
         }
       }
     },

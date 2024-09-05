@@ -390,6 +390,10 @@ export default {
         this.$store.state.authGroupData.id
       );
 
+      if (this.$store.state.authGroupData.name == "AFTesting") {
+        isUserValid.isUserIdValid = true;
+      }
+
       var userId = "";
       if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
         this.invalidLoginMessage =
@@ -459,8 +463,8 @@ export default {
           );
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
         } else {
-          if (this.$store.state.sessionData.session_id != null) {
-              // do not send logs for reports, gurukul
+          if (this.$store.state.sessionData.session_id != null && this.$store.state.authGroupData.name != "AFTesting") {
+              // do not send logs for reports, gurukul, aftesting authgroup
               await UserAPI.postUserSessionActivity(
                 userId,
                 this.$store.state.sessionData.type,

@@ -383,6 +383,13 @@ export default {
      * @returns {Promise<void>} A Promise that resolves once the authentication process is complete.
      */
     async authenticate() {
+      var TESTING_MODE = false;
+      if (this.$store.state.authGroupData.name == "AFTesting") {
+        TESTING_MODE = true;
+        // authenticate all userIds as valid
+        // do not send logs to afdb
+      }
+
       let isUserValid = await validateUser(
         this.auth_type,
         this.userInformation,
@@ -390,9 +397,7 @@ export default {
         this.$store.state.authGroupData.id
       );
 
-      if (this.$store.state.authGroupData.name == "AFTesting") {
-        isUserValid.isUserIdValid = true;
-      }
+      if (TESTING_MODE == true) isUserValid.isUserIdValid = true;
 
       var userId = "";
       if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
@@ -435,13 +440,16 @@ export default {
         }
 
         if (this.enable_pop_up_form) {
-          await UserAPI.postUserSessionActivity(
-            this.userInformation["student_id"],
-            "sign-in",
-            this.$store.state.sessionData.session_id,
-            this.$store.state.authGroupData.input_schema.user_type,
-            this.$store.state.sessionData.session_occurrence_id
-          );
+          if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
+            await UserAPI.postUserSessionActivity(
+              this.userInformation["student_id"],
+              "sign-in",
+              this.$store.state.sessionData.session_id,
+              this.$store.state.authGroupData.input_schema.user_type,
+              this.$store.state.sessionData.session_occurrence_id
+            );
+          }
+
           await sendSQSMessage(
             "sign-in",
             this.sub_type,
@@ -463,8 +471,8 @@ export default {
           );
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
         } else {
-          if (this.$store.state.sessionData.session_id != null && this.$store.state.authGroupData.name != "AFTesting") {
-              // do not send logs for reports, gurukul, aftesting authgroup
+          if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
+              // do not send logs for reports, gurukul, testing_mode
               await UserAPI.postUserSessionActivity(
                 userId,
                 this.$store.state.sessionData.type,

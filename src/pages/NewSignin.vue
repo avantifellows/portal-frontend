@@ -439,7 +439,7 @@ export default {
           );
         }
 
-        if (this.enable_pop_up_form) {
+        if (this.enable_popup) {
           if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
             await UserAPI.postUserSessionActivity(
               this.userInformation["student_id"],

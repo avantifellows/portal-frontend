@@ -217,6 +217,7 @@ export default {
           this.$store.state.sessionData.purpose.params,
           this.id,
           this.$store.state.platform_id,
+          this.$store.state.platform_link,
           this.$store.state.platform,
           this.$store.state.authGroupData.input_schema.user_type
         )

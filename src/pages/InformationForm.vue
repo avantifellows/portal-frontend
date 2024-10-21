@@ -83,7 +83,7 @@ export default {
       });
     }
     if (Object.keys(this.formSchemaData).length == 0) {
-      if (this.$store.state.redirection) this.buttonDisabled = true;
+      this.buttonDisabled = true;
       this.redirect();
     }
     Object.keys(this.formSchemaData).forEach((field) => {

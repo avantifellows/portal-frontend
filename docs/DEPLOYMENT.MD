@@ -15,3 +15,20 @@ This document covers steps on setting up this repository on various cloud hostin
 Setting up a production environment on AWS is the same as setting up a staging environment.
 
 **Make sure to setup `.env.staging` for staging environment and `.env.production` for production environment.**
+
+## Docker
+### Building the Docker Image
+1. Ensure you have Docker installed on your machine.
+2. Navigate to the root of the repository.
+3. Build the Docker image using the following command:
+    ```sh
+    docker build -t portal-frontend .
+    ```
+
+### Running the Docker Container
+1. Run the Docker container using the following command:
+    ```sh
+    docker run -p 80:80 --env-file .env portal-frontend
+    ```
+
+The application should now be accessible at http://localhost.

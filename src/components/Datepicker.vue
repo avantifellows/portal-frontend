@@ -63,7 +63,7 @@ export default {
      */
     date() {
       if (
-        new Date(this.date) < new Date("01-01-1990") ||
+        new Date(this.date) < new Date("01-01-1960") ||
         new Date(this.date) > new Date()
       ) {
         this.invalidDateEntryMessage = this.invalidEntryMessage[this.getLocale];

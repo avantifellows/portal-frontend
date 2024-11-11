@@ -533,6 +533,7 @@ export default {
       /**
        * If sessionId does not exist in route, then retrieve group data directly
        */
+      if (this.getRedirectId.startsWith("Candidates")) this.oldFlow = true;
       if (!this.oldFlow) {
         // this is wrong
         this.authGroupData = await authGroupAPIService.getAuthGroupData(this.authGroup);

@@ -15,6 +15,7 @@
         :is="formField.component"
         :label="formField.label[getLocale]"
         :isRequired="formField.required"
+        :multipleSelect="formField.multipleSelect === true"
         :dbKey="formField.key"
         :defaultValue="formField.defaultValue"
         :options="formField.options[getLocale]"
@@ -96,6 +97,8 @@ export default {
           : false;
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
+        this.formSchemaData[field]["multipleSelect"] =
+        this.formSchemaData[field].multipleSelect == "TRUE" ? true : false;
     });
     this.isUserDataIsComplete();
   },

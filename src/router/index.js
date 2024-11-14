@@ -28,6 +28,7 @@ const allowedQueryParams = [
   "redirection",
   "platform",
   "platform_id",
+  "signup_form_id",
   "type",
   "sub_type",
 ];
@@ -52,6 +53,7 @@ const routes = [
         route.query.platform_id ||
         route.query.redirectId ||
         route.query.redirectID,
+      signup_form_id: route.query.signup_form_id,
     }),
   },
   {

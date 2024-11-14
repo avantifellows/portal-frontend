@@ -47,7 +47,7 @@
       />
     </div>
     <div
-      v-if="$store.state.sessionData.type == 'sign-in'"
+      v-if="$store.state.sessionData.type == 'sign-in' || $store.state.platform == 'gurukul'"
       class="mt-[30px] flex w-48 mx-auto justify-between items-center"
     >
       <hr class="w-20 text-grey" />
@@ -56,7 +56,7 @@
     </div>
 
     <button
-      v-if="$store.state.sessionData.type == 'sign-in'"
+      v-if="$store.state.sessionData.type == 'sign-in' || $store.state.platform == 'gurukul'"
       @click="redirectToSignIn"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signInText"
@@ -74,7 +74,8 @@
       "
       class="bg-primary-hover py-10 rounded-md shadow-sm"
     >
-      <p v-html="idGeneratedText" />
+      <div v-if="userData['already_exists']"><p v-html="idExistsText" /></div>
+      <div v-else><p v-html="idGeneratedText" /></div>
     </div>
 
     <button
@@ -112,9 +113,15 @@ export default {
     };
   },
   async created() {
-    this.formData = await FormSchemaAPI.getFormSchema(
-      this.$store.state.sessionData.signup_form_id
-    );
+    if (this.$store.state.sessionData.signup_form_id) {
+      this.formData = await FormSchemaAPI.getFormSchema(
+        this.$store.state.sessionData.signup_form_id
+      );
+    } else {
+      this.formData = await FormSchemaAPI.getFormSchema(
+        this.$store.state.signup_form_id
+      );
+    }
 
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
@@ -152,7 +159,17 @@ export default {
 
     /** Returns button text */
     startSessionText() {
-      return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
+      let resultText = "";
+      if (this.getLocale != "en") resultText = "सत्र शुरू करें";
+      else {
+        if (this.$store.state.platform == "quiz") resultText = "Start Quiz";
+        else if (this.$store.state.platform == "others") resultText = "Start Session";
+        else if (this.$store.state.platform == "gurukul") resultText = "Start Learning on Gurukul!";
+        else if (["youtube", "meet", "zoom"].includes(this.$store.state.platform)) resultText = "Start Class";
+        else if (["AF-plio", "SCERT-plio"].includes(this.$store.state.platform)) resultText = "Start Plio";
+      }
+
+      return resultText;
     },
 
     /** Returns the locale selected by user */
@@ -173,6 +190,12 @@ export default {
         ? `Your ID is <b> ${this.userData["user_id"]}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
         future sessions.`
         : `आपकी आईडी <b> ${this.userData["user_id"]}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
+    },
+    /** if ID already exists */
+    idExistsText() {
+      return this.getLocale == "en"
+        ? `You are already registered! Your ID is <b> ${this.userData["user_id"]}.</b>`
+        : `आप पहले से पंजीकृत हैं! आपकी आईडी <b> ${this.userData["user_id"]}</b> है|`;
     },
     /** returns title for the form */
     formTitle() {
@@ -270,30 +293,30 @@ export default {
     async signUp() {
       sendSQSMessage(
         "sign-up",
-        this.$store.state.sessionData.purpose["sub-type"],
-        this.$store.state.sessionData.platform,
-        this.$store.state.sessionData.platform_id,
+        this.$store.state.sessionData.purpose?.["sub-type"] ?? "", // ?? for gurukul case
+        this.$store.state.platform,
+        this.$store.state.platform_id,
         this.userData["student_id"],
         "", // list of authentication methods
         this.$store.state.authGroupData.name,
         this.$store.state.authGroupData.input_schema.user_type,
-        this.$store.state.sessionData.session_id,
+        this.$store.state.sessionData.session_id ?? "",
         "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
-        this.$store.state.sessionData.meta_data.batch,
+        this.$store.state.sessionData.meta_data?.batch ?? "",
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
       this.formSubmitted = true;
       this.isLoading = true;
 
-      let createdUserId = await UserAPI.newUserSignup(
+      let createdUser = await UserAPI.newUserSignup(
         this.userData,
         this.$store.state.id_generation,
         this.$store.state.authGroupData.input_schema.user_type,
         this.$store.state.authGroupData.name
       );
 
-      if (createdUserId == "" || createdUserId.error) {
+      if (createdUser == "" || createdUser.error || createdUser == null) {
         this.$router.push({
           name: "Error",
           state: {
@@ -303,14 +326,19 @@ export default {
         });
       }
       this.isLoading = false;
-      this.userData["user_id"] = createdUserId ? createdUserId : "";
-      UserAPI.postUserSessionActivity(
-        this.userData["user_id"],
-        "sign-up",
-        this.$store.state.sessionData.session_id,
-        this.$store.state.authGroupData.input_schema.user_type,
-        this.$store.state.sessionData.session_occurrence_id
-      );
+      this.userData["user_id"] = createdUser?.["user_id"] ?? "";
+      this.userData["already_exists"] = createdUser?.["already_exists"] ?? false;
+
+      if (this.$store.state.platform != "gurukul") {
+        UserAPI.postUserSessionActivity(
+          this.userData["user_id"],
+          "sign-up",
+          this.$store.state.sessionData.session_id,
+          this.$store.state.authGroupData.input_schema.user_type,
+          this.$store.state.sessionData.session_occurrence_id
+        );
+      }
+
     },
 
     /** redirects to destination */
@@ -325,25 +353,28 @@ export default {
           this.$store.state.authGroupData.input_schema.user_type
         )
       ) {
-        postUserSessionActivity(
-          this.userData["student_id"],
-          "attendance-on-sign-up",
-          this.$store.state.sessionData.session_id,
-          this.$store.state.sessionData.session_occurrence_id
-        );
+        if (this.$store.state.platform != "gurukul") {
+          postUserSessionActivity(
+            this.userData["student_id"],
+            "attendance-on-sign-up",
+            this.$store.state.sessionData.session_id,
+            this.$store.state.sessionData.session_occurrence_id
+          );
+        }
+
         sendSQSMessage(
           "attendance-on-sign-up",
-          this.$store.state.sessionData.purpose["sub-type"],
+          this.$store.state.sessionData.purpose?.["sub-type"] ?? "", // ?? for gurukul case
           this.$store.state.platform,
           this.$store.state.platform_id,
           this.userData["user_id"],
           "",
           this.$store.state.authGroupData.name,
           this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData.session_id,
+          this.$store.state.sessionData.session_id ?? "",
           "",
           "phone" in this.userData ? this.userData["phone"] : "",
-          this.$store.state.sessionData.meta_data.batch,
+          this.$store.state.sessionData.meta_data?.batch ?? "", // for gurukul
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }

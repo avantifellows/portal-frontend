@@ -88,7 +88,7 @@ export default {
           })
         )
         .then((response) => {
-          resolve(response.data.toString());
+          resolve(response.data);
         })
         .catch((error) => {
           console.log(error);

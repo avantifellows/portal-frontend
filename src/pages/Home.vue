@@ -167,6 +167,11 @@ export default {
       default: "",
       type: String,
     },
+     /** What the signup form ID is, if any. */
+     signup_form_id: {
+      default: "",
+      type: String,
+    },
     /** What the external platform link is. */
     platform_link: {
       default: "",
@@ -308,6 +313,13 @@ export default {
       this.$store.dispatch(
         "setPlatformId",
         (this.sessionData && this.sessionData.platform_id) || this.platform_id
+      );
+    },
+
+    setSignupFormId() {
+      this.$store.dispatch(
+        "setSignupFormId",
+        (this.sessionData && this.sessionData.signup_form_id) || this.signup_form_id
       );
     },
 
@@ -562,6 +574,7 @@ export default {
     this.isRedirectionEnabled;
     this.setPlatform;
     this.setPlatformId;
+    this.setSignupFormId;
     this.setPlatformLink;
     this.setAuthGroupImages;
 

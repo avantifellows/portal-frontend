@@ -97,7 +97,7 @@ export default {
           : false;
       this.formSchemaData[field]["required"] =
         this.formSchemaData[field].required == "TRUE" ? true : false;
-        this.formSchemaData[field]["multipleSelect"] =
+      this.formSchemaData[field]["multipleSelect"] =
         this.formSchemaData[field].multipleSelect == "TRUE" ? true : false;
     });
     this.isUserDataIsComplete();

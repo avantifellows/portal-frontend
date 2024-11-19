@@ -91,6 +91,7 @@
 <script>
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
+import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
@@ -331,6 +332,14 @@ export default {
       this.isLoading = false;
       this.userData["user_id"] = createdUser?.["user_id"] ?? "";
       this.userData["already_exists"] = createdUser?.["already_exists"] ?? false;
+
+      // create token only for gurukul
+      if (this.$store.state.platform == "gurukul") {
+          await TokenAPI.createAccessToken(
+          this.userData["user_id"],
+          this.$store.state.authGroupData.name
+          );
+        }
 
       if (this.$store.state.platform != "gurukul") {
         UserAPI.postUserSessionActivity(

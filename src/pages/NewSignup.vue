@@ -8,7 +8,7 @@
     </div>
   </div>
   <LocalePicker :options="getLocaleOptions" />
-  <div class="flex w-11/12 h-16 justify-evenly md:w-5/6 md:h-20 xl:w-3/4 mx-auto mt-20">
+  <div class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
@@ -27,6 +27,7 @@
         :key="index"
         :is="formField.component"
         :label="formField.label[getLocale]"
+        :multipleSelect="formField.multipleSelect === true"
         :isRequired="formField.required"
         :dbKey="formField.key"
         :options="formField.options[getLocale]"
@@ -133,6 +134,8 @@ export default {
           : false;
       this.formData.attributes[field]["required"] =
         this.formData.attributes[field].required == "TRUE" ? true : false;
+      this.formData.attributes[field]["multipleSelect"] =
+        this.formData.attributes[field].multipleSelect == "TRUE" ? true : false;
     });
   },
   watch: {

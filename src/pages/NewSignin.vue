@@ -8,7 +8,7 @@
     </div>
   </div>
   <LocalePicker :options="getLocaleOptions" />
-  <div class="flex h-12 md:h-24 justify-evenly mx-auto mt-20">
+  <div class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20">
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>

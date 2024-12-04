@@ -114,6 +114,12 @@ export default {
       type: String,
     },
 
+    /** for a quiz session, if omrmode is true */
+    omrMode: {
+      default: false,
+      type: Boolean,
+    },
+
     /** What authentication action the user is doing. Eg: Sign-in or sign-up */
     type: {
       default: "sign-in",
@@ -288,6 +294,14 @@ export default {
         "setIdGeneration",
         (this.sessionData && this.sessionData.id_generation == "True") ||
           this.id_generation == "true"
+      );
+    },
+
+    /** Stores if it is in omr mode for quiz session */
+    isOmrMode() {
+      this.$store.dispatch(
+        "setOmrMode",
+        this.omrMode
       );
     },
 
@@ -577,6 +591,7 @@ export default {
     this.setSignupFormId;
     this.setPlatformLink;
     this.setAuthGroupImages;
+    this.isOmrMode;
 
     if (!this.oldFlow) {
       let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroupData.name);
@@ -607,17 +622,18 @@ export default {
         if (this.sessionId != "") {
           // do not send logs to afdc for reports, gurukul
           await UserAPI.postUserSessionActivity(
-          user_id,
-          this.$store.state.sessionData.type,
-          this.$store.state.sessionData.session_id,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData.session_occurrence_id
+            user_id,
+            this.$store.state.sessionData.type,
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
           );
         }
 
         redirectToDestination(
           this.sub_type,
           user_id,
+          this.$store.state.omrMode,
           this.$store.state.platform_id,
           this.$store.state.platform_link,
           this.$store.state.platform,

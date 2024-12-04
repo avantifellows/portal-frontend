@@ -11,6 +11,7 @@ import { sendSQSMessage } from "@/services/API/sqs";
 export function redirectToDestination(
   purposeParams,
   userId,
+  omrMode,
   redirectId,
   redirectLink,
   redirectTo,
@@ -47,6 +48,7 @@ export function redirectToDestination(
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         userId: userId,
+        omrMode: omrMode,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;

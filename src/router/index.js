@@ -31,6 +31,7 @@ const allowedQueryParams = [
   "signup_form_id",
   "type",
   "sub_type",
+  "omrMode",
 ];
 
 const routes = [
@@ -41,6 +42,7 @@ const routes = [
     props: (route) => ({
       authGroup: route.query.group || route.query.authGroup,
       sessionId: route.query.sessionId,
+      omrMode: route.query.omrMode,
       type: route.query.type || route.query.purpose,
       sub_type: route.query.sub_type || route.query.subPurpose,
       auth_type: route.query.auth_type,

@@ -219,6 +219,7 @@ export default {
         redirectToDestination(
           this.$store.state.sessionData.purpose.params,
           this.id,
+          this.$store.state.omrMode,
           this.$store.state.platform_id,
           this.$store.state.platform_link,
           this.$store.state.platform,

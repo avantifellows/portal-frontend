@@ -11,6 +11,7 @@ export default createStore({
     platform_id: "",
     signup_form_id: "",
     platform_link: "",
+    omrMode: false,
     images: [],
   },
   actions: {
@@ -22,6 +23,9 @@ export default createStore({
     },
     setIdGeneration({ commit }, id_generation) {
       commit("setIdGeneration", id_generation);
+    },
+    setOmrMode({ commit }, omrMode) {
+      commit("setOmrMode", omrMode);
     },
     setRedirection({ commit }, redirection) {
       commit("setRedirection", redirection);
@@ -54,6 +58,9 @@ export default createStore({
     },
     setIdGeneration(state, id_generation) {
       state.id_generation = id_generation;
+    },
+    setOmrMode(state, omrMode) {
+      state.omrMode = omrMode;
     },
     setRedirection(state, redirection) {
       state.redirection = redirection;

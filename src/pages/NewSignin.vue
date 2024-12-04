@@ -506,6 +506,7 @@ export default {
           redirectToDestination(
             this.sub_type,
             userId,
+            this.$store.state.omrMode,
             this.$store.state.platform_id,
             this.$store.state.platform_link,
             this.$store.state.platform,

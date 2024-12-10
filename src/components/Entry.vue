@@ -627,6 +627,7 @@ export default {
             redirectToDestination(
               this.purposeParams,
               this.userIDList[0]["userID"],
+              false, // omrmode
               this.redirectId,
               this.redirectLink,
               this.redirectTo,

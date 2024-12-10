@@ -482,7 +482,10 @@ export default {
             );
           }
           await sendSQSMessage(
-            this.$store.state.sessionData.type,
+            "sessionData" in this.$store.state &&
+              "type" in this.$store.state.sessionData
+              ? this.$store.state.sessionData.session_id
+              : "sign-in",
             this.sub_type,
             this.$store.state.platform,
             this.$store.state.platform_id,

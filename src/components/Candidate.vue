@@ -106,6 +106,7 @@
         'NIT Trichy',
         'NIT Uttarakhand',
         'NIT Warangal',
+        'SVNIT Surat',
         'IIT Jammu',
         'Hindu College Delhi',
         'PEC Chandigarh',

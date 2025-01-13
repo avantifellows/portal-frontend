@@ -96,6 +96,7 @@
         'Delhi University',
         'Jadavpur University',
         'NIT Delhi',
+        'NIT Durgapur',
         'NIT Hamirpur',
         'NIT Jalandhar',
         'NIT Kurukshetra',

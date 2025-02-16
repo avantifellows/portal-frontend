@@ -99,6 +99,7 @@
         'NIT Durgapur',
         'NIT Hamirpur',
         'NIT Jalandhar',
+        'NIT Jamshedpur',
         'NIT Kurukshetra',
         'NIT Rourkela',
         'NIT Silchar',

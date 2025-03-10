@@ -95,6 +95,7 @@
         'Central University of Kerala',
         'Delhi University',
         'Jadavpur University',
+        'NIT Calicut',
         'NIT Delhi',
         'NIT Durgapur',
         'NIT Hamirpur',

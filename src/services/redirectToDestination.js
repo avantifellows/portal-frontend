@@ -63,10 +63,8 @@ export async function redirectToDestination(
       );
       let redirectURL = null;
       if (abTestResult.inTest) {
-        console.log(`User is in variant: ${abTestResult.variant}`);
         redirectURL = abTestResult.variantUrl;
       } else {
-        console.log(`User not in test: ${abTestResult.reason}`);
         redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
       }
 

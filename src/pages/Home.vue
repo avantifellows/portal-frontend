@@ -120,6 +120,12 @@ export default {
       type: Boolean,
     },
 
+    /** ab test id to indicate which abtest to perform */
+    abTestId: {
+      default: "",
+      type: String
+    },
+
     /** What authentication action the user is doing. Eg: Sign-in or sign-up */
     type: {
       default: "sign-in",
@@ -303,6 +309,14 @@ export default {
         "setOmrMode",
         this.omrMode
       );
+    },
+
+    /** stores ab test id */
+    setAbTestId() {
+      this.$store.dispatch(
+        "setAbTestId",
+        this.abTestId
+      )
     },
 
     /** Stores if user should be redirected to external platform after authentication in the store. */
@@ -592,6 +606,7 @@ export default {
     this.setPlatformLink;
     this.setAuthGroupImages;
     this.isOmrMode;
+    this.setAbTestId;
 
     if (!this.oldFlow) {
       let [token_verified, user_id] = await TokenAPI.checkForTokens(this.authGroupData.name);
@@ -634,6 +649,7 @@ export default {
           this.sub_type,
           user_id,
           this.$store.state.omrMode,
+          this.$store.state.abTestId,
           this.$store.state.platform_id,
           this.$store.state.platform_link,
           this.$store.state.platform,

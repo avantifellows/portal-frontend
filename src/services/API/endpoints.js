@@ -3,6 +3,7 @@ export const getGroupDataEndpoint = "/getGroupData";
 export const sendOTPEndpoint = "/sendotp";
 export const verifyOTPEndpoint = "/verifyotp";
 export const getSessionDataEndpoint = "/session-occurrence";
+export const getAbTestDataEndpoint = "/abtest/";
 export const checkBirthdateEndpoint = "/checkBirthdate";
 export const studentSignupEndpoint = "/studentSignup";
 export const userSignupEndpoint = "/user/";

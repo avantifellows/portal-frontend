@@ -1,4 +1,5 @@
 import { sendSQSMessage } from "@/services/API/sqs";
+import abTestService from "@/services/API/abTestData";
 
 /** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
  * @param {String} purposeParams - extracted from auth layer URL
@@ -8,10 +9,11 @@ import { sendSQSMessage } from "@/services/API/sqs";
  * @param {String} redirectTo - extracted from auth layer URL
  */
 
-export function redirectToDestination(
+export async function redirectToDestination(
   purposeParams,
   userId,
   omrMode,
+  abTestId,
   redirectId,
   redirectLink,
   redirectTo,
@@ -54,7 +56,18 @@ export function redirectToDestination(
       break;
     }
     case "report": {
-      redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
+      const abTestResult = await abTestService.getABTestData(
+        abTestId,
+        redirectId,
+        userId
+      );
+      let redirectURL = null;
+      if (abTestResult.inTest) {
+        redirectURL = abTestResult.variantUrl;
+      } else {
+        redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
+      }
+
       fullURL = redirectURL + "/" + redirectId + "/" + userId;
       break;
     }

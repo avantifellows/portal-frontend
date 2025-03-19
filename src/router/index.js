@@ -32,6 +32,7 @@ const allowedQueryParams = [
   "type",
   "sub_type",
   "omrMode",
+  "abTestId",
 ];
 
 const routes = [
@@ -43,6 +44,7 @@ const routes = [
       authGroup: route.query.group || route.query.authGroup,
       sessionId: route.query.sessionId,
       omrMode: route.query.omrMode,
+      abTestId: route.query.abTestId,
       type: route.query.type || route.query.purpose,
       sub_type: route.query.sub_type || route.query.subPurpose,
       auth_type: route.query.auth_type,

@@ -628,6 +628,7 @@ export default {
               this.purposeParams,
               this.userIDList[0]["userID"],
               false, // omrmode
+              null, // ab test id
               this.redirectId,
               this.redirectLink,
               this.redirectTo,

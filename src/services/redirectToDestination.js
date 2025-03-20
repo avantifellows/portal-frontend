@@ -57,7 +57,7 @@ export async function redirectToDestination(
     }
     case "report": {
       const abTestResult = await abTestService.getABTestData(
-        abTestId,
+        1, // hardcoding abtestid for now
         redirectId,
         userId
       );

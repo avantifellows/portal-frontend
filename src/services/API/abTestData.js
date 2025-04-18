@@ -11,7 +11,7 @@ export default {
    * @param {string} userId - The user ID to determine variant
    * @returns {Promise<Object>} - Object containing test status and variant info
    */
-  getABTestData(abtestId, sessionId, userId) {
+  getABTestData(abtestId, sessionId, userId, redirectId) {
     return new Promise((resolve) => {
       if (!abtestId || abtestId === "") {
         resolve({ inTest: false, reason: "invalid_test_id" });
@@ -42,6 +42,10 @@ export default {
               userVariant = variant;
               break;
             }
+          }
+
+          if (redirectId.includes("EnableStudents")) {
+            userVariant = "treatment";
           }
 
           if (!userVariant) {

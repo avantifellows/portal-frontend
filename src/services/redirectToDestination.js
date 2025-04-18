@@ -59,8 +59,10 @@ export async function redirectToDestination(
       const abTestResult = await abTestService.getABTestData(
         1, // hardcoding abtestid for now
         redirectId,
-        userId
+        userId,
+        redirectId
       );
+      console.log(abTestResult);
       let redirectURL = null;
       if (abTestResult.inTest) {
         redirectURL = abTestResult.variantUrl;

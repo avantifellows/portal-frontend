@@ -1,4 +1,4 @@
-import { dbClient, client } from "@/services/API/rootClient.js";
+import { fastAPIClient, client } from "@/services/API/rootClient.js";
 import { getSessionDataEndpoint } from "@/services/API/endpoints.js";
 
 export default {
@@ -8,7 +8,7 @@ export default {
    */
   getSessionData(sessionId) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get(getSessionDataEndpoint, { params: { session_id: sessionId } })
         .then((response) => {
           resolve(response.data);

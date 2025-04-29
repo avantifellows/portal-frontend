@@ -1,4 +1,4 @@
-import { client, dbClient } from "@/services/API/rootClient.js";
+import { client, fastAPIClient } from "@/services/API/rootClient.js";
 import {
   studentSignupEndpoint,
   userSignupEndpoint,
@@ -17,7 +17,7 @@ export default {
    */
   verifyStudent(studentData) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get(verifyStudentEndpoint, { params: studentData })
         .then((response) => {
           resolve(response.data);
@@ -37,7 +37,7 @@ export default {
    */
   verifyTeacher(teacherData) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get(verifyTeacherEndpoint, { params: teacherData })
         .then((response) => {
           resolve(response.data);
@@ -57,7 +57,7 @@ export default {
    */
   verifySchool(schoolData) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get(verifySchoolEndpoint, { params: schoolData })
         .then((response) => {
           resolve(response.data);
@@ -77,7 +77,7 @@ export default {
    */
   newUserSignup(formData, idGeneration, userType, authGroup) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .post(
           userSignupEndpoint,
           JSON.stringify({
@@ -116,7 +116,7 @@ export default {
    */
   studentData(data) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .post("/student/complete-profile-details", data)
         .then((response) => {
           resolve(response.data);
@@ -208,7 +208,7 @@ export default {
     sessionOccurrenceId
   ) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .post("/user-session", {
           user_id: userId,
           user_activity_type: userActivityType,

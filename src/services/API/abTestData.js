@@ -30,7 +30,10 @@ export default {
           }
 
           // Check if session is part of this test
-          if (!testData.session_ids.includes(sessionId)) {
+          if (
+            !testData.session_ids.includes(sessionId) &&
+            !redirectId.includes("EnableStudents")
+          ) {
             resolve({ inTest: false, reason: "session_not_in_test" });
             return;
           }

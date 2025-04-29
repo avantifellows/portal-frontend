@@ -1,4 +1,4 @@
-import { client, dbClient } from "@/services/API/rootClient.js";
+import { client, fastAPIClient } from "@/services/API/rootClient.js";
 import { getGroupDataEndpoint } from "@/services/API/endpoints.js";
 
 export default {
@@ -29,7 +29,7 @@ export default {
    */
   getAuthGroupName(sessionId) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get("/session-group/" + sessionId)
         .then((response) => {
           resolve(response.data);
@@ -49,7 +49,7 @@ export default {
       name: authGroup,
     };
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get("/auth-group/", { params })
         .then((response) => {
           resolve(response.data);

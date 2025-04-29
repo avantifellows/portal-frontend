@@ -1,5 +1,5 @@
 // src/services/API/abTestData.js
-import { dbClient } from "@/services/API/rootClient.js";
+import { fastAPIClient } from "@/services/API/rootClient.js";
 import { getAbTestDataEndpoint } from "./endpoints";
 
 export default {
@@ -18,7 +18,7 @@ export default {
         return;
       }
 
-      dbClient
+      fastAPIClient
         .get(getAbTestDataEndpoint, { params: { id: abtestId } })
         .then((response) => {
           const testData = response.data;

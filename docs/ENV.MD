@@ -14,14 +14,6 @@ Base URL for the AF Plio link.
 
 Base URL for the SCERT Plio link
 
-## VITE_APP_AWS_SQS_ACCESS_KEY
-
-AWS access key for access to AWS SQS.
-
-## VITE_APP_AWS_SQS_SECRET_KEY
-
-AWS secret key for access to AWS SQS.
-
 ## VITE_APP_BASE_URL_MEET
 
 Base URL for Google Meet link.
@@ -29,14 +21,6 @@ Base URL for Google Meet link.
 ## VITE_APP_BASE_URL_YOUTUBE
 
 Base URL for YouTube link.
-
-## VITE_APP_AWS_REGION
-
-AWS region
-
-## VITE_APP_AWS_SQS_URL
-
-Base URL for AWS SQS
 
 ## VITE_APP_OTP_SERVICE
 

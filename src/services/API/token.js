@@ -1,4 +1,4 @@
-import { dbClient } from "./rootClient";
+import { fastAPIClient } from "./rootClient";
 import {
   createAccessTokenEndpoint,
   refreshTokenEndpoint,
@@ -25,7 +25,7 @@ export default {
       data: { group: group },
     };
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .post(createAccessTokenEndpoint, params)
         .then((response) => {
           document.cookie = `access_token=${response.data.access_token}; Domain=avantifellows.org; Path=/; SameSite=None; Secure`;
@@ -53,7 +53,7 @@ export default {
    */
   async refreshToken(refresh_token, group) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .post(
           refreshTokenEndpoint,
           {},
@@ -96,7 +96,7 @@ export default {
     return new Promise((resolve) => {
       // const refreshResult = this.refreshToken(refresh_token, group);
       // resolve(refreshResult);
-      dbClient
+      fastAPIClient
         .get(verifyTokenEndpoint, {
           headers: { Authorization: `Bearer ${access_token}` },
         })

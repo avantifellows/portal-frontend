@@ -1,4 +1,4 @@
-import { dbClient } from "@/services/API/rootClient.js";
+import { fastAPIClient } from "@/services/API/rootClient.js";
 
 export default {
   /** Gets data about a form schema
@@ -6,7 +6,7 @@ export default {
    */
   getFormSchema(id) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get("/form-schema/", {
           params: {
             id: id,
@@ -29,7 +29,7 @@ export default {
    */
   getFormFields(numberOfFields, formId, studentId) {
     return new Promise((resolve) => {
-      dbClient
+      fastAPIClient
         .get("/form-schema/student", {
           params: {
             number_of_fields_in_popup_form: numberOfFields,

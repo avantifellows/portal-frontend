@@ -1,4 +1,4 @@
-import { client, dbClient } from "@/services/API/rootClient.js";
+import { client, fastAPIClient } from "@/services/API/rootClient.js";
 
 /**
  * Function to send SQS message via backend API
@@ -32,7 +32,7 @@ export function sendSQSMessage(
   dateOfBirth
 ) {
   return new Promise((resolve) => {
-    dbClient
+    fastAPIClient
       .post("/user-session/send-message", {
         type,
         sub_type: sub_type || "",

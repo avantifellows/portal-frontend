@@ -466,6 +466,7 @@ export default {
             ? this.userId.toString()
             : this.studentId.toString(),
           false, // omrmode
+          null, // abtestid
           this.$store.state.sessionData.redirectPlatformParams.id,
           this.$store.state.sessionData.redirectPlatformParams.id, // putting it in link for completeness
           this.$store.state.sessionData.redirectPlatform,

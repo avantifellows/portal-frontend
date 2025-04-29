@@ -313,6 +313,10 @@ export default {
       this.formSubmitted = true;
       this.isLoading = true;
 
+      if (this.formData.meta_data?.batch_registration == true) {
+        this.userData["batch_registration"] = true;
+      }
+
       let createdUser = await UserAPI.newUserSignup(
         this.userData,
         this.$store.state.id_generation,
@@ -360,6 +364,7 @@ export default {
           this.sub_type,
           this.userData["user_id"],
           this.$store.state.omrMode,
+          this.$store.state.abTestId,
           this.$store.state.platform_id,
           this.$store.state.platform_link,
           this.$store.state.platform,

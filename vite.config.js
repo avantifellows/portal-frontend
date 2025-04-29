@@ -1,8 +1,10 @@
-import { defineConfig } from "vite";
-import path from "path";
-import vue from "@vitejs/plugin-vue";
+// Use CommonJS syntax to ensure compatibility across environments
+const { defineConfig } = require("vite");
+const path = require("path");
+const vue = require("@vitejs/plugin-vue");
 
-export default defineConfig({
+// CommonJS module exports
+module.exports = defineConfig({
   plugins: [vue()],
   server: {
     port: 8080,

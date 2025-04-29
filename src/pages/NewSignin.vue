@@ -7,8 +7,9 @@
       />
     </div>
   </div>
-  <LocalePicker :options="getLocaleOptions" />
-  <div class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
@@ -104,7 +105,6 @@ import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
 import CodeEntry from "@/components/CodeEntry.vue";
-import LocalePicker from "@/components/LocalePicker.vue";
 
 import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
@@ -122,7 +122,6 @@ export default {
     Datepicker,
     PhoneNumberEntry,
     CodeEntry,
-    LocalePicker,
   },
   props: {
     sub_type: {
@@ -181,12 +180,6 @@ export default {
     this.mounted = true;
   },
   computed: {
-    getLocaleOptions() {
-      return this.$store.state.authGroupData
-        ? this.$store.state.authGroupData.locale.split(",")
-        : ["English"];
-    },
-
     locale() {
       return this.$store.state.locale;
     },
@@ -243,7 +236,7 @@ export default {
      * Checks if the entry type is a code.
      * @returns {boolean} True if the entry type is a code, false otherwise.
      */
-     checkEntryTypeIsCode() {
+    checkEntryTypeIsCode() {
       return Object.keys(this.codeEntryParameters).length != 0;
     },
 
@@ -361,7 +354,7 @@ export default {
      * @param {string} authType - The authentication type.
      * @returns {boolean} True if the entry type is "code", false otherwise.
      */
-     isEntryCode(authType) {
+    isEntryCode(authType) {
       if (this.findEntryType(authType) == "code") {
         this.codeEntryParameters = this.getUIParameters(authType);
         return true;
@@ -415,32 +408,31 @@ export default {
       ) {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.locale];
-      } else if (
-        this.auth_type.includes("CODE") &&
-        !isUserValid.isCodeValid
-      ) {
-        this.invalidLoginMessage = this.invalidLoginMessageTranslations["CODE"][this.locale];
+      } else if (this.auth_type.includes("CODE") && !isUserValid.isCodeValid) {
+        this.invalidLoginMessage =
+          this.invalidLoginMessageTranslations["CODE"][this.locale];
       } else {
         if ("code" in this.userInformation) {
           userId = this.userInformation["code"];
-        }
-        else if ("teacher_id" in this.userInformation) {
+        } else if ("teacher_id" in this.userInformation) {
           userId = this.userInformation["teacher_id"];
-        }
-        else {
+        } else {
           userId = this.userInformation["student_id"];
         }
 
         // create token only for gurukul
         if (this.$store.state.platform == "gurukul") {
           await TokenAPI.createAccessToken(
-          userId,
-          this.$store.state.authGroupData.name
+            userId,
+            this.$store.state.authGroupData.name
           );
         }
 
         if (this.enable_popup) {
-          if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
+          if (
+            this.$store.state.sessionData.session_id != null &&
+            TESTING_MODE == false
+          ) {
             await UserAPI.postUserSessionActivity(
               this.userInformation["student_id"],
               "sign-in",
@@ -471,14 +463,17 @@ export default {
           );
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
         } else {
-          if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
-              // do not send logs for reports, gurukul, testing_mode
-              await UserAPI.postUserSessionActivity(
-                userId,
-                this.$store.state.sessionData.type,
-                this.$store.state.sessionData.session_id,
-                this.$store.state.authGroupData.input_schema.user_type,
-                this.$store.state.sessionData.session_occurrence_id
+          if (
+            this.$store.state.sessionData.session_id != null &&
+            TESTING_MODE == false
+          ) {
+            // do not send logs for reports, gurukul, testing_mode
+            await UserAPI.postUserSessionActivity(
+              userId,
+              this.$store.state.sessionData.type,
+              this.$store.state.sessionData.session_id,
+              this.$store.state.authGroupData.input_schema.user_type,
+              this.$store.state.sessionData.session_occurrence_id
             );
           }
           await sendSQSMessage(

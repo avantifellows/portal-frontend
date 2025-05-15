@@ -295,21 +295,6 @@ export default {
 
     /** creates user ID based on information */
     async signUp() {
-      sendSQSMessage(
-        "sign-up",
-        this.$store.state.sessionData.purpose?.["sub-type"] ?? "", // ?? for gurukul case
-        this.$store.state.platform,
-        this.$store.state.platform_id,
-        this.userData["student_id"],
-        "", // list of authentication methods
-        this.$store.state.authGroupData.name,
-        this.$store.state.authGroupData.input_schema.user_type,
-        this.$store.state.sessionData.session_id ?? "",
-        "", // user IP address. Will be added in a later PR.
-        "phone" in this.userData ? this.userData["phone"] : "",
-        this.$store.state.sessionData.meta_data?.batch ?? "",
-        "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
-      );
       this.formSubmitted = true;
       this.isLoading = true;
 
@@ -336,6 +321,22 @@ export default {
       this.isLoading = false;
       this.userData["user_id"] = createdUser?.["user_id"] ?? "";
       this.userData["already_exists"] = createdUser?.["already_exists"] ?? false;
+
+      sendSQSMessage(
+        "sign-up",
+        this.$store.state.sessionData.purpose?.["sub-type"] ?? "", // ?? for gurukul case
+        this.$store.state.platform,
+        this.$store.state.platform_id,
+        this.userData["user_id"],
+        "", // list of authentication methods
+        this.$store.state.authGroupData.name,
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.sessionData.session_id ?? "",
+        "", // user IP address. Will be added in a later PR.
+        "phone" in this.userData ? this.userData["phone"] : "",
+        this.$store.state.sessionData.meta_data?.batch ?? "",
+        "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
+      );
 
       // create token only for gurukul
       if (this.$store.state.platform == "gurukul") {
@@ -373,7 +374,7 @@ export default {
       ) {
         if (this.$store.state.platform != "gurukul") {
           postUserSessionActivity(
-            this.userData["student_id"],
+            this.userData["user_id"],
             "attendance-on-sign-up",
             this.$store.state.sessionData.session_id,
             this.$store.state.sessionData.session_occurrence_id

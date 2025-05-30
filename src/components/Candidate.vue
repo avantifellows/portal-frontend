@@ -336,6 +336,11 @@ export default {
   methods: {
     /** After click, calls the parent method */
     submitForm(formData) {
+      // If "Others" is selected for college, use the custom college name instead
+      if (formData.college === 'Others' && formData.customCollege) {
+        formData.college = formData.customCollege;
+        delete formData.customCollege; // Remove the temporary field
+      }
       this.$emit("submit-form", formData);
     },
   },

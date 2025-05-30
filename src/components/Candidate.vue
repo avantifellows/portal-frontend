@@ -114,15 +114,37 @@
         'Hindu College Delhi',
         'PEC Chandigarh',
         'Central University of Karnataka',
+        'Others',
       ]"
       validation="required"
       name="college"
+      v-model="selectedCollege"
       help="Select your college/university"
       :input-class="{ 'w-full': true }"
       :inner-class="{
         'border py-2 px-2 rounded border-grey overflow-hidden': true,
       }"
       :label-class="{ 'text-base': true }"
+      :help-class="{
+        'mt-[5px] text-sm text-grey italic': true,
+      }"
+      :outer-class="{
+        'mb-[20px]': true,
+      }"
+    />
+    <FormKit
+      v-if="selectedCollege === 'Others'"
+      type="text"
+      label="*College/University Name"
+      validation="required|length:3,100"
+      validation-visibility="dirty"
+      name="customCollege"
+      help="Please enter your college/university name"
+      :input-class="{ 'w-full': true }"
+      :label-class="{ 'text-base': true }"
+      :inner-class="{
+        'border py-2 px-2 rounded border-grey overflow-hidden': true,
+      }"
       :help-class="{
         'mt-[5px] text-sm text-grey italic': true,
       }"
@@ -248,6 +270,7 @@ export default {
       candidateName: "",
       phoneNumber: "",
       cgpa: "",
+      selectedCollege: "",
       states: [
         "Andaman and Nicobar Islands",
         "Andhra Pradesh",

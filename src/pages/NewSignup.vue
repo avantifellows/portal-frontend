@@ -106,9 +106,9 @@ const assets = useAssets();
 
 export default {
   name: "NewSignup",
-  components: { 
+  components: {
     LocalePicker,
-    PrivacyPolicyCheckbox 
+    PrivacyPolicyCheckbox
   },
   data() {
     return {

@@ -1,17 +1,17 @@
 <template>
   <div class="flex items-center mt-4 mb-2">
-    <input 
-      type="checkbox" 
-      id="privacy-policy-checkbox" 
+    <input
+      type="checkbox"
+      id="privacy-policy-checkbox"
       class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary"
       :checked="checked"
       @change="toggleCheckbox"
     />
     <label for="privacy-policy-checkbox" class="ml-2 text-sm text-gray-700">
-      I agree to the terms outlined in the 
-      <a 
-        href="https://www.avantifellows.org/privacy" 
-        target="_blank" 
+      I agree to the terms outlined in the
+      <a
+        href="https://www.avantifellows.org/privacy"
+        target="_blank"
         class="text-primary hover:underline"
       >
         privacy policy
@@ -40,4 +40,4 @@ export default {
     }
   }
 }
-</script> 
+</script>

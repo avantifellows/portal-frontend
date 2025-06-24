@@ -71,6 +71,11 @@
       class="text-red text-sm text-center font-bold mt-[10px]"
     />
 
+    <!-- privacy policy checkbox -->
+    <div class="mx-auto w-56">
+      <PrivacyPolicyCheckbox v-model="privacyPolicyAccepted" />
+    </div>
+
     <!-- submit button -->
     <button
       class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md"
@@ -105,6 +110,7 @@ import Datepicker from "@/components/Datepicker.vue";
 import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
 import CodeEntry from "@/components/CodeEntry.vue";
 import LocalePicker from "@/components/LocalePicker.vue";
+import PrivacyPolicyCheckbox from "@/components/PrivacyPolicyCheckbox.vue";
 
 import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/newValidation.js";
@@ -123,6 +129,7 @@ export default {
     PhoneNumberEntry,
     CodeEntry,
     LocalePicker,
+    PrivacyPolicyCheckbox,
   },
   props: {
     sub_type: {
@@ -157,6 +164,7 @@ export default {
       dateEntryParameters: {}, // stores UI parameters for date entry component
       codeEntryParameters: {}, // stores UI parameters for code entry component
       userInformation: {}, // stores data about the user
+      privacyPolicyAccepted: true, // privacy policy checkbox state (default: checked)
       invalidLoginMessageTranslations: {
         ID: {
           en: "This ID is not registered. Try again",
@@ -265,7 +273,8 @@ export default {
             : true) &&
           (this.checkEntryTypeIsCode
             ? this.$refs.codeEntry["0"].isCodeEntryValid
-            : true)
+            : true) &&
+          this.privacyPolicyAccepted
         );
       }
       return true;

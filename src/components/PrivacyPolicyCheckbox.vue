@@ -8,7 +8,7 @@
       @change="toggleCheckbox"
     />
     <label for="privacy-policy-checkbox" class="ml-2 text-sm text-gray-700">
-      By continuing, you agree to the terms in our 
+      I agree to the terms outlined in the 
       <a 
         href="https://www.avantifellows.org/privacy" 
         target="_blank" 

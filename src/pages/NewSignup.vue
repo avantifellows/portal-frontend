@@ -39,6 +39,9 @@
         class="mt-[25px]"
       />
 
+      <!-- privacy policy checkbox -->
+      <PrivacyPolicyCheckbox v-model="privacyPolicyAccepted" class="mt-[25px]" />
+
       <!-- submit button -->
       <button
         class="mt-[30px] bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md w-full p-2 rounded"
@@ -97,12 +100,16 @@ import FormSchemaAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LocalePicker from "../components/LocalePicker.vue";
+import PrivacyPolicyCheckbox from "@/components/PrivacyPolicyCheckbox.vue";
 
 const assets = useAssets();
 
 export default {
   name: "NewSignup",
-  components: { LocalePicker },
+  components: { 
+    LocalePicker,
+    PrivacyPolicyCheckbox 
+  },
   data() {
     return {
       isLoading: false,
@@ -112,6 +119,7 @@ export default {
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       userId: "",
       formData: {},
+      privacyPolicyAccepted: true, // privacy policy checkbox state (default: checked)
     };
   },
   async created() {
@@ -148,6 +156,11 @@ export default {
       },
       deep: true,
     },
+    privacyPolicyAccepted: {
+      handler() {
+        this.isUserDataIsComplete();
+      }
+    }
   },
   computed: {
     getLocaleOptions() {
@@ -280,6 +293,11 @@ export default {
           isUserDataComplete = false;
         }
       });
+
+      // Check if privacy policy is accepted
+      if (!this.privacyPolicyAccepted) {
+        isUserDataComplete = false;
+      }
 
       return isUserDataComplete
         ? (this.signUpDisabled = false)

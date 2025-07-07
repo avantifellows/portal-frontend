@@ -130,6 +130,7 @@ export async function validateID(
             var isBirthdateValid = await userAPI.verifyStudent({
               student_id: userID,
               date_of_birth: dob,
+              auth_group: group,
             });
             return userValidationResponse && isBirthdateValid;
           }
@@ -137,6 +138,7 @@ export async function validateID(
             var isPhoneNumberValid = await userAPI.verifyStudent({
               student_id: userID,
               phone: phoneNumber,
+              auth_group: group,
             });
             return userValidationResponse && isPhoneNumberValid;
           }

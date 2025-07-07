@@ -4,7 +4,8 @@ export async function validateUser(
   authTypes,
   userInformation,
   userType,
-  authGroupId
+  authGroupId,
+  authGroupName
 ) {
   let user = {};
 

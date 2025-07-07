@@ -523,7 +523,8 @@ export default {
             this.$store.state.platform_id,
             this.$store.state.platform_link,
             this.$store.state.platform,
-            this.$store.state.authGroupData.input_schema.user_type
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData && this.$store.state.sessionData.meta_data && this.$store.state.sessionData.meta_data.test_type
           );
         }
       }

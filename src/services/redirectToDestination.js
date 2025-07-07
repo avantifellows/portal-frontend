@@ -7,6 +7,7 @@ import abTestService from "@/services/API/abTestData";
  * @param {String} redirectId - extracted from auth layer URL
  * @param {String} redirectLink - from auth layer
  * @param {String} redirectTo - extracted from auth layer URL
+ * @param {String} testType - test type from session meta_data
  */
 
 export async function redirectToDestination(
@@ -17,13 +18,20 @@ export async function redirectToDestination(
   redirectId,
   redirectLink,
   redirectTo,
-  group
+  group,
+  testType
 ) {
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
 
-  switch (redirectTo) {
+  // Handle special case: when redirectTo is "quiz" but testType is "form"
+  let actualRedirectTo = redirectTo;
+  if (redirectTo === "quiz" && testType === "form") {
+    actualRedirectTo = "form";
+  }
+
+  switch (actualRedirectTo) {
     case "AF-plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_AF_PLIO;
       let url = new URL(redirectURL + redirectId);
@@ -51,6 +59,16 @@ export async function redirectToDestination(
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         userId: userId,
         omrMode: omrMode,
+      });
+      fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
+    case "form": {
+      redirectURL = import.meta.env.VITE_APP_BASE_URL_FORM;
+      let url = new URL(redirectURL + redirectId);
+      finalURLQueryParams = new URLSearchParams({
+        apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
+        userId: userId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;

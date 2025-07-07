@@ -653,7 +653,8 @@ export default {
           this.$store.state.platform_id,
           this.$store.state.platform_link,
           this.$store.state.platform,
-          this.authGroupData.input_schema.userType
+          this.authGroupData.input_schema.userType,
+          this.sessionData && this.sessionData.meta_data && this.sessionData.meta_data.test_type
         );
 
       } else {

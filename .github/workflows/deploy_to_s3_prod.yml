@@ -42,6 +42,7 @@ jobs:
           VITE_APP_PLIO_SCERT_API_KEY: ${{ secrets.VITE_APP_PLIO_SCERT_API_KEY }}
           VITE_APP_QUIZ_AF_API_KEY: ${{ secrets.VITE_APP_QUIZ_AF_API_KEY }}
           VITE_APP_BASE_URL_QUIZ: "https://quiz.avantifellows.org/quiz/"
+          VITE_APP_BASE_URL_FORM: "https://quiz.avantifellows.org/form/"
           VITE_APP_BASE_URL_MEET: "https://meet.google.com/"
           VITE_APP_OTP_SERVICE: ${{ secrets.VITE_APP_OTP_SERVICE }}
           VITE_APP_BASE_URL_YOUTUBE: "https://www.youtube.com/watch?v="

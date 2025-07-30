@@ -470,7 +470,9 @@ export default {
           this.$store.state.sessionData.redirectPlatformParams.id,
           this.$store.state.sessionData.redirectPlatformParams.id, // putting it in link for completeness
           this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.sessionData.group
+          this.$store.state.sessionData.group,
+          null, // session metadata testType
+          this.$route.query.testType
         )
       ) {
         sendSQSMessage(

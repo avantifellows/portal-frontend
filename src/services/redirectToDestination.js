@@ -8,6 +8,7 @@ import abTestService from "@/services/API/abTestData";
  * @param {String} redirectLink - from auth layer
  * @param {String} redirectTo - extracted from auth layer URL
  * @param {String} testType - test type from session meta_data
+ * @param {String} urlTestType - test type from auth layer URL (optional, fallback to session meta_data)
  */
 
 export async function redirectToDestination(
@@ -19,15 +20,19 @@ export async function redirectToDestination(
   redirectLink,
   redirectTo,
   group,
-  testType
+  testType,
+  urlTestType
 ) {
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
 
+  // Use URL testType if provided, otherwise fallback to session metadata testType
+  const effectiveTestType = urlTestType || testType;
+
   // Handle special case: when redirectTo is "quiz" but testType is "form"
   let actualRedirectTo = redirectTo;
-  if (redirectTo === "quiz" && testType === "form") {
+  if (redirectTo === "quiz" && effectiveTestType === "form") {
     actualRedirectTo = "form";
   }
 
@@ -84,7 +89,7 @@ export async function redirectToDestination(
       if (abTestResult.inTest) {
         redirectURL = abTestResult.variantUrl;
       } else {
-        if (testType === "form") {
+        if (effectiveTestType === "form") {
           redirectURL = import.meta.env.VITE_APP_FORM_REPORT_BASE_URL;
         } else {
           redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;

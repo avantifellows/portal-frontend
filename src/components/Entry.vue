@@ -632,7 +632,9 @@ export default {
               this.redirectId,
               this.redirectLink,
               this.redirectTo,
-              this.group
+              this.group,
+              null, // session metadata testType
+              this.$route.query.testType
             )
           ) {
             sendSQSMessage(

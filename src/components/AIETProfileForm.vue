@@ -271,10 +271,14 @@ export default {
           this.isNotStudentRegistration
             ? this.userId.toString()
             : this.studentId.toString(),
+          false, // omrMode
+          null, // abTestId
           this.$store.state.sessionData.redirectPlatformParams.id,
+          null, // redirectLink
           this.$store.state.sessionData.redirectPlatform,
-          this.$store.state.groupData.authType,
-          this.$store.state.sessionData.group
+          this.$store.state.sessionData.group,
+          null, // session metadata testType
+          this.$route.query.testType
         )
       ) {
         sendSQSMessage(

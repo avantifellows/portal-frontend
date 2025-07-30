@@ -189,6 +189,11 @@ export default {
       default: "",
       type: String,
     },
+    /** Test type from auth layer URL. */
+    testType: {
+      default: "",
+      type: String,
+    },
   },
   data() {
     return {
@@ -654,7 +659,8 @@ export default {
           this.$store.state.platform_link,
           this.$store.state.platform,
           this.authGroupData.input_schema.userType,
-          this.sessionData && this.sessionData.meta_data && this.sessionData.meta_data.test_type
+          this.sessionData && this.sessionData.meta_data && this.sessionData.meta_data.test_type,
+          this.testType
         );
 
       } else {

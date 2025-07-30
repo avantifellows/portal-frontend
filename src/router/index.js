@@ -33,6 +33,7 @@ const allowedQueryParams = [
   "sub_type",
   "omrMode",
   "abTestId",
+  "testType",
 ];
 
 const routes = [
@@ -58,6 +59,7 @@ const routes = [
         route.query.redirectId ||
         route.query.redirectID,
       signup_form_id: route.query.signup_form_id,
+      testType: route.query.testType,
     }),
   },
   {

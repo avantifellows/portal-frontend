@@ -426,10 +426,14 @@ export default {
         redirectToDestination(
           this.purposeParams,
           this.phoneNumberList,
+          false, // omrMode
+          null, // abTestId
           this.redirectId,
+          null, // redirectLink
           this.redirectTo,
-          this.authType,
-          this.group
+          this.group,
+          null, // session metadata testType
+          this.$route.query.testType
         )
       ) {
         this.isLoading = false;

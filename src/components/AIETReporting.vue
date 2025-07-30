@@ -96,10 +96,14 @@ export default {
           redirectToDestination(
             "reporting",
             this.$route.params.id,
+            false, // omrMode
+            null, // abTestId
             this.$route.params.redirectId,
+            null, // redirectLink
             "report",
-            "",
-            "EnableStudents"
+            "EnableStudents",
+            null, // session metadata testType
+            this.$route.query.testType
           )
         ) {
           sendSQSMessage(

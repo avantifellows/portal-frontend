@@ -50,6 +50,7 @@ jobs:
           VITE_APP_CLOUD_FUNCTIONS_BASE_URL: "https://asia-south1-avantifellows.cloudfunctions.net"
           VITE_APP_PORTAL_BACKEND: " https://b93ddkdz0g.execute-api.ap-south-1.amazonaws.com/"
           VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/student_quiz_report"
+          VITE_APP_FORM_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/form_respones"
           VITE_APP_GURUKUL_BASE_URL: "https://staging-gurukul.avantifellows.org/"
         run: npm run build
 

@@ -80,12 +80,15 @@ export async function redirectToDestination(
         userId,
         redirectId
       );
-      console.log(abTestResult);
       let redirectURL = null;
       if (abTestResult.inTest) {
         redirectURL = abTestResult.variantUrl;
       } else {
-        redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
+        if (testType === "form") {
+          redirectURL = import.meta.env.VITE_APP_FORM_REPORT_BASE_URL;
+        } else {
+          redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
+        }
       }
 
       fullURL = redirectURL + "/" + redirectId + "/" + userId;

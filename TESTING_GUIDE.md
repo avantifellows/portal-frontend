@@ -51,7 +51,7 @@ Ensure the portal-backend is running on `127.0.0.1:8000` before testing.
 ### 2. Sessionless Authentication
 
 #### 2.1 Valid Auth Group
-- **URL**: `http://localhost:8080/?platform=gurukul&authGroup=PunjabTeachers&type=sign-in`
+- **URL**: `http://localhost:8080/?platform=gurukul&group=DelhiStudents`
 - **URL**: `http://localhost:8080/?type=attendance&redirectTo=report&redirectId=DelhiStudents_688caff6bf2c493ccb8619a7&sub_type=reporting&group=DelhiStudents&auth_type=ID,DOB`
 - **Expected Backend Calls**:
   - `GET /auth-group/?name=PunjabTeachers` or `GET /auth-group/?name=DelhiStudents`

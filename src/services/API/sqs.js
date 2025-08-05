@@ -1,4 +1,4 @@
-import { client, fastAPIClient } from "@/services/API/rootClient.js";
+import { fastAPIClient } from "@/services/API/rootClient.js";
 
 /**
  * Function to send SQS message via backend API

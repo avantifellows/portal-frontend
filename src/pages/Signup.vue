@@ -7,14 +7,20 @@
       />
     </div>
   </div>
-  <LocalePicker :options="getLocaleOptions" />
-  <div class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20">
+  <LocalePicker v-if="contextChecked" :options="getLocaleOptions" />
+  <div
+    v-if="contextChecked"
+    class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
   </div>
 
-  <div v-if="!formSubmitted" class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3">
+  <div
+    v-if="contextChecked && !formSubmitted"
+    class="flex flex-col my-auto h-full pt-12 pb-10 space-y-3"
+  >
     <p class="mt-6 text-center text-black font-bold">
       {{ formTitle }}
     </p>
@@ -31,7 +37,7 @@
         :isRequired="formField.required"
         :dbKey="formField.key"
         :options="formField.options[getLocale]"
-        :isTypeSignIn=false
+        :isTypeSignIn="false"
         :multiple="formField.multiple"
         :maxLengthOfEntry="formField.maxLengthOfEntry"
         :helpText="formField.helpText[getLocale]"
@@ -40,7 +46,10 @@
       />
 
       <!-- privacy policy checkbox -->
-      <PrivacyPolicyCheckbox v-model="privacyPolicyAccepted" class="mt-[25px]" />
+      <PrivacyPolicyCheckbox
+        v-model="privacyPolicyAccepted"
+        class="mt-[25px]"
+      />
 
       <!-- submit button -->
       <button
@@ -51,7 +60,10 @@
       />
     </div>
     <div
-      v-if="$store.state.sessionData.type == 'sign-in' || $store.state.platform == 'gurukul'"
+      v-if="
+        $store.state.sessionData.type == 'sign-in' ||
+        $store.state.platform == 'gurukul'
+      "
       class="mt-[30px] flex w-48 mx-auto justify-between items-center"
     >
       <hr class="w-20 text-grey" />
@@ -60,7 +72,10 @@
     </div>
 
     <button
-      v-if="$store.state.sessionData.type == 'sign-in' || $store.state.platform == 'gurukul'"
+      v-if="
+        $store.state.sessionData.type == 'sign-in' ||
+        $store.state.platform == 'gurukul'
+      "
       @click="redirectToSignIn"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
       v-html="signInText"
@@ -96,7 +111,7 @@ import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
-import FormSchemaAPI from "@/services/API/form.js";
+import FormAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import LocalePicker from "../components/LocalePicker.vue";
@@ -105,14 +120,15 @@ import PrivacyPolicyCheckbox from "@/components/PrivacyPolicyCheckbox.vue";
 const assets = useAssets();
 
 export default {
-  name: "NewSignup",
+  name: "SignUp",
   components: {
     LocalePicker,
-    PrivacyPolicyCheckbox
+    PrivacyPolicyCheckbox,
   },
   data() {
     return {
-      isLoading: false,
+      isLoading: true, // Start with loading state
+      contextChecked: false, // Track if we've checked for store context
       userData: {},
       formSubmitted: false,
       signUpDisabled: true,
@@ -123,16 +139,37 @@ export default {
     };
   },
   async created() {
-    if (this.$store.state.sessionData.signup_form_id) {
-      this.formData = await FormSchemaAPI.getFormSchema(
-        this.$store.state.sessionData.signup_form_id
-      );
-    } else {
-      this.formData = await FormSchemaAPI.getFormSchema(
-        this.$store.state.signup_form_id
-      );
+    // Check if we have the required store context (lost on refresh)
+    const hasAuthContext =
+      this.$store.state.authGroupData &&
+      Object.keys(this.$store.state.authGroupData).length > 0;
+    const hasSessionContext =
+      this.$store.state.sessionData &&
+      Object.keys(this.$store.state.sessionData).length > 0;
+
+    if (!hasAuthContext && !hasSessionContext) {
+      // Context lost (likely due to page refresh) - redirect to error
+      this.$router.push({
+        name: "Error",
+        props: {
+          text: "Session expired. Please start from the beginning by accessing your sign-in link again.",
+        },
+      });
+      return;
     }
 
+    // Mark context as checked so template can render safely
+    this.contextChecked = true;
+
+    // Get enhanced form schema (backend handles all enhancements)
+    const authGroup = this.$store.state.authGroupData?.name;
+    const formId =
+      this.$store.state.sessionData.signup_form_id ||
+      this.$store.state.signup_form_id;
+
+    this.formData = await FormAPI.getFormSchema(formId, authGroup);
+
+    // Process form fields
     Object.keys(this.formData.attributes).forEach((field) => {
       this.formData.attributes[field]["component"] =
         typeToInputParameters[this.formData.attributes[field].type];
@@ -146,6 +183,9 @@ export default {
       this.formData.attributes[field]["multipleSelect"] =
         this.formData.attributes[field].multipleSelect == "TRUE" ? true : false;
     });
+
+    // Done loading
+    this.isLoading = false;
   },
   watch: {
     userData: {
@@ -159,12 +199,13 @@ export default {
     privacyPolicyAccepted: {
       handler() {
         this.isUserDataIsComplete();
-      }
-    }
+      },
+    },
   },
   computed: {
     getLocaleOptions() {
-      return this.$store.state.authGroupData
+      return this.$store.state.authGroupData &&
+        this.$store.state.authGroupData.locale
         ? this.$store.state.authGroupData.locale.split(",")
         : ["English"];
     },
@@ -180,10 +221,16 @@ export default {
       if (this.getLocale != "en") resultText = "सत्र शुरू करें";
       else {
         if (this.$store.state.platform == "quiz") resultText = "Start Quiz";
-        else if (this.$store.state.platform == "others") resultText = "Start Session";
-        else if (this.$store.state.platform == "gurukul") resultText = "Start Learning on Gurukul!";
-        else if (["youtube", "meet", "zoom"].includes(this.$store.state.platform)) resultText = "Start Class";
-        else if (["AF-plio", "SCERT-plio"].includes(this.$store.state.platform)) resultText = "Start Plio";
+        else if (this.$store.state.platform == "others")
+          resultText = "Start Session";
+        else if (this.$store.state.platform == "gurukul")
+          resultText = "Start Learning on Gurukul!";
+        else if (
+          ["youtube", "meet", "zoom"].includes(this.$store.state.platform)
+        )
+          resultText = "Start Class";
+        else if (["AF-plio", "SCERT-plio"].includes(this.$store.state.platform))
+          resultText = "Start Plio";
       }
 
       return resultText;
@@ -320,7 +367,7 @@ export default {
         this.userData["batch_registration"] = true;
       }
 
-      let createdUser = await UserAPI.newUserSignup(
+      let createdUser = await UserAPI.userSignup(
         this.userData,
         this.$store.state.id_generation,
         this.$store.state.authGroupData.input_schema.user_type,
@@ -338,11 +385,11 @@ export default {
       }
       this.isLoading = false;
       this.userData["user_id"] = createdUser?.["user_id"] ?? "";
-      this.userData["already_exists"] = createdUser?.["already_exists"] ?? false;
+      this.userData["already_exists"] =
+        createdUser?.["already_exists"] ?? false;
 
       sendSQSMessage(
         "sign-up",
-        this.$store.state.sessionData.purpose?.["sub-type"] ?? "", // ?? for gurukul case
         this.$store.state.platform,
         this.$store.state.platform_id,
         this.userData["user_id"],
@@ -350,7 +397,6 @@ export default {
         this.$store.state.authGroupData.name,
         this.$store.state.authGroupData.input_schema.user_type,
         this.$store.state.sessionData.session_id ?? "",
-        "", // user IP address. Will be added in a later PR.
         "phone" in this.userData ? this.userData["phone"] : "",
         this.$store.state.sessionData.meta_data?.batch ?? "",
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
@@ -358,11 +404,11 @@ export default {
 
       // create token only for gurukul
       if (this.$store.state.platform == "gurukul") {
-          await TokenAPI.createAccessToken(
+        await TokenAPI.createAccessToken(
           this.userData["user_id"],
           this.$store.state.authGroupData.name
-          );
-        }
+        );
+      }
 
       if (this.$store.state.platform != "gurukul") {
         UserAPI.postUserSessionActivity(
@@ -373,14 +419,12 @@ export default {
           this.$store.state.sessionData.session_occurrence_id
         );
       }
-
     },
 
     /** redirects to destination */
     redirect() {
       if (
         redirectToDestination(
-          this.sub_type,
           this.userData["user_id"],
           this.$store.state.omrMode,
           this.$store.state.abTestId,
@@ -388,22 +432,24 @@ export default {
           this.$store.state.platform_link,
           this.$store.state.platform,
           this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData && this.$store.state.sessionData.meta_data && this.$store.state.sessionData.meta_data.test_type,
+          this.$store.state.sessionData &&
+            this.$store.state.sessionData.meta_data &&
+            this.$store.state.sessionData.meta_data.test_type,
           this.$route.query.testType
         )
       ) {
         if (this.$store.state.platform != "gurukul") {
-          postUserSessionActivity(
+          UserAPI.postUserSessionActivity(
             this.userData["user_id"],
             "attendance-on-sign-up",
             this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_occurrence_id
           );
         }
 
         sendSQSMessage(
           "attendance-on-sign-up",
-          this.$store.state.sessionData.purpose?.["sub-type"] ?? "", // ?? for gurukul case
           this.$store.state.platform,
           this.$store.state.platform_id,
           this.userData["user_id"],
@@ -411,7 +457,6 @@ export default {
           this.$store.state.authGroupData.name,
           this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id ?? "",
-          "",
           "phone" in this.userData ? this.userData["phone"] : "",
           this.$store.state.sessionData.meta_data?.batch ?? "", // for gurukul
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""

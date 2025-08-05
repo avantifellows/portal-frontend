@@ -8,7 +8,9 @@
     </div>
   </div>
   <LocalePicker :options="getLocaleOptions" />
-  <div class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20">
+  <div
+    class="flex w-full h-28 justify-evenly md:w-4/5 md:h-32 xl:w-3/4 mx-auto mt-20"
+  >
     <template v-for="(image, index) in $store.state.images" :key="index">
       <img :src="image" />
     </template>
@@ -107,13 +109,13 @@ import useAssets from "@/assets/assets.js";
 
 import NumberEntry from "@/components/NumberEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
-import PhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
+import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 import CodeEntry from "@/components/CodeEntry.vue";
 import LocalePicker from "@/components/LocalePicker.vue";
 import PrivacyPolicyCheckbox from "@/components/PrivacyPolicyCheckbox.vue";
 
 import { authToInputParameters } from "@/services/authToInputParameters";
-import { validateUser } from "@/services/newValidation.js";
+import { validateUser } from "@/services/authValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import TokenAPI from "@/services/API/token";
@@ -132,10 +134,6 @@ export default {
     PrivacyPolicyCheckbox,
   },
   props: {
-    sub_type: {
-      default: "",
-      type: String,
-    },
     is_type_signin: {
       default: true,
       type: Boolean,
@@ -203,7 +201,7 @@ export default {
       return this.locale == "en" ? "Login" : "लॉग इन";
     },
 
-    /** Retutns if sign up flow should be activated */
+    /** Returns if sign up flow should be activated */
     isSignupActivated() {
       return this.$store.state.sessionData.activate_signup == "True";
     },
@@ -211,7 +209,7 @@ export default {
     /** Returns text based on locale */
     signUpText() {
       return this.locale == "en"
-        ? "<span>New Student?</span> <b> Register Now</b>"
+        ? "<span>New User?</span> <b> Register Now</b>"
         : "<span>नया छात्र?</span><b>अब रजिस्टर करें। </b>";
     },
 
@@ -251,7 +249,7 @@ export default {
      * Checks if the entry type is a code.
      * @returns {boolean} True if the entry type is a code, false otherwise.
      */
-     checkEntryTypeIsCode() {
+    checkEntryTypeIsCode() {
       return Object.keys(this.codeEntryParameters).length != 0;
     },
 
@@ -370,7 +368,7 @@ export default {
      * @param {string} authType - The authentication type.
      * @returns {boolean} True if the entry type is "code", false otherwise.
      */
-     isEntryCode(authType) {
+    isEntryCode(authType) {
       if (this.findEntryType(authType) == "code") {
         this.codeEntryParameters = this.getUIParameters(authType);
         return true;
@@ -424,32 +422,31 @@ export default {
       ) {
         this.invalidLoginMessage =
           this.invalidLoginMessageTranslations["PH"][this.locale];
-      } else if (
-        this.auth_type.includes("CODE") &&
-        !isUserValid.isCodeValid
-      ) {
-        this.invalidLoginMessage = this.invalidLoginMessageTranslations["CODE"][this.locale];
+      } else if (this.auth_type.includes("CODE") && !isUserValid.isCodeValid) {
+        this.invalidLoginMessage =
+          this.invalidLoginMessageTranslations["CODE"][this.locale];
       } else {
         if ("code" in this.userInformation) {
           userId = this.userInformation["code"];
-        }
-        else if ("teacher_id" in this.userInformation) {
+        } else if ("teacher_id" in this.userInformation) {
           userId = this.userInformation["teacher_id"];
-        }
-        else {
+        } else {
           userId = this.userInformation["student_id"];
         }
 
         // create token only for gurukul
         if (this.$store.state.platform == "gurukul") {
           await TokenAPI.createAccessToken(
-          userId,
-          this.$store.state.authGroupData.name
+            userId,
+            this.$store.state.authGroupData.name
           );
         }
 
         if (this.enable_popup) {
-          if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
+          if (
+            this.$store.state.sessionData.session_id != null &&
+            TESTING_MODE == false
+          ) {
             await UserAPI.postUserSessionActivity(
               this.userInformation["student_id"],
               "sign-in",
@@ -461,7 +458,6 @@ export default {
 
           await sendSQSMessage(
             "sign-in",
-            this.sub_type,
             this.$store.state.platform,
             this.$store.state.platform_id,
             this.userInformation["student_id"],
@@ -469,7 +465,6 @@ export default {
             this.$store.state.authGroupData.name,
             this.$store.state.authGroupData.input_schema.user_type,
             this.$store.state.sessionData.session_id,
-            "",
             "phone" in this.userInformation
               ? this.userInformation["phone"]
               : "",
@@ -480,14 +475,17 @@ export default {
           );
           this.$router.push(`/form/${this.userInformation["student_id"]}`);
         } else {
-          if (this.$store.state.sessionData.session_id != null && TESTING_MODE == false) {
-              // do not send logs for reports, gurukul, testing_mode
-              await UserAPI.postUserSessionActivity(
-                userId,
-                this.$store.state.sessionData.type,
-                this.$store.state.sessionData.session_id,
-                this.$store.state.authGroupData.input_schema.user_type,
-                this.$store.state.sessionData.session_occurrence_id
+          if (
+            this.$store.state.sessionData.session_id != null &&
+            TESTING_MODE == false
+          ) {
+            // do not send logs for reports, gurukul, testing_mode
+            await UserAPI.postUserSessionActivity(
+              userId,
+              this.$store.state.sessionData.type,
+              this.$store.state.sessionData.session_id,
+              this.$store.state.authGroupData.input_schema.user_type,
+              this.$store.state.sessionData.session_occurrence_id
             );
           }
           await sendSQSMessage(
@@ -495,7 +493,6 @@ export default {
               "type" in this.$store.state.sessionData
               ? this.$store.state.sessionData.type
               : "sign-in",
-            this.sub_type,
             this.$store.state.platform,
             this.$store.state.platform_id,
             userId,
@@ -506,7 +503,6 @@ export default {
               "session_id" in this.$store.state.sessionData
               ? this.$store.state.sessionData.session_id
               : "",
-            "",
             "phone" in this.userInformation
               ? this.userInformation["phone"]
               : "",
@@ -516,7 +512,6 @@ export default {
               : ""
           );
           redirectToDestination(
-            this.sub_type,
             userId,
             this.$store.state.omrMode,
             this.$store.state.abTestId,
@@ -524,7 +519,9 @@ export default {
             this.$store.state.platform_link,
             this.$store.state.platform,
             this.$store.state.authGroupData.input_schema.user_type,
-            this.$store.state.sessionData && this.$store.state.sessionData.meta_data && this.$store.state.sessionData.meta_data.test_type,
+            this.$store.state.sessionData &&
+              this.$store.state.sessionData.meta_data &&
+              this.$store.state.sessionData.meta_data.test_type,
             this.$route.query.testType
           );
         }
@@ -532,11 +529,22 @@ export default {
     },
 
     /**
-     * Redirects the user to the sign-up page.
+     * Redirects the user to the sign-up page with session context.
      */
     redirectToSignUp() {
+      const query = {};
+
+      // Include sessionId if available for better URL aesthetics and context
+      if (this.$route.query.sessionId) {
+        query.sessionId = this.$route.query.sessionId;
+      }
+
+      // Set type to signup to indicate the intended flow
+      query.type = "signup";
+
       this.$router.push({
-        name: "NewSignup",
+        name: "SignUp",
+        query: query,
       });
     },
   },

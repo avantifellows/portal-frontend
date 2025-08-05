@@ -1,77 +1,120 @@
 <template>
-  <div class="flex flex-col justify-center">
-    <p
-      class="text-xl lg:text-xl xl:text-2xl mx-auto font-semibold md:w-full text-center"
-    >
-      Enter your phone number / अपना फोन नंबर डालें
+  <div class="" v-if="show">
+    <p class="text-base mb-[10px] text-left">
+      {{ label }}<span v-if="isRequired">*</span>
     </p>
-    <div class="flex flex-row justify-center">
-      <input
-        v-model="phoneNumber"
-        type="tel"
-        inputmode="numeric"
-        placeholder="Your Phone Number / अपना फोन नंबर"
-        required
-        class="border-2 rounded-md p-4 mx-auto border-gray-500 focus:border-gray-800 focus:outline-none mt-2"
-        :class="selectInputBoxClasses()"
-        @keypress="isValidPhoneNumberEntry($event)"
-        @input="updatePhoneNumber($event)"
-        ondrop="return false"
-        onpaste="return false"
-      />
-    </div>
-    <span
+    <input
+      type="tel"
+      v-model="phoneNumber"
+      placeholder="xxxxxxxxxx"
+      @keypress="isValidPhoneNumberEntry($event)"
+      @input="updatePhoneNumberEntry($event)"
+      class="border py-2 px-2 w-full rounded mx-auto border-grey"
+      :class="invalid ? 'border-red' : 'border-grey'"
+    />
+    <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
+
+    <p
       v-if="isInvalidPhoneNumberMessageShown"
-      class="mx-auto text-red-700 text-base mb-1"
-      >{{ invalidPhoneNumberMessage }}</span
+      class="text-red text-sm mt-[10px]"
     >
+      {{ invalidPhoneNumberMessage }}
+    </p>
   </div>
 </template>
 <script>
+import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
+
 export default {
   name: "PhoneNumberEntry",
-  emits: ["valid-entry", "reset-invalid-login-message"],
+  emits: ["update"],
+  props: {
+    show: {
+      type: Boolean,
+      default: true,
+    },
+    label: {
+      type: String,
+      default: "",
+    },
+    placeholder: {
+      type: String,
+      defult: "",
+    },
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
+    dbKey: {
+      type: String,
+      default: "",
+    },
+    helpText: {
+      type: String,
+      default: "",
+    },
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       phoneNumber: "",
       invalidPhoneNumberMessage: "",
+      invalidEntryMessage: {
+        en: `Please enter a valid phone number`,
+        hi: `एक मान्य दूरभाष क्रमांक दर्ज करे`,
+      },
     };
   },
   computed: {
-    /** Returns if message for an invalid phone number needs to be shown */
+    /**
+     * Checks if the invalid phone number entry message is shown.
+     * @returns {boolean} True if the invalid number entry message is not null, false otherwise.
+     */
     isInvalidPhoneNumberMessageShown() {
       return this.invalidPhoneNumberMessage != null;
     },
+
+    /**
+     * Checks if the phone number entry is valid.
+     * @returns {boolean} True if the phone number entry is valid, or if it is not required. False otherwise.
+     */
+    isPhoneNumberEntryValid() {
+      return this.isRequired
+        ? this.phoneNumber != "" && this.invalidPhoneNumberMessage == ""
+        : this.invalidPhoneNumberMessage == "";
+    },
+    /** Returns the locale selected by user */
+    getLocale() {
+      return this.$store.state.locale;
+    },
   },
   methods: {
-    /** Determines how the input box should look.
+    /**
+     * Updates the phone number value based on user entry
      */
-    selectInputBoxClasses() {
-      return [
-        {
-          "border-red-600 focus:border-red-600": this.invalidPhoneNumberMessage,
-        },
-      ];
-    },
-    /** Returns if the phone number entry is not complete */
-    isPhoneNumberNotComplete() {
-      return this.phoneNumber.length < 10;
-    },
-    /** Updates phone number based on user entry */
-    updatePhoneNumber(event) {
-      if (event.target.value.length == 0) {
+    updatePhoneNumberEntry() {
+      if (this.phoneNumber.length == 0) {
         this.invalidPhoneNumberMessage = "";
-      } else if (event.target.value.length > 10) {
-        event.target.value = event.target.value.slice(0, 10);
-        this.phoneNumber = event.target.value.toString();
-      } else if (event.target.value.length < 10) {
-        this.invalidPhoneNumberMessage = "Please enter valid phone number";
-        this.$emit("reset-invalid-login-message");
+      } else if (this.phoneNumber.length > 10) {
+        this.phoneNumber = this.phoneNumber.slice(0, 10).toString();
+      } else if (this.phoneNumber.length < 10) {
+        this.invalidPhoneNumberMessage =
+          this.invalidEntryMessage[this.getLocale];
+        this.$emit("update", "", this.dbKey);
       } else {
         this.invalidPhoneNumberMessage = "";
+        this.$emit("update", this.phoneNumber, this.dbKey);
       }
     },
-    /** Checks for valid format of phone number; (0|91)?[6-9][0-9]{9}*/
+
+    /**
+     * Checks if the phone number entry is valid
+     * @param {Event} event - The input event.
+     * @returns {boolean} True if the phone number entry is valid, prevent user entry otherwise.
+     */
     isValidPhoneNumberEntry(event) {
       if (this.phoneNumber.length < 1) {
         if (
@@ -84,7 +127,9 @@ export default {
         )
           event.preventDefault();
       } else {
-        this.$emit("valid-entry", event);
+        if (validationTypeToFunctionMap["numeric"](event)) {
+          return true;
+        } else event.preventDefault();
       }
     },
   },

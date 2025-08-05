@@ -4,7 +4,7 @@ import EmailEntry from "@/components/EmailEntry.vue";
 import Datepicker from "@/components/Datepicker.vue";
 import Dropdown from "@/components/Dropdown.vue";
 import NumberEntry from "@/components/NumberEntry.vue";
-import NewPhoneNumberEntry from "@/components/NewPhoneNumberEntry.vue";
+import PhoneNumberEntry from "@/components/PhoneNumberEntry.vue";
 import Upload from "@/components/Upload.vue";
 import Checkbox from "@/components/Checkbox.vue";
 import { shallowRef } from "vue";
@@ -22,7 +22,7 @@ export const typeToInputParameters = {
   number: shallowRef(NumberEntry),
   dropdown: shallowRef(Dropdown),
   date: shallowRef(Datepicker),
-  phone: shallowRef(NewPhoneNumberEntry),
+  phone: shallowRef(PhoneNumberEntry),
   upload: shallowRef(Upload),
   checkbox: shallowRef(Checkbox),
   code: shallowRef(CodeEntry),

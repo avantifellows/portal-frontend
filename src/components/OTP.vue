@@ -123,7 +123,6 @@ export default {
     redirectTo: String,
     redirectId: String,
     purpose: String,
-    purposeParams: String,
     groupData: Object,
     group: String,
     authType: String,
@@ -337,7 +336,10 @@ export default {
 
     /** Starts the timer */
     startTimer() {
-      this.OTPInterval = setInterval(() => (this.resendOTPTimeLimit -= 1), 1000);
+      this.OTPInterval = setInterval(
+        () => (this.resendOTPTimeLimit -= 1),
+        1000
+      );
     },
 
     /** Calls the mapping function to validate the typed character
@@ -362,10 +364,14 @@ export default {
       if (event.target.value.length == 0) {
         this.invalidPhoneNumberMessage = "";
       } else if (event.target.value.length > this.maxLengthOfPhoneNumber) {
-        event.target.value = event.target.value.slice(0, this.maxLengthOfPhoneNumber);
+        event.target.value = event.target.value.slice(
+          0,
+          this.maxLengthOfPhoneNumber
+        );
         this.phoneNumberList[0]["userID"] = event.target.value.toString();
       } else if (event.target.value.length < this.maxLengthOfPhoneNumber) {
-        this.invalidPhoneNumberMessage = this.invalidPhoneNumberMessageFromDatabase;
+        this.invalidPhoneNumberMessage =
+          this.invalidPhoneNumberMessageFromDatabase;
       } else {
         this.resetinvalidPhoneNumberMessage();
       }
@@ -379,7 +385,9 @@ export default {
       const response = await OTPAuth.sendOTP(parseInt(this.phoneNumber));
       let responseStatusCodeAndMessage = response.data.split("|");
       const responseStatusMessage = responseStatusCodeAndMessage[0];
-      this.displayOTPMessage = mapSendStatusCodeToMessage(responseStatusMessage.trim());
+      this.displayOTPMessage = mapSendStatusCodeToMessage(
+        responseStatusMessage.trim()
+      );
       this.displayOTPMessage["status"] === "success"
         ? (this.isOTPSent = true)
         : (this.isOTPSent = false);
@@ -391,7 +399,10 @@ export default {
 
     /** Function that verifies the OTP */
     async verifyOTP() {
-      const response = await OTPAuth.verifyOTP(parseInt(this.phoneNumber), this.OTPCode);
+      const response = await OTPAuth.verifyOTP(
+        parseInt(this.phoneNumber),
+        this.OTPCode
+      );
       let responseStatusCodeAndMessage = response.data.split("|");
       const responseStatusMessage = responseStatusCodeAndMessage[0];
       const responseStatusCode = responseStatusCodeAndMessage[1];
@@ -424,7 +435,6 @@ export default {
     async authenticateAndRedirect() {
       if (
         redirectToDestination(
-          this.purposeParams,
           this.phoneNumberList,
           false, // omrMode
           null, // abTestId
@@ -441,13 +451,18 @@ export default {
         this;
         sendSQSMessage(
           this.purpose,
-          this.purposeParams,
+          "", // deprecated purposeParams
           this.redirectTo,
           this.redirectId,
           this.phoneNumberList,
           this.authType,
           this.group,
-          this.userType
+          this.userType,
+          "", // sessionId
+          "", // userIpAddress
+          this.phoneNumber,
+          "", // batch
+          "" // dateOfBirth
         );
       }
     },

@@ -1,33 +1,26 @@
 <template>
-  <div class="flex flex-col space-y-8 items-center">
-    <!-- 404 -->
-    <div
-      v-if="isError404"
-      class="w-full mt-16 flex flex-col space-y-4 items-center"
-    >
-      <inline-svg
-        class="w-12 h-12 text-yellow-600 fill-current"
-        :src="warningSvg"
-      />
+  <div
+    class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+  >
+    <div class="max-w-md w-full space-y-8 text-center">
+      <div>
+        <inline-svg class="mx-auto h-16 w-16 text-red" :src="warningSvg" />
+        <h2 class="mt-6 text-3xl font-bold text-black">
+          {{ getTitle }}
+        </h2>
+        <p class="mt-2 text-sm text-grey">
+          {{ getDescription }}
+        </p>
+        <p class="mt-4 text-base text-black leading-relaxed">
+          {{ text }}
+        </p>
+      </div>
 
-      <p class="text-2xl align-middle">Page Not Found</p>
-      <p class="text-lg text-gray-500 text-center w-10/12 sm:w-1/2">
-        {{ text }}
-      </p>
-    </div>
-    <div
-      v-if="isError500"
-      class="w-full mt-16 flex flex-col space-y-4 items-center"
-    >
-      <inline-svg
-        class="w-12 h-12 text-yellow-600 fill-current"
-        :src="warningSvg"
-      />
-
-      <p class="text-2xl align-middle">Oops! Something is wrong with us!</p>
-      <p class="text-lg text-gray-500 text-center w-10/12 sm:w-1/2">
-        {{ text }}
-      </p>
+      <div class="mt-6 text-center">
+        <p class="text-xs text-grey">
+          If this problem persists, please contact your Program Manager.
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -60,6 +53,16 @@ export default {
     },
     isError500() {
       return this.type === "500";
+    },
+    getTitle() {
+      if (this.isError404) return "Page Not Found";
+      if (this.isError500) return "Server Error";
+      return "Something Went Wrong";
+    },
+    getDescription() {
+      if (this.isError404) return "The page you're looking for doesn't exist.";
+      if (this.isError500) return "We're experiencing technical difficulties.";
+      return "An unexpected error occurred.";
     },
   },
 };

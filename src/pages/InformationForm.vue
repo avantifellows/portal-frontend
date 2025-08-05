@@ -206,7 +206,7 @@ export default {
       this.userData[key] = value;
     },
     async profileDetails() {
-      await UserAPI.studentData(
+      await UserAPI.completeProfile(
         this.userData,
         (this.userData["student_id"] = this.id)
       );
@@ -217,7 +217,6 @@ export default {
     redirect() {
       if (
         redirectToDestination(
-          this.$store.state.sessionData.purpose.params,
           this.id,
           this.$store.state.omrMode,
           this.$store.state.abTestId,
@@ -225,7 +224,9 @@ export default {
           this.$store.state.platform_link,
           this.$store.state.platform,
           this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData && this.$store.state.sessionData.meta_data && this.$store.state.sessionData.meta_data.test_type,
+          this.$store.state.sessionData &&
+            this.$store.state.sessionData.meta_data &&
+            this.$store.state.sessionData.meta_data.test_type,
           this.$route.query.testType
         )
       ) {
@@ -238,7 +239,6 @@ export default {
         );
         sendSQSMessage(
           "popup_form",
-          this.$store.state.sessionData.purpose["sub-type"],
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.id,
@@ -246,7 +246,6 @@ export default {
           this.$store.state.authGroupData.name,
           this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id,
-          "",
           "phone" in this.userData ? this.userData["phone"] : "",
           this.$store.state.sessionData.meta_data.batch,
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""

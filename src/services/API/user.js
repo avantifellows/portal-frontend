@@ -1,13 +1,9 @@
-import { client, fastAPIClient } from "@/services/API/rootClient.js";
+import { fastAPIClient } from "@/services/API/rootClient.js";
 import {
-  studentSignupEndpoint,
-  userSignupEndpoint,
   verifyStudentEndpoint,
-  checkForUserEndpoint,
-  checkBirthdateEndpoint,
-  verifyAIETStudentEndpoint,
   verifyTeacherEndpoint,
   verifySchoolEndpoint,
+  userSignupEndpoint,
 } from "@/services/API/endpoints.js";
 
 export default {
@@ -75,7 +71,7 @@ export default {
    * Creates a new user
    * @param {Object} formData - contains data filled in the form by user
    */
-  newUserSignup(formData, idGeneration, userType, authGroup) {
+  userSignup(formData, idGeneration, userType, authGroup) {
     return new Promise((resolve) => {
       fastAPIClient
         .post(
@@ -91,22 +87,8 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          console.log(error);
           resolve({ error: error });
           throw new Error(error);
-        });
-    });
-  },
-  userSignup(formData) {
-    return new Promise((resolve) => {
-      client
-        .post("/userSignup", JSON.stringify(formData))
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          resolve({ error: error });
-          throw new Error("User API returned an error:", error);
         });
     });
   },
@@ -114,7 +96,7 @@ export default {
   /** Posts profile data that a student has entered
    * @param {Object} data - student data
    */
-  studentData(data) {
+  completeProfile(data) {
     return new Promise((resolve) => {
       fastAPIClient
         .post("/student/complete-profile-details", data)
@@ -124,78 +106,6 @@ export default {
         .catch((error) => {
           resolve({ error: error });
           throw new Error("Form API returned an error:", error);
-        });
-    });
-  },
-
-  /**
-   * Creates a new student
-   * @param {Object} formData - contains data filled in the form by user
-   */
-  studentSignup(formData) {
-    return new Promise((resolve) => {
-      client
-        .post(studentSignupEndpoint, JSON.stringify(formData))
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          resolve({ error: error });
-          throw new Error("User API returned an error:", error);
-        });
-    });
-  },
-
-  verifyUser(userId, collectionName) {
-    const params = {
-      userID: userId,
-      collectionName: collectionName,
-    };
-    return new Promise((resolve) => {
-      client
-        .post(checkForUserEndpoint, JSON.stringify(params))
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          resolve({ error: error });
-          throw new Error("User API returned an error:", error);
-        });
-    });
-  },
-
-  doesBirthdateMatch(birthdate, userID, collectionName) {
-    const params = {
-      userID: userID,
-      collectionName: collectionName,
-      dob: birthdate,
-    };
-
-    return new Promise((resolve) => {
-      client
-        .post(checkBirthdateEndpoint, JSON.stringify(params))
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          resolve({ error: error });
-          throw new Error("User API returned an error:", error);
-        });
-    });
-  },
-
-  verifyAIETStudent(data) {
-    return new Promise((resolve) => {
-      client
-        .post(verifyAIETStudentEndpoint, JSON.stringify(data))
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
-          }
         });
     });
   },

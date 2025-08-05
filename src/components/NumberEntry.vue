@@ -104,7 +104,7 @@ export default {
     /** Checks if input entry is percentage */
     isPercentageLabel() {
       return this.label.includes("%");
-    }
+    },
   },
   methods: {
     /**
@@ -114,7 +114,10 @@ export default {
     updateNumberEntry() {
       if (this.number.length == 0) {
         this.invalidNumberEntryMessage = "";
-      } else if (this.isPercentageLabel && (this.number < 0 || this.number > 100)) {
+      } else if (
+        this.isPercentageLabel &&
+        (this.number < 0 || this.number > 100)
+      ) {
         this.invalidNumberEntryMessage = "Percentage must be between 0 and 100";
         this.number = this.number.slice(0, 3).toString();
       } else if (
@@ -122,14 +125,12 @@ export default {
         this.number.length > this.maxLengthOfEntry
       ) {
         this.number = this.number.slice(0, this.maxLengthOfEntry).toString();
-      }
-      else if (
+      } else if (
         this.number.length <= this.maxLengthOfEntry &&
         this.$props.isTypeSignIn == true
       ) {
         this.invalidNumberEntryMessage = "";
-      }
-      else if (
+      } else if (
         this.maxLengthOfEntry != null &&
         this.number.length < this.maxLengthOfEntry &&
         this.$props.isTypeSignIn == false &&
@@ -162,7 +163,7 @@ export default {
       } else {
         event.preventDefault();
       }
-  },
+    },
   },
 };
 </script>

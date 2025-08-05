@@ -1,5 +1,39 @@
 <template>
-  <div class="">
+  <!-- Loading State -->
+  <div v-if="isLoading" class="h-full w-full fixed z-50">
+    <div class="flex mx-auto w-full h-full">
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
+    </div>
+  </div>
+
+  <!-- Auto-redirect State -->
+  <div
+    v-else-if="isAutoRedirecting"
+    class="flex flex-col items-center justify-center min-h-screen"
+  >
+    <div class="text-center">
+      <inline-svg
+        class="text-primary text-4xl m-auto animate-spin h-16 w-16 mb-6"
+        :src="loadingSpinnerSvg"
+      />
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">
+        {{ getLocale === "en" ? "Profile Complete!" : "प्रोफाइल पूर्ण!" }}
+      </h2>
+      <p class="text-gray-600">
+        {{
+          getLocale === "en"
+            ? "Your profile is already complete. Redirecting to your session..."
+            : "आपकी प्रोफाइल पहले से पूर्ण है। सत्र पर पुनर्निर्देशित कर रहे हैं..."
+        }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Form Content -->
+  <div v-else class="">
     <LocalePicker :options="getLocaleOptions" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-black font-bold">
@@ -53,10 +87,14 @@ export default {
   data() {
     return {
       AFLogo: assets.AFLogoSvg,
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
       formSchemaData: {}, // contains data about the form schema
       buttonDisabled: true,
       userData: {}, // contains data entered by user
       toast: useToast(),
+      contextChecked: false, // Track if we've checked for store context
+      isLoading: true, // Show loading state initially
+      isAutoRedirecting: false, // Track if we're auto-redirecting due to empty form
     };
   },
   props: {
@@ -64,8 +102,34 @@ export default {
       type: String,
       default: "",
     },
+    sessionId: {
+      type: String,
+      default: "",
+    },
   },
   async created() {
+    // Check if we have the required store context (lost on refresh)
+    const hasAuthContext =
+      this.$store.state.authGroupData &&
+      Object.keys(this.$store.state.authGroupData).length > 0;
+    const hasSessionContext =
+      this.$store.state.sessionData &&
+      Object.keys(this.$store.state.sessionData).length > 0;
+
+    if (!hasAuthContext || !hasSessionContext) {
+      // Context lost (likely due to page refresh) - redirect to error
+      this.$router.push({
+        name: "Error",
+        props: {
+          text: "Session expired. Please start from the beginning by accessing your sign-in link again.",
+        },
+      });
+      return;
+    }
+
+    // Mark context as checked so template can render safely
+    this.contextChecked = true;
+
     /** Fetches all the fields that need to be filled by the student
     /* Also, maps each field to its input component
     */
@@ -84,8 +148,14 @@ export default {
       });
     }
     if (Object.keys(this.formSchemaData).length == 0) {
-      this.buttonDisabled = false;
-      this.redirect();
+      // Form is empty, user's profile is complete - auto-redirect
+      this.isAutoRedirecting = true;
+
+      // Small delay to show the redirect message, then redirect
+      setTimeout(() => {
+        this.redirect();
+      }, 1500);
+      return;
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
@@ -101,6 +171,9 @@ export default {
         this.formSchemaData[field].multipleSelect == "TRUE" ? true : false;
     });
     this.isUserDataIsComplete();
+
+    // Form loaded successfully, stop loading
+    this.isLoading = false;
   },
   watch: {
     userData: {
@@ -114,7 +187,8 @@ export default {
   },
   computed: {
     getLocaleOptions() {
-      return this.$store.state.authGroupData
+      return this.$store.state.authGroupData &&
+        this.$store.state.authGroupData.locale
         ? this.$store.state.authGroupData.locale.split(",")
         : ["English"];
     },

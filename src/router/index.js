@@ -72,7 +72,10 @@ const routes = [
   {
     path: "/form/:id",
     name: "Information Form",
-    props: true,
+    props: (route) => ({
+      id: route.params.id,
+      sessionId: route.query.sessionId,
+    }),
     component: InformationForm,
   },
   {
@@ -151,6 +154,19 @@ router.beforeEach((to) => {
         name: "Error",
         props: {
           text: "Please start from the beginning by accessing the proper sign-in link. Direct access to signup is not allowed.",
+        },
+      };
+    }
+  }
+
+  // Prevent direct access to /form/:id without proper context
+  if (to.name === "Information Form") {
+    // Check if accessing form directly without sessionId parameter
+    if (!to.query.sessionId) {
+      return {
+        name: "Error",
+        props: {
+          text: "Session expired or invalid access. Please start from the beginning by accessing your sign-in link again.",
         },
       };
     }

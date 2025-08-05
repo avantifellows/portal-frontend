@@ -23,6 +23,15 @@ const allowedQueryParams = [
   "platform_link",
 ];
 
+// Legacy parameters for backwards compatibility with existing shortened links
+// TODO: Will be deprecated once all old links are updated
+const LEGACY_ALLOWED_PARAMS = [
+  "redirectTo", // maps to platform
+  "redirectId", // maps to platform_id
+  "group", // maps to authGroup
+  "sub_type", // ignored (deprecated)
+];
+
 const routes = [
   {
     path: "/",
@@ -89,16 +98,48 @@ const router = createRouter({
   mode: "history",
 });
 
-/** Check if correct query params exist */
+/** Check if correct query params exist and map legacy parameters */
 router.beforeEach((to) => {
   const queryParams = Object.keys(to.query);
+  const allAllowedParams = [...allowedQueryParams, ...LEGACY_ALLOWED_PARAMS];
   const validQueryParams = queryParams.every((queryParam) =>
-    allowedQueryParams.includes(queryParam)
+    allAllowedParams.includes(queryParam)
   );
 
   if (!validQueryParams) {
     return {
       name: "Error",
+    };
+  }
+
+  // Map legacy parameters for backwards compatibility
+  const legacyMappings = {
+    redirectTo: "platform",
+    redirectId: "platform_id",
+    group: "authGroup",
+  };
+
+  let hasLegacyParams = false;
+  Object.entries(legacyMappings).forEach(([legacyParam, currentParam]) => {
+    if (to.query[legacyParam]) {
+      to.query[currentParam] = to.query[legacyParam];
+      delete to.query[legacyParam];
+      hasLegacyParams = true;
+    }
+  });
+
+  // Remove deprecated parameters
+  if (to.query.sub_type) {
+    delete to.query.sub_type;
+    hasLegacyParams = true;
+  }
+
+  // If we modified the query, redirect to clean URL
+  if (hasLegacyParams) {
+    return {
+      path: to.path,
+      query: to.query,
+      replace: true,
     };
   }
 

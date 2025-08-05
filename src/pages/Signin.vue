@@ -193,7 +193,8 @@ export default {
   },
   computed: {
     getLocaleOptions() {
-      return this.$store.state.authGroupData
+      return this.$store.state.authGroupData &&
+        this.$store.state.authGroupData.locale
         ? this.$store.state.authGroupData.locale.split(",")
         : ["English"];
     },

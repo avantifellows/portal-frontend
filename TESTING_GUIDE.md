@@ -42,7 +42,7 @@ Ensure the portal-backend is running on `127.0.0.1:8000` before testing.
   - Displays appropriate error message
 
 #### 1.4 Session with Signup Enabled
-- **URL**: `http://localhost:8080/?sessionId=SESSION_WITH_SIGNUP`
+- **URL**: `http://localhost:8080/?sessionId=PunjabStudents_PunjabStudents_12_24_A001_02108`
 - **Expected Behavior**:
   - Shows signin form
   - Displays signup button below signin form
@@ -52,12 +52,14 @@ Ensure the portal-backend is running on `127.0.0.1:8000` before testing.
 
 #### 2.1 Valid Auth Group
 - **URL**: `http://localhost:8080/?platform=gurukul&authGroup=PunjabTeachers&type=sign-in`
+- **URL**: `http://localhost:8080/?type=attendance&redirectTo=report&redirectId=DelhiStudents_688caff6bf2c493ccb8619a7&sub_type=reporting&group=DelhiStudents&auth_type=ID,DOB`
 - **Expected Backend Calls**:
-  - `GET /auth-group/?name=PunjabTeachers`
+  - `GET /auth-group/?name=PunjabTeachers` or `GET /auth-group/?name=DelhiStudents`
 - **Expected Behavior**:
   - Shows signin form
   - Form configured based on auth group settings
   - Appropriate input fields based on auth_type
+  - Backwards compatible
 
 #### 2.2 Missing Auth Group Parameter
 - **URL**: `http://localhost:8080/?platform=gurukul&type=sign-in`

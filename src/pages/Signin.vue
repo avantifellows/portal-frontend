@@ -35,6 +35,7 @@
         @update="updateUserInformation"
         @resetInvalidLoginMessage="resetInvalidLoginMessage"
         :invalid="isInvalidLoginMessageShown"
+        data-testid="auth-id-input"
       />
       <PhoneNumberEntry
         v-if="isEntryPhoneNumber(authType)"
@@ -44,6 +45,7 @@
         :isRequired="phoneNumberEntryParameters.required"
         :dbKey="phoneNumberEntryParameters.key"
         @update="updateUserInformation"
+        data-testid="auth-phone-input"
       />
       <Datepicker
         v-if="isEntryDate(authType)"
@@ -52,6 +54,7 @@
         :isRequired="dateEntryParameters.required"
         :dbKey="dateEntryParameters.key"
         @update="updateUserInformation"
+        data-testid="auth-date-input"
       />
       <CodeEntry
         v-if="isEntryCode(authType)"
@@ -61,6 +64,7 @@
         :maxLengthOfEntry="codeEntryParameters.maxLengthOfEntry"
         :dbKey="codeEntryParameters.key"
         @update="updateUserInformation"
+        data-testid="auth-code-input"
         @resetInvalidLoginMessage="resetInvalidLoginMessage"
         :invalid="isInvalidLoginMessageShown"
       />
@@ -100,6 +104,7 @@
       v-show="enable_signup"
       @click="redirectToSignUp"
       class="mt-[20px] mx-auto pt-2 text-primary text-base text"
+      data-testid="signup-button"
       v-html="signUpText"
     />
   </div>

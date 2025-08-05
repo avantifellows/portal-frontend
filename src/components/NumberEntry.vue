@@ -105,6 +105,11 @@ export default {
     isPercentageLabel() {
       return this.label.includes("%");
     },
+
+    /** Checks if input entry is CGPA */
+    isCGPALabel() {
+      return this.dbKey === "latest_cgpa";
+    },
   },
   methods: {
     /**
@@ -121,6 +126,12 @@ export default {
         this.invalidNumberEntryMessage = "Percentage must be between 0 and 100";
         this.number = this.number.slice(0, 3).toString();
       } else if (
+        this.isCGPALabel &&
+        (parseFloat(this.number) < 0 || parseFloat(this.number) > 10)
+      ) {
+        this.invalidNumberEntryMessage = "CGPA must be between 0 and 10";
+        // Don't slice for CGPA as it might be a valid decimal like 8.5
+      } else if (
         this.maxLengthOfEntry != null &&
         this.number.length > this.maxLengthOfEntry
       ) {
@@ -134,7 +145,8 @@ export default {
         this.maxLengthOfEntry != null &&
         this.number.length < this.maxLengthOfEntry &&
         this.$props.isTypeSignIn == false &&
-        !this.isPercentageLabel
+        !this.isPercentageLabel &&
+        !this.isCGPALabel
       ) {
         this.invalidNumberEntryMessage =
           this.invalidEntryMessage[this.getLocale];
@@ -154,7 +166,20 @@ export default {
      * @returns {boolean} True if the number entry is valid, prevent user entry otherwise.
      */
     isValidNumberEntry(event) {
-      if (validationTypeToFunctionMap["numeric"](event)) {
+      // Use decimal validation for CGPA, numeric for others
+      const validationType = this.isCGPALabel ? "decimal" : "numeric";
+
+      if (validationTypeToFunctionMap[validationType](event)) {
+        // Prevent multiple decimal points for CGPA
+        if (
+          this.isCGPALabel &&
+          event.keyCode === 46 &&
+          this.number.includes(".")
+        ) {
+          event.preventDefault();
+          return false;
+        }
+
         if (this.isPercentageLabel && this.number.length >= 3) {
           event.preventDefault();
         } else {

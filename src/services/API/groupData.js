@@ -14,7 +14,6 @@ export default {
         })
         .catch((error) => {
           resolve({ error: error });
-          throw new Error("Session Group API returned an error:", error);
         });
     });
   },
@@ -34,7 +33,6 @@ export default {
         })
         .catch((error) => {
           resolve({ error: error });
-          throw new Error("Auth Group API returned an error:", error);
         });
     });
   },

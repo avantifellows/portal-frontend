@@ -8,11 +8,19 @@
     </div>
   </div>
 
-  <div v-if="isLandingPage" class="flex h-screen flex-col">
+  <div
+    v-if="isLandingPage"
+    class="flex h-screen flex-col"
+    data-testid="landing-page"
+  >
     <LandingPage />
   </div>
 
-  <div v-if="hasUrlError" class="flex h-screen flex-col">
+  <div
+    v-if="hasUrlError"
+    class="flex h-screen flex-col"
+    data-testid="error-page"
+  >
     <Error :text="getUrlClassification.error" />
   </div>
 
@@ -28,6 +36,7 @@
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
         :enable_popup="isPopUpFormEnabled"
+        data-testid="signin-form"
       />
       <Signup v-if="isTypeSignUp && doesGroupExist" />
     </div>
@@ -410,10 +419,9 @@ export default {
         if ("is_session_open" in this.sessionData) {
           this.sessionEnabled = this.sessionData.is_session_open;
 
-          // If session exists but is closed, show appropriate message
+          // If session exists but is closed, show NoClassMessage instead of Error
           if (!this.sessionData.is_session_open) {
             this.setState();
-            this.$router.push({ name: "Error" });
             return;
           }
         }

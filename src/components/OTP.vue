@@ -107,7 +107,7 @@
 <script>
 import useAssets from "@/assets/assets.js";
 
-import { validateID } from "@/services/validation.js";
+import { validateUser } from "@/services/authValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { validationTypeToFunctionMap } from "@/services/basicValidationMapping.js";
@@ -131,7 +131,7 @@ export default {
       OTPCode: "", // string that contains the OTP code entered by the user
       isLoading: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
-      displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
+      displayOTPMessage: { message: "", status: "" }, // object that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
       isOTPResendButtonShown: false, // whether OTP resend button should be shown
       resendOTPTimeLimit: RESEND_OTP_TIME_OUT, // time in seconds after which the resend OTP button should be displayed
@@ -177,6 +177,13 @@ export default {
     /** Get auth group data from store */
     getAuthGroupData() {
       return this.$store.state.authGroupData;
+    },
+
+    /** Get auth group ID for validation */
+    getAuthGroupId() {
+      return this.getAuthGroupData && this.getAuthGroupData.id
+        ? this.getAuthGroupData.id
+        : null;
     },
 
     /** Get session data from store */
@@ -462,9 +469,9 @@ export default {
   },
   watch: {
     /** Watches for the timer to finish */
-    resendOTPTimer() {
-      if (this.resendOTPTimer === 0) {
-        clearInterval(this.interval);
+    resendOTPTimeLimit() {
+      if (this.resendOTPTimeLimit === 0) {
+        clearInterval(this.OTPInterval);
       }
     },
   },
@@ -584,16 +591,28 @@ export default {
       }
     },
 
-    /** This method authenticates the phone number.
+    /** This method authenticates the phone number using modern validation.
      */
     async authenticatePhoneNumber() {
       this.isLoading = true;
-      this.phoneNumberList[0]["valid"] = await validateID(
-        this.phoneNumber,
-        this.groupData.dataSource,
-        this.authType,
-        this.validateCount
+
+      // Prepare user information for validation
+      const userInformation = {
+        phone: this.phoneNumber,
+      };
+
+      // Use modern validateUser function
+      const validationResult = await validateUser(
+        [this.authType], // authTypes array
+        userInformation,
+        this.userType,
+        this.getAuthGroupId,
+        this.group
       );
+
+      // Set validation result
+      this.phoneNumberList[0]["valid"] =
+        validationResult.isPhoneNumberValid || false;
       this.isLoading = false;
     },
 

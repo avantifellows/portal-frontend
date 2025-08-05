@@ -4,7 +4,7 @@
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
-        :src="require('@/assets/images/loading_spinner.svg')"
+        :src="loadingSpinnerSvg"
       ></inline-svg>
     </div>
   </div>
@@ -105,6 +105,8 @@
 </template>
 
 <script>
+import useAssets from "@/assets/assets.js";
+
 import { validateID } from "@/services/validation.js";
 import { redirectToDestination } from "@/services/redirectToDestination.js";
 import { sendSQSMessage } from "@/services/API/sqs";
@@ -115,18 +117,12 @@ import {
   mapSendStatusCodeToMessage,
 } from "@/services/OTPCodes.js";
 import { mapState, mapActions } from "vuex";
+
+const assets = useAssets();
 const RESEND_OTP_TIME_OUT = 60;
 
 export default {
   name: "OTP",
-  props: {
-    redirectTo: String,
-    redirectId: String,
-    purpose: String,
-    groupData: Object,
-    group: String,
-    authType: String,
-  },
   data() {
     return {
       phoneNumberList: [{ userID: "", valid: false }], // contains the phone number entered by the user
@@ -134,12 +130,36 @@ export default {
       isOTPSent: false, // has the OTP been sent
       OTPCode: "", // string that contains the OTP code entered by the user
       isLoading: false,
+      loadingSpinnerSvg: assets.loadingSpinnerSvg,
       displayOTPMessage: [{ message: "", status: "" }], // string that contains any messages returned by the OTP service
       invalidPhoneNumberMessage: null, // whether the input being entered by the user matches a phone number format
       isOTPResendButtonShown: false, // whether OTP resend button should be shown
       resendOTPTimeLimit: RESEND_OTP_TIME_OUT, // time in seconds after which the resend OTP button should be displayed
       OTPInterval: null, // to store the interval instance of the countdown timer
       userType: "", // differentiates between different kinds of users
+      // Locale translations for OTP messages
+      otpMessageTranslations: {
+        enterOTP: {
+          en: "Enter OTP",
+          hi: "OTP दर्ज करें",
+        },
+        requestOTP: {
+          en: "Request OTP",
+          hi: "OTP मांगें",
+        },
+        submitButton: {
+          en: "Submit",
+          hi: "जमा करें",
+        },
+        resendOTP: {
+          en: "Resend OTP",
+          hi: "OTP फिर से भेजें",
+        },
+        resendOTPText: {
+          en: "Resend OTP in",
+          hi: "OTP फिर से भेजें",
+        },
+      },
     };
   },
 
@@ -148,6 +168,112 @@ export default {
       /** Retrieve phone number stored in vuex */
       storePhoneNumber: (state) => state.phoneNumber,
     }),
+
+    /** Get locale from store */
+    getLocale() {
+      return this.$store.state.locale;
+    },
+
+    /** Get auth group data from store */
+    getAuthGroupData() {
+      return this.$store.state.authGroupData;
+    },
+
+    /** Get session data from store */
+    getSessionData() {
+      return this.$store.state.sessionData;
+    },
+
+    /** Get redirect destination from store */
+    redirectTo() {
+      return this.$store.state.platform;
+    },
+
+    /** Get redirect ID from store */
+    redirectId() {
+      return this.$store.state.platform_id;
+    },
+
+    /** Get purpose from session data */
+    purpose() {
+      return this.getSessionData && this.getSessionData.type
+        ? this.getSessionData.type
+        : "otp-verification";
+    },
+
+    /** Get group name from auth group data */
+    group() {
+      return this.getAuthGroupData && this.getAuthGroupData.name
+        ? this.getAuthGroupData.name
+        : "";
+    },
+
+    /** Get auth type from auth group data */
+    authType() {
+      return this.getAuthGroupData &&
+        this.getAuthGroupData.input_schema &&
+        this.getAuthGroupData.input_schema.auth_type
+        ? this.getAuthGroupData.input_schema.auth_type
+        : "PH";
+    },
+
+    /** Get group data from auth group data based on locale */
+    groupData() {
+      if (!this.getAuthGroupData || !this.getAuthGroupData.locale_data) {
+        return {
+          input: {
+            mode: "numeric",
+            type: "tel",
+            maxLengthOfId: 10,
+            basicValidationType: "phoneNumber",
+          },
+          text: {
+            default: {
+              display: "Enter Phone Number",
+              placeholder: "Phone Number",
+              enterOTP: "Enter OTP",
+              requestOTP: "Request OTP",
+              submitButton: "Submit",
+              resendOTPButton: "Resend OTP",
+              resendOTPText: "Resend OTP in",
+              invalid: { input: "Invalid phone number" },
+            },
+          },
+          userType: "student",
+          dataSource: "default",
+        };
+      }
+
+      const localeData =
+        this.getAuthGroupData.locale_data[this.getLocale] ||
+        this.getAuthGroupData.locale_data["en"];
+      const phoneData = localeData && localeData.PH ? localeData.PH : {};
+
+      return {
+        input: {
+          mode: "numeric",
+          type: "tel",
+          maxLengthOfId: 10,
+          basicValidationType: "phoneNumber",
+        },
+        text: {
+          default: {
+            display: phoneData.label || "Enter Phone Number",
+            placeholder: phoneData.placeholder || "Phone Number",
+            enterOTP: "Enter OTP",
+            requestOTP: "Request OTP",
+            submitButton: "Submit",
+            resendOTPButton: "Resend OTP",
+            resendOTPText: "Resend OTP in",
+            invalid: { input: phoneData.invalid || "Invalid phone number" },
+          },
+        },
+        userType: this.getAuthGroupData.input_schema
+          ? this.getAuthGroupData.input_schema.user_type
+          : "student",
+        dataSource: "default",
+      };
+    },
 
     /** Extracts phone number from list */
     phoneNumber() {
@@ -208,17 +334,26 @@ export default {
 
     /** Returns the title text for the OTP code input box */
     enterOTPInputBoxDisplayText() {
-      return this.groupData.text.default.enterOTP;
+      return (
+        this.otpMessageTranslations.enterOTP[this.getLocale] ||
+        this.otpMessageTranslations.enterOTP.en
+      );
     },
 
     /** Returns the text for the Request OTP button */
     requestOTPButtonDisplayText() {
-      return this.groupData.text.default.requestOTP;
+      return (
+        this.otpMessageTranslations.requestOTP[this.getLocale] ||
+        this.otpMessageTranslations.requestOTP.en
+      );
     },
 
     /** Returns the text for the submit button */
     submitButtonDisplayText() {
-      return this.groupData.text.default.submitButton;
+      return (
+        this.otpMessageTranslations.submitButton[this.getLocale] ||
+        this.otpMessageTranslations.submitButton.en
+      );
     },
 
     /** Returns the maximum length of the ID */
@@ -275,12 +410,18 @@ export default {
 
     /** Returns text for resend OTP button */
     resendOTPButtonText() {
-      return this.groupData.text.default.resendOTPButton;
+      return (
+        this.otpMessageTranslations.resendOTP[this.getLocale] ||
+        this.otpMessageTranslations.resendOTP.en
+      );
     },
 
     /** Returns text for resend OTP title */
     resendOTPText() {
-      return this.groupData.text.default.resendOTPText;
+      return (
+        this.otpMessageTranslations.resendOTPText[this.getLocale] ||
+        this.otpMessageTranslations.resendOTPText.en
+      );
     },
 
     /** Format for the timer */
@@ -300,6 +441,24 @@ export default {
     isPhoneNumberNotEditable() {
       return this.isOTPSent && this.hasCountdownStarted;
     },
+
+    /** Check if auth context exists in store */
+    hasAuthContext() {
+      return (
+        this.$store.state.authGroupData &&
+        this.$store.state.authGroupData.input_schema
+      );
+    },
+
+    /** Check if session context exists in store */
+    hasSessionContext() {
+      return this.$store.state.sessionData;
+    },
+
+    /** Check if required store context is available */
+    hasRequiredContext() {
+      return this.hasAuthContext && this.hasSessionContext;
+    },
   },
   watch: {
     /** Watches for the timer to finish */
@@ -310,6 +469,15 @@ export default {
     },
   },
   created() {
+    /** Validate required store context */
+    if (!this.hasRequiredContext) {
+      console.error(
+        "OTP component: Missing required store context (authGroupData or sessionData)"
+      );
+      this.$router.push({ name: "Error" });
+      return;
+    }
+
     /** The user type is set as soon as component is created */
     this.userType = this.groupData.userType;
   },
@@ -435,14 +603,17 @@ export default {
     async authenticateAndRedirect() {
       if (
         redirectToDestination(
-          this.phoneNumberList,
-          false, // omrMode
-          null, // abTestId
+          this.phoneNumber,
+          this.$store.state.omrMode || false,
+          this.$store.state.abTestId || null,
           this.redirectId,
-          null, // redirectLink
+          this.$store.state.platform_link || null,
           this.redirectTo,
-          this.group,
-          null, // session metadata testType
+          this.userType,
+          (this.getSessionData &&
+            this.getSessionData.meta_data &&
+            this.getSessionData.meta_data.test_type) ||
+            null,
           this.$route.query.testType
         )
       ) {
@@ -451,17 +622,21 @@ export default {
         this;
         sendSQSMessage(
           this.purpose,
-          "", // deprecated purposeParams
           this.redirectTo,
           this.redirectId,
-          this.phoneNumberList,
+          this.phoneNumber,
           this.authType,
           this.group,
           this.userType,
-          "", // sessionId
-          "", // userIpAddress
+          this.getSessionData && this.getSessionData.session_id
+            ? this.getSessionData.session_id
+            : "",
           this.phoneNumber,
-          "", // batch
+          this.getSessionData &&
+            this.getSessionData.meta_data &&
+            this.getSessionData.meta_data.batch
+            ? this.getSessionData.meta_data.batch
+            : "",
           "" // dateOfBirth
         );
       }

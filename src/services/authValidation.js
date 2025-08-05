@@ -42,6 +42,12 @@ export async function validateUser(
     }
   }
 
+  if (userType == "candidate" && authTypes.includes("ID")) {
+    user["isUserIdValid"] = await userAPI.verifyCandidate({
+      candidate_id: userInformation["candidate_id"],
+    });
+  }
+
   if (userType == "teacher" && authTypes.includes("ID")) {
     user["isUserIdValid"] = await userAPI.verifyTeacher({
       teacher_id: userInformation["teacher_id"],

@@ -2,6 +2,7 @@ import { fastAPIClient } from "@/services/API/rootClient.js";
 import {
   verifyStudentEndpoint,
   verifyTeacherEndpoint,
+  verifyCandidateEndpoint,
   verifySchoolEndpoint,
   userSignupEndpoint,
 } from "@/services/API/endpoints.js";
@@ -35,6 +36,26 @@ export default {
     return new Promise((resolve) => {
       fastAPIClient
         .get(verifyTeacherEndpoint, { params: teacherData })
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          if (error.response.status == 404) resolve(false);
+          else {
+            throw new Error("User API returned an error:", error);
+          }
+        });
+    });
+  },
+
+  /**
+   * Validates that the ID exists
+   * @param {String} candidateId - the id that needs to be validated
+   */
+  verifyCandidate(candidateData) {
+    return new Promise((resolve) => {
+      fastAPIClient
+        .get(verifyCandidateEndpoint, { params: candidateData })
         .then((response) => {
           resolve(response.data);
         })

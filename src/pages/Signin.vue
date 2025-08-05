@@ -436,6 +436,8 @@ export default {
           userId = this.userInformation["code"];
         } else if ("teacher_id" in this.userInformation) {
           userId = this.userInformation["teacher_id"];
+        } else if ("candidate_id" in this.userInformation) {
+          userId = this.userInformation["candidate_id"];
         } else {
           userId = this.userInformation["student_id"];
         }

@@ -163,9 +163,7 @@ export default {
 
     // Get enhanced form schema (backend handles all enhancements)
     const authGroup = this.$store.state.authGroupData?.name;
-    const formId =
-      this.$store.state.sessionData.signup_form_id ||
-      this.$store.state.signup_form_id;
+    const formId = this.$store.state.signup_form_id;
 
     this.formData = await FormAPI.getFormSchema(formId, authGroup);
 

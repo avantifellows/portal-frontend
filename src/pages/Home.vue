@@ -130,14 +130,14 @@ export default {
 
     /** Whether an ID needs to be generated when the user signs up. */
     id_generation: {
-      default: false,
-      type: Boolean,
+      default: "false",
+      type: String,
     },
 
     /** Whether the user should be redirected to an external platform after authentication. */
     redirection: {
-      default: false,
-      type: Boolean,
+      default: "false",
+      type: String,
     },
 
     /** What the external platform is. */
@@ -311,7 +311,9 @@ export default {
       // ID generation
       this.$store.dispatch(
         "setIdGeneration",
-        (this.sessionData && this.sessionData.id_generation == "true") ||
+        (this.sessionData &&
+          (this.sessionData.id_generation === true ||
+            this.sessionData.id_generation === "true")) ||
           this.id_generation == "true"
       );
 
@@ -324,7 +326,9 @@ export default {
       // Redirection settings
       this.$store.dispatch(
         "setRedirection",
-        (this.sessionData && this.sessionData.redirection == "true") ||
+        (this.sessionData &&
+          (this.sessionData.redirection === true ||
+            this.sessionData.redirection === "true")) ||
           this.redirection == "true" ||
           this.platform == "report" ||
           this.platform == "gurukul"

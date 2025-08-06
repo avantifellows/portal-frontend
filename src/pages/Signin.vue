@@ -78,16 +78,11 @@
       class="text-red text-sm text-center font-bold mt-[10px]"
     />
 
-    <!-- privacy policy checkbox -->
-    <div class="mx-auto w-56">
-      <PrivacyPolicyCheckbox v-model="privacyPolicyAccepted" />
-    </div>
-
     <!-- OTP Flow for PH auth type -->
     <div v-if="showOTPFlow" class="mx-auto w-56">
       <!-- OTP input field -->
       <div v-if="isOTPSent" class="mb-4">
-        <p class="text-base mb-2 text-center font-semibold">
+        <p class="text-base mb-2 text-left font-semibold">
           Enter OTP sent to your phone
         </p>
         <input
@@ -96,7 +91,7 @@
           inputmode="numeric"
           pattern="[0-9]*"
           placeholder="Enter OTP"
-          class="border py-2 px-2 w-full rounded mx-auto border-grey text-center"
+          class="border py-2 px-2 w-56 rounded mx-auto border-grey text-center block"
           maxlength="6"
         />
       </div>
@@ -142,10 +137,15 @@
       <p
         v-if="displayOTPMessage.message"
         :class="displayOTPMessageClass"
-        class="text-center mt-2"
+        class="text-center mt-2 mx-auto w-56"
       >
         {{ displayOTPMessage.message }}
       </p>
+    </div>
+
+    <!-- privacy policy checkbox - always shown -->
+    <div class="mx-auto w-56">
+      <PrivacyPolicyCheckbox v-model="privacyPolicyAccepted" />
     </div>
 
     <!-- Regular submit button for non-PH auth types -->
@@ -390,7 +390,7 @@ export default {
     displayOTPMessageClass() {
       return this.displayOTPMessage.status === "failure"
         ? "text-red-600 text-sm"
-        : "text-green-600 text-sm";
+        : "text-primary text-sm";
     },
   },
   methods: {
@@ -501,11 +501,9 @@ export default {
         const response = await OTPAuth.sendOTP(
           parseInt(this.userInformation.phone)
         );
-        let responseStatusCodeAndMessage = response.data.split("|");
-        const responseStatusMessage = responseStatusCodeAndMessage[0];
 
         this.displayOTPMessage = mapSendStatusCodeToMessage(
-          responseStatusMessage.trim()
+          response.data.message
         );
 
         if (this.displayOTPMessage.status === "success") {
@@ -532,11 +530,7 @@ export default {
           this.OTPCode
         );
 
-        let responseStatusCodeAndMessage = response.data.split("|");
-        const responseStatusMessage = responseStatusCodeAndMessage[0];
-        const responseStatusCode = responseStatusCodeAndMessage[1];
-
-        if (responseStatusMessage.trim() === "success") {
+        if (response.data.statusCode === 200) {
           // OTP verified successfully, proceed with authentication
           this.displayOTPMessage = {
             message: "OTP verified successfully!",
@@ -547,7 +541,7 @@ export default {
           await this.completePhoneAuthentication();
         } else {
           this.displayOTPMessage = mapVerifyStatusCodeToMessage[
-            responseStatusCode.trim().toString()
+            response.data.statusCode
           ] || {
             message: "Invalid OTP. Please try again.",
             status: "failure",

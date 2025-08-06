@@ -46,6 +46,7 @@
         :dbKey="phoneNumberEntryParameters.key"
         @update="updateUserInformation"
         data-testid="auth-phone-input"
+        :disabled="showOTPFlow"
       />
       <Datepicker
         v-if="isEntryDate(authType)"
@@ -82,8 +83,74 @@
       <PrivacyPolicyCheckbox v-model="privacyPolicyAccepted" />
     </div>
 
-    <!-- submit button -->
+    <!-- OTP Flow for PH auth type -->
+    <div v-if="showOTPFlow" class="mx-auto w-56">
+      <!-- OTP input field -->
+      <div v-if="isOTPSent" class="mb-4">
+        <p class="text-base mb-2 text-center font-semibold">
+          Enter OTP sent to your phone
+        </p>
+        <input
+          v-model="OTPCode"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          placeholder="Enter OTP"
+          class="border py-2 px-2 w-full rounded mx-auto border-grey text-center"
+          maxlength="6"
+        />
+      </div>
+
+      <!-- Request OTP button -->
+      <button
+        v-if="!isOTPSent"
+        @click="sendOTP"
+        class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md block"
+        :disabled="!phoneVerified"
+      >
+        Send OTP
+      </button>
+
+      <!-- Verify OTP button -->
+      <button
+        v-if="isOTPSent"
+        @click="verifyOTP"
+        class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md block"
+        :disabled="OTPCode.length < 4"
+      >
+        Verify OTP
+      </button>
+
+      <!-- Resend OTP button -->
+      <button
+        v-if="isOTPSent && resendOTPTimeLimit === 0"
+        @click="sendOTP"
+        class="mt-[10px] bg-gray-500 hover:bg-gray-600 text-white text-base mx-auto w-48 p-2 rounded shadow-md block"
+      >
+        Resend OTP
+      </button>
+
+      <!-- Countdown timer -->
+      <p
+        v-if="isOTPSent && resendOTPTimeLimit > 0"
+        class="text-center mt-2 text-gray-600"
+      >
+        Resend OTP in {{ formattedResendTimer }}
+      </p>
+
+      <!-- OTP response message -->
+      <p
+        v-if="displayOTPMessage.message"
+        :class="displayOTPMessageClass"
+        class="text-center mt-2"
+      >
+        {{ displayOTPMessage.message }}
+      </p>
+    </div>
+
+    <!-- Regular submit button for non-PH auth types -->
     <button
+      v-if="!showOTPFlow"
       class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md"
       :disabled="isSubmitButtonDisabled"
       @click="authenticate"
@@ -125,6 +192,11 @@ import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
+import OTPAuth from "@/services/API/otp.js";
+import {
+  mapVerifyStatusCodeToMessage,
+  mapSendStatusCodeToMessage,
+} from "@/services/OTPCodes.js";
 
 const assets = useAssets();
 
@@ -168,6 +240,14 @@ export default {
       codeEntryParameters: {}, // stores UI parameters for code entry component
       userInformation: {}, // stores data about the user
       privacyPolicyAccepted: true, // privacy policy checkbox state (default: checked)
+      // OTP-related states
+      showOTPFlow: false, // whether to show OTP input and verification
+      isOTPSent: false, // whether OTP has been sent
+      OTPCode: "", // OTP entered by user
+      displayOTPMessage: { message: "", status: "" }, // OTP service messages
+      resendOTPTimeLimit: 60, // countdown timer for resend
+      OTPInterval: null, // timer interval
+      phoneVerified: false, // whether phone number is verified in database
       invalidLoginMessageTranslations: {
         ID: {
           en: "This ID is not registered. Try again",
@@ -290,6 +370,28 @@ export default {
         ? this.$store.state.sessionData.meta_data.batch
         : "";
     },
+
+    /** Check if auth type includes phone number authentication */
+    includesPhoneAuth() {
+      return this.auth_type.includes("PH");
+    },
+
+    /** Format for the resend timer */
+    formattedResendTimer() {
+      const minutes = Math.floor(this.resendOTPTimeLimit / 60);
+      let seconds = this.resendOTPTimeLimit % 60;
+      if (seconds < 10) {
+        seconds = `0${seconds}`;
+      }
+      return `${minutes}:${seconds}`;
+    },
+
+    /** CSS classes for OTP message display */
+    displayOTPMessageClass() {
+      return this.displayOTPMessage.status === "failure"
+        ? "text-red-600 text-sm"
+        : "text-green-600 text-sm";
+    },
   },
   methods: {
     /** Resets the invalid login message to empty string */
@@ -391,6 +493,151 @@ export default {
       this.userInformation[dbKey] = value;
     },
 
+    /** Send OTP to verified phone number */
+    async sendOTP() {
+      if (!this.phoneVerified || !this.userInformation.phone) return;
+
+      try {
+        const response = await OTPAuth.sendOTP(
+          parseInt(this.userInformation.phone)
+        );
+        let responseStatusCodeAndMessage = response.data.split("|");
+        const responseStatusMessage = responseStatusCodeAndMessage[0];
+
+        this.displayOTPMessage = mapSendStatusCodeToMessage(
+          responseStatusMessage.trim()
+        );
+
+        if (this.displayOTPMessage.status === "success") {
+          this.isOTPSent = true;
+          this.resendOTPTimeLimit = 60;
+          this.startResendTimer();
+        }
+      } catch (error) {
+        console.error("Send OTP error:", error);
+        this.displayOTPMessage = {
+          message: "Failed to send OTP. Please try again.",
+          status: "failure",
+        };
+      }
+    },
+
+    /** Verify OTP entered by user */
+    async verifyOTP() {
+      if (!this.OTPCode || !this.userInformation.phone) return;
+
+      try {
+        const response = await OTPAuth.verifyOTP(
+          parseInt(this.userInformation.phone),
+          this.OTPCode
+        );
+
+        let responseStatusCodeAndMessage = response.data.split("|");
+        const responseStatusMessage = responseStatusCodeAndMessage[0];
+        const responseStatusCode = responseStatusCodeAndMessage[1];
+
+        if (responseStatusMessage.trim() === "success") {
+          // OTP verified successfully, proceed with authentication
+          this.displayOTPMessage = {
+            message: "OTP verified successfully!",
+            status: "success",
+          };
+
+          // Proceed with final authentication and redirection
+          await this.completePhoneAuthentication();
+        } else {
+          this.displayOTPMessage = mapVerifyStatusCodeToMessage[
+            responseStatusCode.trim().toString()
+          ] || {
+            message: "Invalid OTP. Please try again.",
+            status: "failure",
+          };
+        }
+      } catch (error) {
+        console.error("Verify OTP error:", error);
+        this.displayOTPMessage = {
+          message: "Failed to verify OTP. Please try again.",
+          status: "failure",
+        };
+      }
+    },
+
+    /** Complete phone authentication after OTP verification */
+    async completePhoneAuthentication() {
+      try {
+        const userId = this.userInformation.phone;
+
+        // Send SQS message
+        await sendSQSMessage(
+          "sessionData" in this.$store.state &&
+            "type" in this.$store.state.sessionData
+            ? this.$store.state.sessionData.type
+            : "sign-in",
+          "", // deprecated sub_type
+          this.$store.state.platform,
+          this.$store.state.platform_id,
+          userId,
+          this.auth_type.toString(),
+          this.$store.state.authGroupData.name,
+          this.$store.state.authGroupData.input_schema.user_type,
+          "sessionData" in this.$store.state &&
+            "session_id" in this.$store.state.sessionData
+            ? this.$store.state.sessionData.session_id
+            : "",
+          this.userInformation.phone,
+          this.getBatch,
+          "" // date of birth
+        );
+
+        // Post user session activity
+        if (this.$store.state.sessionData.session_id != null) {
+          await UserAPI.postUserSessionActivity(
+            userId,
+            this.$store.state.sessionData.type,
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
+          );
+        }
+
+        // Redirect to destination
+        redirectToDestination(
+          userId,
+          this.$store.state.omrMode,
+          this.$store.state.abTestId,
+          this.$store.state.platform_id,
+          this.$store.state.platform_link,
+          this.$store.state.platform,
+          this.$store.state.authGroupData.input_schema.user_type,
+          this.$store.state.sessionData &&
+            this.$store.state.sessionData.meta_data &&
+            this.$store.state.sessionData.meta_data.test_type,
+          this.$route.query.testType
+        );
+      } catch (error) {
+        console.error("Complete phone authentication error:", error);
+        this.displayOTPMessage = {
+          message: "Authentication failed. Please try again.",
+          status: "failure",
+        };
+      }
+    },
+
+    /** Start countdown timer for resend OTP */
+    startResendTimer() {
+      if (this.OTPInterval) {
+        clearInterval(this.OTPInterval);
+      }
+
+      this.OTPInterval = setInterval(() => {
+        if (this.resendOTPTimeLimit > 0) {
+          this.resendOTPTimeLimit -= 1;
+        } else {
+          clearInterval(this.OTPInterval);
+        }
+      }, 1000);
+    },
+
     /**
      * Performs authentication by validating the user and redirecting user only if valid.
      * @returns {Promise<void>} A Promise that resolves once the authentication process is complete.
@@ -410,7 +657,10 @@ export default {
         this.$store.state.authGroupData.id
       );
 
-      if (TESTING_MODE == true) isUserValid.isUserIdValid = true;
+      if (TESTING_MODE == true) {
+        isUserValid.isUserIdValid = true;
+        isUserValid.isPhoneNumberValid = true; // temp
+      }
 
       var userId = "";
       if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
@@ -438,6 +688,11 @@ export default {
           userId = this.userInformation["teacher_id"];
         } else if ("candidate_id" in this.userInformation) {
           userId = this.userInformation["candidate_id"];
+        } else if ("phone" in this.userInformation) {
+          userId = this.userInformation["phone"];
+          this.phoneVerified = true;
+          this.showOTPFlow = true;
+          return; // Don't proceed with normal auth - wait for OTP verification
         } else {
           userId = this.userInformation["student_id"];
         }
@@ -466,6 +721,7 @@ export default {
 
           await sendSQSMessage(
             "sign-in",
+            "", // deprecated sub_type
             this.$store.state.platform,
             this.$store.state.platform_id,
             this.userInformation["student_id"],
@@ -504,6 +760,7 @@ export default {
               "type" in this.$store.state.sessionData
               ? this.$store.state.sessionData.type
               : "sign-in",
+            "", // deprecated sub_type
             this.$store.state.platform,
             this.$store.state.platform_id,
             userId,

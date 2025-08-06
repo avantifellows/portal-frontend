@@ -313,6 +313,7 @@ export default {
         );
         sendSQSMessage(
           "popup_form",
+          "", // deprecated sub_type
           this.$store.state.sessionData.platform,
           this.$store.state.sessionData.platform_id,
           this.id,

@@ -388,6 +388,7 @@ export default {
 
       sendSQSMessage(
         "sign-up",
+        "", // deprecated sub_type
         this.$store.state.platform,
         this.$store.state.platform_id,
         this.userData["user_id"],
@@ -448,6 +449,7 @@ export default {
 
         sendSQSMessage(
           "attendance-on-sign-up",
+          "", // deprecated sub_type
           this.$store.state.platform,
           this.$store.state.platform_id,
           this.userData["user_id"],

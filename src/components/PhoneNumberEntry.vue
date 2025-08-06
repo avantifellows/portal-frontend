@@ -11,6 +11,7 @@
       @input="updatePhoneNumberEntry($event)"
       class="border py-2 px-2 w-full rounded mx-auto border-grey"
       :class="invalid ? 'border-red' : 'border-grey'"
+      :disabled="disabled"
     />
     <span class="mt-[10px] text-sm text-grey italic">{{ helpText }}</span>
 
@@ -54,6 +55,10 @@ export default {
       default: "",
     },
     invalid: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
       type: Boolean,
       default: false,
     },

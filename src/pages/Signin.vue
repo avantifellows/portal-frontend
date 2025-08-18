@@ -773,19 +773,19 @@ export default {
               ? this.userInformation["date_of_birth"]
               : ""
           );
-          redirectToDestination(
-            userId,
-            this.$store.state.omrMode,
-            this.$store.state.abTestId,
-            this.$store.state.platform_id,
-            this.$store.state.platform_link,
-            this.$store.state.platform,
-            this.$store.state.authGroupData.input_schema.user_type,
-            this.$store.state.sessionData &&
-              this.$store.state.sessionData.meta_data &&
-              this.$store.state.sessionData.meta_data.test_type,
-            this.$route.query.testType
-          );
+          // redirectToDestination(
+          //   userId,
+          //   this.$store.state.omrMode,
+          //   this.$store.state.abTestId,
+          //   this.$store.state.platform_id,
+          //   this.$store.state.platform_link,
+          //   this.$store.state.platform,
+          //   this.$store.state.authGroupData.input_schema.user_type,
+          //   this.$store.state.sessionData &&
+          //     this.$store.state.sessionData.meta_data &&
+          //     this.$store.state.sessionData.meta_data.test_type,
+          //   this.$route.query.testType
+          // );
         }
       }
     },

@@ -2,15 +2,19 @@ import { fastAPIClient } from "@/services/API/rootClient.js";
 
 export default {
   /** Gets data about a form schema
-   * @param {String} name - name of the form schema
+   * @param {String} id - ID of the form schema
+   * @param {String} authGroup - Auth group for form enhancement (optional)
    */
-  getFormSchema(id) {
+  getFormSchema(id, authGroup = null) {
     return new Promise((resolve) => {
+      const params = { id: id };
+      if (authGroup) {
+        params.auth_group = authGroup;
+      }
+
       fastAPIClient
         .get("/form-schema/", {
-          params: {
-            id: id,
-          },
+          params: params,
         })
         .then((response) => {
           resolve(response.data);
@@ -24,7 +28,7 @@ export default {
 
   /** Returns fields that are to be completed by the student
    * @param {Number} numberOfFields - number of fields to show the user
-   * @param {String} formName - name of the form
+   * @param {String} formId - ID of the form
    * @param {String} studentId - student ID
    */
   getFormFields(numberOfFields, formId, studentId) {

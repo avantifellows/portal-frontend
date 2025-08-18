@@ -25,3 +25,15 @@ Base URL for YouTube link.
 ## VITE_APP_OTP_SERVICE
 
 Base URL for OTP service
+
+## VITE_APP_BACKEND_URL
+
+Base URL for the FastAPI backend service. This is used for all API calls to the portal backend.
+
+## VITE_APP_AF_BASE_URL
+
+Base URL for Avanti Fellows services and authentication.
+
+## VITE_APP_GURUKUL_ACCESS_TOKEN_URL
+
+URL endpoint for generating access tokens for Gurukul platform authentication.

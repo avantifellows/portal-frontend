@@ -26,18 +26,18 @@ export default {
   props: {
     modelValue: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   computed: {
     checked() {
       return this.modelValue;
-    }
+    },
   },
   methods: {
     toggleCheckbox(event) {
-      this.$emit('update:modelValue', event.target.checked);
-    }
-  }
-}
+      this.$emit("update:modelValue", event.target.checked);
+    },
+  },
+};
 </script>

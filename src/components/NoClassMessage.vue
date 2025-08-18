@@ -1,5 +1,8 @@
 <template>
-  <div class="fixed w-full top-1/4 my-5 flex justify-center">
+  <div
+    class="fixed w-full top-1/4 my-5 flex justify-center"
+    data-testid="no-class-message"
+  >
     <div
       class="bg-white w-11/12 sm:w-9/12 lg:w-7/12 p-4 sm:p-10 rounded-lg border border-black"
     >

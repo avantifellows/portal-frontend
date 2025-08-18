@@ -31,3 +31,7 @@ package-lock.json
 
 # testing
 /coverage
+
+# Cypress
+cypress/videos
+cypress/screenshots

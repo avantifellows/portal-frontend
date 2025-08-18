@@ -6,7 +6,7 @@ export default function useAssets() {
       allSvgs["/src/assets/images/loading_spinner.svg"].default,
     deleteSvg: allSvgs["/src/assets/images/remove_circle.svg"].default,
     addSvg: allSvgs["/src/assets/images/add_circle.svg"].default,
-    AFLogoSvg: allPngs["/src/assets/images/AF_favicon.png"].default,
+    AFLogoSvg: "/favicon.ico",
     warningSvg: allSvgs["/src/assets/images/warning.svg"].default,
   };
 }

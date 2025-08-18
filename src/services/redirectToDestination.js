@@ -1,17 +1,19 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 import abTestService from "@/services/API/abTestData";
 
-/** This function is called when a user has to be redirected to the destination. Depending on the destination, the destination URL is built.
- * @param {String} purposeParams - extracted from auth layer URL
- * @param {Array} userIDList - list of userIDs wanting to go through the layer
- * @param {String} redirectId - extracted from auth layer URL
- * @param {String} redirectLink - from auth layer
- * @param {String} redirectTo - extracted from auth layer URL
+/** Redirects user to the appropriate destination platform
+ * @param {String} userId - user ID for authentication
+ * @param {Boolean} omrMode - whether OMR mode is enabled
+ * @param {String} abTestId - A/B test identifier
+ * @param {String} redirectId - platform-specific ID
+ * @param {String} redirectLink - direct link for some platforms
+ * @param {String} redirectTo - destination platform name
+ * @param {String} group - user group for context
  * @param {String} testType - test type from session meta_data
+ * @param {String} urlTestType - test type from URL (fallback)
  */
 
 export async function redirectToDestination(
-  purposeParams,
   userId,
   omrMode,
   abTestId,
@@ -19,15 +21,19 @@ export async function redirectToDestination(
   redirectLink,
   redirectTo,
   group,
-  testType
+  testType,
+  urlTestType
 ) {
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
 
+  // Use URL testType if provided, otherwise fallback to session metadata testType
+  const effectiveTestType = urlTestType || testType;
+
   // Handle special case: when redirectTo is "quiz" but testType is "form"
   let actualRedirectTo = redirectTo;
-  if (redirectTo === "quiz" && testType === "form") {
+  if (redirectTo === "quiz" && effectiveTestType === "form") {
     actualRedirectTo = "form";
   }
 
@@ -80,12 +86,15 @@ export async function redirectToDestination(
         userId,
         redirectId
       );
-      console.log(abTestResult);
       let redirectURL = null;
       if (abTestResult.inTest) {
         redirectURL = abTestResult.variantUrl;
       } else {
-        redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
+        if (effectiveTestType === "form") {
+          redirectURL = import.meta.env.VITE_APP_FORM_REPORT_BASE_URL;
+        } else {
+          redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
+        }
       }
 
       fullURL = redirectURL + "/" + redirectId + "/" + userId;
@@ -130,8 +139,21 @@ export async function redirectToDestination(
       break;
     }
     default: {
-      var purpose = "Error";
-      sendSQSMessage(purpose, purposeParams, redirectTo, redirectId, userId);
+      sendSQSMessage(
+        "error", // type
+        "", // sub_type (deprecated)
+        redirectTo,
+        redirectId,
+        userId,
+        "", // authType
+        group,
+        "", // userType
+        "", // sessionId
+        "", // userIpAddress
+        "", // phoneNumber
+        "", // batch
+        "" // dateOfBirth
+      );
       return false;
     }
   }

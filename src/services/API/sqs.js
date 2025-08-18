@@ -1,9 +1,9 @@
-import { client, fastAPIClient } from "@/services/API/rootClient.js";
+import { fastAPIClient } from "@/services/API/rootClient.js";
 
 /**
  * Function to send SQS message via backend API
  * @param {String} type
- * @param {String} sub_type
+ * @param {String} sub_type # deprecated
  * @param {String} platform
  * @param {String} platformId
  * @param {String} userId
@@ -26,10 +26,10 @@ export function sendSQSMessage(
   authGroup,
   userType,
   sessionId,
-  userIpAddress,
   phoneNumber,
   batch,
-  dateOfBirth
+  dateOfBirth,
+  userIpAddress
 ) {
   return new Promise((resolve) => {
     fastAPIClient

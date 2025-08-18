@@ -1,6 +1,8 @@
 <template>
   <div v-if="show">
-    <p class="text-base mb-[10px]">{{ label }}<span v-if="isRequired">*</span></p>
+    <p class="text-base mb-[10px]">
+      {{ label }}<span v-if="isRequired">*</span>
+    </p>
     <FormKit
       type="date"
       :name="dbKey"
@@ -16,9 +18,11 @@
         'mt-[10px] text-sm text-grey italic': true,
       }"
     />
-    <span v-if="isInvalidDateEntryMessageShown" class="text-red text-sm mt-[10px]">{{
-      invalidDateEntryMessage
-    }}</span>
+    <span
+      v-if="isInvalidDateEntryMessageShown"
+      class="text-red text-sm mt-[10px]"
+      >{{ invalidDateEntryMessage }}</span
+    >
   </div>
 </template>
 <script>

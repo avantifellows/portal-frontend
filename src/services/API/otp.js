@@ -12,6 +12,10 @@ export default {
     };
     return new Promise((resolve) => {
       OTPClient.post(sendOTPEndpoint, null, { params }).then((response) => {
+        // Parse JSON response from Lambda if needed
+        if (typeof response.data === "string") {
+          response.data = JSON.parse(response.data);
+        }
         resolve(response);
       });
     });
@@ -24,6 +28,10 @@ export default {
     };
     return new Promise((resolve) => {
       OTPClient.post(verifyOTPEndpoint, null, { params }).then((response) => {
+        // Parse JSON response from Lambda if needed
+        if (typeof response.data === "string") {
+          response.data = JSON.parse(response.data);
+        }
         resolve(response);
       });
     });

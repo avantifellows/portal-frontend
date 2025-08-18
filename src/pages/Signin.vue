@@ -595,19 +595,7 @@ export default {
         }
 
         // Redirect to destination
-        redirectToDestination(
-          userId,
-          this.$store.state.omrMode,
-          this.$store.state.abTestId,
-          this.$store.state.platform_id,
-          this.$store.state.platform_link,
-          this.$store.state.platform,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData &&
-            this.$store.state.sessionData.meta_data &&
-            this.$store.state.sessionData.meta_data.test_type,
-          this.$route.query.testType
-        );
+        this.handleRedirectToDestination(userId);
       } catch (error) {
         console.error("Complete phone authentication error:", error);
         this.displayOTPMessage = {
@@ -773,21 +761,28 @@ export default {
               ? this.userInformation["date_of_birth"]
               : ""
           );
-          // redirectToDestination(
-          //   userId,
-          //   this.$store.state.omrMode,
-          //   this.$store.state.abTestId,
-          //   this.$store.state.platform_id,
-          //   this.$store.state.platform_link,
-          //   this.$store.state.platform,
-          //   this.$store.state.authGroupData.input_schema.user_type,
-          //   this.$store.state.sessionData &&
-          //     this.$store.state.sessionData.meta_data &&
-          //     this.$store.state.sessionData.meta_data.test_type,
-          //   this.$route.query.testType
-          // );
+          this.handleRedirectToDestination(userId);
         }
       }
+    },
+
+    /**
+     * Handles redirection to destination with consistent parameters
+     */
+    handleRedirectToDestination(userId) {
+      redirectToDestination(
+        userId,
+        this.$store.state.omrMode,
+        this.$store.state.abTestId,
+        this.$store.state.platform_id,
+        this.$store.state.platform_link,
+        this.$store.state.platform,
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.sessionData &&
+          this.$store.state.sessionData.meta_data &&
+          this.$store.state.sessionData.meta_data.test_type,
+        this.$route.query.testType
+      );
     },
 
     /**

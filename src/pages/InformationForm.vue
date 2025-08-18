@@ -289,21 +289,21 @@ export default {
 
     /** redirects to destination */
     redirect() {
-      if (
-        redirectToDestination(
-          this.id,
-          this.$store.state.omrMode,
-          this.$store.state.abTestId,
-          this.$store.state.platform_id,
-          this.$store.state.platform_link,
-          this.$store.state.platform,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData &&
-            this.$store.state.sessionData.meta_data &&
-            this.$store.state.sessionData.meta_data.test_type,
-          this.$route.query.testType
-        )
-      ) {
+      const redirected = redirectToDestination(
+        this.id,
+        this.$store.state.omrMode,
+        this.$store.state.abTestId,
+        this.$store.state.platform_id,
+        this.$store.state.platform_link,
+        this.$store.state.platform,
+        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.sessionData &&
+          this.$store.state.sessionData.meta_data &&
+          this.$store.state.sessionData.meta_data.test_type,
+        this.$route.query.testType
+      );
+
+      if (redirected) {
         UserAPI.postUserSessionActivity(
           this.id,
           "popup_form",

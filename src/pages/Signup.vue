@@ -403,10 +403,25 @@ export default {
 
       // create token only for gurukul
       if (this.$store.state.platform == "gurukul") {
-        await TokenAPI.createAccessToken(
-          this.userData["user_id"],
-          this.$store.state.authGroupData.name
-        );
+        const tokenIdentifiers = {
+          user_id:
+            this.userData["user_id"] ?? this.userData["student_id"] ?? null,
+          student_id: this.userData["student_id"] ?? null,
+          apaar_id: this.userData["apaar_id"] ?? null,
+        };
+
+        if (tokenIdentifiers.user_id) {
+          await TokenAPI.createAccessToken({
+            subjectId: tokenIdentifiers.user_id,
+            group: this.$store.state.authGroupData.name,
+            identifiers: tokenIdentifiers,
+          });
+        } else {
+          console.warn(
+            "Skipping token creation due to missing user identifier",
+            tokenIdentifiers
+          );
+        }
       }
 
       if (this.$store.state.platform != "gurukul") {

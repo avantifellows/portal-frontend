@@ -29,4 +29,4 @@ A Vue.js-based authentication portal that serves as the primary entry point for 
 To set up this project, visit the [installation steps](./docs/INSTALLATION.MD).
 
 ## Deployment
-Visit our [deployment guideline](./docs/DEPLOYMENT.MD) for setting up this repository on a production environment.
+Visit our [deployment guidelines](./docs/DEPLOYMENT.MD) for setting up this repository on a production environment.

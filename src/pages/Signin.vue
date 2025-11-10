@@ -738,9 +738,10 @@ export default {
           delete this.userInformation.candidate_id;
         }
 
-        // create token only for gurukul
+        // create token only for gurukul and quiz -- only they provide logout as of now
         if (
-          this.$store.state.platform == "gurukul" &&
+          (this.$store.state.platform == "gurukul" ||
+            this.$store.state.platform == "quiz") &&
           tokenIdentifiers.user_id
         ) {
           await TokenAPI.createAccessToken({

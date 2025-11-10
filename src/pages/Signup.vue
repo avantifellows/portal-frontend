@@ -401,8 +401,11 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      // create token only for gurukul
-      if (this.$store.state.platform == "gurukul") {
+      // create token only for gurukul and quiz -- only they provide logout as of now
+      if (
+        this.$store.state.platform == "gurukul" ||
+        this.$store.state.platform == "quiz"
+      ) {
         const tokenIdentifiers = {
           user_id:
             this.userData["user_id"] ?? this.userData["student_id"] ?? null,

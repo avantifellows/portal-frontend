@@ -63,8 +63,8 @@ export async function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userId,
         omrMode: omrMode,
+        fromPortal: true,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -74,7 +74,9 @@ export async function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userId,
+        fromPortal: true,
+        singlePageMode: true,
+        autoStart: true,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;

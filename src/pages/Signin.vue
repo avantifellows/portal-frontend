@@ -666,10 +666,6 @@ export default {
       } else {
         if ("code" in this.userInformation) {
           userId = this.userInformation["code"];
-        } else if ("teacher_id" in this.userInformation) {
-          userId = this.userInformation["teacher_id"];
-        } else if ("candidate_id" in this.userInformation) {
-          userId = this.userInformation["candidate_id"];
         } else if ("phone" in this.userInformation) {
           userId = this.userInformation["phone"];
           this.phoneVerified = true;
@@ -679,12 +675,50 @@ export default {
           userId = this.userInformation["student_id"];
         }
 
-        // create token only for gurukul
-        if (this.$store.state.platform == "gurukul") {
-          await TokenAPI.createAccessToken(
+        const identifierBundle = isUserValid.identifiers || {};
+
+        const tokenIdentifiers = {
+          student_id: identifierBundle.student_id ?? null,
+          apaar_id: identifierBundle.apaar_id ?? null,
+          user_id:
+            identifierBundle.user_id ??
+            this.userInformation["user_id"] ??
             userId,
-            this.$store.state.authGroupData.name
-          );
+          display_id: identifierBundle.display_id ?? userId ?? null,
+          display_id_type: identifierBundle.display_id_type ?? null,
+        };
+
+        userId = tokenIdentifiers.user_id;
+
+        if (tokenIdentifiers.student_id) {
+          this.userInformation["student_id"] = tokenIdentifiers.student_id;
+        }
+        if (tokenIdentifiers.apaar_id) {
+          this.userInformation["apaar_id"] = tokenIdentifiers.apaar_id;
+        }
+        this.userInformation["user_id"] = tokenIdentifiers.user_id;
+        this.userInformation["display_id"] = tokenIdentifiers.display_id;
+        this.userInformation["display_id_type"] =
+          tokenIdentifiers.display_id_type;
+
+        if ("teacher_id" in this.userInformation) {
+          delete this.userInformation.teacher_id;
+        }
+        if ("candidate_id" in this.userInformation) {
+          delete this.userInformation.candidate_id;
+        }
+
+        // create token only for gurukul and quiz -- only they provide logout as of now
+        if (
+          (this.$store.state.platform == "gurukul" ||
+            this.$store.state.platform == "quiz") &&
+          tokenIdentifiers.user_id
+        ) {
+          await TokenAPI.createAccessToken({
+            subjectId: tokenIdentifiers.user_id,
+            group: this.$store.state.authGroupData.name,
+            identifiers: tokenIdentifiers,
+          });
         }
 
         if (this.enable_popup) {
@@ -693,7 +727,7 @@ export default {
             TESTING_MODE == false
           ) {
             await UserAPI.postUserSessionActivity(
-              this.userInformation["student_id"],
+              tokenIdentifiers.user_id,
               "sign-in",
               this.$store.state.sessionData.session_id,
               this.$store.state.authGroupData.input_schema.user_type,
@@ -706,7 +740,7 @@ export default {
             "", // deprecated sub_type
             this.$store.state.platform,
             this.$store.state.platform_id,
-            this.userInformation["student_id"],
+            tokenIdentifiers.user_id,
             this.auth_type.toString(),
             this.$store.state.authGroupData.name,
             this.$store.state.authGroupData.input_schema.user_type,
@@ -720,7 +754,7 @@ export default {
               : ""
           );
           this.$router.push({
-            path: `/form/${this.userInformation["student_id"]}`,
+            path: `/form/${tokenIdentifiers.user_id}`,
             query: { sessionId: this.$store.state.sessionData.sessionId },
           });
         } else {
@@ -730,7 +764,7 @@ export default {
           ) {
             // do not send logs for reports, gurukul, testing_mode
             await UserAPI.postUserSessionActivity(
-              userId,
+              tokenIdentifiers.user_id,
               this.$store.state.sessionData.type,
               this.$store.state.sessionData.session_id,
               this.$store.state.authGroupData.input_schema.user_type,
@@ -745,7 +779,7 @@ export default {
             "", // deprecated sub_type
             this.$store.state.platform,
             this.$store.state.platform_id,
-            userId,
+            tokenIdentifiers.user_id,
             this.auth_type.toString(),
             this.$store.state.authGroupData.name,
             this.$store.state.authGroupData.input_schema.user_type,

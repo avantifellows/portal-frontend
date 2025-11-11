@@ -20,9 +20,11 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
+          if (error.response && error.response.status == 404) {
+            resolve({ is_valid: false });
+          } else {
+            console.error("User API returned an error:", error);
+            resolve({ is_valid: false });
           }
         });
     });
@@ -40,9 +42,11 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
+          if (error.response && error.response.status == 404) {
+            resolve({ is_valid: false });
+          } else {
+            console.error("User API returned an error:", error);
+            resolve({ is_valid: false });
           }
         });
     });
@@ -60,9 +64,11 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
+          if (error.response && error.response.status == 404) {
+            resolve({ is_valid: false });
+          } else {
+            console.error("User API returned an error:", error);
+            resolve({ is_valid: false });
           }
         });
     });

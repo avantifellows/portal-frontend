@@ -401,12 +401,30 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      // create token only for gurukul
-      if (this.$store.state.platform == "gurukul") {
-        await TokenAPI.createAccessToken(
-          this.userData["user_id"],
-          this.$store.state.authGroupData.name
-        );
+      // create token only for gurukul and quiz -- only they provide logout as of now
+      if (
+        this.$store.state.platform == "gurukul" ||
+        this.$store.state.platform == "quiz"
+      ) {
+        const tokenIdentifiers = {
+          user_id:
+            this.userData["user_id"] ?? this.userData["student_id"] ?? null,
+          student_id: this.userData["student_id"] ?? null,
+          apaar_id: this.userData["apaar_id"] ?? null,
+        };
+
+        if (tokenIdentifiers.user_id) {
+          await TokenAPI.createAccessToken({
+            subjectId: tokenIdentifiers.user_id,
+            group: this.$store.state.authGroupData.name,
+            identifiers: tokenIdentifiers,
+          });
+        } else {
+          console.warn(
+            "Skipping token creation due to missing user identifier",
+            tokenIdentifiers
+          );
+        }
       }
 
       if (this.$store.state.platform != "gurukul") {

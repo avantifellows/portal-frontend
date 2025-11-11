@@ -493,7 +493,7 @@ export default {
         this.auth_type.toString(),
         this.authGroupData ? this.authGroupData.name : "default",
         this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.userType
+          ? this.authGroupData.input_schema.user_type
           : "student",
         this.sessionData && "session_id" in this.sessionData
           ? this.sessionData.session_id
@@ -527,7 +527,7 @@ export default {
         this.$store.state.platform_link,
         this.$store.state.platform,
         this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.userType
+          ? this.authGroupData.input_schema.user_type
           : "student",
         this.sessionData &&
           this.sessionData.meta_data &&

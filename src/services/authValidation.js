@@ -100,13 +100,17 @@ export async function validateUser(
         displayIdType = "apaar_id";
       }
 
-      user["identifiers"] = {
-        student_id: verifiedStudentId,
-        apaar_id: verifiedApaarId,
+      const identifiers = sanitizeIdentifiers({
         user_id: canonicalUserId,
         display_id: displayId,
         display_id_type: displayIdType,
-      };
+      });
+
+      if (identifiers) {
+        identifiers.student_id = verifiedStudentId;
+        identifiers.apaar_id = verifiedApaarId;
+        user["identifiers"] = identifiers;
+      }
     }
   }
 

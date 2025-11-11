@@ -76,17 +76,7 @@ export default {
    * @throws {Error} Throws an error if the Token API returns an error during the process.
    */
   async createAccessToken({ subjectId, group, identifiers = {} }) {
-    const candidateSubject =
-      identifiers.user_id !== undefined && identifiers.user_id !== null
-        ? identifiers.user_id
-        : subjectId;
-
-    const canonicalUserId =
-      candidateSubject !== undefined &&
-      candidateSubject !== null &&
-      candidateSubject !== ""
-        ? String(candidateSubject)
-        : "";
+    const canonicalUserId = String(identifiers.user_id ?? subjectId ?? "");
 
     if (!group || canonicalUserId === "") {
       console.error(

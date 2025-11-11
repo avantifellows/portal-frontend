@@ -701,13 +701,6 @@ export default {
         this.userInformation["display_id_type"] =
           tokenIdentifiers.display_id_type;
 
-        if ("teacher_id" in this.userInformation) {
-          delete this.userInformation.teacher_id;
-        }
-        if ("candidate_id" in this.userInformation) {
-          delete this.userInformation.candidate_id;
-        }
-
         // create token only for gurukul and quiz -- only they provide logout as of now
         if (
           (this.$store.state.platform == "gurukul" ||

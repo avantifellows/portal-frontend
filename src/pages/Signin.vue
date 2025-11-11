@@ -676,46 +676,16 @@ export default {
         }
 
         const identifierBundle = isUserValid.identifiers || {};
-        const typedStudentId = this.userInformation["student_id"] ?? null;
-        const typedApaarId = this.userInformation["apaar_id"] ?? null;
-        const typedTeacherId = this.userInformation["teacher_id"] ?? null;
-        const typedCandidateId = this.userInformation["candidate_id"] ?? null;
-
-        const inferredDisplayIdType =
-          identifierBundle.display_id_type ??
-          this.userInformation["display_id_type"] ??
-          (typedStudentId
-            ? "student_id"
-            : typedApaarId
-            ? "apaar_id"
-            : typedTeacherId
-            ? "teacher_id"
-            : typedCandidateId
-            ? "candidate_id"
-            : null);
-
-        const inferredDisplayId =
-          identifierBundle.display_id ??
-          this.userInformation["display_id"] ??
-          (inferredDisplayIdType === "student_id"
-            ? typedStudentId
-            : inferredDisplayIdType === "apaar_id"
-            ? typedApaarId
-            : inferredDisplayIdType === "teacher_id"
-            ? typedTeacherId
-            : inferredDisplayIdType === "candidate_id"
-            ? typedCandidateId
-            : userId ?? null);
 
         const tokenIdentifiers = {
-          student_id: identifierBundle.student_id ?? typedStudentId ?? null,
-          apaar_id: identifierBundle.apaar_id ?? typedApaarId ?? null,
+          student_id: identifierBundle.student_id ?? null,
+          apaar_id: identifierBundle.apaar_id ?? null,
           user_id:
             identifierBundle.user_id ??
             this.userInformation["user_id"] ??
             userId,
-          display_id: inferredDisplayId ?? null,
-          display_id_type: inferredDisplayIdType,
+          display_id: identifierBundle.display_id ?? userId ?? null,
+          display_id_type: identifierBundle.display_id_type ?? null,
         };
 
         userId = tokenIdentifiers.user_id;
@@ -751,16 +721,13 @@ export default {
           });
         }
 
-        const activityUserId =
-          tokenIdentifiers.user_id ?? tokenIdentifiers.display_id ?? "";
-
         if (this.enable_popup) {
           if (
             this.$store.state.sessionData.session_id != null &&
             TESTING_MODE == false
           ) {
             await UserAPI.postUserSessionActivity(
-              activityUserId,
+              tokenIdentifiers.user_id,
               "sign-in",
               this.$store.state.sessionData.session_id,
               this.$store.state.authGroupData.input_schema.user_type,
@@ -773,7 +740,7 @@ export default {
             "", // deprecated sub_type
             this.$store.state.platform,
             this.$store.state.platform_id,
-            activityUserId,
+            tokenIdentifiers.user_id,
             this.auth_type.toString(),
             this.$store.state.authGroupData.name,
             this.$store.state.authGroupData.input_schema.user_type,
@@ -787,7 +754,7 @@ export default {
               : ""
           );
           this.$router.push({
-            path: `/form/${activityUserId}`,
+            path: `/form/${tokenIdentifiers.user_id}`,
             query: { sessionId: this.$store.state.sessionData.sessionId },
           });
         } else {
@@ -797,7 +764,7 @@ export default {
           ) {
             // do not send logs for reports, gurukul, testing_mode
             await UserAPI.postUserSessionActivity(
-              activityUserId,
+              tokenIdentifiers.user_id,
               this.$store.state.sessionData.type,
               this.$store.state.sessionData.session_id,
               this.$store.state.authGroupData.input_schema.user_type,
@@ -812,7 +779,7 @@ export default {
             "", // deprecated sub_type
             this.$store.state.platform,
             this.$store.state.platform_id,
-            activityUserId,
+            tokenIdentifiers.user_id,
             this.auth_type.toString(),
             this.$store.state.authGroupData.name,
             this.$store.state.authGroupData.input_schema.user_type,

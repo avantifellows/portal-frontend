@@ -75,6 +75,8 @@ export async function redirectToDestination(
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         userId: userId,
+        singlePageMode: true,
+        autoStart: true,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;

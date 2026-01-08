@@ -157,14 +157,14 @@ export default {
         closeButton: false,
       });
     }
-    if (Object.keys(this.formSchemaData).length == 0) {
-      // Form is empty, user's profile is complete - auto-redirect
+    if (this.shouldAutoRedirect()) {
       this.isAutoRedirecting = true;
+      this.isLoading = false;
 
       // Small delay to show the redirect message, then redirect
       setTimeout(() => {
         this.redirect();
-      }, 1500);
+      }, 500);
       return;
     }
     Object.keys(this.formSchemaData).forEach((field) => {
@@ -223,6 +223,16 @@ export default {
     },
   },
   methods: {
+    /** Determine if user should skip directly to destination (no fields to show). */
+    shouldAutoRedirect() {
+      const fields = Object.values(this.formSchemaData || {});
+      if (fields.length === 0) {
+        return true;
+      }
+
+      return !fields.some((field) => field.show);
+    },
+
     /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formSchemaData).forEach((field) => {

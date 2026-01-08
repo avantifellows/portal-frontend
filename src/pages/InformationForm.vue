@@ -157,16 +157,6 @@ export default {
         closeButton: false,
       });
     }
-    if (this.shouldAutoRedirect()) {
-      this.isAutoRedirecting = true;
-      this.isLoading = false;
-
-      // Small delay to show the redirect message, then redirect
-      setTimeout(() => {
-        this.redirect();
-      }, 500);
-      return;
-    }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
         typeToInputParameters[this.formSchemaData[field].type];
@@ -180,6 +170,20 @@ export default {
       this.formSchemaData[field]["multipleSelect"] =
         this.formSchemaData[field].multipleSelect == "TRUE" ? true : false;
     });
+
+    this.showBasedOn();
+
+    if (this.shouldAutoRedirect()) {
+      this.isAutoRedirecting = true;
+      this.isLoading = false;
+
+      // Small delay to show the redirect message, then redirect
+      setTimeout(() => {
+        this.redirect();
+      }, 500);
+      return;
+    }
+
     this.isUserDataIsComplete();
 
     // Form loaded successfully, stop loading

@@ -710,7 +710,10 @@ export default {
             this.auth_type.toString(),
             this.$store.state.authGroupData.name,
             this.$store.state.authGroupData.input_schema.user_type,
-            this.$store.state.sessionData.session_id,
+            "sessionData" in this.$store.state &&
+              "session_id" in this.$store.state.sessionData
+              ? this.$store.state.sessionData.session_id
+              : "",
             "phone" in this.userInformation
               ? this.userInformation["phone"]
               : "",
@@ -719,9 +722,38 @@ export default {
               ? this.userInformation["date_of_birth"]
               : ""
           );
+          const formQuery = {};
+          const sessionDataFromStore = this.$store.state.sessionData || {};
+          if (sessionDataFromStore.sessionId) {
+            formQuery.sessionId = sessionDataFromStore.sessionId;
+          } else if (this.$route.query.sessionId) {
+            formQuery.sessionId = this.$route.query.sessionId;
+          }
+
+          const platformQuery =
+            this.$store.state.platform || this.$route.query.platform;
+          if (platformQuery) {
+            formQuery.platform = platformQuery;
+          }
+
+          const popupFormId =
+            sessionDataFromStore.popup_form_id ||
+            this.$route.query.popup_form_id;
+          if (popupFormId) {
+            formQuery.popup_form_id = popupFormId;
+          }
+
+          if (this.$route.query.popup_form) {
+            formQuery.popup_form = this.$route.query.popup_form;
+          }
+
+          if (this.$route.query.authGroup) {
+            formQuery.authGroup = this.$route.query.authGroup;
+          }
+
           this.$router.push({
             path: `/form/${this.userInformation["student_id"]}`,
-            query: { sessionId: this.$store.state.sessionData.sessionId },
+            query: formQuery,
           });
         } else {
           if (

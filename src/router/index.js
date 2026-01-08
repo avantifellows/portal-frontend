@@ -33,6 +33,8 @@ const LEGACY_ALLOWED_PARAMS = [
   "sub_type", // ignored (deprecated)
 ];
 
+const SESSIONLESS_PLATFORMS = ["gurukul", "report", "teacher-web-app"];
+
 const routes = [
   {
     path: "/",
@@ -163,8 +165,11 @@ router.beforeEach((to) => {
 
   // Prevent direct access to /form/:id without proper context
   if (to.name === "Information Form") {
-    // Check if accessing form directly without sessionId parameter
-    if (!to.query.sessionId) {
+    const hasSessionId = Boolean(to.query.sessionId);
+    const isSessionlessPlatform =
+      to.query.platform && SESSIONLESS_PLATFORMS.includes(to.query.platform);
+
+    if (!hasSessionId && !isSessionlessPlatform) {
       return {
         name: "Error",
         props: {

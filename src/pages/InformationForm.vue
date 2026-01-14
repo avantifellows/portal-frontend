@@ -139,7 +139,7 @@ export default {
     */
     const sessionData = this.$store.state.sessionData || {};
     const metaData = sessionData.meta_data || {};
-    const numberOfFields = metaData.number_of_fields_in_popup_form ?? 3; // sessionless fallback
+    const numberOfFields = metaData.number_of_fields_in_popup_form ?? 5; // sessionless fallback
     const popupFormId =
       sessionData.popup_form_id || this.$route.query.popup_form_id || "";
 

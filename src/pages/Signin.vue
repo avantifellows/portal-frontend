@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoading" class="h-full w-full fixed z-50">
+  <div v-if="isLoading || isSubmitting" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
       <inline-svg
         class="text-black text-4xl m-auto animate-spin h-20 w-20"
@@ -101,7 +101,7 @@
         v-if="!isOTPSent"
         @click="sendOTP"
         class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md block"
-        :disabled="!phoneVerified"
+        :disabled="!phoneVerified || isSubmitting"
       >
         Send OTP
       </button>
@@ -111,7 +111,7 @@
         v-if="isOTPSent"
         @click="verifyOTP"
         class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md block"
-        :disabled="OTPCode.length < 4"
+        :disabled="OTPCode.length < 4 || isSubmitting"
       >
         Verify OTP
       </button>
@@ -121,6 +121,7 @@
         v-if="isOTPSent && resendOTPTimeLimit === 0"
         @click="sendOTP"
         class="mt-[10px] bg-gray-500 hover:bg-gray-600 text-white text-base mx-auto w-48 p-2 rounded shadow-md block"
+        :disabled="isSubmitting"
       >
         Resend OTP
       </button>
@@ -152,7 +153,7 @@
     <button
       v-if="!showOTPFlow"
       class="mt-[10px] bg-primary hover:bg-primary-hover disabled:bg-primary-hover text-white text-base mx-auto w-48 p-2 rounded shadow-md"
-      :disabled="isSubmitButtonDisabled"
+      :disabled="isSubmitButtonDisabled || isSubmitting"
       @click="authenticate"
     >
       {{ signInButtonLabel }}
@@ -231,6 +232,7 @@ export default {
   data() {
     return {
       isLoading: false,
+      isSubmitting: false,
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       invalidLoginMessage: "", // message to display when login is invalid
       mounted: false,
@@ -495,8 +497,14 @@ export default {
 
     /** Send OTP to verified phone number */
     async sendOTP() {
-      if (!this.phoneVerified || !this.userInformation.phone) return;
+      if (
+        this.isSubmitting ||
+        !this.phoneVerified ||
+        !this.userInformation.phone
+      )
+        return;
 
+      this.isSubmitting = true;
       try {
         const response = await OTPAuth.sendOTP(
           parseInt(this.userInformation.phone)
@@ -517,13 +525,18 @@ export default {
           message: "Failed to send OTP. Please try again.",
           status: "failure",
         };
+      } finally {
+        this.isSubmitting = false;
       }
     },
 
     /** Verify OTP entered by user */
     async verifyOTP() {
-      if (!this.OTPCode || !this.userInformation.phone) return;
+      if (this.isSubmitting || !this.OTPCode || !this.userInformation.phone) {
+        return;
+      }
 
+      this.isSubmitting = true;
       try {
         const response = await OTPAuth.verifyOTP(
           parseInt(this.userInformation.phone),
@@ -553,6 +566,8 @@ export default {
           message: "Failed to verify OTP. Please try again.",
           status: "failure",
         };
+      } finally {
+        this.isSubmitting = false;
       }
     },
 
@@ -625,176 +640,185 @@ export default {
      * @returns {Promise<void>} A Promise that resolves once the authentication process is complete.
      */
     async authenticate() {
-      var TESTING_MODE = false;
-      if (this.$store.state.authGroupData.name == "AFTesting") {
-        TESTING_MODE = true;
-        // authenticate all userIds as valid
-        // do not send logs to afdb
-      }
-
-      let isUserValid = await validateUser(
-        this.auth_type,
-        this.userInformation,
-        this.$store.state.authGroupData.input_schema.user_type,
-        this.$store.state.authGroupData.id
-      );
-
-      if (TESTING_MODE == true) {
-        isUserValid.isUserIdValid = true;
-        isUserValid.isPhoneNumberValid = true; // temp
-      }
-
-      var userId = "";
-      if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["ID"][this.locale];
-      } else if (
-        this.auth_type.includes("DOB") &&
-        !isUserValid.isDateOfBirthValid
-      ) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["DOB"][this.locale];
-      } else if (
-        this.auth_type.includes("PH") &&
-        !isUserValid.isPhoneNumberValid
-      ) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["PH"][this.locale];
-      } else if (this.auth_type.includes("CODE") && !isUserValid.isCodeValid) {
-        this.invalidLoginMessage =
-          this.invalidLoginMessageTranslations["CODE"][this.locale];
-      } else {
-        if ("code" in this.userInformation) {
-          userId = this.userInformation["code"];
-        } else if ("teacher_id" in this.userInformation) {
-          userId = this.userInformation["teacher_id"];
-        } else if ("candidate_id" in this.userInformation) {
-          userId = this.userInformation["candidate_id"];
-        } else if ("phone" in this.userInformation) {
-          userId = this.userInformation["phone"];
-          this.phoneVerified = true;
-          this.showOTPFlow = true;
-          return; // Don't proceed with normal auth - wait for OTP verification
-        } else {
-          userId = this.userInformation["student_id"];
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
+      try {
+        var TESTING_MODE = false;
+        if (this.$store.state.authGroupData.name == "AFTesting") {
+          TESTING_MODE = true;
+          // authenticate all userIds as valid
+          // do not send logs to afdb
         }
 
-        // create token only for gurukul
-        if (this.$store.state.platform == "gurukul") {
-          await TokenAPI.createAccessToken(
-            userId,
-            this.$store.state.authGroupData.name
-          );
+        let isUserValid = await validateUser(
+          this.auth_type,
+          this.userInformation,
+          this.$store.state.authGroupData.input_schema.user_type,
+          this.$store.state.authGroupData.id
+        );
+
+        if (TESTING_MODE == true) {
+          isUserValid.isUserIdValid = true;
+          isUserValid.isPhoneNumberValid = true; // temp
         }
 
-        if (this.enable_popup) {
-          if (
-            this.$store.state.sessionData.session_id != null &&
-            TESTING_MODE == false
-          ) {
-            await UserAPI.postUserSessionActivity(
-              this.userInformation["student_id"],
-              "sign-in",
-              this.$store.state.sessionData.session_id,
-              this.$store.state.authGroupData.input_schema.user_type,
-              this.$store.state.sessionData.session_occurrence_id
-            );
-          }
-
-          await sendSQSMessage(
-            "sign-in",
-            "", // deprecated sub_type
-            this.$store.state.platform,
-            this.$store.state.platform_id,
-            this.userInformation["student_id"],
-            this.auth_type.toString(),
-            this.$store.state.authGroupData.name,
-            this.$store.state.authGroupData.input_schema.user_type,
-            "sessionData" in this.$store.state &&
-              "session_id" in this.$store.state.sessionData
-              ? this.$store.state.sessionData.session_id
-              : "",
-            "phone" in this.userInformation
-              ? this.userInformation["phone"]
-              : "",
-            this.getBatch,
-            "date_of_birth" in this.userInformation
-              ? this.userInformation["date_of_birth"]
-              : ""
-          );
-          const formQuery = {};
-          const sessionDataFromStore = this.$store.state.sessionData || {};
-          if (sessionDataFromStore.sessionId) {
-            formQuery.sessionId = sessionDataFromStore.sessionId;
-          } else if (this.$route.query.sessionId) {
-            formQuery.sessionId = this.$route.query.sessionId;
-          }
-
-          const platformQuery =
-            this.$store.state.platform || this.$route.query.platform;
-          if (platformQuery) {
-            formQuery.platform = platformQuery;
-          }
-
-          const popupFormId =
-            sessionDataFromStore.popup_form_id ||
-            this.$route.query.popup_form_id;
-          if (popupFormId) {
-            formQuery.popup_form_id = popupFormId;
-          }
-
-          if (this.$route.query.popup_form) {
-            formQuery.popup_form = this.$route.query.popup_form;
-          }
-
-          if (this.$route.query.authGroup) {
-            formQuery.authGroup = this.$route.query.authGroup;
-          }
-
-          this.$router.push({
-            path: `/form/${this.userInformation["student_id"]}`,
-            query: formQuery,
-          });
+        var userId = "";
+        if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
+          this.invalidLoginMessage =
+            this.invalidLoginMessageTranslations["ID"][this.locale];
+        } else if (
+          this.auth_type.includes("DOB") &&
+          !isUserValid.isDateOfBirthValid
+        ) {
+          this.invalidLoginMessage =
+            this.invalidLoginMessageTranslations["DOB"][this.locale];
+        } else if (
+          this.auth_type.includes("PH") &&
+          !isUserValid.isPhoneNumberValid
+        ) {
+          this.invalidLoginMessage =
+            this.invalidLoginMessageTranslations["PH"][this.locale];
+        } else if (
+          this.auth_type.includes("CODE") &&
+          !isUserValid.isCodeValid
+        ) {
+          this.invalidLoginMessage =
+            this.invalidLoginMessageTranslations["CODE"][this.locale];
         } else {
-          if (
-            this.$store.state.sessionData.session_id != null &&
-            TESTING_MODE == false
-          ) {
-            // do not send logs for reports, gurukul, testing_mode
-            await UserAPI.postUserSessionActivity(
+          if ("code" in this.userInformation) {
+            userId = this.userInformation["code"];
+          } else if ("teacher_id" in this.userInformation) {
+            userId = this.userInformation["teacher_id"];
+          } else if ("candidate_id" in this.userInformation) {
+            userId = this.userInformation["candidate_id"];
+          } else if ("phone" in this.userInformation) {
+            userId = this.userInformation["phone"];
+            this.phoneVerified = true;
+            this.showOTPFlow = true;
+            return; // Don't proceed with normal auth - wait for OTP verification
+          } else {
+            userId = this.userInformation["student_id"];
+          }
+
+          // create token only for gurukul
+          if (this.$store.state.platform == "gurukul") {
+            await TokenAPI.createAccessToken(
               userId,
-              this.$store.state.sessionData.type,
-              this.$store.state.sessionData.session_id,
-              this.$store.state.authGroupData.input_schema.user_type,
-              this.$store.state.sessionData.session_occurrence_id
+              this.$store.state.authGroupData.name
             );
           }
-          await sendSQSMessage(
-            "sessionData" in this.$store.state &&
-              "type" in this.$store.state.sessionData
-              ? this.$store.state.sessionData.type
-              : "sign-in",
-            "", // deprecated sub_type
-            this.$store.state.platform,
-            this.$store.state.platform_id,
-            userId,
-            this.auth_type.toString(),
-            this.$store.state.authGroupData.name,
-            this.$store.state.authGroupData.input_schema.user_type,
-            "sessionData" in this.$store.state &&
-              "session_id" in this.$store.state.sessionData
-              ? this.$store.state.sessionData.session_id
-              : "",
-            "phone" in this.userInformation
-              ? this.userInformation["phone"]
-              : "",
-            this.getBatch,
-            "date_of_birth" in this.userInformation
-              ? this.userInformation["date_of_birth"]
-              : ""
-          );
-          this.handleRedirectToDestination(userId);
+
+          if (this.enable_popup) {
+            if (
+              this.$store.state.sessionData.session_id != null &&
+              TESTING_MODE == false
+            ) {
+              await UserAPI.postUserSessionActivity(
+                this.userInformation["student_id"],
+                "sign-in",
+                this.$store.state.sessionData.session_id,
+                this.$store.state.authGroupData.input_schema.user_type,
+                this.$store.state.sessionData.session_occurrence_id
+              );
+            }
+
+            await sendSQSMessage(
+              "sign-in",
+              "", // deprecated sub_type
+              this.$store.state.platform,
+              this.$store.state.platform_id,
+              this.userInformation["student_id"],
+              this.auth_type.toString(),
+              this.$store.state.authGroupData.name,
+              this.$store.state.authGroupData.input_schema.user_type,
+              "sessionData" in this.$store.state &&
+                "session_id" in this.$store.state.sessionData
+                ? this.$store.state.sessionData.session_id
+                : "",
+              "phone" in this.userInformation
+                ? this.userInformation["phone"]
+                : "",
+              this.getBatch,
+              "date_of_birth" in this.userInformation
+                ? this.userInformation["date_of_birth"]
+                : ""
+            );
+            const formQuery = {};
+            const sessionDataFromStore = this.$store.state.sessionData || {};
+            if (sessionDataFromStore.sessionId) {
+              formQuery.sessionId = sessionDataFromStore.sessionId;
+            } else if (this.$route.query.sessionId) {
+              formQuery.sessionId = this.$route.query.sessionId;
+            }
+
+            const platformQuery =
+              this.$store.state.platform || this.$route.query.platform;
+            if (platformQuery) {
+              formQuery.platform = platformQuery;
+            }
+
+            const popupFormId =
+              sessionDataFromStore.popup_form_id ||
+              this.$route.query.popup_form_id;
+            if (popupFormId) {
+              formQuery.popup_form_id = popupFormId;
+            }
+
+            if (this.$route.query.popup_form) {
+              formQuery.popup_form = this.$route.query.popup_form;
+            }
+
+            if (this.$route.query.authGroup) {
+              formQuery.authGroup = this.$route.query.authGroup;
+            }
+
+            this.$router.push({
+              path: `/form/${this.userInformation["student_id"]}`,
+              query: formQuery,
+            });
+          } else {
+            if (
+              this.$store.state.sessionData.session_id != null &&
+              TESTING_MODE == false
+            ) {
+              // do not send logs for reports, gurukul, testing_mode
+              await UserAPI.postUserSessionActivity(
+                userId,
+                this.$store.state.sessionData.type,
+                this.$store.state.sessionData.session_id,
+                this.$store.state.authGroupData.input_schema.user_type,
+                this.$store.state.sessionData.session_occurrence_id
+              );
+            }
+            await sendSQSMessage(
+              "sessionData" in this.$store.state &&
+                "type" in this.$store.state.sessionData
+                ? this.$store.state.sessionData.type
+                : "sign-in",
+              "", // deprecated sub_type
+              this.$store.state.platform,
+              this.$store.state.platform_id,
+              userId,
+              this.auth_type.toString(),
+              this.$store.state.authGroupData.name,
+              this.$store.state.authGroupData.input_schema.user_type,
+              "sessionData" in this.$store.state &&
+                "session_id" in this.$store.state.sessionData
+                ? this.$store.state.sessionData.session_id
+                : "",
+              "phone" in this.userInformation
+                ? this.userInformation["phone"]
+                : "",
+              this.getBatch,
+              "date_of_birth" in this.userInformation
+                ? this.userInformation["date_of_birth"]
+                : ""
+            );
+            this.handleRedirectToDestination(userId);
+          }
         }
+      } finally {
+        this.isSubmitting = false;
       }
     },
 

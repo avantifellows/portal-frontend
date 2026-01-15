@@ -1,4 +1,13 @@
 <template>
+  <div v-if="isSubmitting" class="fixed inset-0 z-50 bg-white bg-opacity-60">
+    <div class="flex mx-auto w-full h-full">
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
+    </div>
+  </div>
+
   <!-- Loading State -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
@@ -62,7 +71,7 @@
 
       <button
         class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
-        :disabled="buttonDisabled"
+        :disabled="buttonDisabled || isSubmitting"
         @click="profileDetails"
         v-html="startSessionText"
       />
@@ -94,6 +103,7 @@ export default {
       toast: useToast(),
       contextChecked: false, // Track if we've checked for store context
       isLoading: true, // Show loading state initially
+      isSubmitting: false,
       isAutoRedirecting: false, // Track if we're auto-redirecting due to empty form
     };
   },
@@ -304,11 +314,17 @@ export default {
       this.userData[key] = value;
     },
     async profileDetails() {
-      await UserAPI.completeProfile(
-        this.userData,
-        (this.userData["student_id"] = this.id)
-      );
-      this.redirect();
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
+      try {
+        await UserAPI.completeProfile(
+          this.userData,
+          (this.userData["student_id"] = this.id)
+        );
+        this.redirect();
+      } finally {
+        this.isSubmitting = false;
+      }
     },
 
     /** redirects to destination */

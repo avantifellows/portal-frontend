@@ -81,6 +81,7 @@
 <script>
 import useAssets from "@/assets/assets.js";
 import FormSchemaAPI from "@/services/API/form.js";
+import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
@@ -235,6 +236,11 @@ export default {
     startSessionText() {
       return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
     },
+  },
+  beforeRouteLeave(to, from, next) {
+    // example: when you click back button on your browser
+    TokenAPI.deleteCookies();
+    next();
   },
   methods: {
     /** Determine if user should skip directly to destination (no fields to show). */

@@ -45,7 +45,7 @@ jobs:
           VITE_APP_BASE_URL_MEET: "https://meet.google.com/"
           VITE_APP_OTP_SERVICE: ${{ secrets.VITE_APP_OTP_SERVICE }}
           VITE_APP_BASE_URL_YOUTUBE: "https://www.youtube.com/watch?v="
-          VITE_APP_PORTAL_BACKEND: " https://b93ddkdz0g.execute-api.ap-south-1.amazonaws.com/"
+          VITE_APP_PORTAL_BACKEND: "https://b93ddkdz0g.execute-api.ap-south-1.amazonaws.com/"
           VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/student_quiz_report/v3"
           VITE_APP_FORM_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/form_respones"
           VITE_APP_GURUKUL_BASE_URL: "https://staging-gurukul.avantifellows.org/"

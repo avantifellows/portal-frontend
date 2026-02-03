@@ -323,10 +323,8 @@ export default {
       if (this.isSubmitting) return;
       this.isSubmitting = true;
       try {
-        await UserAPI.completeProfile(
-          this.userData,
-          (this.userData["student_id"] = this.id)
-        );
+        this.userData["user_id"] = this.id;
+        await UserAPI.completeProfile(this.userData);
         this.redirect();
       } finally {
         this.isSubmitting = false;
@@ -337,12 +335,13 @@ export default {
     redirect() {
       const redirected = redirectToDestination(
         this.id,
+        this.userData?.display_id || null,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,
         this.$store.state.platform_link,
         this.$store.state.platform,
-        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name,
         this.$store.state.sessionData &&
           this.$store.state.sessionData.meta_data &&
           this.$store.state.sessionData.meta_data.test_type,

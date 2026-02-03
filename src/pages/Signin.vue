@@ -16,7 +16,7 @@
     </template>
   </div>
 
-  <div class="flex flex-col mx-auto my-auto h-full py-10">
+  <div class="flex flex-col mx-auto my-auto h-full py-10" v-bind="$attrs">
     <!-- different input components -->
     <div
       v-for="(authType, index) in auth_type"
@@ -203,6 +203,7 @@ const assets = useAssets();
 
 export default {
   name: "SignIn",
+  inheritAttrs: false,
   components: {
     NumberEntry,
     Datepicker,
@@ -250,6 +251,7 @@ export default {
       resendOTPTimeLimit: 60, // countdown timer for resend
       OTPInterval: null, // timer interval
       phoneVerified: false, // whether phone number is verified in database
+      pendingTokenIdentifiers: null, // token identifiers captured before OTP verification
       invalidLoginMessageTranslations: {
         ID: {
           en: "This ID is not registered. Try again",
@@ -407,11 +409,9 @@ export default {
      * @returns {string|undefined} The entry type corresponding to the authentication type, or undefined if not found.
      */
     findEntryType(authType) {
-      return Object.keys(authToInputParameters).find((key) => {
-        if (Object.values(authToInputParameters[key]).includes(authType)) {
-          return key;
-        }
-      });
+      return Object.keys(authToInputParameters).find((key) =>
+        Object.values(authToInputParameters[key]).includes(authType)
+      );
     },
 
     /**
@@ -420,18 +420,18 @@ export default {
      * @returns {object|undefined} The UI parameters corresponding to the authentication type, or undefined if not found.
      */
     getUIParameters(authType) {
-      let UIParameters;
-      Object.keys(
+      const localeData =
+        this.$store.state.authGroupData &&
+        this.$store.state.authGroupData.locale_data &&
         this.$store.state.authGroupData.locale_data[this.locale]
-      ).find((key) => {
-        if (key == authType) {
-          UIParameters =
-            this.$store.state.authGroupData.locale_data[this.locale][
-              key.toString()
-            ];
-        }
-      });
-      return UIParameters;
+          ? this.$store.state.authGroupData.locale_data[this.locale]
+          : null;
+
+      if (!localeData) {
+        return undefined;
+      }
+
+      return localeData[authType];
     },
 
     /**
@@ -574,9 +574,98 @@ export default {
     /** Complete phone authentication after OTP verification */
     async completePhoneAuthentication() {
       try {
-        const userId = this.userInformation.phone;
+        const fallbackUserId = this.userInformation.phone || "";
+        const tokenIdentifiers = this.pendingTokenIdentifiers || {
+          student_id: this.userInformation["student_id"] ?? null,
+          apaar_id: this.userInformation["apaar_id"] ?? null,
+          user_id: this.userInformation["user_id"] ?? fallbackUserId,
+          display_id: this.userInformation["display_id"] ?? fallbackUserId,
+          display_id_type: this.userInformation["display_id_type"] ?? null,
+        };
+        const canonicalUserId = tokenIdentifiers.user_id || fallbackUserId;
 
-        // Send SQS message
+        if (!canonicalUserId) {
+          throw new Error("Missing canonical user identifier for OTP flow");
+        }
+
+        // create token only for gurukul and quiz -- only they provide logout as of now
+        if (
+          (this.$store.state.platform == "gurukul" ||
+            this.$store.state.platform == "quiz") &&
+          tokenIdentifiers.user_id
+        ) {
+          await TokenAPI.createAccessToken({
+            subjectId: tokenIdentifiers.user_id,
+            group: this.$store.state.authGroupData.name,
+            identifiers: tokenIdentifiers,
+          });
+        }
+
+        if (this.enable_popup) {
+          if (this.$store.state.sessionData.session_id != null) {
+            await UserAPI.postUserSessionActivity(
+              canonicalUserId,
+              "sign-in",
+              this.$store.state.sessionData.session_id,
+              this.$store.state.authGroupData.input_schema.user_type,
+              this.$store.state.sessionData.session_occurrence_id
+            );
+          }
+
+          await sendSQSMessage(
+            "sign-in",
+            "", // deprecated sub_type
+            this.$store.state.platform,
+            this.$store.state.platform_id,
+            canonicalUserId,
+            this.auth_type.toString(),
+            this.$store.state.authGroupData.name,
+            this.$store.state.authGroupData.input_schema.user_type,
+            "sessionData" in this.$store.state &&
+              "session_id" in this.$store.state.sessionData
+              ? this.$store.state.sessionData.session_id
+              : "",
+            this.userInformation.phone,
+            this.getBatch,
+            "" // date of birth
+          );
+
+          const formQuery = {};
+          const sessionDataFromStore = this.$store.state.sessionData || {};
+          if (sessionDataFromStore.sessionId) {
+            formQuery.sessionId = sessionDataFromStore.sessionId;
+          } else if (this.$route.query.sessionId) {
+            formQuery.sessionId = this.$route.query.sessionId;
+          }
+
+          const platformQuery =
+            this.$store.state.platform || this.$route.query.platform;
+          if (platformQuery) {
+            formQuery.platform = platformQuery;
+          }
+
+          const popupFormId =
+            sessionDataFromStore.popup_form_id ||
+            this.$route.query.popup_form_id;
+          if (popupFormId) {
+            formQuery.popup_form_id = popupFormId;
+          }
+
+          if (this.$route.query.popup_form) {
+            formQuery.popup_form = this.$route.query.popup_form;
+          }
+
+          if (this.$route.query.authGroup) {
+            formQuery.authGroup = this.$route.query.authGroup;
+          }
+
+          this.$router.push({
+            path: `/form/${canonicalUserId}`,
+            query: formQuery,
+          });
+          return;
+        }
+
         await sendSQSMessage(
           "sessionData" in this.$store.state &&
             "type" in this.$store.state.sessionData
@@ -585,7 +674,7 @@ export default {
           "", // deprecated sub_type
           this.$store.state.platform,
           this.$store.state.platform_id,
-          userId,
+          canonicalUserId,
           this.auth_type.toString(),
           this.$store.state.authGroupData.name,
           this.$store.state.authGroupData.input_schema.user_type,
@@ -598,10 +687,9 @@ export default {
           "" // date of birth
         );
 
-        // Post user session activity
         if (this.$store.state.sessionData.session_id != null) {
           await UserAPI.postUserSessionActivity(
-            userId,
+            canonicalUserId,
             this.$store.state.sessionData.type,
             this.$store.state.sessionData.session_id,
             this.$store.state.authGroupData.input_schema.user_type,
@@ -609,8 +697,7 @@ export default {
           );
         }
 
-        // Redirect to destination
-        this.handleRedirectToDestination(userId);
+        this.handleRedirectToDestination(canonicalUserId);
       } catch (error) {
         console.error("Complete phone authentication error:", error);
         this.displayOTPMessage = {
@@ -643,7 +730,7 @@ export default {
       if (this.isSubmitting) return;
       this.isSubmitting = true;
       try {
-        var TESTING_MODE = false;
+        let TESTING_MODE = false;
         if (this.$store.state.authGroupData.name == "AFTesting") {
           TESTING_MODE = true;
           // authenticate all userIds as valid
@@ -662,7 +749,7 @@ export default {
           isUserValid.isPhoneNumberValid = true; // temp
         }
 
-        var userId = "";
+        let userId = "";
         if (this.auth_type.includes("ID") && !isUserValid.isUserIdValid) {
           this.invalidLoginMessage =
             this.invalidLoginMessageTranslations["ID"][this.locale];
@@ -693,19 +780,54 @@ export default {
             userId = this.userInformation["candidate_id"];
           } else if ("phone" in this.userInformation) {
             userId = this.userInformation["phone"];
-            this.phoneVerified = true;
-            this.showOTPFlow = true;
-            return; // Don't proceed with normal auth - wait for OTP verification
           } else {
             userId = this.userInformation["student_id"];
           }
 
-          // create token only for gurukul
-          if (this.$store.state.platform == "gurukul") {
-            await TokenAPI.createAccessToken(
+          const identifierBundle = isUserValid.identifiers || {};
+
+          const tokenIdentifiers = {
+            student_id: identifierBundle.student_id ?? null,
+            apaar_id: identifierBundle.apaar_id ?? null,
+            user_id:
+              identifierBundle.user_id ??
+              this.userInformation["user_id"] ??
               userId,
-              this.$store.state.authGroupData.name
-            );
+            display_id: identifierBundle.display_id ?? userId ?? null,
+            display_id_type: identifierBundle.display_id_type ?? null,
+          };
+
+          userId = tokenIdentifiers.user_id;
+
+          if (tokenIdentifiers.student_id) {
+            this.userInformation["student_id"] = tokenIdentifiers.student_id;
+          }
+          if (tokenIdentifiers.apaar_id) {
+            this.userInformation["apaar_id"] = tokenIdentifiers.apaar_id;
+          }
+          this.userInformation["user_id"] = tokenIdentifiers.user_id;
+          this.userInformation["display_id"] = tokenIdentifiers.display_id;
+          this.userInformation["display_id_type"] =
+            tokenIdentifiers.display_id_type;
+
+          if ("phone" in this.userInformation) {
+            this.pendingTokenIdentifiers = tokenIdentifiers;
+            this.phoneVerified = true;
+            this.showOTPFlow = true;
+            return; // Don't proceed with normal auth - wait for OTP verification
+          }
+
+          // create token only for gurukul and quiz -- only they provide logout as of now
+          if (
+            (this.$store.state.platform == "gurukul" ||
+              this.$store.state.platform == "quiz") &&
+            tokenIdentifiers.user_id
+          ) {
+            await TokenAPI.createAccessToken({
+              subjectId: tokenIdentifiers.user_id,
+              group: this.$store.state.authGroupData.name,
+              identifiers: tokenIdentifiers,
+            });
           }
 
           if (this.enable_popup) {
@@ -714,7 +836,7 @@ export default {
               TESTING_MODE == false
             ) {
               await UserAPI.postUserSessionActivity(
-                this.userInformation["student_id"],
+                tokenIdentifiers.user_id,
                 "sign-in",
                 this.$store.state.sessionData.session_id,
                 this.$store.state.authGroupData.input_schema.user_type,
@@ -727,7 +849,7 @@ export default {
               "", // deprecated sub_type
               this.$store.state.platform,
               this.$store.state.platform_id,
-              this.userInformation["student_id"],
+              tokenIdentifiers.user_id,
               this.auth_type.toString(),
               this.$store.state.authGroupData.name,
               this.$store.state.authGroupData.input_schema.user_type,
@@ -773,7 +895,7 @@ export default {
             }
 
             this.$router.push({
-              path: `/form/${this.userInformation["student_id"]}`,
+              path: `/form/${tokenIdentifiers.user_id}`,
               query: formQuery,
             });
           } else {
@@ -783,7 +905,7 @@ export default {
             ) {
               // do not send logs for reports, gurukul, testing_mode
               await UserAPI.postUserSessionActivity(
-                userId,
+                tokenIdentifiers.user_id,
                 this.$store.state.sessionData.type,
                 this.$store.state.sessionData.session_id,
                 this.$store.state.authGroupData.input_schema.user_type,
@@ -798,7 +920,7 @@ export default {
               "", // deprecated sub_type
               this.$store.state.platform,
               this.$store.state.platform_id,
-              userId,
+              tokenIdentifiers.user_id,
               this.auth_type.toString(),
               this.$store.state.authGroupData.name,
               this.$store.state.authGroupData.input_schema.user_type,
@@ -828,12 +950,13 @@ export default {
     handleRedirectToDestination(userId) {
       redirectToDestination(
         userId,
+        this.userInformation?.display_id || null,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,
         this.$store.state.platform_link,
         this.$store.state.platform,
-        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name,
         this.$store.state.sessionData &&
           this.$store.state.sessionData.meta_data &&
           this.$store.state.sessionData.meta_data.test_type,

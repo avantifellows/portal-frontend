@@ -239,6 +239,11 @@ export default {
       return this.$store.state.locale;
     },
 
+    /** Returns the display ID shown to the user */
+    displayId() {
+      return this.userData["display_id"] || this.userData["user_id"] || "";
+    },
+
     /** Returns text based on locale */
     signInText() {
       return this.getLocale == "en"
@@ -249,15 +254,15 @@ export default {
     /** Returns text based on locale */
     idGeneratedText() {
       return this.getLocale == "en"
-        ? `Your ID is <b> ${this.userData["user_id"]}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
+        ? `Your ID is <b> ${this.displayId}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
         future sessions.`
-        : `आपकी आईडी <b> ${this.userData["user_id"]}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
+        : `आपकी आईडी <b> ${this.displayId}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
     },
     /** if ID already exists */
     idExistsText() {
       return this.getLocale == "en"
-        ? `You are already registered! Your ID is <b> ${this.userData["user_id"]}.</b>`
-        : `आप पहले से पंजीकृत हैं! आपकी आईडी <b> ${this.userData["user_id"]}</b> है|`;
+        ? `You are already registered! Your ID is <b> ${this.displayId}.</b>`
+        : `आप पहले से पंजीकृत हैं! आपकी आईडी <b> ${this.displayId}</b> है|`;
     },
     /** returns title for the form */
     formTitle() {
@@ -382,7 +387,23 @@ export default {
         });
       }
       this.isLoading = false;
-      this.userData["user_id"] = createdUser?.["user_id"] ?? "";
+      const createdUserId = createdUser?.["user_id"] ?? "";
+      const displayId = createdUser?.["display_id"] ?? createdUserId;
+      const displayIdType = createdUser?.["display_id_type"] ?? null;
+
+      this.userData["user_id"] = createdUserId;
+      if (createdUser?.student_id) {
+        this.userData["student_id"] = createdUser.student_id;
+      }
+      if (createdUser?.apaar_id) {
+        this.userData["apaar_id"] = createdUser.apaar_id;
+      }
+      if (displayId) {
+        this.userData["display_id"] = displayId;
+      }
+      if (displayIdType) {
+        this.userData["display_id_type"] = displayIdType;
+      }
       this.userData["already_exists"] =
         createdUser?.["already_exists"] ?? false;
 
@@ -401,12 +422,31 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      // create token only for gurukul
-      if (this.$store.state.platform == "gurukul") {
-        await TokenAPI.createAccessToken(
-          this.userData["user_id"],
-          this.$store.state.authGroupData.name
-        );
+      // create token only for gurukul and quiz -- only they provide logout as of now
+      if (
+        this.$store.state.platform == "gurukul" ||
+        this.$store.state.platform == "quiz"
+      ) {
+        const tokenIdentifiers = {
+          user_id: this.userData["user_id"] ?? null,
+          student_id: this.userData["student_id"] ?? null,
+          apaar_id: this.userData["apaar_id"] ?? null,
+          display_id: this.userData["display_id"] ?? null,
+          display_id_type: this.userData["display_id_type"] ?? null,
+        };
+
+        if (tokenIdentifiers.user_id) {
+          await TokenAPI.createAccessToken({
+            subjectId: tokenIdentifiers.user_id,
+            group: this.$store.state.authGroupData.name,
+            identifiers: tokenIdentifiers,
+          });
+        } else {
+          console.warn(
+            "Skipping token creation due to missing user identifier",
+            tokenIdentifiers
+          );
+        }
       }
 
       if (this.$store.state.platform != "gurukul") {
@@ -425,12 +465,13 @@ export default {
       if (
         redirectToDestination(
           this.userData["user_id"],
+          this.userData["display_id"] ?? null,
           this.$store.state.omrMode,
           this.$store.state.abTestId,
           this.$store.state.platform_id,
           this.$store.state.platform_link,
           this.$store.state.platform,
-          this.$store.state.authGroupData.input_schema.user_type,
+          this.$store.state.authGroupData.name,
           this.$store.state.sessionData &&
             this.$store.state.sessionData.meta_data &&
             this.$store.state.sessionData.meta_data.test_type,

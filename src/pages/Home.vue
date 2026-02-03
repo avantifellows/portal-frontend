@@ -156,6 +156,11 @@ export default {
       default: "",
       type: String,
     },
+    /** What the popup form ID is, if any. */
+    popup_form_id: {
+      default: "",
+      type: String,
+    },
     /** What the external platform link is. */
     platform_link: {
       default: "",
@@ -322,7 +327,9 @@ export default {
       }
 
       const popupFormId =
-        sessionDataFromStore.popup_form_id || this.$route.query.popup_form_id;
+        sessionDataFromStore.popup_form_id ||
+        this.popup_form_id ||
+        this.$route.query.popup_form_id;
       if (popupFormId) {
         query.popup_form_id = popupFormId;
       }
@@ -512,7 +519,7 @@ export default {
     // Initialize store with session/URL parameters
     this.initializeStore();
 
-    let [token_verified, user_id] = await TokenAPI.checkForTokens(
+    let [token_verified, user_id, token_data] = await TokenAPI.checkForTokens(
       this.authGroupData ? this.authGroupData.name : "default"
     );
     if (token_verified && this.isTypeSignIn) {
@@ -530,14 +537,14 @@ export default {
         this.sessionData && "session_id" in this.sessionData
           ? this.sessionData.session_id
           : "",
+        "", //phone number
         this.sessionData &&
           "meta_data" in this.sessionData &&
           "batch" in this.sessionData.meta_data
           ? this.sessionData.meta_data.batch
           : "",
-        "", //phone number
-        "",
-        "" // date of birth
+        "", // date of birth
+        "" // user ip address
       );
 
       if (this.sessionId != "") {
@@ -561,14 +568,13 @@ export default {
 
       redirectToDestination(
         user_id,
+        token_data?.display_id || null,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,
         this.$store.state.platform_link,
         this.$store.state.platform,
-        this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.user_type
-          : "student",
+        this.authGroupData ? this.authGroupData.name : this.authGroup,
         this.sessionData &&
           this.sessionData.meta_data &&
           this.sessionData.meta_data.test_type,

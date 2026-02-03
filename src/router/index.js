@@ -16,6 +16,7 @@ const allowedQueryParams = [
   "platform",
   "platform_id",
   "signup_form_id",
+  "popup_form_id",
   "type",
   "omrMode",
   "abTestId",
@@ -31,6 +32,8 @@ const LEGACY_ALLOWED_PARAMS = [
   "group", // maps to authGroup
   "sub_type", // ignored (deprecated)
 ];
+
+const SESSIONLESS_PLATFORMS = ["gurukul", "report", "teacher-web-app"];
 
 const routes = [
   {
@@ -52,6 +55,7 @@ const routes = [
       platform_id: route.query.platform_id,
       platform_link: route.query.platform_link,
       signup_form_id: route.query.signup_form_id,
+      popup_form_id: route.query.popup_form_id,
       testType: route.query.testType,
     }),
   },
@@ -161,8 +165,11 @@ router.beforeEach((to) => {
 
   // Prevent direct access to /form/:id without proper context
   if (to.name === "Information Form") {
-    // Check if accessing form directly without sessionId parameter
-    if (!to.query.sessionId) {
+    const hasSessionId = Boolean(to.query.sessionId);
+    const isSessionlessPlatform =
+      to.query.platform && SESSIONLESS_PLATFORMS.includes(to.query.platform);
+
+    if (!hasSessionId && !isSessionlessPlatform) {
       return {
         name: "Error",
         props: {

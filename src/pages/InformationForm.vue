@@ -1,4 +1,13 @@
 <template>
+  <div v-if="isSubmitting" class="fixed inset-0 z-50 bg-white bg-opacity-60">
+    <div class="flex mx-auto w-full h-full">
+      <inline-svg
+        class="text-black text-4xl m-auto animate-spin h-20 w-20"
+        :src="loadingSpinnerSvg"
+      />
+    </div>
+  </div>
+
   <!-- Loading State -->
   <div v-if="isLoading" class="h-full w-full fixed z-50">
     <div class="flex mx-auto w-full h-full">
@@ -62,7 +71,7 @@
 
       <button
         class="mt-[20px] w-full bg-primary disabled:bg-primary-hover hover:bg-primary-hover text-white mx-auto shadow-md p-2 rounded"
-        :disabled="buttonDisabled"
+        :disabled="buttonDisabled || isSubmitting"
         @click="profileDetails"
         v-html="startSessionText"
       />
@@ -72,6 +81,7 @@
 <script>
 import useAssets from "@/assets/assets.js";
 import FormSchemaAPI from "@/services/API/form.js";
+import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
@@ -94,6 +104,7 @@ export default {
       toast: useToast(),
       contextChecked: false, // Track if we've checked for store context
       isLoading: true, // Show loading state initially
+      isSubmitting: false,
       isAutoRedirecting: false, // Track if we're auto-redirecting due to empty form
     };
   },
@@ -115,8 +126,12 @@ export default {
     const hasSessionContext =
       this.$store.state.sessionData &&
       Object.keys(this.$store.state.sessionData).length > 0;
+    const sessionlessPlatforms = ["gurukul", "report", "teacher-web-app"];
+    const platform = this.$store.state.platform || this.$route.query.platform;
+    const isSessionlessFlow =
+      !this.sessionId && platform && sessionlessPlatforms.includes(platform);
 
-    if (!hasAuthContext || !hasSessionContext) {
+    if (!hasAuthContext || (!hasSessionContext && !isSessionlessFlow)) {
       // Context lost (likely due to page refresh) - redirect to error
       this.$router.push({
         name: "Error",
@@ -133,9 +148,15 @@ export default {
     /** Fetches all the fields that need to be filled by the student
     /* Also, maps each field to its input component
     */
+    const sessionData = this.$store.state.sessionData || {};
+    const metaData = sessionData.meta_data || {};
+    const numberOfFields = metaData.number_of_fields_in_popup_form ?? 5; // sessionless fallback
+    const popupFormId =
+      sessionData.popup_form_id || this.$route.query.popup_form_id || "";
+
     this.formSchemaData = await FormSchemaAPI.getFormFields(
-      this.$store.state.sessionData.meta_data.number_of_fields_in_popup_form,
-      this.$store.state.sessionData.popup_form_id,
+      numberOfFields,
+      popupFormId,
       this.id
     );
     if (this.formSchemaData.error) {
@@ -146,16 +167,6 @@ export default {
         draggable: false,
         closeButton: false,
       });
-    }
-    if (Object.keys(this.formSchemaData).length == 0) {
-      // Form is empty, user's profile is complete - auto-redirect
-      this.isAutoRedirecting = true;
-
-      // Small delay to show the redirect message, then redirect
-      setTimeout(() => {
-        this.redirect();
-      }, 1500);
-      return;
     }
     Object.keys(this.formSchemaData).forEach((field) => {
       this.formSchemaData[field]["component"] =
@@ -170,6 +181,20 @@ export default {
       this.formSchemaData[field]["multipleSelect"] =
         this.formSchemaData[field].multipleSelect == "TRUE" ? true : false;
     });
+
+    this.showBasedOn();
+
+    if (this.shouldAutoRedirect()) {
+      this.isAutoRedirecting = true;
+      this.isLoading = false;
+
+      // Small delay to show the redirect message, then redirect
+      setTimeout(() => {
+        this.redirect();
+      }, 500);
+      return;
+    }
+
     this.isUserDataIsComplete();
 
     // Form loaded successfully, stop loading
@@ -212,7 +237,22 @@ export default {
       return this.getLocale == "en" ? "Start Session" : "सत्र शुरू करें";
     },
   },
+  beforeRouteLeave(to, from, next) {
+    // example: when you click back button on your browser
+    TokenAPI.deleteCookies();
+    next();
+  },
   methods: {
+    /** Determine if user should skip directly to destination (no fields to show). */
+    shouldAutoRedirect() {
+      const fields = Object.values(this.formSchemaData || {});
+      if (fields.length === 0) {
+        return true;
+      }
+
+      return !fields.some((field) => field.show);
+    },
+
     /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formSchemaData).forEach((field) => {
@@ -280,11 +320,15 @@ export default {
       this.userData[key] = value;
     },
     async profileDetails() {
-      await UserAPI.completeProfile(
-        this.userData,
-        (this.userData["student_id"] = this.id)
-      );
-      this.redirect();
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
+      try {
+        this.userData["user_id"] = this.id;
+        await UserAPI.completeProfile(this.userData);
+        this.redirect();
+      } finally {
+        this.isSubmitting = false;
+      }
     },
 
     /** redirects to destination */
@@ -296,7 +340,7 @@ export default {
         this.$store.state.platform_id,
         this.$store.state.platform_link,
         this.$store.state.platform,
-        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name,
         this.$store.state.sessionData &&
           this.$store.state.sessionData.meta_data &&
           this.$store.state.sessionData.meta_data.test_type,
@@ -304,25 +348,36 @@ export default {
       );
 
       if (redirected) {
-        UserAPI.postUserSessionActivity(
-          this.id,
-          "popup_form",
-          this.$store.state.sessionData.session_id,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData.session_occurrence_id
-        );
+        const sessionData = this.$store.state.sessionData || {};
+        const sessionId =
+          sessionData.session_id ||
+          sessionData.sessionId ||
+          this.$route.query.sessionId ||
+          "";
+        const sessionOccurrenceId = sessionData.session_occurrence_id || "";
+
+        if (sessionId) {
+          UserAPI.postUserSessionActivity(
+            this.id,
+            "popup_form",
+            sessionId,
+            this.$store.state.authGroupData.input_schema.user_type,
+            sessionOccurrenceId
+          );
+        }
+
         sendSQSMessage(
           "popup_form",
           "", // deprecated sub_type
-          this.$store.state.sessionData.platform,
-          this.$store.state.sessionData.platform_id,
+          this.$store.state.platform,
+          this.$store.state.platform_id,
           this.id,
           "",
           this.$store.state.authGroupData.name,
           this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData.session_id,
+          sessionId,
           "phone" in this.userData ? this.userData["phone"] : "",
-          this.$store.state.sessionData.meta_data.batch,
+          sessionData.meta_data ? sessionData.meta_data.batch : "",
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }

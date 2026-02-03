@@ -5,60 +5,61 @@ import {
   verifyTokenEndpoint,
 } from "./endpoints";
 
-const TOKEN_COOKIE_OPTIONS = ["Path=/", "SameSite=None", "Secure"];
+const DEFAULT_COOKIE_DOMAIN = "avantifellows.org";
+const COOKIE_DOMAIN =
+  import.meta.env.VITE_APP_COOKIE_DOMAIN || DEFAULT_COOKIE_DOMAIN;
 
-const isTopLevelDomainHost = () => {
-  if (typeof window === "undefined" || !window.location?.hostname) {
-    return false;
+function isLocalHostname(hostname) {
+  if (!hostname) return true;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return true;
   }
-  return window.location.hostname.endsWith("avantifellows.org");
-};
-
-const setTokenCookie = (name, value) => {
-  if (typeof document === "undefined") return;
-
-  const encodedValue = encodeURIComponent(value);
-  const baseAttributes = TOKEN_COOKIE_OPTIONS.join("; ");
-
-  document.cookie = `${name}=${encodedValue}; ${baseAttributes}`;
-
-  if (isTopLevelDomainHost()) {
-    document.cookie = `${name}=${encodedValue}; Domain=.avantifellows.org; ${baseAttributes}`;
+  if (hostname === "::1" || hostname === "0.0.0.0") {
+    return true;
   }
-};
+  return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+}
 
-const clearTokenCookie = (name) => {
-  if (typeof document === "undefined") return;
-
-  const expiredAttributes = [
-    ...TOKEN_COOKIE_OPTIONS,
-    "Expires=Thu, 01 Jan 1970 00:00:01 GMT",
-  ].join("; ");
-
-  document.cookie = `${name}=; ${expiredAttributes}`;
-
-  if (isTopLevelDomainHost()) {
-    document.cookie = `${name}=; Domain=.avantifellows.org; ${expiredAttributes}`;
+function resolveCookieDomain(hostname) {
+  if (isLocalHostname(hostname)) return "";
+  if (hostname === COOKIE_DOMAIN || hostname.endsWith(`.${COOKIE_DOMAIN}`)) {
+    return COOKIE_DOMAIN;
   }
-};
+  return "";
+}
 
-const persistToken = (key, value) => {
-  if (typeof window === "undefined" || !window.localStorage) return;
-  try {
-    window.localStorage.setItem(key, value);
-  } catch (error) {
-    console.warn("Unable to persist token in localStorage", error);
-  }
-};
+function buildCookieAttributes() {
+  const hostname = window.location.hostname;
+  const isLocal = isLocalHostname(hostname);
+  const isSecure = window.location.protocol === "https:";
+  const domain = resolveCookieDomain(hostname);
+  const sameSite = !isLocal && isSecure ? "None" : "Lax";
+  const attributes = [`Path=/`, `SameSite=${sameSite}`];
 
-const removePersistedToken = (key) => {
-  if (typeof window === "undefined" || !window.localStorage) return;
-  try {
-    window.localStorage.removeItem(key);
-  } catch (error) {
-    console.warn("Unable to clear token from localStorage", error);
+  if (isSecure) {
+    attributes.push("Secure");
   }
-};
+  if (domain) {
+    attributes.push(`Domain=${domain}`);
+  }
+
+  return attributes.join("; ");
+}
+
+function setCookie(name, value) {
+  document.cookie = `${name}=${value}; ${buildCookieAttributes()}`;
+}
+
+function clearCookie(name) {
+  const hostname = window.location.hostname;
+  const expires = "Expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  const domain = resolveCookieDomain(hostname);
+
+  document.cookie = `${name}=; ${expires}; Path=/`;
+  if (domain) {
+    document.cookie = `${name}=; ${expires}; Path=/; Domain=${domain}`;
+  }
+}
 
 export default {
   /**
@@ -121,14 +122,13 @@ export default {
           const refreshToken = response.data.refresh_token;
 
           if (accessToken) {
-            setTokenCookie("access_token", accessToken);
-            persistToken("access_token", accessToken);
+            setCookie("access_token", accessToken);
           }
 
           if (refreshToken) {
-            setTokenCookie("refresh_token", refreshToken);
-            persistToken("refresh_token", refreshToken);
+            setCookie("refresh_token", refreshToken);
           }
+
           resolve();
         })
         .catch((error) => {
@@ -167,9 +167,7 @@ export default {
             return;
           }
 
-          setTokenCookie("access_token", newAccessToken);
-          persistToken("access_token", newAccessToken);
-
+          setCookie("access_token", newAccessToken);
           const verifyResult = await this.verifyToken(
             newAccessToken,
             refresh_token,
@@ -234,10 +232,8 @@ export default {
    */
 
   deleteCookies() {
-    clearTokenCookie("access_token");
-    clearTokenCookie("refresh_token");
-    removePersistedToken("access_token");
-    removePersistedToken("refresh_token");
+    clearCookie("access_token");
+    clearCookie("refresh_token");
   },
 
   /**

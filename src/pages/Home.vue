@@ -156,6 +156,11 @@ export default {
       default: "",
       type: String,
     },
+    /** What the popup form ID is, if any. */
+    popup_form_id: {
+      default: "",
+      type: String,
+    },
     /** What the external platform link is. */
     platform_link: {
       default: "",
@@ -304,6 +309,40 @@ export default {
   methods: {
     setState() {
       this.isLoading = false;
+    },
+
+    buildPopupFormQuery() {
+      const query = {};
+      const sessionDataFromStore = this.$store.state.sessionData || {};
+
+      if (sessionDataFromStore.sessionId) {
+        query.sessionId = sessionDataFromStore.sessionId;
+      } else if (this.sessionId) {
+        query.sessionId = this.sessionId;
+      }
+
+      const platformQuery = this.$store.state.platform || this.platform;
+      if (platformQuery) {
+        query.platform = platformQuery;
+      }
+
+      const popupFormId =
+        sessionDataFromStore.popup_form_id ||
+        this.popup_form_id ||
+        this.$route.query.popup_form_id;
+      if (popupFormId) {
+        query.popup_form_id = popupFormId;
+      }
+
+      if (this.$route.query.popup_form) {
+        query.popup_form = this.$route.query.popup_form;
+      }
+
+      if (this.$route.query.authGroup) {
+        query.authGroup = this.$route.query.authGroup;
+      }
+
+      return query;
     },
 
     /** Initialize store with session/URL parameters */
@@ -498,14 +537,14 @@ export default {
         this.sessionData && "session_id" in this.sessionData
           ? this.sessionData.session_id
           : "",
+        "", //phone number
         this.sessionData &&
           "meta_data" in this.sessionData &&
           "batch" in this.sessionData.meta_data
           ? this.sessionData.meta_data.batch
           : "",
-        "", //phone number
-        "",
-        "" // date of birth
+        "", // date of birth
+        "" // user ip address
       );
 
       if (this.sessionId != "") {
@@ -519,6 +558,14 @@ export default {
         );
       }
 
+      if (this.isPopUpFormEnabled) {
+        this.$router.push({
+          path: `/form/${user_id}`,
+          query: this.buildPopupFormQuery(),
+        });
+        return;
+      }
+
       redirectToDestination(
         user_id,
         this.$store.state.omrMode,
@@ -526,9 +573,7 @@ export default {
         this.$store.state.platform_id,
         this.$store.state.platform_link,
         this.$store.state.platform,
-        this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.user_type
-          : "student",
+        this.authGroupData ? this.authGroupData.name : this.authGroup,
         this.sessionData &&
           this.sessionData.meta_data &&
           this.sessionData.meta_data.test_type,

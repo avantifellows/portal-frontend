@@ -335,6 +335,7 @@ export default {
     redirect() {
       const redirected = redirectToDestination(
         this.id,
+        this.userData?.display_id || null,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,

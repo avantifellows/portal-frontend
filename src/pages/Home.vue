@@ -519,7 +519,7 @@ export default {
     // Initialize store with session/URL parameters
     this.initializeStore();
 
-    let [token_verified, user_id] = await TokenAPI.checkForTokens(
+    let [token_verified, user_id, token_data] = await TokenAPI.checkForTokens(
       this.authGroupData ? this.authGroupData.name : "default"
     );
     if (token_verified && this.isTypeSignIn) {
@@ -568,6 +568,7 @@ export default {
 
       redirectToDestination(
         user_id,
+        token_data?.display_id || null,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,

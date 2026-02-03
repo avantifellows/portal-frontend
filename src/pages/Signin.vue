@@ -950,6 +950,7 @@ export default {
     handleRedirectToDestination(userId) {
       redirectToDestination(
         userId,
+        this.userInformation?.display_id || null,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,

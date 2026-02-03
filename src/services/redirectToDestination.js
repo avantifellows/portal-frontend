@@ -3,6 +3,7 @@ import abTestService from "@/services/API/abTestData";
 
 /** Redirects user to the appropriate destination platform
  * @param {String} userId - user ID for authentication
+ * @param {String} [displayId] - display ID for user-facing contexts
  * @param {Boolean} omrMode - whether OMR mode is enabled
  * @param {String} abTestId - A/B test identifier
  * @param {String} redirectId - platform-specific ID
@@ -15,6 +16,7 @@ import abTestService from "@/services/API/abTestData";
 
 export async function redirectToDestination(
   userId,
+  displayId,
   omrMode,
   abTestId,
   redirectId,
@@ -24,6 +26,7 @@ export async function redirectToDestination(
   testType,
   urlTestType
 ) {
+  const reportDisplayId = displayId || userId;
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
@@ -43,7 +46,7 @@ export async function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
-        unique_id: userId,
+        unique_id: reportDisplayId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -53,7 +56,7 @@ export async function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_SCERT_API_KEY,
-        unique_id: userId,
+        unique_id: reportDisplayId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -99,7 +102,7 @@ export async function redirectToDestination(
         }
       }
 
-      fullURL = redirectURL + "/" + redirectId + "/" + userId;
+      fullURL = redirectURL + "/" + redirectId + "/" + reportDisplayId;
       break;
     }
     case "meet": {

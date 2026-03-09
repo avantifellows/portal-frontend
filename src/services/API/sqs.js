@@ -32,23 +32,25 @@ export function sendSQSMessage(
   userIpAddress
 ) {
   return new Promise((resolve) => {
+    const payload = {
+      type,
+      sub_type: sub_type || "",
+      platform,
+      platform_id: platformId,
+      user_id: userId,
+      auth_type: authType,
+      auth_group: authGroup,
+      user_type: userType,
+      session_id: sessionId,
+      user_ip_address: userIpAddress || "",
+      phone_number: phoneNumber || "",
+      batch: batch || "",
+      date_of_birth: dateOfBirth || "",
+      user_validated: true,
+    };
+
     fastAPIClient
-      .post("/user-session/send-message", {
-        type,
-        sub_type: sub_type || "",
-        platform,
-        platform_id: platformId,
-        user_id: userId,
-        auth_type: authType,
-        auth_group: authGroup,
-        user_type: userType,
-        session_id: sessionId,
-        user_ip_address: userIpAddress || "",
-        phone_number: phoneNumber || "",
-        batch: batch || "",
-        date_of_birth: dateOfBirth || "",
-        user_validated: true,
-      })
+      .post("/user-session/send-message", payload)
       .then((response) => {
         resolve(response.data);
       })

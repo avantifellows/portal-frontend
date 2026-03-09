@@ -29,16 +29,16 @@ export default {
   /** Returns fields that are to be completed by the student
    * @param {Number} numberOfFields - number of fields to show the user
    * @param {String} formId - ID of the form
-   * @param {String} studentId - student ID
+   * @param {String} userId - canonical user ID
    */
-  getFormFields(numberOfFields, formId, studentId) {
+  getFormFields(numberOfFields, formId, userId) {
     return new Promise((resolve) => {
       fastAPIClient
         .get("/form-schema/student", {
           params: {
             number_of_fields_in_popup_form: numberOfFields,
             form_id: formId,
-            student_id: studentId,
+            user_id: userId,
           },
         })
         .then((response) => {

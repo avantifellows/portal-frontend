@@ -392,9 +392,11 @@ export default {
       // Auth group images
       this.$store.dispatch(
         "setImages",
-        this.authGroupData &&
-          this.authGroupData.input_schema &&
-          this.authGroupData.input_schema.images
+        this.sessionId === "DelhiStudents_DelhiStudents_12_24_A003_86549"
+          ? []
+          : this.authGroupData &&
+            this.authGroupData.input_schema &&
+            this.authGroupData.input_schema.images
           ? this.authGroupData.input_schema.images.split(",")
           : []
       );

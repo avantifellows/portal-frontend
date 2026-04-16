@@ -86,6 +86,7 @@ import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 import LocalePicker from "../components/LocalePicker.vue";
 import { useToast } from "vue-toastification";
 
@@ -379,7 +380,7 @@ export default {
           this.$store.state.authGroupData.input_schema.user_type,
           sessionId,
           "phone" in this.userData ? this.userData["phone"] : "",
-          sessionData.meta_data ? sessionData.meta_data.batch : "",
+          getSessionBatchIdentifier(sessionData),
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }

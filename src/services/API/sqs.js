@@ -11,10 +11,10 @@ import { fastAPIClient } from "@/services/API/rootClient.js";
  * @param {String} authGroup
  * @param {String} userType
  * @param {String} sessionId
- * @param {String} userIpAddress
  * @param {String} phoneNumber
  * @param {String} batch
  * @param {String} dateOfBirth
+ * @param {String} userIpAddress
  */
 export function sendSQSMessage(
   type,

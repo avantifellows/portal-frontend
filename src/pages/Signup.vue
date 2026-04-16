@@ -114,6 +114,8 @@ import UserAPI from "@/services/API/user.js";
 import FormAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
+import { useToast } from "vue-toastification";
 import LocalePicker from "../components/LocalePicker.vue";
 import PrivacyPolicyCheckbox from "@/components/PrivacyPolicyCheckbox.vue";
 
@@ -136,6 +138,7 @@ export default {
       userId: "",
       formData: {},
       privacyPolicyAccepted: true, // privacy policy checkbox state (default: checked)
+      toast: useToast(),
     };
   },
   async created() {
@@ -373,13 +376,24 @@ export default {
       );
 
       if (createdUser == "" || createdUser.error || createdUser == null) {
+        const errorText =
+          createdUser?.error?.response?.data?.detail ||
+          "ID could not be created. Please contact your program manager.";
+
+        this.formSubmitted = false;
+        this.isLoading = false;
+        this.toast.error(errorText, {
+          position: "top-center",
+          timeout: 6000,
+        });
         this.$router.push({
           name: "Error",
           state: {
             type: "500",
-            text: "ID could not be created. Please contact your program manager.",
+            text: errorText,
           },
         });
+        return;
       }
       this.isLoading = false;
       this.userData["user_id"] = createdUser?.["user_id"] ?? "";
@@ -397,7 +411,7 @@ export default {
         this.$store.state.authGroupData.input_schema.user_type,
         this.$store.state.sessionData.session_id ?? "",
         "phone" in this.userData ? this.userData["phone"] : "",
-        this.$store.state.sessionData.meta_data?.batch ?? "",
+        getSessionBatchIdentifier(this.$store.state.sessionData),
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
@@ -458,7 +472,7 @@ export default {
           this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.sessionData.session_id ?? "",
           "phone" in this.userData ? this.userData["phone"] : "",
-          this.$store.state.sessionData.meta_data?.batch ?? "", // for gurukul
+          getSessionBatchIdentifier(this.$store.state.sessionData), // for gurukul
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }

@@ -60,6 +60,7 @@ import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 
 import useAssets from "@/assets/assets.js";
 
@@ -532,11 +533,7 @@ export default {
         this.sessionData && "session_id" in this.sessionData
           ? this.sessionData.session_id
           : "",
-        this.sessionData &&
-          "meta_data" in this.sessionData &&
-          "batch" in this.sessionData.meta_data
-          ? this.sessionData.meta_data.batch
-          : "",
+        getSessionBatchIdentifier(this.sessionData),
         "", //phone number
         "",
         "" // date of birth

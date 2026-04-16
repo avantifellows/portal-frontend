@@ -366,10 +366,6 @@ export default {
       }
       return true;
     },
-    getBatch() {
-      return getSessionBatchIdentifier(this.$store.state.sessionData || {});
-    },
-
     /** Check if auth type includes phone number authentication */
     includesPhoneAuth() {
       return this.auth_type.includes("PH");
@@ -393,6 +389,10 @@ export default {
     },
   },
   methods: {
+    getBatch() {
+      return getSessionBatchIdentifier(this.$store.state.sessionData || {});
+    },
+
     /** Resets the invalid login message to empty string */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";

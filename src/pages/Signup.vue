@@ -111,7 +111,7 @@ import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
-import { buildAuthContext } from "@/services/authContext";
+import { buildHydratedAuthContext } from "@/services/hydrateAuthContext";
 import FormAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
@@ -437,7 +437,7 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      const authContext = buildAuthContext({
+      const authContext = await buildHydratedAuthContext({
         userInformation: this.userData,
         identifiers: {
           user_id: this.userData["user_id"] ?? null,
@@ -452,6 +452,7 @@ export default {
         },
         group: this.$store.state.authGroupData.name,
         userType: this.$store.state.authGroupData.input_schema.user_type,
+        platform: this.$store.state.platform,
       });
 
       if (this.$store.state.platform == "gurukul" && authContext) {
@@ -475,7 +476,7 @@ export default {
 
     /** redirects to destination */
     async redirect() {
-      const authContext = buildAuthContext({
+      const authContext = await buildHydratedAuthContext({
         userInformation: this.userData,
         identifiers: {
           user_id: this.userData["user_id"] ?? null,
@@ -490,6 +491,7 @@ export default {
         },
         group: this.$store.state.authGroupData.name,
         userType: this.$store.state.authGroupData.input_schema.user_type,
+        platform: this.$store.state.platform,
       });
 
       const redirected = await redirectToDestination(

@@ -195,7 +195,7 @@ import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import OTPAuth from "@/services/API/otp.js";
-import { buildAuthContext } from "@/services/authContext";
+import { buildHydratedAuthContext } from "@/services/hydrateAuthContext";
 import {
   mapVerifyStatusCodeToMessage,
   mapSendStatusCodeToMessage,
@@ -592,11 +592,12 @@ export default {
           throw new Error("Missing canonical user identifier for OTP flow");
         }
 
-        const authContext = buildAuthContext({
+        const authContext = await buildHydratedAuthContext({
           userInformation: this.userInformation,
           identifiers: tokenIdentifiers,
           group: this.$store.state.authGroupData.name,
           userType: this.$store.state.authGroupData.input_schema.user_type,
+          platform: this.$store.state.platform,
         });
 
         if (this.$store.state.platform == "gurukul" && authContext) {
@@ -827,19 +828,20 @@ export default {
           this.userInformation["display_id_type"] =
             tokenIdentifiers.display_id_type;
 
-          const authContext = buildAuthContext({
-            userInformation: this.userInformation,
-            identifiers: tokenIdentifiers,
-            group: this.$store.state.authGroupData.name,
-            userType: this.$store.state.authGroupData.input_schema.user_type,
-          });
-
           if ("phone" in this.userInformation) {
             this.pendingTokenIdentifiers = tokenIdentifiers;
             this.phoneVerified = true;
             this.showOTPFlow = true;
             return; // Don't proceed with normal auth - wait for OTP verification
           }
+
+          const authContext = await buildHydratedAuthContext({
+            userInformation: this.userInformation,
+            identifiers: tokenIdentifiers,
+            group: this.$store.state.authGroupData.name,
+            userType: this.$store.state.authGroupData.input_schema.user_type,
+            platform: this.$store.state.platform,
+          });
 
           if (this.$store.state.platform == "gurukul" && authContext) {
             await TokenAPI.createAccessToken({

@@ -60,6 +60,7 @@ import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 
 import useAssets from "@/assets/assets.js";
 
@@ -399,9 +400,11 @@ export default {
       // Auth group images
       this.$store.dispatch(
         "setImages",
-        this.authGroupData &&
-          this.authGroupData.input_schema &&
-          this.authGroupData.input_schema.images
+        this.sessionId === "DelhiStudents_DelhiStudents_12_24_A003_86549"
+          ? []
+          : this.authGroupData &&
+            this.authGroupData.input_schema &&
+            this.authGroupData.input_schema.images
           ? this.authGroupData.input_schema.images.split(",")
           : []
       );
@@ -537,14 +540,10 @@ export default {
         this.sessionData && "session_id" in this.sessionData
           ? this.sessionData.session_id
           : "",
+        getSessionBatchIdentifier(this.sessionData),
         "", //phone number
-        this.sessionData &&
-          "meta_data" in this.sessionData &&
-          "batch" in this.sessionData.meta_data
-          ? this.sessionData.meta_data.batch
-          : "",
-        "", // date of birth
-        "" // user ip address
+        "",
+        "" // date of birth
       );
 
       if (this.sessionId != "") {

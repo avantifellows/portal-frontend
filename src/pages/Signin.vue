@@ -191,6 +191,7 @@ import { authToInputParameters } from "@/services/authToInputParameters";
 import { validateUser } from "@/services/authValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
+import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import OTPAuth from "@/services/API/otp.js";
@@ -367,14 +368,6 @@ export default {
       }
       return true;
     },
-    getBatch() {
-      return "sessionData" in this.$store.state &&
-        "meta_data" in this.$store.state.sessionData &&
-        "batch" in this.$store.state.sessionData.meta_data
-        ? this.$store.state.sessionData.meta_data.batch
-        : "";
-    },
-
     /** Check if auth type includes phone number authentication */
     includesPhoneAuth() {
       return this.auth_type.includes("PH");
@@ -398,6 +391,10 @@ export default {
     },
   },
   methods: {
+    getBatch() {
+      return getSessionBatchIdentifier(this.$store.state.sessionData || {});
+    },
+
     /** Resets the invalid login message to empty string */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
@@ -683,7 +680,7 @@ export default {
             ? this.$store.state.sessionData.session_id
             : "",
           this.userInformation.phone,
-          this.getBatch,
+          this.getBatch(),
           "" // date of birth
         );
 
@@ -860,7 +857,7 @@ export default {
               "phone" in this.userInformation
                 ? this.userInformation["phone"]
                 : "",
-              this.getBatch,
+              this.getBatch(),
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]
                 : ""
@@ -931,7 +928,7 @@ export default {
               "phone" in this.userInformation
                 ? this.userInformation["phone"]
                 : "",
-              this.getBatch,
+              this.getBatch(),
               "date_of_birth" in this.userInformation
                 ? this.userInformation["date_of_birth"]
                 : ""

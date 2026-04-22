@@ -180,9 +180,31 @@ export async function validateUser(
   }
 
   if (userType == "school" && authTypes.includes("CODE")) {
-    user["isCodeValid"] = await userAPI.verifySchool({
+    const verificationResult = await userAPI.verifySchool({
       code: userInformation["code"],
     });
+
+    const isValid = Boolean(verificationResult && verificationResult.is_valid);
+    user["isCodeValid"] = isValid;
+
+    if (isValid) {
+      const identifiers = sanitizeIdentifiers({
+        user_id:
+          verificationResult.user_id ??
+          userInformation["user_id"] ??
+          userInformation["code"] ??
+          null,
+        display_id:
+          verificationResult.display_id ?? userInformation["code"] ?? null,
+        display_id_type: verificationResult.display_id_type ?? "school_code",
+      });
+
+      if (identifiers) {
+        identifiers.school_code =
+          verificationResult.school_code ?? userInformation["code"] ?? null;
+        user["identifiers"] = identifiers;
+      }
+    }
   }
 
   return user;

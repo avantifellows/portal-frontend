@@ -195,6 +195,7 @@ import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import OTPAuth from "@/services/API/otp.js";
+import { buildAuthContext } from "@/services/authContext";
 import {
   mapVerifyStatusCodeToMessage,
   mapSendStatusCodeToMessage,
@@ -575,6 +576,12 @@ export default {
         const tokenIdentifiers = this.pendingTokenIdentifiers || {
           student_id: this.userInformation["student_id"] ?? null,
           apaar_id: this.userInformation["apaar_id"] ?? null,
+          teacher_id: this.userInformation["teacher_id"] ?? null,
+          candidate_id: this.userInformation["candidate_id"] ?? null,
+          school_code:
+            this.userInformation["school_code"] ??
+            this.userInformation["code"] ??
+            null,
           user_id: this.userInformation["user_id"] ?? fallbackUserId,
           display_id: this.userInformation["display_id"] ?? fallbackUserId,
           display_id_type: this.userInformation["display_id_type"] ?? null,
@@ -585,16 +592,16 @@ export default {
           throw new Error("Missing canonical user identifier for OTP flow");
         }
 
-        // create token only for gurukul and quiz -- only they provide logout as of now
-        if (
-          (this.$store.state.platform == "gurukul" ||
-            this.$store.state.platform == "quiz") &&
-          tokenIdentifiers.user_id
-        ) {
+        const authContext = buildAuthContext({
+          userInformation: this.userInformation,
+          identifiers: tokenIdentifiers,
+          group: this.$store.state.authGroupData.name,
+          userType: this.$store.state.authGroupData.input_schema.user_type,
+        });
+
+        if (this.$store.state.platform == "gurukul" && authContext) {
           await TokenAPI.createAccessToken({
-            subjectId: tokenIdentifiers.user_id,
-            group: this.$store.state.authGroupData.name,
-            identifiers: tokenIdentifiers,
+            ...authContext,
           });
         }
 
@@ -694,7 +701,7 @@ export default {
           );
         }
 
-        this.handleRedirectToDestination(canonicalUserId);
+        await this.handleRedirectToDestination(canonicalUserId, authContext);
       } catch (error) {
         console.error("Complete phone authentication error:", error);
         this.displayOTPMessage = {
@@ -786,6 +793,19 @@ export default {
           const tokenIdentifiers = {
             student_id: identifierBundle.student_id ?? null,
             apaar_id: identifierBundle.apaar_id ?? null,
+            teacher_id:
+              identifierBundle.teacher_id ??
+              this.userInformation["teacher_id"] ??
+              null,
+            candidate_id:
+              identifierBundle.candidate_id ??
+              this.userInformation["candidate_id"] ??
+              null,
+            school_code:
+              identifierBundle.school_code ??
+              this.userInformation["school_code"] ??
+              this.userInformation["code"] ??
+              null,
             user_id:
               identifierBundle.user_id ??
               this.userInformation["user_id"] ??
@@ -807,6 +827,13 @@ export default {
           this.userInformation["display_id_type"] =
             tokenIdentifiers.display_id_type;
 
+          const authContext = buildAuthContext({
+            userInformation: this.userInformation,
+            identifiers: tokenIdentifiers,
+            group: this.$store.state.authGroupData.name,
+            userType: this.$store.state.authGroupData.input_schema.user_type,
+          });
+
           if ("phone" in this.userInformation) {
             this.pendingTokenIdentifiers = tokenIdentifiers;
             this.phoneVerified = true;
@@ -814,16 +841,9 @@ export default {
             return; // Don't proceed with normal auth - wait for OTP verification
           }
 
-          // create token only for gurukul and quiz -- only they provide logout as of now
-          if (
-            (this.$store.state.platform == "gurukul" ||
-              this.$store.state.platform == "quiz") &&
-            tokenIdentifiers.user_id
-          ) {
+          if (this.$store.state.platform == "gurukul" && authContext) {
             await TokenAPI.createAccessToken({
-              subjectId: tokenIdentifiers.user_id,
-              group: this.$store.state.authGroupData.name,
-              identifiers: tokenIdentifiers,
+              ...authContext,
             });
           }
 
@@ -933,7 +953,7 @@ export default {
                 ? this.userInformation["date_of_birth"]
                 : ""
             );
-            this.handleRedirectToDestination(userId);
+            await this.handleRedirectToDestination(userId, authContext);
           }
         }
       } finally {
@@ -944,8 +964,8 @@ export default {
     /**
      * Handles redirection to destination with consistent parameters
      */
-    handleRedirectToDestination(userId) {
-      redirectToDestination(
+    handleRedirectToDestination(userId, authContext = null) {
+      return redirectToDestination(
         userId,
         this.userInformation?.display_id || null,
         this.$store.state.omrMode,
@@ -957,7 +977,8 @@ export default {
         this.$store.state.sessionData &&
           this.$store.state.sessionData.meta_data &&
           this.$store.state.sessionData.meta_data.test_type,
-        this.$route.query.testType
+        this.$route.query.testType,
+        authContext
       );
     },
 

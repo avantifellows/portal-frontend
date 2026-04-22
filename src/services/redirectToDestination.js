@@ -1,5 +1,6 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 import abTestService from "@/services/API/abTestData";
+import TokenAPI from "@/services/API/token";
 
 /** Redirects user to the appropriate destination platform
  * @param {String} userId - user ID for authentication
@@ -24,7 +25,8 @@ export async function redirectToDestination(
   redirectTo,
   group,
   testType,
-  urlTestType
+  urlTestType,
+  launchContext = null
 ) {
   const reportDisplayId = displayId || userId;
   let redirectURL = "";
@@ -39,6 +41,22 @@ export async function redirectToDestination(
   if (redirectTo === "quiz" && effectiveTestType === "form") {
     actualRedirectTo = "form";
   }
+
+  const buildLaunchToken = async (audience) => {
+    if (!launchContext?.subjectId || !launchContext?.group) {
+      return null;
+    }
+
+    const tokenResponse = await TokenAPI.createLaunchToken({
+      subjectId: launchContext.subjectId,
+      group: launchContext.group,
+      identifiers: launchContext.identifiers || {},
+      profile: launchContext.profile || null,
+      audience,
+    });
+
+    return tokenResponse?.access_token || null;
+  };
 
   switch (actualRedirectTo) {
     case "AF-plio": {
@@ -64,10 +82,18 @@ export async function redirectToDestination(
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
       let url = new URL(redirectURL + redirectId);
+      const launchToken = await buildLaunchToken("quiz");
+
+      if (!launchToken) {
+        console.error("Unable to mint quiz launch token", launchContext);
+        return false;
+      }
+
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         omrMode: omrMode,
         fromPortal: true,
+        launchToken,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -75,11 +101,19 @@ export async function redirectToDestination(
     case "form": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_FORM;
       let url = new URL(redirectURL + redirectId);
+      const launchToken = await buildLaunchToken("form");
+
+      if (!launchToken) {
+        console.error("Unable to mint form launch token", launchContext);
+        return false;
+      }
+
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         fromPortal: true,
         singlePageMode: true,
         autoStart: true,
+        launchToken,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -102,7 +136,19 @@ export async function redirectToDestination(
         }
       }
 
-      fullURL = redirectURL + "/" + redirectId + "/" + reportDisplayId;
+      const launchToken = await buildLaunchToken("report");
+
+      if (!launchToken) {
+        console.error("Unable to mint report launch token", launchContext);
+        return false;
+      }
+
+      const reportUrl = new URL(`${redirectURL}/${redirectId}`);
+      reportUrl.searchParams.set("launchToken", launchToken);
+      if (reportDisplayId) {
+        reportUrl.searchParams.set("displayId", reportDisplayId);
+      }
+      fullURL = reportUrl.toString();
       break;
     }
     case "meet": {

@@ -84,6 +84,7 @@ import FormSchemaAPI from "@/services/API/form.js";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
+import { buildAuthContext } from "@/services/authContext";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
@@ -326,15 +327,26 @@ export default {
       try {
         this.userData["user_id"] = this.id;
         await UserAPI.completeProfile(this.userData);
-        this.redirect();
+        await this.redirect();
       } finally {
         this.isSubmitting = false;
       }
     },
 
     /** redirects to destination */
-    redirect() {
-      const redirected = redirectToDestination(
+    async redirect() {
+      const authContext = buildAuthContext({
+        userInformation: this.userData,
+        identifiers: {
+          user_id: this.id,
+          display_id: this.userData?.display_id || null,
+          display_id_type: this.userData?.display_id_type || null,
+        },
+        group: this.$store.state.authGroupData.name,
+        userType: this.$store.state.authGroupData.input_schema.user_type,
+      });
+
+      const redirected = await redirectToDestination(
         this.id,
         this.userData?.display_id || null,
         this.$store.state.omrMode,
@@ -346,7 +358,8 @@ export default {
         this.$store.state.sessionData &&
           this.$store.state.sessionData.meta_data &&
           this.$store.state.sessionData.meta_data.test_type,
-        this.$route.query.testType
+        this.$route.query.testType,
+        authContext
       );
 
       if (redirected) {

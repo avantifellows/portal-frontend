@@ -111,6 +111,7 @@ import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
+import { buildAuthContext } from "@/services/authContext";
 import FormAPI from "@/services/API/form.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
@@ -436,31 +437,29 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      // create token only for gurukul and quiz -- only they provide logout as of now
-      if (
-        this.$store.state.platform == "gurukul" ||
-        this.$store.state.platform == "quiz"
-      ) {
-        const tokenIdentifiers = {
+      const authContext = buildAuthContext({
+        userInformation: this.userData,
+        identifiers: {
           user_id: this.userData["user_id"] ?? null,
           student_id: this.userData["student_id"] ?? null,
           apaar_id: this.userData["apaar_id"] ?? null,
+          teacher_id: this.userData["teacher_id"] ?? null,
+          candidate_id: this.userData["candidate_id"] ?? null,
+          school_code:
+            this.userData["school_code"] ?? this.userData["code"] ?? null,
           display_id: this.userData["display_id"] ?? null,
           display_id_type: this.userData["display_id_type"] ?? null,
-        };
+        },
+        group: this.$store.state.authGroupData.name,
+        userType: this.$store.state.authGroupData.input_schema.user_type,
+      });
 
-        if (tokenIdentifiers.user_id) {
-          await TokenAPI.createAccessToken({
-            subjectId: tokenIdentifiers.user_id,
-            group: this.$store.state.authGroupData.name,
-            identifiers: tokenIdentifiers,
-          });
-        } else {
-          console.warn(
-            "Skipping token creation due to missing user identifier",
-            tokenIdentifiers
-          );
-        }
+      if (this.$store.state.platform == "gurukul" && authContext) {
+        await TokenAPI.createAccessToken({
+          ...authContext,
+        });
+      } else if (!authContext) {
+        console.warn("Skipping token creation due to missing auth context");
       }
 
       if (this.$store.state.platform != "gurukul") {
@@ -475,23 +474,41 @@ export default {
     },
 
     /** redirects to destination */
-    redirect() {
-      if (
-        redirectToDestination(
-          this.userData["user_id"],
-          this.userData["display_id"] ?? null,
-          this.$store.state.omrMode,
-          this.$store.state.abTestId,
-          this.$store.state.platform_id,
-          this.$store.state.platform_link,
-          this.$store.state.platform,
-          this.$store.state.authGroupData.name,
-          this.$store.state.sessionData &&
-            this.$store.state.sessionData.meta_data &&
-            this.$store.state.sessionData.meta_data.test_type,
-          this.$route.query.testType
-        )
-      ) {
+    async redirect() {
+      const authContext = buildAuthContext({
+        userInformation: this.userData,
+        identifiers: {
+          user_id: this.userData["user_id"] ?? null,
+          student_id: this.userData["student_id"] ?? null,
+          apaar_id: this.userData["apaar_id"] ?? null,
+          teacher_id: this.userData["teacher_id"] ?? null,
+          candidate_id: this.userData["candidate_id"] ?? null,
+          school_code:
+            this.userData["school_code"] ?? this.userData["code"] ?? null,
+          display_id: this.userData["display_id"] ?? null,
+          display_id_type: this.userData["display_id_type"] ?? null,
+        },
+        group: this.$store.state.authGroupData.name,
+        userType: this.$store.state.authGroupData.input_schema.user_type,
+      });
+
+      const redirected = await redirectToDestination(
+        this.userData["user_id"],
+        this.userData["display_id"] ?? null,
+        this.$store.state.omrMode,
+        this.$store.state.abTestId,
+        this.$store.state.platform_id,
+        this.$store.state.platform_link,
+        this.$store.state.platform,
+        this.$store.state.authGroupData.name,
+        this.$store.state.sessionData &&
+          this.$store.state.sessionData.meta_data &&
+          this.$store.state.sessionData.meta_data.test_type,
+        this.$route.query.testType,
+        authContext
+      );
+
+      if (redirected) {
         if (this.$store.state.platform != "gurukul") {
           UserAPI.postUserSessionActivity(
             this.userData["user_id"],

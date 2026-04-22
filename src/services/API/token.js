@@ -76,7 +76,14 @@ export default {
    *
    * @throws {Error} Throws an error if the Token API returns an error during the process.
    */
-  async createAccessToken({ subjectId, group, identifiers = {} }) {
+  async createAccessToken({
+    subjectId,
+    group,
+    identifiers = {},
+    profile = null,
+    persist = true,
+    audience = null,
+  }) {
     const canonicalUserId = String(identifiers.user_id ?? subjectId ?? "");
 
     if (!group || canonicalUserId === "") {
@@ -99,11 +106,26 @@ export default {
     if (identifiers.apaar_id) {
       tokenData.apaar_id = identifiers.apaar_id;
     }
+    if (identifiers.teacher_id) {
+      tokenData.teacher_id = identifiers.teacher_id;
+    }
+    if (identifiers.candidate_id) {
+      tokenData.candidate_id = identifiers.candidate_id;
+    }
+    if (identifiers.school_code || identifiers.code) {
+      tokenData.school_code = identifiers.school_code || identifiers.code;
+    }
     if (identifiers.display_id) {
       tokenData.display_id = identifiers.display_id;
     }
     if (identifiers.display_id_type) {
       tokenData.display_id_type = identifiers.display_id_type;
+    }
+    if (profile) {
+      tokenData.profile = profile;
+      if (profile?.auth?.user_type) {
+        tokenData.user_type = profile.auth.user_type;
+      }
     }
 
     tokenData.user_id = canonicalUserId;
@@ -113,6 +135,8 @@ export default {
       is_user_valid: true,
       id: canonicalUserId,
       data: tokenData,
+      session_mode: persist ? "persistent" : "launch",
+      audience,
     };
     return new Promise((resolve) => {
       fastAPIClient
@@ -121,20 +145,27 @@ export default {
           const accessToken = response.data.access_token;
           const refreshToken = response.data.refresh_token;
 
-          if (accessToken) {
+          if (persist && accessToken) {
             setCookie("access_token", accessToken);
           }
 
-          if (refreshToken) {
+          if (persist && refreshToken) {
             setCookie("refresh_token", refreshToken);
           }
 
-          resolve();
+          resolve(response.data);
         })
         .catch((error) => {
           console.error("Token API returned an error:", error);
           resolve({ error: error });
         });
+    });
+  },
+
+  async createLaunchToken(options) {
+    return this.createAccessToken({
+      ...options,
+      persist: false,
     });
   },
 

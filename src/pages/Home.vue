@@ -352,59 +352,66 @@ export default {
         return;
       }
 
+      this.isLoading = true;
+
       const { userId, displayId, tokenData, launchContext } =
         this.pendingPortalSession;
-      this.clearPendingPortalSession();
 
-      await sendSQSMessage(
-        this.type,
-        "", // deprecated sub_type
-        this.$store.state.platform,
-        this.$store.state.platform_id,
-        userId,
-        this.auth_type.toString(),
-        this.authGroupData ? this.authGroupData.name : "default",
-        this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.user_type
-          : "student",
-        this.sessionData && "session_id" in this.sessionData
-          ? this.sessionData.session_id
-          : "",
-        "", // phone number
-        this.sessionData &&
-          "meta_data" in this.sessionData &&
-          "batch" in this.sessionData.meta_data
-          ? this.sessionData.meta_data.batch
-          : "",
-        "", // date of birth
-        "" // user ip address
-      );
-
-      if (this.sessionId != "") {
-        await UserAPI.postUserSessionActivity(
+      try {
+        await sendSQSMessage(
+          this.type,
+          "", // deprecated sub_type
+          this.$store.state.platform,
+          this.$store.state.platform_id,
           userId,
-          this.$store.state.sessionData.type,
-          this.$store.state.sessionData.session_id,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData.session_occurrence_id
+          this.auth_type.toString(),
+          this.authGroupData ? this.authGroupData.name : "default",
+          this.authGroupData && this.authGroupData.input_schema
+            ? this.authGroupData.input_schema.user_type
+            : "student",
+          this.sessionData && "session_id" in this.sessionData
+            ? this.sessionData.session_id
+            : "",
+          "", // phone number
+          this.sessionData &&
+            "meta_data" in this.sessionData &&
+            "batch" in this.sessionData.meta_data
+            ? this.sessionData.meta_data.batch
+            : "",
+          "", // date of birth
+          "" // user ip address
         );
-      }
 
-      await redirectToDestination(
-        userId,
-        displayId || tokenData?.display_id || null,
-        this.$store.state.omrMode,
-        this.$store.state.abTestId,
-        this.$store.state.platform_id,
-        this.$store.state.platform_link,
-        this.$store.state.platform,
-        this.authGroupData ? this.authGroupData.name : this.authGroup,
-        this.sessionData &&
-          this.sessionData.meta_data &&
-          this.sessionData.meta_data.test_type,
-        this.testType,
-        launchContext
-      );
+        if (this.sessionId != "") {
+          await UserAPI.postUserSessionActivity(
+            userId,
+            this.$store.state.sessionData.type,
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
+          );
+        }
+
+        await redirectToDestination(
+          userId,
+          displayId || tokenData?.display_id || null,
+          this.$store.state.omrMode,
+          this.$store.state.abTestId,
+          this.$store.state.platform_id,
+          this.$store.state.platform_link,
+          this.$store.state.platform,
+          this.authGroupData ? this.authGroupData.name : this.authGroup,
+          this.sessionData &&
+            this.sessionData.meta_data &&
+            this.sessionData.meta_data.test_type,
+          this.testType,
+          launchContext
+        );
+      } catch (error) {
+        this.isLoading = false;
+        this.toast.error("Unable to continue this session. Please try again.");
+        throw error;
+      }
     },
 
     switchUser() {

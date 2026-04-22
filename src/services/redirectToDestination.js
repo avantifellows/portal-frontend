@@ -92,7 +92,6 @@ export async function redirectToDestination(
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
         omrMode: omrMode,
-        fromPortal: true,
         launchToken,
       });
       fullURL = url + "?" + finalURLQueryParams;
@@ -110,7 +109,6 @@ export async function redirectToDestination(
 
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        fromPortal: true,
         singlePageMode: true,
         autoStart: true,
         launchToken,
@@ -145,9 +143,6 @@ export async function redirectToDestination(
 
       const reportUrl = new URL(`${redirectURL}/${redirectId}`);
       reportUrl.searchParams.set("launchToken", launchToken);
-      if (reportDisplayId) {
-        reportUrl.searchParams.set("displayId", reportDisplayId);
-      }
       fullURL = reportUrl.toString();
       break;
     }

@@ -213,7 +213,6 @@ export default {
       toast: useToast(),
       urlClassification: null, // URL type classification
       pendingPortalSession: null,
-      autoRedirectTimeoutId: null,
     };
   },
   computed: {
@@ -345,10 +344,6 @@ export default {
     },
 
     clearPendingPortalSession() {
-      if (this.autoRedirectTimeoutId) {
-        clearTimeout(this.autoRedirectTimeoutId);
-        this.autoRedirectTimeoutId = null;
-      }
       this.pendingPortalSession = null;
     },
 
@@ -687,10 +682,6 @@ export default {
         launchContext,
       };
       this.setState();
-
-      this.autoRedirectTimeoutId = setTimeout(() => {
-        this.continueWithStoredSession();
-      }, 1200);
     } else {
       this.setState();
     }

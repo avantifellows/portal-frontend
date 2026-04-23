@@ -337,6 +337,10 @@ export default {
     hasUrlError() {
       return this.getUrlClassification.type === URL_TYPES.ERROR;
     },
+
+    isGurukulSource() {
+      return this.$route.query.source === "gurukul";
+    },
   },
   methods: {
     setState() {
@@ -688,6 +692,16 @@ export default {
         tokenData: token_data || {},
         launchContext,
       };
+
+      if (this.isGurukulSource) {
+        try {
+          await this.continueWithStoredSession();
+        } catch (error) {
+          this.setState();
+        }
+        return;
+      }
+
       this.setState();
     } else {
       this.setState();

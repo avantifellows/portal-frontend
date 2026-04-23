@@ -22,6 +22,7 @@ const allowedQueryParams = [
   "abTestId",
   "testType",
   "platform_link",
+  "source",
 ];
 
 // Legacy parameters for backwards compatibility with existing shortened links

@@ -83,6 +83,7 @@ import useAssets from "@/assets/assets.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
+import authGroupAPIService from "@/services/API/groupData.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
 import { buildAuthContext } from "@/services/authContext";
 import { redirectToDestination } from "@/services/redirectToDestination";
@@ -122,7 +123,7 @@ export default {
   },
   async created() {
     // Check if we have the required store context (lost on refresh)
-    const hasAuthContext =
+    let hasAuthContext =
       this.$store.state.authGroupData &&
       Object.keys(this.$store.state.authGroupData).length > 0;
     const hasSessionContext =
@@ -132,6 +133,34 @@ export default {
     const platform = this.$store.state.platform || this.$route.query.platform;
     const isSessionlessFlow =
       !this.sessionId && platform && sessionlessPlatforms.includes(platform);
+
+    if (!hasAuthContext && isSessionlessFlow && this.$route.query.authGroup) {
+      const authGroupData = await authGroupAPIService.getAuthGroupData(
+        this.$route.query.authGroup
+      );
+
+      if (authGroupData && !authGroupData.error) {
+        this.$store.dispatch("setAuthGroupData", authGroupData);
+        this.$store.dispatch("setPlatform", platform);
+        this.$store.dispatch(
+          "setPlatformId",
+          this.$route.query.platform_id || ""
+        );
+        this.$store.dispatch(
+          "setPlatformLink",
+          this.$route.query.platform_link || ""
+        );
+
+        if (authGroupData.input_schema?.default_locale) {
+          this.$store.dispatch(
+            "setLocale",
+            authGroupData.input_schema.default_locale
+          );
+        }
+
+        hasAuthContext = true;
+      }
+    }
 
     if (!hasAuthContext || (!hasSessionContext && !isSessionlessFlow)) {
       // Context lost (likely due to page refresh) - redirect to error
@@ -335,20 +364,36 @@ export default {
 
     /** redirects to destination */
     async redirect() {
+      const groupName = this.$store.state.authGroupData.name;
+      const userType = this.$store.state.authGroupData.input_schema.user_type;
+      const existingTokenData = await this.getExistingTokenData(groupName);
+      const mergedUserData = this.mergeTokenProfileData(existingTokenData);
       const authContext = buildAuthContext({
-        userInformation: this.userData,
+        userInformation: mergedUserData,
         identifiers: {
+          ...existingTokenData,
           user_id: this.id,
-          display_id: this.userData?.display_id || null,
-          display_id_type: this.userData?.display_id_type || null,
+          display_id:
+            mergedUserData?.display_id || existingTokenData?.display_id || null,
+          display_id_type:
+            mergedUserData?.display_id_type ||
+            existingTokenData?.display_id_type ||
+            null,
         },
-        group: this.$store.state.authGroupData.name,
-        userType: this.$store.state.authGroupData.input_schema.user_type,
+        group: groupName,
+        userType,
       });
+      const displayId = authContext?.identifiers?.display_id || null;
+
+      if (this.$store.state.platform === "gurukul" && authContext) {
+        await TokenAPI.createAccessToken({
+          ...authContext,
+        });
+      }
 
       const redirected = await redirectToDestination(
         this.id,
-        this.userData?.display_id || null,
+        displayId,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,
@@ -396,6 +441,40 @@ export default {
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
+    },
+
+    async getExistingTokenData(groupName) {
+      if (this.$store.state.platform !== "gurukul") {
+        return {};
+      }
+
+      const [tokenVerified, tokenUserId, tokenData] =
+        await TokenAPI.checkForTokens(groupName);
+
+      if (!tokenVerified || String(tokenUserId) !== String(this.id)) {
+        return {};
+      }
+
+      return tokenData || {};
+    },
+
+    mergeTokenProfileData(existingTokenData) {
+      const profile = existingTokenData?.profile || {};
+      const profileData = {
+        ...(profile.auth || {}),
+        ...(profile.user || {}),
+        ...(profile.student || {}),
+        ...(profile.teacher || {}),
+        ...(profile.candidate || {}),
+        ...(profile.school || {}),
+      };
+
+      return {
+        ...profileData,
+        ...existingTokenData,
+        ...this.userData,
+        user_id: this.id,
+      };
     },
   },
 };

@@ -396,6 +396,73 @@ export default {
       return getSessionBatchIdentifier(this.$store.state.sessionData || {});
     },
 
+    getEnteredUserId() {
+      if ("code" in this.userInformation) {
+        return this.userInformation["code"];
+      }
+      if ("teacher_id" in this.userInformation) {
+        return this.userInformation["teacher_id"];
+      }
+      if ("candidate_id" in this.userInformation) {
+        return this.userInformation["candidate_id"];
+      }
+      if ("phone" in this.userInformation) {
+        return this.userInformation["phone"];
+      }
+
+      return this.userInformation["student_id"];
+    },
+
+    buildTokenIdentifiers(identifierBundle, fallbackUserId) {
+      return {
+        student_id: identifierBundle.student_id ?? null,
+        apaar_id: identifierBundle.apaar_id ?? null,
+        teacher_id:
+          identifierBundle.teacher_id ??
+          this.userInformation["teacher_id"] ??
+          null,
+        candidate_id:
+          identifierBundle.candidate_id ??
+          this.userInformation["candidate_id"] ??
+          null,
+        school_code:
+          identifierBundle.school_code ??
+          this.userInformation["school_code"] ??
+          this.userInformation["code"] ??
+          null,
+        user_id:
+          identifierBundle.user_id ??
+          this.userInformation["user_id"] ??
+          fallbackUserId,
+        display_id: identifierBundle.display_id ?? fallbackUserId ?? null,
+        display_id_type: identifierBundle.display_id_type ?? null,
+      };
+    },
+
+    syncUserInformationWithTokenIdentifiers(tokenIdentifiers) {
+      if (tokenIdentifiers.student_id) {
+        this.userInformation["student_id"] = tokenIdentifiers.student_id;
+      }
+      if (tokenIdentifiers.apaar_id) {
+        this.userInformation["apaar_id"] = tokenIdentifiers.apaar_id;
+      }
+
+      this.userInformation["user_id"] = tokenIdentifiers.user_id;
+      this.userInformation["display_id"] = tokenIdentifiers.display_id;
+      this.userInformation["display_id_type"] =
+        tokenIdentifiers.display_id_type;
+    },
+
+    buildAuthContextForToken(tokenIdentifiers) {
+      return buildHydratedAuthContext({
+        userInformation: this.userInformation,
+        identifiers: tokenIdentifiers,
+        group: this.$store.state.authGroupData.name,
+        userType: this.$store.state.authGroupData.input_schema.user_type,
+        platform: this.$store.state.platform,
+      });
+    },
+
     /** Resets the invalid login message to empty string */
     resetInvalidLoginMessage() {
       this.invalidLoginMessage = "";
@@ -777,56 +844,13 @@ export default {
           this.invalidLoginMessage =
             this.invalidLoginMessageTranslations["CODE"][this.locale];
         } else {
-          if ("code" in this.userInformation) {
-            userId = this.userInformation["code"];
-          } else if ("teacher_id" in this.userInformation) {
-            userId = this.userInformation["teacher_id"];
-          } else if ("candidate_id" in this.userInformation) {
-            userId = this.userInformation["candidate_id"];
-          } else if ("phone" in this.userInformation) {
-            userId = this.userInformation["phone"];
-          } else {
-            userId = this.userInformation["student_id"];
-          }
-
-          const identifierBundle = isUserValid.identifiers || {};
-
-          const tokenIdentifiers = {
-            student_id: identifierBundle.student_id ?? null,
-            apaar_id: identifierBundle.apaar_id ?? null,
-            teacher_id:
-              identifierBundle.teacher_id ??
-              this.userInformation["teacher_id"] ??
-              null,
-            candidate_id:
-              identifierBundle.candidate_id ??
-              this.userInformation["candidate_id"] ??
-              null,
-            school_code:
-              identifierBundle.school_code ??
-              this.userInformation["school_code"] ??
-              this.userInformation["code"] ??
-              null,
-            user_id:
-              identifierBundle.user_id ??
-              this.userInformation["user_id"] ??
-              userId,
-            display_id: identifierBundle.display_id ?? userId ?? null,
-            display_id_type: identifierBundle.display_id_type ?? null,
-          };
-
+          userId = this.getEnteredUserId();
+          const tokenIdentifiers = this.buildTokenIdentifiers(
+            isUserValid.identifiers || {},
+            userId
+          );
           userId = tokenIdentifiers.user_id;
-
-          if (tokenIdentifiers.student_id) {
-            this.userInformation["student_id"] = tokenIdentifiers.student_id;
-          }
-          if (tokenIdentifiers.apaar_id) {
-            this.userInformation["apaar_id"] = tokenIdentifiers.apaar_id;
-          }
-          this.userInformation["user_id"] = tokenIdentifiers.user_id;
-          this.userInformation["display_id"] = tokenIdentifiers.display_id;
-          this.userInformation["display_id_type"] =
-            tokenIdentifiers.display_id_type;
+          this.syncUserInformationWithTokenIdentifiers(tokenIdentifiers);
 
           if ("phone" in this.userInformation) {
             this.pendingTokenIdentifiers = tokenIdentifiers;
@@ -835,13 +859,9 @@ export default {
             return; // Don't proceed with normal auth - wait for OTP verification
           }
 
-          const authContext = await buildHydratedAuthContext({
-            userInformation: this.userInformation,
-            identifiers: tokenIdentifiers,
-            group: this.$store.state.authGroupData.name,
-            userType: this.$store.state.authGroupData.input_schema.user_type,
-            platform: this.$store.state.platform,
-          });
+          const authContext = await this.buildAuthContextForToken(
+            tokenIdentifiers
+          );
 
           if (this.$store.state.platform == "gurukul" && authContext) {
             await TokenAPI.createAccessToken({

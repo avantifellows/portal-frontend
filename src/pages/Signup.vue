@@ -308,9 +308,10 @@ export default {
       const authGroup = this.$route.query.authGroup;
       const sessionlessPlatforms = ["gurukul", "report", "teacher-web-app"];
       let authGroupData = null;
+      let sessionData = null;
 
       if (sessionId) {
-        const sessionData = await sessionAPIService.getSessionData(sessionId);
+        sessionData = await sessionAPIService.getSessionData(sessionId);
 
         if (
           !sessionData ||
@@ -341,25 +342,46 @@ export default {
         return false;
       }
 
+      const resolvedPlatform =
+        (sessionData && sessionData.platform) || platform || "";
+
       this.$store.dispatch("setAuthGroupData", authGroupData);
       this.$store.dispatch(
         "setIdGeneration",
-        this.$route.query.id_generation === "true"
+        (sessionData &&
+          (sessionData.id_generation === true ||
+            sessionData.id_generation === "true")) ||
+          this.$route.query.id_generation === "true"
       );
       this.$store.dispatch("setOmrMode", this.$route.query.omrMode);
       this.$store.dispatch("setAbTestId", this.$route.query.abTestId || "");
-      this.$store.dispatch("setPlatform", platform || "");
+      this.$store.dispatch(
+        "setRedirection",
+        (sessionData &&
+          (sessionData.redirection === true ||
+            sessionData.redirection === "true")) ||
+          this.$route.query.redirection === "true" ||
+          resolvedPlatform === "report" ||
+          resolvedPlatform === "gurukul"
+      );
+      this.$store.dispatch("setPlatform", resolvedPlatform);
       this.$store.dispatch(
         "setPlatformId",
-        this.$route.query.platform_id || ""
+        (sessionData && sessionData.platform_id) ||
+          this.$route.query.platform_id ||
+          ""
       );
       this.$store.dispatch(
         "setSignupFormId",
-        this.$route.query.signup_form_id || ""
+        (sessionData && sessionData.signup_form_id) ||
+          this.$route.query.signup_form_id ||
+          ""
       );
       this.$store.dispatch(
         "setPlatformLink",
-        this.$route.query.platform_link || ""
+        (sessionData && sessionData.platform_link) ||
+          this.$route.query.platform_link ||
+          ""
       );
 
       if (authGroupData.input_schema?.default_locale) {

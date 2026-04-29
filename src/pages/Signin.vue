@@ -631,7 +631,7 @@ export default {
               ? this.$store.state.sessionData.session_id
               : "",
             this.userInformation.phone,
-            this.getBatch,
+            this.getBatch(),
             "" // date of birth
           );
 

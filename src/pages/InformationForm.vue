@@ -366,30 +366,17 @@ export default {
     async redirect() {
       const groupName = this.$store.state.authGroupData.name;
       const userType = this.$store.state.authGroupData.input_schema.user_type;
-      const existingTokenData = await this.getExistingTokenData(groupName);
-      const mergedUserData = this.mergeTokenProfileData(existingTokenData);
       const authContext = buildAuthContext({
-        userInformation: mergedUserData,
-        identifiers: {
-          ...existingTokenData,
+        userInformation: {
           user_id: this.id,
-          display_id:
-            mergedUserData?.display_id || existingTokenData?.display_id || null,
-          display_id_type:
-            mergedUserData?.display_id_type ||
-            existingTokenData?.display_id_type ||
-            null,
+        },
+        identifiers: {
+          user_id: this.id,
         },
         group: groupName,
         userType,
       });
       const displayId = authContext?.identifiers?.display_id || null;
-
-      if (this.$store.state.platform === "gurukul" && authContext) {
-        await TokenAPI.createAccessToken({
-          ...authContext,
-        });
-      }
 
       const redirected = await redirectToDestination(
         this.id,
@@ -441,40 +428,6 @@ export default {
           "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
         );
       }
-    },
-
-    async getExistingTokenData(groupName) {
-      if (this.$store.state.platform !== "gurukul") {
-        return {};
-      }
-
-      const [tokenVerified, tokenUserId, tokenData] =
-        await TokenAPI.checkForTokens(groupName);
-
-      if (!tokenVerified || String(tokenUserId) !== String(this.id)) {
-        return {};
-      }
-
-      return tokenData || {};
-    },
-
-    mergeTokenProfileData(existingTokenData) {
-      const profile = existingTokenData?.profile || {};
-      const profileData = {
-        ...(profile.auth || {}),
-        ...(profile.user || {}),
-        ...(profile.student || {}),
-        ...(profile.teacher || {}),
-        ...(profile.candidate || {}),
-        ...(profile.school || {}),
-      };
-
-      return {
-        ...profileData,
-        ...existingTokenData,
-        ...this.userData,
-        user_id: this.id,
-      };
     },
   },
 };

@@ -8,6 +8,12 @@ import {
 const DEFAULT_COOKIE_DOMAIN = "avantifellows.org";
 const COOKIE_DOMAIN =
   import.meta.env.VITE_APP_COOKIE_DOMAIN || DEFAULT_COOKIE_DOMAIN;
+const TOKEN_EXPIRED_DETAIL = "Signature has expired";
+
+function emptyTokenResult() {
+  // TODO: replace this tuple with an object return shape after callers are migrated.
+  return [false, "", {}];
+}
 
 function isLocalHostname(hostname) {
   if (!hostname) return true;
@@ -70,11 +76,7 @@ export default {
    * @param {string} options.group - Auth group associated with the user.
    * @param {Object} [options.identifiers] - Optional identifier bundle to embed in the token
    *                   (student_id, apaar_id, user_id, display_id, display_id_type).
-   * @returns {Promise} A Promise that resolves when the access token is created successfully.
-   *                   The Promise resolves with an object containing access_token and refresh_token.
-   *                   If there is an error, it rejects with an error object.
-   *
-   * @throws {Error} Throws an error if the Token API returns an error during the process.
+   * @returns {Promise<Object>} Token API response. On error, resolves with { error }.
    */
   async createAccessToken({
     subjectId,
@@ -194,7 +196,7 @@ export default {
 
           if (!newAccessToken) {
             this.deleteCookies();
-            resolve([false, "", {}]);
+            resolve(emptyTokenResult());
             return;
           }
 
@@ -208,7 +210,7 @@ export default {
         })
         .catch((error) => {
           this.deleteCookies();
-          resolve([false, "", {}]);
+          resolve(emptyTokenResult());
           console.error("Token API returned an error:", error);
         });
     });
@@ -218,15 +220,13 @@ export default {
    * Verifies the user's access token and checks if the user belongs to the specified group.
    *
    * @param {string} group - The group to which the user belongs.
-   * @returns {Promise} A Promise that resolves with an array indicating the verification result.
+   * @returns {Promise<[boolean, string, Object]>} A Promise that resolves with a tuple.
    *                   The resolved array has up to three elements:
    *                   - The first element (boolean) indicates whether the user belongs to the specified group.
    *                   - The second element (string) is the JWT subject (user identifier) when verification succeeds.
    *                   - The third element (object) exposes the decoded custom claims for downstream use.
    *                   If there is an error or the user doesn't belong to the group, the Promise resolves
-   *                   with [false, "", {}].
-   *
-   * @throws {Error} Throws an error if the Token API returns an error during the verification process.
+   *                   with the empty token result tuple.
    */
   async verifyToken(access_token, refresh_token, group) {
     return new Promise((resolve) => {
@@ -247,13 +247,14 @@ export default {
           if (
             error.response &&
             error.response.status == 422 &&
-            error.response.data.detail == "Signature has expired"
+            error.response.data.detail == TOKEN_EXPIRED_DETAIL
           ) {
             const refreshResult = this.refreshToken(refresh_token, group);
             resolve(refreshResult);
+            return;
           }
           console.error("Token API returned an error:", error);
-          resolve([false, "", {}]);
+          resolve(emptyTokenResult());
         });
     });
   },
@@ -273,10 +274,10 @@ export default {
    * @param {string} group - The group to which the user's access is being checked.
    * @returns {Promise<[boolean, string, Object]>} A Promise that resolves with an array indicating the verification result.
    *                                             The resolved array has up to three elements mirroring verifyToken.
-   *                                             If there are no tokens or an error occurs, the Promise resolves with [false, "", {}].
+   *                                             If there are no tokens or an error occurs, resolves with the empty token result tuple.
    */
   checkForTokens(group) {
-    if (decodeURIComponent(document.cookie) == "") return [false, "", {}];
+    if (decodeURIComponent(document.cookie) == "") return emptyTokenResult();
     const cookies = {};
 
     let document_cookies = decodeURIComponent(document.cookie).split(";");
@@ -284,14 +285,14 @@ export default {
       const cookie = document_cookies[index];
       let [cookie_name, cookie_value] = cookie.split("=");
       if (cookie_value == undefined || cookie_value == "undefined") {
-        return [false, "", {}];
+        return emptyTokenResult();
       }
       cookies[cookie_name.trim()] = cookie_value;
     }
 
     // Check if access_token and refresh_token are present
     if (!cookies["access_token"] || !cookies["refresh_token"]) {
-      return [false, "", {}];
+      return emptyTokenResult();
     }
 
     return this.verifyToken(

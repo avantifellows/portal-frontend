@@ -113,6 +113,8 @@ import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import { buildHydratedAuthContext } from "@/services/hydrateAuthContext";
 import FormAPI from "@/services/API/form.js";
+import authGroupAPIService from "@/services/API/groupData.js";
+import sessionAPIService from "@/services/API/sessionData.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
@@ -144,12 +146,23 @@ export default {
   },
   async created() {
     // Check if we have the required store context (lost on refresh)
-    const hasAuthContext =
+    let hasAuthContext =
       this.$store.state.authGroupData &&
       Object.keys(this.$store.state.authGroupData).length > 0;
-    const hasSessionContext =
+    let hasSessionContext =
       this.$store.state.sessionData &&
       Object.keys(this.$store.state.sessionData).length > 0;
+
+    if (!hasAuthContext && !hasSessionContext) {
+      const contextRecovered = await this.recoverContextFromRoute();
+      hasAuthContext =
+        contextRecovered ||
+        (this.$store.state.authGroupData &&
+          Object.keys(this.$store.state.authGroupData).length > 0);
+      hasSessionContext =
+        this.$store.state.sessionData &&
+        Object.keys(this.$store.state.sessionData).length > 0;
+    }
 
     if (!hasAuthContext && !hasSessionContext) {
       // Context lost (likely due to page refresh) - redirect to error
@@ -289,6 +302,82 @@ export default {
     },
   },
   methods: {
+    async recoverContextFromRoute() {
+      const sessionId = this.$route.query.sessionId;
+      const platform = this.$route.query.platform;
+      const authGroup = this.$route.query.authGroup;
+      const sessionlessPlatforms = ["gurukul", "report", "teacher-web-app"];
+      let authGroupData = null;
+
+      if (sessionId) {
+        const sessionData = await sessionAPIService.getSessionData(sessionId);
+
+        if (
+          !sessionData ||
+          sessionData.error ||
+          Object.keys(sessionData).length === 0
+        ) {
+          return false;
+        }
+
+        sessionData.sessionId = sessionId;
+        this.$store.dispatch("setSessionData", sessionData);
+
+        authGroupData =
+          sessionData.type === "broadcast"
+            ? await authGroupAPIService.getAuthGroupData(
+                sessionData.meta_data.group
+              )
+            : await authGroupAPIService.getAuthGroupName(sessionData.id);
+      } else if (
+        platform &&
+        sessionlessPlatforms.includes(platform) &&
+        authGroup
+      ) {
+        authGroupData = await authGroupAPIService.getAuthGroupData(authGroup);
+      }
+
+      if (!authGroupData || authGroupData.error) {
+        return false;
+      }
+
+      this.$store.dispatch("setAuthGroupData", authGroupData);
+      this.$store.dispatch(
+        "setIdGeneration",
+        this.$route.query.id_generation === "true"
+      );
+      this.$store.dispatch("setOmrMode", this.$route.query.omrMode);
+      this.$store.dispatch("setAbTestId", this.$route.query.abTestId || "");
+      this.$store.dispatch("setPlatform", platform || "");
+      this.$store.dispatch(
+        "setPlatformId",
+        this.$route.query.platform_id || ""
+      );
+      this.$store.dispatch(
+        "setSignupFormId",
+        this.$route.query.signup_form_id || ""
+      );
+      this.$store.dispatch(
+        "setPlatformLink",
+        this.$route.query.platform_link || ""
+      );
+
+      if (authGroupData.input_schema?.default_locale) {
+        this.$store.dispatch(
+          "setLocale",
+          authGroupData.input_schema.default_locale
+        );
+      }
+      if (authGroupData.input_schema?.images) {
+        this.$store.dispatch(
+          "setImages",
+          authGroupData.input_schema.images.split(",")
+        );
+      }
+
+      return true;
+    },
+
     /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formData.attributes).forEach((field) => {

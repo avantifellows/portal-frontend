@@ -988,7 +988,7 @@ export default {
      * Redirects the user to the sign-up page with session context.
      */
     redirectToSignUp() {
-      const query = {};
+      const query = { ...this.$route.query };
 
       // Include sessionId if available for better URL aesthetics and context
       if (this.$route.query.sessionId) {

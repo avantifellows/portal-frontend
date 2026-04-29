@@ -476,6 +476,52 @@ export default {
       } else this.userData[key] = value;
     },
 
+    applyCreatedUser(createdUser) {
+      const createdUserId = createdUser?.["user_id"] ?? "";
+      const displayId = createdUser?.["display_id"] ?? createdUserId;
+      const displayIdType = createdUser?.["display_id_type"] ?? null;
+
+      this.userData["user_id"] = createdUserId;
+      if (createdUser?.student_id) {
+        this.userData["student_id"] = createdUser.student_id;
+      }
+      if (createdUser?.apaar_id) {
+        this.userData["apaar_id"] = createdUser.apaar_id;
+      }
+      if (displayId) {
+        this.userData["display_id"] = displayId;
+      }
+      if (displayIdType) {
+        this.userData["display_id_type"] = displayIdType;
+      }
+      this.userData["already_exists"] =
+        createdUser?.["already_exists"] ?? false;
+    },
+
+    getSignupTokenIdentifiers() {
+      return {
+        user_id: this.userData["user_id"] ?? null,
+        student_id: this.userData["student_id"] ?? null,
+        apaar_id: this.userData["apaar_id"] ?? null,
+        teacher_id: this.userData["teacher_id"] ?? null,
+        candidate_id: this.userData["candidate_id"] ?? null,
+        school_code:
+          this.userData["school_code"] ?? this.userData["code"] ?? null,
+        display_id: this.userData["display_id"] ?? null,
+        display_id_type: this.userData["display_id_type"] ?? null,
+      };
+    },
+
+    buildSignupAuthContext() {
+      return buildHydratedAuthContext({
+        userInformation: this.userData,
+        identifiers: this.getSignupTokenIdentifiers(),
+        group: this.$store.state.authGroupData.name,
+        userType: this.$store.state.authGroupData.input_schema.user_type,
+        platform: this.$store.state.platform,
+      });
+    },
+
     /** creates user ID based on information */
     async signUp() {
       this.formSubmitted = true;
@@ -513,25 +559,7 @@ export default {
         return;
       }
       this.isLoading = false;
-      const createdUserId = createdUser?.["user_id"] ?? "";
-      const displayId = createdUser?.["display_id"] ?? createdUserId;
-      const displayIdType = createdUser?.["display_id_type"] ?? null;
-
-      this.userData["user_id"] = createdUserId;
-      if (createdUser?.student_id) {
-        this.userData["student_id"] = createdUser.student_id;
-      }
-      if (createdUser?.apaar_id) {
-        this.userData["apaar_id"] = createdUser.apaar_id;
-      }
-      if (displayId) {
-        this.userData["display_id"] = displayId;
-      }
-      if (displayIdType) {
-        this.userData["display_id_type"] = displayIdType;
-      }
-      this.userData["already_exists"] =
-        createdUser?.["already_exists"] ?? false;
+      this.applyCreatedUser(createdUser);
 
       sendSQSMessage(
         "sign-up",
@@ -548,23 +576,7 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      const authContext = await buildHydratedAuthContext({
-        userInformation: this.userData,
-        identifiers: {
-          user_id: this.userData["user_id"] ?? null,
-          student_id: this.userData["student_id"] ?? null,
-          apaar_id: this.userData["apaar_id"] ?? null,
-          teacher_id: this.userData["teacher_id"] ?? null,
-          candidate_id: this.userData["candidate_id"] ?? null,
-          school_code:
-            this.userData["school_code"] ?? this.userData["code"] ?? null,
-          display_id: this.userData["display_id"] ?? null,
-          display_id_type: this.userData["display_id_type"] ?? null,
-        },
-        group: this.$store.state.authGroupData.name,
-        userType: this.$store.state.authGroupData.input_schema.user_type,
-        platform: this.$store.state.platform,
-      });
+      const authContext = await this.buildSignupAuthContext();
 
       if (this.$store.state.platform == "gurukul" && authContext) {
         await TokenAPI.createAccessToken({
@@ -587,23 +599,7 @@ export default {
 
     /** redirects to destination */
     async redirect() {
-      const authContext = await buildHydratedAuthContext({
-        userInformation: this.userData,
-        identifiers: {
-          user_id: this.userData["user_id"] ?? null,
-          student_id: this.userData["student_id"] ?? null,
-          apaar_id: this.userData["apaar_id"] ?? null,
-          teacher_id: this.userData["teacher_id"] ?? null,
-          candidate_id: this.userData["candidate_id"] ?? null,
-          school_code:
-            this.userData["school_code"] ?? this.userData["code"] ?? null,
-          display_id: this.userData["display_id"] ?? null,
-          display_id_type: this.userData["display_id_type"] ?? null,
-        },
-        group: this.$store.state.authGroupData.name,
-        userType: this.$store.state.authGroupData.input_schema.user_type,
-        platform: this.$store.state.platform,
-      });
+      const authContext = await this.buildSignupAuthContext();
 
       const redirected = await redirectToDestination(
         this.userData["user_id"],

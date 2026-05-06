@@ -83,7 +83,9 @@ import useAssets from "@/assets/assets.js";
 import FormSchemaAPI from "@/services/API/form.js";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
+import authGroupAPIService from "@/services/API/groupData.js";
 import { typeToInputParameters } from "@/services/authToInputParameters";
+import { buildAuthContext } from "@/services/authContext";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
@@ -121,7 +123,7 @@ export default {
   },
   async created() {
     // Check if we have the required store context (lost on refresh)
-    const hasAuthContext =
+    let hasAuthContext =
       this.$store.state.authGroupData &&
       Object.keys(this.$store.state.authGroupData).length > 0;
     const hasSessionContext =
@@ -131,6 +133,34 @@ export default {
     const platform = this.$store.state.platform || this.$route.query.platform;
     const isSessionlessFlow =
       !this.sessionId && platform && sessionlessPlatforms.includes(platform);
+
+    if (!hasAuthContext && isSessionlessFlow && this.$route.query.authGroup) {
+      const authGroupData = await authGroupAPIService.getAuthGroupData(
+        this.$route.query.authGroup
+      );
+
+      if (authGroupData && !authGroupData.error) {
+        this.$store.dispatch("setAuthGroupData", authGroupData);
+        this.$store.dispatch("setPlatform", platform);
+        this.$store.dispatch(
+          "setPlatformId",
+          this.$route.query.platform_id || ""
+        );
+        this.$store.dispatch(
+          "setPlatformLink",
+          this.$route.query.platform_link || ""
+        );
+
+        if (authGroupData.input_schema?.default_locale) {
+          this.$store.dispatch(
+            "setLocale",
+            authGroupData.input_schema.default_locale
+          );
+        }
+
+        hasAuthContext = true;
+      }
+    }
 
     if (!hasAuthContext || (!hasSessionContext && !isSessionlessFlow)) {
       // Context lost (likely due to page refresh) - redirect to error
@@ -324,30 +354,44 @@ export default {
       if (this.isSubmitting) return;
       this.isSubmitting = true;
       try {
-        await UserAPI.completeProfile(
-          this.userData,
-          (this.userData["student_id"] = this.id)
-        );
-        this.redirect();
+        this.userData["user_id"] = this.id;
+        await UserAPI.completeProfile(this.userData);
+        await this.redirect();
       } finally {
         this.isSubmitting = false;
       }
     },
 
     /** redirects to destination */
-    redirect() {
-      const redirected = redirectToDestination(
+    async redirect() {
+      const groupName = this.$store.state.authGroupData.name;
+      const userType = this.$store.state.authGroupData.input_schema.user_type;
+      const authContext = buildAuthContext({
+        userInformation: {
+          user_id: this.id,
+        },
+        identifiers: {
+          user_id: this.id,
+        },
+        group: groupName,
+        userType,
+      });
+      const displayId = authContext?.identifiers?.display_id || null;
+
+      const redirected = await redirectToDestination(
         this.id,
+        displayId,
         this.$store.state.omrMode,
         this.$store.state.abTestId,
         this.$store.state.platform_id,
         this.$store.state.platform_link,
         this.$store.state.platform,
-        this.$store.state.authGroupData.input_schema.user_type,
+        this.$store.state.authGroupData.name,
         this.$store.state.sessionData &&
           this.$store.state.sessionData.meta_data &&
           this.$store.state.sessionData.meta_data.test_type,
-        this.$route.query.testType
+        this.$route.query.testType,
+        authContext
       );
 
       if (redirected) {

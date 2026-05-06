@@ -111,7 +111,10 @@ import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
+import { buildHydratedAuthContext } from "@/services/hydrateAuthContext";
 import FormAPI from "@/services/API/form.js";
+import authGroupAPIService from "@/services/API/groupData.js";
+import sessionAPIService from "@/services/API/sessionData.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
@@ -143,12 +146,23 @@ export default {
   },
   async created() {
     // Check if we have the required store context (lost on refresh)
-    const hasAuthContext =
+    let hasAuthContext =
       this.$store.state.authGroupData &&
       Object.keys(this.$store.state.authGroupData).length > 0;
-    const hasSessionContext =
+    let hasSessionContext =
       this.$store.state.sessionData &&
       Object.keys(this.$store.state.sessionData).length > 0;
+
+    if (!hasAuthContext && !hasSessionContext) {
+      const contextRecovered = await this.recoverContextFromRoute();
+      hasAuthContext =
+        contextRecovered ||
+        (this.$store.state.authGroupData &&
+          Object.keys(this.$store.state.authGroupData).length > 0);
+      hasSessionContext =
+        this.$store.state.sessionData &&
+        Object.keys(this.$store.state.sessionData).length > 0;
+    }
 
     if (!hasAuthContext && !hasSessionContext) {
       // Context lost (likely due to page refresh) - redirect to error
@@ -242,6 +256,11 @@ export default {
       return this.$store.state.locale;
     },
 
+    /** Returns the display ID shown to the user */
+    displayId() {
+      return this.userData["display_id"] || this.userData["user_id"] || "";
+    },
+
     /** Returns text based on locale */
     signInText() {
       return this.getLocale == "en"
@@ -252,15 +271,15 @@ export default {
     /** Returns text based on locale */
     idGeneratedText() {
       return this.getLocale == "en"
-        ? `Your ID is <b> ${this.userData["user_id"]}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
+        ? `Your ID is <b> ${this.displayId}.</b>  <br/> Kindly make a note of it. You will need this to log in to all your
         future sessions.`
-        : `आपकी आईडी <b> ${this.userData["user_id"]}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
+        : `आपकी आईडी <b> ${this.displayId}</b> है|  <br/> कृपया इसे नोट कर लीजिए। भविष्य में साइन-इन करने के लिए इसी आईडी का उपयोग करें।`;
     },
     /** if ID already exists */
     idExistsText() {
       return this.getLocale == "en"
-        ? `You are already registered! Your ID is <b> ${this.userData["user_id"]}.</b>`
-        : `आप पहले से पंजीकृत हैं! आपकी आईडी <b> ${this.userData["user_id"]}</b> है|`;
+        ? `You are already registered! Your ID is <b> ${this.displayId}.</b>`
+        : `आप पहले से पंजीकृत हैं! आपकी आईडी <b> ${this.displayId}</b> है|`;
     },
     /** returns title for the form */
     formTitle() {
@@ -283,6 +302,104 @@ export default {
     },
   },
   methods: {
+    async recoverContextFromRoute() {
+      const sessionId = this.$route.query.sessionId;
+      const platform = this.$route.query.platform;
+      const authGroup = this.$route.query.authGroup;
+      const sessionlessPlatforms = ["gurukul", "report", "teacher-web-app"];
+      let authGroupData = null;
+      let sessionData = null;
+
+      if (sessionId) {
+        sessionData = await sessionAPIService.getSessionData(sessionId);
+
+        if (
+          !sessionData ||
+          sessionData.error ||
+          Object.keys(sessionData).length === 0
+        ) {
+          return false;
+        }
+
+        sessionData.sessionId = sessionId;
+        this.$store.dispatch("setSessionData", sessionData);
+
+        authGroupData =
+          sessionData.type === "broadcast"
+            ? await authGroupAPIService.getAuthGroupData(
+                sessionData.meta_data.group
+              )
+            : await authGroupAPIService.getAuthGroupName(sessionData.id);
+      } else if (
+        platform &&
+        sessionlessPlatforms.includes(platform) &&
+        authGroup
+      ) {
+        authGroupData = await authGroupAPIService.getAuthGroupData(authGroup);
+      }
+
+      if (!authGroupData || authGroupData.error) {
+        return false;
+      }
+
+      const resolvedPlatform =
+        (sessionData && sessionData.platform) || platform || "";
+
+      this.$store.dispatch("setAuthGroupData", authGroupData);
+      this.$store.dispatch(
+        "setIdGeneration",
+        (sessionData &&
+          (sessionData.id_generation === true ||
+            sessionData.id_generation === "true")) ||
+          this.$route.query.id_generation === "true"
+      );
+      this.$store.dispatch("setOmrMode", this.$route.query.omrMode);
+      this.$store.dispatch("setAbTestId", this.$route.query.abTestId || "");
+      this.$store.dispatch(
+        "setRedirection",
+        (sessionData &&
+          (sessionData.redirection === true ||
+            sessionData.redirection === "true")) ||
+          this.$route.query.redirection === "true" ||
+          resolvedPlatform === "report" ||
+          resolvedPlatform === "gurukul"
+      );
+      this.$store.dispatch("setPlatform", resolvedPlatform);
+      this.$store.dispatch(
+        "setPlatformId",
+        (sessionData && sessionData.platform_id) ||
+          this.$route.query.platform_id ||
+          ""
+      );
+      this.$store.dispatch(
+        "setSignupFormId",
+        (sessionData && sessionData.signup_form_id) ||
+          this.$route.query.signup_form_id ||
+          ""
+      );
+      this.$store.dispatch(
+        "setPlatformLink",
+        (sessionData && sessionData.platform_link) ||
+          this.$route.query.platform_link ||
+          ""
+      );
+
+      if (authGroupData.input_schema?.default_locale) {
+        this.$store.dispatch(
+          "setLocale",
+          authGroupData.input_schema.default_locale
+        );
+      }
+      if (authGroupData.input_schema?.images) {
+        this.$store.dispatch(
+          "setImages",
+          authGroupData.input_schema.images.split(",")
+        );
+      }
+
+      return true;
+    },
+
     /** Returns if there any fields that have visibilty dependence on any other fields */
     showBasedOn() {
       return Object.keys(this.formData.attributes).forEach((field) => {
@@ -359,6 +476,52 @@ export default {
       } else this.userData[key] = value;
     },
 
+    applyCreatedUser(createdUser) {
+      const createdUserId = createdUser?.["user_id"] ?? "";
+      const displayId = createdUser?.["display_id"] ?? createdUserId;
+      const displayIdType = createdUser?.["display_id_type"] ?? null;
+
+      this.userData["user_id"] = createdUserId;
+      if (createdUser?.student_id) {
+        this.userData["student_id"] = createdUser.student_id;
+      }
+      if (createdUser?.apaar_id) {
+        this.userData["apaar_id"] = createdUser.apaar_id;
+      }
+      if (displayId) {
+        this.userData["display_id"] = displayId;
+      }
+      if (displayIdType) {
+        this.userData["display_id_type"] = displayIdType;
+      }
+      this.userData["already_exists"] =
+        createdUser?.["already_exists"] ?? false;
+    },
+
+    getSignupTokenIdentifiers() {
+      return {
+        user_id: this.userData["user_id"] ?? null,
+        student_id: this.userData["student_id"] ?? null,
+        apaar_id: this.userData["apaar_id"] ?? null,
+        teacher_id: this.userData["teacher_id"] ?? null,
+        candidate_id: this.userData["candidate_id"] ?? null,
+        school_code:
+          this.userData["school_code"] ?? this.userData["code"] ?? null,
+        display_id: this.userData["display_id"] ?? null,
+        display_id_type: this.userData["display_id_type"] ?? null,
+      };
+    },
+
+    buildSignupAuthContext() {
+      return buildHydratedAuthContext({
+        userInformation: this.userData,
+        identifiers: this.getSignupTokenIdentifiers(),
+        group: this.$store.state.authGroupData.name,
+        userType: this.$store.state.authGroupData.input_schema.user_type,
+        platform: this.$store.state.platform,
+      });
+    },
+
     /** creates user ID based on information */
     async signUp() {
       this.formSubmitted = true;
@@ -396,9 +559,7 @@ export default {
         return;
       }
       this.isLoading = false;
-      this.userData["user_id"] = createdUser?.["user_id"] ?? "";
-      this.userData["already_exists"] =
-        createdUser?.["already_exists"] ?? false;
+      this.applyCreatedUser(createdUser);
 
       sendSQSMessage(
         "sign-up",
@@ -415,12 +576,14 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      // create token only for gurukul
-      if (this.$store.state.platform == "gurukul") {
-        await TokenAPI.createAccessToken(
-          this.userData["user_id"],
-          this.$store.state.authGroupData.name
-        );
+      const authContext = await this.buildSignupAuthContext();
+
+      if (this.$store.state.platform == "gurukul" && authContext) {
+        await TokenAPI.createAccessToken({
+          ...authContext,
+        });
+      } else if (!authContext) {
+        console.warn("Skipping token creation due to missing auth context");
       }
 
       if (this.$store.state.platform != "gurukul") {
@@ -435,22 +598,26 @@ export default {
     },
 
     /** redirects to destination */
-    redirect() {
-      if (
-        redirectToDestination(
-          this.userData["user_id"],
-          this.$store.state.omrMode,
-          this.$store.state.abTestId,
-          this.$store.state.platform_id,
-          this.$store.state.platform_link,
-          this.$store.state.platform,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData &&
-            this.$store.state.sessionData.meta_data &&
-            this.$store.state.sessionData.meta_data.test_type,
-          this.$route.query.testType
-        )
-      ) {
+    async redirect() {
+      const authContext = await this.buildSignupAuthContext();
+
+      const redirected = await redirectToDestination(
+        this.userData["user_id"],
+        this.userData["display_id"] ?? null,
+        this.$store.state.omrMode,
+        this.$store.state.abTestId,
+        this.$store.state.platform_id,
+        this.$store.state.platform_link,
+        this.$store.state.platform,
+        this.$store.state.authGroupData.name,
+        this.$store.state.sessionData &&
+          this.$store.state.sessionData.meta_data &&
+          this.$store.state.sessionData.meta_data.test_type,
+        this.$route.query.testType,
+        authContext
+      );
+
+      if (redirected) {
         if (this.$store.state.platform != "gurukul") {
           UserAPI.postUserSessionActivity(
             this.userData["user_id"],

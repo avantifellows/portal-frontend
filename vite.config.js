@@ -9,7 +9,7 @@ module.exports = defineConfig({
   server: {
     port: 8080,
   },
-  base: "",
+  base: "/",
   resolve: {
     alias: [
       {

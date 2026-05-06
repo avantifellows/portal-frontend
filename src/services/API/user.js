@@ -4,8 +4,47 @@ import {
   verifyTeacherEndpoint,
   verifyCandidateEndpoint,
   verifySchoolEndpoint,
+  getStudentEndpoint,
+  getTeacherEndpoint,
+  getCandidateEndpoint,
+  getSchoolEndpoint,
   userSignupEndpoint,
 } from "@/services/API/endpoints.js";
+
+function getFirstRecord(data) {
+  if (Array.isArray(data)) {
+    return data[0] || null;
+  }
+
+  return data || null;
+}
+
+function flattenProfileRecord(record) {
+  if (!record || typeof record !== "object") {
+    return null;
+  }
+
+  const user =
+    record.user && typeof record.user === "object" ? record.user : {};
+  const school =
+    record.school && typeof record.school === "object" ? record.school : {};
+
+  return {
+    ...record,
+    ...school,
+    ...user,
+    school_id: record.school_id ?? school.id ?? null,
+    school_code:
+      record.school_code ??
+      school.school_code ??
+      school.code ??
+      record.code ??
+      null,
+    code: record.code ?? school.code ?? null,
+    school_name:
+      record.school_name ?? school.school_name ?? school.name ?? null,
+  };
+}
 
 export default {
   /**
@@ -20,9 +59,11 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
+          if (error.response && error.response.status == 404) {
+            resolve({ is_valid: false });
+          } else {
+            console.error("User API returned an error:", error);
+            resolve({ is_valid: false });
           }
         });
     });
@@ -40,9 +81,11 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
+          if (error.response && error.response.status == 404) {
+            resolve({ is_valid: false });
+          } else {
+            console.error("User API returned an error:", error);
+            resolve({ is_valid: false });
           }
         });
     });
@@ -60,9 +103,11 @@ export default {
           resolve(response.data);
         })
         .catch((error) => {
-          if (error.response.status == 404) resolve(false);
-          else {
-            throw new Error("User API returned an error:", error);
+          if (error.response && error.response.status == 404) {
+            resolve({ is_valid: false });
+          } else {
+            console.error("User API returned an error:", error);
+            resolve({ is_valid: false });
           }
         });
     });
@@ -86,6 +131,59 @@ export default {
           }
         });
     });
+  },
+
+  async getProfileForToken(userType, identifiers = {}) {
+    let endpoint = null;
+    let params = null;
+
+    if (userType === "student") {
+      endpoint = getStudentEndpoint;
+      params = {
+        user_id:
+          identifiers.user_id ??
+          identifiers.student_id ??
+          identifiers.apaar_id ??
+          null,
+        student_id: identifiers.student_id ?? null,
+        apaar_id: identifiers.apaar_id ?? null,
+      };
+    } else if (userType === "teacher") {
+      endpoint = getTeacherEndpoint;
+      params = {
+        teacher_id: identifiers.teacher_id ?? null,
+      };
+    } else if (userType === "candidate") {
+      endpoint = getCandidateEndpoint;
+      params = {
+        candidate_id: identifiers.candidate_id ?? null,
+      };
+    } else if (userType === "school") {
+      endpoint = getSchoolEndpoint;
+      params = {
+        code: identifiers.school_code ?? identifiers.code ?? null,
+      };
+    } else {
+      return null;
+    }
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value)
+    );
+
+    if (Object.keys(filteredParams).length === 0) {
+      return null;
+    }
+
+    try {
+      const response = await fastAPIClient.get(endpoint, {
+        params: filteredParams,
+      });
+      return flattenProfileRecord(getFirstRecord(response.data));
+    } catch (error) {
+      console.error("User profile hydration failed:", error);
+      return null;
+    }
   },
 
   /**

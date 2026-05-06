@@ -30,8 +30,37 @@
 
   <div v-else>
     <div>
+      <div
+        v-if="pendingPortalSession"
+        class="mx-auto mt-16 max-w-md rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm"
+      >
+        <p class="text-sm uppercase tracking-wide text-gray-500">
+          Existing session found
+        </p>
+        <h2 class="mt-2 text-2xl font-semibold text-gray-900">
+          Continue as
+          {{ pendingPortalSession.displayId || pendingPortalSession.userId }}
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          If this is not your account, switch user before continuing.
+        </p>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <button
+            class="rounded bg-primary px-4 py-2 text-white shadow-md hover:bg-primary-hover"
+            @click="continueWithStoredSession"
+          >
+            Continue
+          </button>
+          <button
+            class="rounded border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
+            @click="switchUser"
+          >
+            Not you? Switch user
+          </button>
+        </div>
+      </div>
       <Signin
-        v-if="isTypeSignIn && doesGroupExist"
+        v-else-if="isTypeSignIn && doesGroupExist"
         :is_type_signin="isTypeSignIn"
         :auth_type="getAuthTypes"
         :enable_signup="isSignupEnabled"
@@ -61,6 +90,7 @@ import UserAPI from "@/services/API/user.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
+import { buildAuthContext } from "@/services/authContext";
 
 import useAssets from "@/assets/assets.js";
 
@@ -157,6 +187,11 @@ export default {
       default: "",
       type: String,
     },
+    /** What the popup form ID is, if any. */
+    popup_form_id: {
+      default: "",
+      type: String,
+    },
     /** What the external platform link is. */
     platform_link: {
       default: "",
@@ -177,6 +212,7 @@ export default {
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       toast: useToast(),
       urlClassification: null, // URL type classification
+      pendingPortalSession: null,
     };
   },
   computed: {
@@ -301,10 +337,91 @@ export default {
     hasUrlError() {
       return this.getUrlClassification.type === URL_TYPES.ERROR;
     },
+
+    isGurukulSource() {
+      return this.$route.query.source === "gurukul";
+    },
   },
   methods: {
     setState() {
       this.isLoading = false;
+    },
+
+    clearPendingPortalSession() {
+      this.pendingPortalSession = null;
+    },
+
+    async continueWithStoredSession() {
+      if (!this.pendingPortalSession) {
+        return;
+      }
+
+      this.isLoading = true;
+
+      const { userId, displayId, tokenData, launchContext } =
+        this.pendingPortalSession;
+
+      try {
+        await sendSQSMessage(
+          this.type,
+          "", // deprecated sub_type
+          this.$store.state.platform,
+          this.$store.state.platform_id,
+          userId,
+          this.auth_type.toString(),
+          this.authGroupData ? this.authGroupData.name : "default",
+          this.authGroupData && this.authGroupData.input_schema
+            ? this.authGroupData.input_schema.user_type
+            : "student",
+          this.sessionData && "session_id" in this.sessionData
+            ? this.sessionData.session_id
+            : "",
+          "", // phone number
+          this.sessionData &&
+            "meta_data" in this.sessionData &&
+            "batch" in this.sessionData.meta_data
+            ? this.sessionData.meta_data.batch
+            : "",
+          "", // date of birth
+          "" // user ip address
+        );
+
+        if (this.sessionId != "") {
+          await UserAPI.postUserSessionActivity(
+            userId,
+            this.$store.state.sessionData.type,
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
+          );
+        }
+
+        await redirectToDestination(
+          userId,
+          displayId || tokenData?.display_id || null,
+          this.$store.state.omrMode,
+          this.$store.state.abTestId,
+          this.$store.state.platform_id,
+          this.$store.state.platform_link,
+          this.$store.state.platform,
+          this.authGroupData ? this.authGroupData.name : this.authGroup,
+          this.sessionData &&
+            this.sessionData.meta_data &&
+            this.sessionData.meta_data.test_type,
+          this.testType,
+          launchContext
+        );
+      } catch (error) {
+        this.isLoading = false;
+        this.toast.error("Unable to continue this session. Please try again.");
+        throw error;
+      }
+    },
+
+    switchUser() {
+      TokenAPI.deleteCookies();
+      this.clearPendingPortalSession();
+      this.setState();
     },
 
     buildPopupFormQuery() {
@@ -323,7 +440,9 @@ export default {
       }
 
       const popupFormId =
-        sessionDataFromStore.popup_form_id || this.$route.query.popup_form_id;
+        sessionDataFromStore.popup_form_id ||
+        this.popup_form_id ||
+        this.$route.query.popup_form_id;
       if (popupFormId) {
         query.popup_form_id = popupFormId;
       }
@@ -515,42 +634,41 @@ export default {
     // Initialize store with session/URL parameters
     this.initializeStore();
 
-    let [token_verified, user_id] = await TokenAPI.checkForTokens(
+    let [token_verified, user_id, token_data] = await TokenAPI.checkForTokens(
       this.authGroupData ? this.authGroupData.name : "default"
     );
     if (token_verified && this.isTypeSignIn) {
-      await sendSQSMessage(
-        this.type,
-        "", // deprecated sub_type
-        this.$store.state.platform,
-        this.$store.state.platform_id,
-        user_id,
-        this.auth_type.toString(),
-        this.authGroupData ? this.authGroupData.name : "default",
-        this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.user_type
-          : "student",
-        this.sessionData && "session_id" in this.sessionData
-          ? this.sessionData.session_id
-          : "",
-        getSessionBatchIdentifier(this.sessionData),
-        "", //phone number
-        "",
-        "" // date of birth
-      );
-
-      if (this.sessionId != "") {
-        // do not send logs to afdc for reports, gurukul
-        await UserAPI.postUserSessionActivity(
-          user_id,
-          this.$store.state.sessionData.type,
-          this.$store.state.sessionData.session_id,
-          this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.sessionData.session_occurrence_id
-        );
-      }
-
       if (this.isPopUpFormEnabled) {
+        await sendSQSMessage(
+          this.type,
+          "", // deprecated sub_type
+          this.$store.state.platform,
+          this.$store.state.platform_id,
+          user_id,
+          this.auth_type.toString(),
+          this.authGroupData ? this.authGroupData.name : "default",
+          this.authGroupData && this.authGroupData.input_schema
+            ? this.authGroupData.input_schema.user_type
+            : "student",
+          this.sessionData && "session_id" in this.sessionData
+            ? this.sessionData.session_id
+            : "",
+          getSessionBatchIdentifier(this.sessionData),
+          "", // phone number
+          "", // date of birth
+          "" // user ip address
+        );
+
+        if (this.sessionId != "") {
+          await UserAPI.postUserSessionActivity(
+            user_id,
+            this.$store.state.sessionData.type,
+            this.$store.state.sessionData.session_id,
+            this.$store.state.authGroupData.input_schema.user_type,
+            this.$store.state.sessionData.session_occurrence_id
+          );
+        }
+
         this.$router.push({
           path: `/form/${user_id}`,
           query: this.buildPopupFormQuery(),
@@ -558,24 +676,39 @@ export default {
         return;
       }
 
-      redirectToDestination(
-        user_id,
-        this.$store.state.omrMode,
-        this.$store.state.abTestId,
-        this.$store.state.platform_id,
-        this.$store.state.platform_link,
-        this.$store.state.platform,
-        this.authGroupData && this.authGroupData.input_schema
-          ? this.authGroupData.input_schema.user_type
-          : "student",
-        this.sessionData &&
-          this.sessionData.meta_data &&
-          this.sessionData.meta_data.test_type,
-        this.testType
-      );
+      const launchContext = buildAuthContext({
+        userInformation: token_data || {},
+        identifiers: token_data || {},
+        group: this.authGroupData ? this.authGroupData.name : this.authGroup,
+        userType:
+          token_data?.user_type ||
+          token_data?.profile?.auth?.user_type ||
+          this.authGroupData?.input_schema?.user_type,
+      });
+
+      this.pendingPortalSession = {
+        userId: user_id,
+        displayId: token_data?.display_id || user_id,
+        tokenData: token_data || {},
+        launchContext,
+      };
+
+      if (this.isGurukulSource) {
+        try {
+          await this.continueWithStoredSession();
+        } catch (error) {
+          this.setState();
+        }
+        return;
+      }
+
+      this.setState();
     } else {
       this.setState();
     }
+  },
+  beforeUnmount() {
+    this.clearPendingPortalSession();
   },
 };
 </script>

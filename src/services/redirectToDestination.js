@@ -1,8 +1,10 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 import abTestService from "@/services/API/abTestData";
+import TokenAPI from "@/services/API/token";
 
 /** Redirects user to the appropriate destination platform
  * @param {String} userId - user ID for authentication
+ * @param {String} [displayId] - display ID for user-facing contexts
  * @param {Boolean} omrMode - whether OMR mode is enabled
  * @param {String} abTestId - A/B test identifier
  * @param {String} redirectId - platform-specific ID
@@ -15,6 +17,7 @@ import abTestService from "@/services/API/abTestData";
 
 export async function redirectToDestination(
   userId,
+  displayId,
   omrMode,
   abTestId,
   redirectId,
@@ -22,8 +25,10 @@ export async function redirectToDestination(
   redirectTo,
   group,
   testType,
-  urlTestType
+  urlTestType,
+  launchContext = null
 ) {
+  const reportDisplayId = displayId || userId;
   let redirectURL = "";
   let fullURL = "";
   let finalURLQueryParams = "";
@@ -37,13 +42,29 @@ export async function redirectToDestination(
     actualRedirectTo = "form";
   }
 
+  const buildLaunchToken = async (audience) => {
+    if (!launchContext?.subjectId || !launchContext?.group) {
+      return null;
+    }
+
+    const tokenResponse = await TokenAPI.createLaunchToken({
+      subjectId: launchContext.subjectId,
+      group: launchContext.group,
+      identifiers: launchContext.identifiers || {},
+      profile: launchContext.profile || null,
+      audience,
+    });
+
+    return tokenResponse?.access_token || null;
+  };
+
   switch (actualRedirectTo) {
     case "AF-plio": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_AF_PLIO;
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_AF_API_KEY,
-        unique_id: userId,
+        unique_id: reportDisplayId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -53,7 +74,7 @@ export async function redirectToDestination(
       let url = new URL(redirectURL + redirectId);
       finalURLQueryParams = new URLSearchParams({
         api_key: import.meta.env.VITE_APP_PLIO_SCERT_API_KEY,
-        unique_id: userId,
+        unique_id: reportDisplayId,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -61,10 +82,17 @@ export async function redirectToDestination(
     case "quiz": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_QUIZ;
       let url = new URL(redirectURL + redirectId);
+      const launchToken = await buildLaunchToken("quiz");
+
+      if (!launchToken) {
+        console.error("Unable to mint quiz launch token", launchContext);
+        return false;
+      }
+
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userId,
         omrMode: omrMode,
+        launchToken,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -72,11 +100,18 @@ export async function redirectToDestination(
     case "form": {
       redirectURL = import.meta.env.VITE_APP_BASE_URL_FORM;
       let url = new URL(redirectURL + redirectId);
+      const launchToken = await buildLaunchToken("form");
+
+      if (!launchToken) {
+        console.error("Unable to mint form launch token", launchContext);
+        return false;
+      }
+
       finalURLQueryParams = new URLSearchParams({
         apiKey: import.meta.env.VITE_APP_QUIZ_AF_API_KEY,
-        userId: userId,
         singlePageMode: true,
         autoStart: true,
+        launchToken,
       });
       fullURL = url + "?" + finalURLQueryParams;
       break;
@@ -99,7 +134,16 @@ export async function redirectToDestination(
         }
       }
 
-      fullURL = redirectURL + "/" + redirectId + "/" + userId;
+      const launchToken = await buildLaunchToken("report");
+
+      if (!launchToken) {
+        console.error("Unable to mint report launch token", launchContext);
+        return false;
+      }
+
+      const reportUrl = new URL(`${redirectURL}/${redirectId}`);
+      reportUrl.searchParams.set("launchToken", launchToken);
+      fullURL = reportUrl.toString();
       break;
     }
     case "meet": {

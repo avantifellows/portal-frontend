@@ -649,7 +649,18 @@ export default {
      * Redirects the user to the sign-in page.
      */
     redirectToSignIn() {
-      this.$router.go(-1);
+      const signInQuery = { ...this.$route.query };
+
+      delete signInQuery.signup_form;
+      delete signInQuery.signup_form_id;
+      delete signInQuery.id_generation;
+
+      signInQuery.type = "sign-in";
+
+      this.$router.replace({
+        name: "Home",
+        query: signInQuery,
+      });
     },
   },
 };

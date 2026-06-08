@@ -1,5 +1,4 @@
 import { sendSQSMessage } from "@/services/API/sqs";
-import abTestService from "@/services/API/abTestData";
 import TokenAPI from "@/services/API/token";
 
 /** Redirects user to the appropriate destination platform
@@ -117,21 +116,10 @@ export async function redirectToDestination(
       break;
     }
     case "report": {
-      const abTestResult = await abTestService.getABTestData(
-        1, // hardcoding abtestid for now
-        redirectId,
-        userId,
-        redirectId
-      );
-      let redirectURL = null;
-      if (abTestResult.inTest) {
-        redirectURL = abTestResult.variantUrl;
+      if (effectiveTestType === "form") {
+        redirectURL = import.meta.env.VITE_APP_FORM_REPORT_BASE_URL;
       } else {
-        if (effectiveTestType === "form") {
-          redirectURL = import.meta.env.VITE_APP_FORM_REPORT_BASE_URL;
-        } else {
-          redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
-        }
+        redirectURL = import.meta.env.VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL;
       }
 
       const launchToken = await buildLaunchToken("report");

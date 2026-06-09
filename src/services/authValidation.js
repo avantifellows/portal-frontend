@@ -70,10 +70,8 @@ export async function validateUser(
     }
 
     if (isValid) {
-      const verifiedStudentId =
-        verificationResult.student_id ?? userInformation["student_id"] ?? null;
-      const verifiedApaarId =
-        verificationResult.apaar_id ?? userInformation["apaar_id"] ?? null;
+      const verifiedStudentId = verificationResult.student_id ?? null;
+      const verifiedApaarId = verificationResult.apaar_id ?? null;
       const canonicalUserId =
         verificationResult.user_id ??
         userInformation["user_id"] ??
@@ -86,17 +84,17 @@ export async function validateUser(
       let displayId = null;
       let displayIdType = null;
 
-      if (typedStudentId) {
-        displayId = typedStudentId;
-        displayIdType = "student_id";
-      } else if (typedApaarId) {
-        displayId = typedApaarId;
-        displayIdType = "apaar_id";
-      } else if (verifiedStudentId) {
+      if (verifiedStudentId) {
         displayId = verifiedStudentId;
         displayIdType = "student_id";
       } else if (verifiedApaarId) {
         displayId = verifiedApaarId;
+        displayIdType = "apaar_id";
+      } else if (typedStudentId) {
+        displayId = typedStudentId;
+        displayIdType = "student_id";
+      } else if (typedApaarId) {
+        displayId = typedApaarId;
         displayIdType = "apaar_id";
       }
 

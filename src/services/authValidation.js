@@ -177,29 +177,39 @@ export async function validateUser(
     }
   }
 
-  if (userType == "school" && authTypes.includes("CODE")) {
+  if (
+    userType == "school" &&
+    (authTypes.includes("ID") || authTypes.includes("CODE"))
+  ) {
     const verificationResult = await userAPI.verifySchool({
-      code: userInformation["code"],
+      code: userInformation["code"] ?? userInformation["school_code"],
     });
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
-    user["isCodeValid"] = isValid;
+
+    if (authTypes.includes("ID")) {
+      user["isUserIdValid"] = isValid;
+    }
+    if (authTypes.includes("CODE")) {
+      user["isCodeValid"] = isValid;
+    }
 
     if (isValid) {
+      const enteredSchoolCode =
+        userInformation["code"] ?? userInformation["school_code"] ?? null;
       const identifiers = sanitizeIdentifiers({
         user_id:
           verificationResult.user_id ??
           userInformation["user_id"] ??
-          userInformation["code"] ??
+          enteredSchoolCode ??
           null,
-        display_id:
-          verificationResult.display_id ?? userInformation["code"] ?? null,
+        display_id: verificationResult.display_id ?? enteredSchoolCode ?? null,
         display_id_type: verificationResult.display_id_type ?? "school_code",
       });
 
       if (identifiers) {
         identifiers.school_code =
-          verificationResult.school_code ?? userInformation["code"] ?? null;
+          verificationResult.school_code ?? enteredSchoolCode ?? null;
         user["identifiers"] = identifiers;
       }
     }

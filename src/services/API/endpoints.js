@@ -16,3 +16,4 @@ export const getSchoolEndpoint = "/school";
 export const createAccessTokenEndpoint = "/auth/create-access-token";
 export const verifyTokenEndpoint = "/auth/verify";
 export const refreshTokenEndpoint = "/auth/refresh-token";
+export const createSashaktLaunchEndpoint = "/sashakt/launch";

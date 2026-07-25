@@ -11,9 +11,12 @@ export async function buildHydratedAuthContext({
   let mergedUserInformation = userInformation;
 
   if (platform === "gurukul") {
+    // `group` is the auth group name; pass it through so a student_id that exists in
+    // more than one auth group hydrates the profile for the group being signed into.
     const hydratedProfile = await UserAPI.getProfileForToken(
       userType,
-      identifiers
+      identifiers,
+      group
     );
 
     if (hydratedProfile) {

@@ -133,20 +133,24 @@ export default {
     });
   },
 
-  async getProfileForToken(userType, identifiers = {}) {
+  async getProfileForToken(userType, identifiers = {}, authGroup = null) {
     let endpoint = null;
     let params = null;
 
     if (userType === "student") {
       endpoint = getStudentEndpoint;
+      // `user_id` must only ever carry a real canonical user id. Falling back to
+      // student_id/apaar_id here sent a non-user_id value in the user_id slot, which the
+      // backend ANDs with the other filters - so the lookup matched nothing at all.
+      // student_id and apaar_id are already sent as their own params below.
       params = {
-        user_id:
-          identifiers.user_id ??
-          identifiers.student_id ??
-          identifiers.apaar_id ??
-          null,
+        user_id: identifiers.user_id ?? null,
         student_id: identifiers.student_id ?? null,
         apaar_id: identifiers.apaar_id ?? null,
+        // `student_id` is only unique within an auth group, so scope the lookup to the
+        // group the student is signing in through. Without this a student registered in
+        // more than one auth group can hydrate the wrong group's profile.
+        auth_group: authGroup ?? null,
       };
     } else if (userType === "teacher") {
       endpoint = getTeacherEndpoint;

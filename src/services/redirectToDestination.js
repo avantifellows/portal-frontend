@@ -1,5 +1,6 @@
 import { sendSQSMessage } from "@/services/API/sqs";
 import TokenAPI from "@/services/API/token";
+import SashaktAPI from "@/services/API/sashakt";
 
 /** Redirects user to the appropriate destination platform
  * @param {String} userId - user ID for authentication
@@ -113,6 +114,21 @@ export async function redirectToDestination(
         launchToken,
       });
       fullURL = url + "?" + finalURLQueryParams;
+      break;
+    }
+    case "sashakt": {
+      const launchResponse = await SashaktAPI.createLaunch({
+        user_id: userId,
+        test_link_uuid: redirectId,
+        device_info: window.navigator?.userAgent || "Browser",
+      });
+
+      if (!launchResponse?.launch_url) {
+        console.error("Unable to create Sashakt launch", launchResponse);
+        return false;
+      }
+
+      fullURL = launchResponse.launch_url;
       break;
     }
     case "report": {

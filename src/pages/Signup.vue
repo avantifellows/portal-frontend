@@ -236,6 +236,8 @@ export default {
       if (this.getLocale != "en") resultText = "सत्र शुरू करें";
       else {
         if (this.$store.state.platform == "quiz") resultText = "Start Quiz";
+        else if (this.$store.state.platform == "sashakt")
+          resultText = "Start Test";
         else if (this.$store.state.platform == "others")
           resultText = "Start Session";
         else if (this.$store.state.platform == "gurukul")

@@ -68,6 +68,7 @@ export async function validateUser(
     let verificationResult = await userAPI.verifyStudent(
       studentVerificationParams
     );
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
 
@@ -121,7 +122,6 @@ export async function validateUser(
         identifiers.apaar_id = verifiedApaarId;
         user["identifiers"] = identifiers;
       }
-      user["tokens"] = pickTokens(verificationResult);
     }
   }
 
@@ -130,6 +130,7 @@ export async function validateUser(
       candidate_id: userInformation["candidate_id"],
       auth_group: authGroupName,
     });
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
     user["isUserIdValid"] = isValid;
@@ -151,7 +152,6 @@ export async function validateUser(
       if (identifiers) {
         user["identifiers"] = identifiers;
       }
-      user["tokens"] = pickTokens(verificationResult);
     }
   }
 
@@ -163,6 +163,7 @@ export async function validateUser(
       teacher_id: userInformation["teacher_id"],
       auth_group: authGroupName,
     });
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
 
@@ -190,7 +191,6 @@ export async function validateUser(
       if (identifiers) {
         user["identifiers"] = identifiers;
       }
-      user["tokens"] = pickTokens(verificationResult);
     }
   }
 
@@ -202,6 +202,7 @@ export async function validateUser(
       code: userInformation["code"] ?? userInformation["school_code"],
       auth_group: authGroupName,
     });
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
 
@@ -230,7 +231,6 @@ export async function validateUser(
           verificationResult.school_code ?? enteredSchoolCode ?? null;
         user["identifiers"] = identifiers;
       }
-      user["tokens"] = pickTokens(verificationResult);
     }
   }
 

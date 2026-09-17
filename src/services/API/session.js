@@ -63,18 +63,26 @@ function clearCookie(name) {
  * (Gurukul), also writes them as cookies for silent login later.
  */
 export function storeSessionTokens(
-  { access_token, refresh_token } = {},
+  tokens = {},
   { persist = persistToCookies } = {}
 ) {
   persistToCookies = Boolean(persist);
+  const { access_token, refresh_token } = tokens;
 
   if (access_token) {
     accessToken = access_token;
     if (persistToCookies) setCookie("access_token", access_token);
   }
+
+  // A response that omits refresh_token (access-only refresh) keeps the current one;
+  // an explicitly empty value (AFTesting) clears it so no earlier user's token lingers.
+  if (!("refresh_token" in tokens)) return;
   if (refresh_token) {
     refreshToken = refresh_token;
     if (persistToCookies) setCookie("refresh_token", refresh_token);
+  } else {
+    refreshToken = null;
+    clearCookie("refresh_token");
   }
 }
 

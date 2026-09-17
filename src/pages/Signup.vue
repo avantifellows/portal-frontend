@@ -590,8 +590,13 @@ export default {
       }
     },
 
-    /** redirects to destination */
+    /** redirects to destination; an existing account must sign in first */
     async redirect() {
+      if (this.userData["already_exists"]) {
+        this.redirectToSignIn();
+        return;
+      }
+
       const authContext = await this.buildSignupAuthContext();
 
       const redirected = await redirectToDestination(

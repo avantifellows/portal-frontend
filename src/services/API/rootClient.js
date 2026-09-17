@@ -4,7 +4,10 @@ import {
   getRefreshToken,
   storeSessionTokens,
 } from "@/services/API/session.js";
-import { refreshTokenEndpoint } from "@/services/API/endpoints.js";
+import {
+  refreshTokenEndpoint,
+  verifyTokenEndpoint,
+} from "@/services/API/endpoints.js";
 
 const TOKEN_EXPIRED_DETAIL = "Signature has expired";
 
@@ -35,7 +38,7 @@ function isExpiredTokenError(error) {
   return status === 401 || (status === 422 && detail === TOKEN_EXPIRED_DETAIL);
 }
 
-// /auth/* routes manage their own tokens; everything else retries once after a refresh.
+// verify/refresh manage their own tokens; everything else retries once after a refresh.
 fastAPIClient.interceptors.response.use(undefined, async (error) => {
   const config = error.config;
   const refreshToken = getRefreshToken();
@@ -45,7 +48,7 @@ fastAPIClient.interceptors.response.use(undefined, async (error) => {
     config._retried ||
     !refreshToken ||
     !isExpiredTokenError(error) ||
-    String(config.url || "").startsWith("/auth/")
+    [refreshTokenEndpoint, verifyTokenEndpoint].includes(config.url)
   ) {
     return Promise.reject(error);
   }

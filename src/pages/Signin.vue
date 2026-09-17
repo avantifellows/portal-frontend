@@ -188,7 +188,11 @@ import LocalePicker from "@/components/LocalePicker.vue";
 import PrivacyPolicyCheckbox from "@/components/PrivacyPolicyCheckbox.vue";
 
 import { authToInputParameters } from "@/services/authToInputParameters";
-import { validateUser } from "@/services/authValidation.js";
+import {
+  validateUser,
+  buildStudentVerificationParams,
+  pickTokens,
+} from "@/services/authValidation.js";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import { sendSQSMessage } from "@/services/API/sqs";
 import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
@@ -610,12 +614,9 @@ export default {
 
       this.isSubmitting = true;
       try {
-        const response = await OTPAuth.verifyOTP(
-          parseInt(this.userInformation.phone),
-          this.OTPCode
-        );
+        const otpStatusCode = await this.confirmOTP();
 
-        if (response.data.statusCode === 200) {
+        if (otpStatusCode === 200) {
           // OTP verified successfully, proceed with authentication
           this.displayOTPMessage = {
             message: "OTP verified successfully!",
@@ -626,7 +627,7 @@ export default {
           await this.completePhoneAuthentication();
         } else {
           this.displayOTPMessage = mapVerifyStatusCodeToMessage[
-            response.data.statusCode
+            otpStatusCode
           ] || {
             message: "Invalid OTP. Please try again.",
             status: "failure",
@@ -641,6 +642,37 @@ export default {
       } finally {
         this.isSubmitting = false;
       }
+    },
+
+    /**
+     * Students confirm the OTP through the backend verify route, which then
+     * issues validated tokens. Other user types still use the OTP service directly.
+     * @returns {Promise<number>} OTP status code, 200 on success
+     */
+    async confirmOTP() {
+      const authGroupData = this.$store.state.authGroupData;
+      if (authGroupData.input_schema.user_type === "student") {
+        const result = await UserAPI.verifyStudent({
+          ...buildStudentVerificationParams(
+            this.auth_type,
+            this.userInformation,
+            authGroupData.id,
+            authGroupData.name
+          ),
+          otp: this.OTPCode,
+        });
+        if (result.is_valid) {
+          this.pendingSessionTokens = pickTokens(result);
+          return 200;
+        }
+        return result.otp_status_code ?? 0;
+      }
+
+      const response = await OTPAuth.verifyOTP(
+        parseInt(this.userInformation.phone),
+        this.OTPCode
+      );
+      return response.data.statusCode;
     },
 
     /** Complete phone authentication after OTP verification */

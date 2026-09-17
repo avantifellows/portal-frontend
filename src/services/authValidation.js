@@ -1,5 +1,31 @@
 import userAPI from "@/services/API/user.js";
 
+export function pickTokens(result) {
+  return result?.access_token
+    ? {
+        access_token: result.access_token,
+        refresh_token: result.refresh_token ?? "",
+      }
+    : null;
+}
+
+export function buildStudentVerificationParams(
+  authTypes,
+  userInformation,
+  authGroupId,
+  authGroupName
+) {
+  const params = { auth_group_id: authGroupId };
+  if (authGroupName) params["auth_group"] = authGroupName;
+  if (authTypes.includes("ID"))
+    params["student_id"] = userInformation["student_id"];
+  if (authTypes.includes("DOB")) {
+    params["date_of_birth"] = userInformation["date_of_birth"];
+  }
+  if (authTypes.includes("PH")) params["phone"] = userInformation["phone"];
+  return params;
+}
+
 export async function validateUser(
   authTypes,
   userInformation,
@@ -11,14 +37,6 @@ export async function validateUser(
 
   user["identifiers"] = null;
   user["tokens"] = null;
-
-  const pickTokens = (result) =>
-    result?.access_token
-      ? {
-          access_token: result.access_token,
-          refresh_token: result.refresh_token ?? "",
-        }
-      : null;
 
   const sanitizeIdentifiers = ({
     user_id = null,
@@ -45,25 +63,12 @@ export async function validateUser(
   };
 
   if (userType == "student") {
-    let studentVerificationParams = {
-      auth_group_id: authGroupId,
-    };
-    if (authGroupName) {
-      studentVerificationParams["auth_group"] = authGroupName;
-    }
-
-    if (authTypes.includes("ID")) {
-      studentVerificationParams["student_id"] = userInformation["student_id"];
-    }
-
-    if (authTypes.includes("DOB")) {
-      studentVerificationParams["date_of_birth"] =
-        userInformation["date_of_birth"];
-    }
-
-    if (authTypes.includes("PH")) {
-      studentVerificationParams["phone"] = userInformation["phone"];
-    }
+    const studentVerificationParams = buildStudentVerificationParams(
+      authTypes,
+      userInformation,
+      authGroupId,
+      authGroupName
+    );
 
     let verificationResult = await userAPI.verifyStudent(
       studentVerificationParams

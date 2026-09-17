@@ -10,6 +10,15 @@ export async function validateUser(
   let user = {};
 
   user["identifiers"] = null;
+  user["tokens"] = null;
+
+  const pickTokens = (result) =>
+    result?.access_token
+      ? {
+          access_token: result.access_token,
+          refresh_token: result.refresh_token ?? "",
+        }
+      : null;
 
   const sanitizeIdentifiers = ({
     user_id = null,
@@ -39,6 +48,9 @@ export async function validateUser(
     let studentVerificationParams = {
       auth_group_id: authGroupId,
     };
+    if (authGroupName) {
+      studentVerificationParams["auth_group"] = authGroupName;
+    }
 
     if (authTypes.includes("ID")) {
       studentVerificationParams["student_id"] = userInformation["student_id"];
@@ -109,12 +121,14 @@ export async function validateUser(
         identifiers.apaar_id = verifiedApaarId;
         user["identifiers"] = identifiers;
       }
+      user["tokens"] = pickTokens(verificationResult);
     }
   }
 
   if (userType == "candidate" && authTypes.includes("ID")) {
     const verificationResult = await userAPI.verifyCandidate({
       candidate_id: userInformation["candidate_id"],
+      auth_group: authGroupName,
     });
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
@@ -137,6 +151,7 @@ export async function validateUser(
       if (identifiers) {
         user["identifiers"] = identifiers;
       }
+      user["tokens"] = pickTokens(verificationResult);
     }
   }
 
@@ -146,6 +161,7 @@ export async function validateUser(
   ) {
     const verificationResult = await userAPI.verifyTeacher({
       teacher_id: userInformation["teacher_id"],
+      auth_group: authGroupName,
     });
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
@@ -174,6 +190,7 @@ export async function validateUser(
       if (identifiers) {
         user["identifiers"] = identifiers;
       }
+      user["tokens"] = pickTokens(verificationResult);
     }
   }
 
@@ -183,6 +200,7 @@ export async function validateUser(
   ) {
     const verificationResult = await userAPI.verifySchool({
       code: userInformation["code"] ?? userInformation["school_code"],
+      auth_group: authGroupName,
     });
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
@@ -212,6 +230,7 @@ export async function validateUser(
           verificationResult.school_code ?? enteredSchoolCode ?? null;
         user["identifiers"] = identifiers;
       }
+      user["tokens"] = pickTokens(verificationResult);
     }
   }
 

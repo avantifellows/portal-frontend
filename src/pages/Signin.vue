@@ -195,7 +195,7 @@ import { getSessionBatchIdentifier } from "@/services/sessionMetadata";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
 import OTPAuth from "@/services/API/otp.js";
-import { buildHydratedAuthContext } from "@/services/hydrateAuthContext";
+import { buildAuthContext } from "@/services/authContext";
 import {
   mapVerifyStatusCodeToMessage,
   mapSendStatusCodeToMessage,
@@ -254,6 +254,7 @@ export default {
       OTPInterval: null, // timer interval
       phoneVerified: false, // whether phone number is verified in database
       pendingTokenIdentifiers: null, // token identifiers captured before OTP verification
+      pendingSessionTokens: null, // session tokens captured before OTP verification
       invalidLoginMessageTranslations: {
         ID: {
           en: "This ID is not registered. Try again",
@@ -454,12 +455,18 @@ export default {
     },
 
     buildAuthContextForToken(tokenIdentifiers) {
-      return buildHydratedAuthContext({
+      return buildAuthContext({
         userInformation: this.userInformation,
         identifiers: tokenIdentifiers,
         group: this.$store.state.authGroupData.name,
         userType: this.$store.state.authGroupData.input_schema.user_type,
-        platform: this.$store.state.platform,
+      });
+    },
+
+    /** Keeps the tokens returned by verify; Gurukul also gets them as cookies */
+    storeSessionTokens(tokens) {
+      return TokenAPI.storeSessionTokens(tokens, {
+        persist: this.$store.state.platform == "gurukul",
       });
     },
 
@@ -659,19 +666,8 @@ export default {
           throw new Error("Missing canonical user identifier for OTP flow");
         }
 
-        const authContext = await buildHydratedAuthContext({
-          userInformation: this.userInformation,
-          identifiers: tokenIdentifiers,
-          group: this.$store.state.authGroupData.name,
-          userType: this.$store.state.authGroupData.input_schema.user_type,
-          platform: this.$store.state.platform,
-        });
-
-        if (this.$store.state.platform == "gurukul" && authContext) {
-          await TokenAPI.createAccessToken({
-            ...authContext,
-          });
-        }
+        const authContext = this.buildAuthContextForToken(tokenIdentifiers);
+        this.storeSessionTokens(this.pendingSessionTokens);
 
         if (this.enable_popup) {
           if (this.$store.state.sessionData.session_id != null) {
@@ -813,7 +809,8 @@ export default {
           this.auth_type,
           this.userInformation,
           this.$store.state.authGroupData.input_schema.user_type,
-          this.$store.state.authGroupData.id
+          this.$store.state.authGroupData.id,
+          this.$store.state.authGroupData.name
         );
 
         if (TESTING_MODE == true) {
@@ -854,20 +851,14 @@ export default {
 
           if ("phone" in this.userInformation) {
             this.pendingTokenIdentifiers = tokenIdentifiers;
+            this.pendingSessionTokens = isUserValid.tokens;
             this.phoneVerified = true;
             this.showOTPFlow = true;
             return; // Don't proceed with normal auth - wait for OTP verification
           }
 
-          const authContext = await this.buildAuthContextForToken(
-            tokenIdentifiers
-          );
-
-          if (this.$store.state.platform == "gurukul" && authContext) {
-            await TokenAPI.createAccessToken({
-              ...authContext,
-            });
-          }
+          const authContext = this.buildAuthContextForToken(tokenIdentifiers);
+          this.storeSessionTokens(isUserValid.tokens);
 
           if (this.enable_popup) {
             if (

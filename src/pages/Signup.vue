@@ -111,7 +111,7 @@ import { typeToInputParameters } from "@/services/authToInputParameters";
 import { redirectToDestination } from "@/services/redirectToDestination";
 import TokenAPI from "@/services/API/token";
 import UserAPI from "@/services/API/user.js";
-import { buildHydratedAuthContext } from "@/services/hydrateAuthContext";
+import { buildAuthContext } from "@/services/authContext";
 import FormAPI from "@/services/API/form.js";
 import authGroupAPIService from "@/services/API/groupData.js";
 import sessionAPIService from "@/services/API/sessionData.js";
@@ -496,6 +496,10 @@ export default {
       }
       this.userData["already_exists"] =
         createdUser?.["already_exists"] ?? false;
+
+      TokenAPI.storeSessionTokens(createdUser, {
+        persist: this.$store.state.platform == "gurukul",
+      });
     },
 
     getSignupTokenIdentifiers() {
@@ -513,12 +517,11 @@ export default {
     },
 
     buildSignupAuthContext() {
-      return buildHydratedAuthContext({
+      return buildAuthContext({
         userInformation: this.userData,
         identifiers: this.getSignupTokenIdentifiers(),
         group: this.$store.state.authGroupData.name,
         userType: this.$store.state.authGroupData.input_schema.user_type,
-        platform: this.$store.state.platform,
       });
     },
 
@@ -575,16 +578,6 @@ export default {
         getSessionBatchIdentifier(this.$store.state.sessionData),
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
-
-      const authContext = await this.buildSignupAuthContext();
-
-      if (this.$store.state.platform == "gurukul" && authContext) {
-        await TokenAPI.createAccessToken({
-          ...authContext,
-        });
-      } else if (!authContext) {
-        console.warn("Skipping token creation due to missing auth context");
-      }
 
       if (this.$store.state.platform != "gurukul") {
         UserAPI.postUserSessionActivity(

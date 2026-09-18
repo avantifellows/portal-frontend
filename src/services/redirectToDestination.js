@@ -157,6 +157,19 @@ export async function redirectToDestination(
       fullURL = import.meta.env.VITE_APP_GURUKUL_BASE_URL;
       break;
     }
+    case "futures": {
+      const launchToken = await buildLaunchToken("futures");
+
+      if (!launchToken) {
+        console.error("Unable to mint futures launch token", launchContext);
+        return false;
+      }
+
+      const futuresUrl = new URL(import.meta.env.VITE_APP_FUTURES_BASE_URL);
+      futuresUrl.searchParams.set("launchToken", launchToken);
+      fullURL = futuresUrl.toString();
+      break;
+    }
     case "others": {
       fullURL = redirectLink;
       break;

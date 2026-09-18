@@ -49,6 +49,7 @@ jobs:
           VITE_APP_STUDENT_QUIZ_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/student_quiz_report"
           VITE_APP_FORM_REPORT_BASE_URL: "https://reports-staging.avantifellows.org/reports/form_responses"
           VITE_APP_GURUKUL_BASE_URL: "https://staging-gurukul.avantifellows.org/"
+          VITE_APP_FUTURES_BASE_URL: "https://futures.avantifellows.org"
         run: npm run build
 
       - name: Configure AWS Credentials

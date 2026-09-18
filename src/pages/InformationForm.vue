@@ -129,7 +129,12 @@ export default {
     const hasSessionContext =
       this.$store.state.sessionData &&
       Object.keys(this.$store.state.sessionData).length > 0;
-    const sessionlessPlatforms = ["gurukul", "report", "teacher-web-app"];
+    const sessionlessPlatforms = [
+      "gurukul",
+      "report",
+      "teacher-web-app",
+      "futures",
+    ];
     const platform = this.$store.state.platform || this.$route.query.platform;
     const isSessionlessFlow =
       !this.sessionId && platform && sessionlessPlatforms.includes(platform);

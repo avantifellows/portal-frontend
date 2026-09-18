@@ -20,7 +20,12 @@ export const URL_TYPES = {
 /**
  * Platforms that support sessionless authentication
  */
-const SESSIONLESS_PLATFORMS = ["gurukul", "report", "teacher-web-app"];
+const SESSIONLESS_PLATFORMS = [
+  "gurukul",
+  "report",
+  "teacher-web-app",
+  "futures",
+];
 
 /**
  * Classify the current URL based on provided parameters

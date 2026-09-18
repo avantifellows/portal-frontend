@@ -306,7 +306,12 @@ export default {
       const sessionId = this.$route.query.sessionId;
       const platform = this.$route.query.platform;
       const authGroup = this.$route.query.authGroup;
-      const sessionlessPlatforms = ["gurukul", "report", "teacher-web-app"];
+      const sessionlessPlatforms = [
+        "gurukul",
+        "report",
+        "teacher-web-app",
+        "futures",
+      ];
       let authGroupData = null;
       let sessionData = null;
 

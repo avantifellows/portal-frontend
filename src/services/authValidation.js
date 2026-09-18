@@ -1,5 +1,31 @@
 import userAPI from "@/services/API/user.js";
 
+export function pickTokens(result) {
+  return result?.access_token
+    ? {
+        access_token: result.access_token,
+        refresh_token: result.refresh_token ?? "",
+      }
+    : null;
+}
+
+export function buildStudentVerificationParams(
+  authTypes,
+  userInformation,
+  authGroupId,
+  authGroupName
+) {
+  const params = { auth_group_id: authGroupId };
+  if (authGroupName) params["auth_group"] = authGroupName;
+  if (authTypes.includes("ID"))
+    params["student_id"] = userInformation["student_id"];
+  if (authTypes.includes("DOB")) {
+    params["date_of_birth"] = userInformation["date_of_birth"];
+  }
+  if (authTypes.includes("PH")) params["phone"] = userInformation["phone"];
+  return params;
+}
+
 export async function validateUser(
   authTypes,
   userInformation,
@@ -10,6 +36,7 @@ export async function validateUser(
   let user = {};
 
   user["identifiers"] = null;
+  user["tokens"] = null;
 
   const sanitizeIdentifiers = ({
     user_id = null,
@@ -36,26 +63,17 @@ export async function validateUser(
   };
 
   if (userType == "student") {
-    let studentVerificationParams = {
-      auth_group_id: authGroupId,
-    };
-
-    if (authTypes.includes("ID")) {
-      studentVerificationParams["student_id"] = userInformation["student_id"];
-    }
-
-    if (authTypes.includes("DOB")) {
-      studentVerificationParams["date_of_birth"] =
-        userInformation["date_of_birth"];
-    }
-
-    if (authTypes.includes("PH")) {
-      studentVerificationParams["phone"] = userInformation["phone"];
-    }
+    const studentVerificationParams = buildStudentVerificationParams(
+      authTypes,
+      userInformation,
+      authGroupId,
+      authGroupName
+    );
 
     let verificationResult = await userAPI.verifyStudent(
       studentVerificationParams
     );
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
 
@@ -115,7 +133,9 @@ export async function validateUser(
   if (userType == "candidate" && authTypes.includes("ID")) {
     const verificationResult = await userAPI.verifyCandidate({
       candidate_id: userInformation["candidate_id"],
+      auth_group: authGroupName,
     });
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
     user["isUserIdValid"] = isValid;
@@ -146,7 +166,9 @@ export async function validateUser(
   ) {
     const verificationResult = await userAPI.verifyTeacher({
       teacher_id: userInformation["teacher_id"],
+      auth_group: authGroupName,
     });
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
 
@@ -183,7 +205,9 @@ export async function validateUser(
   ) {
     const verificationResult = await userAPI.verifySchool({
       code: userInformation["code"] ?? userInformation["school_code"],
+      auth_group: authGroupName,
     });
+    user["tokens"] = pickTokens(verificationResult);
 
     const isValid = Boolean(verificationResult && verificationResult.is_valid);
 

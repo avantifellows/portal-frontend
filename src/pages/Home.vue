@@ -483,7 +483,8 @@ export default {
             this.sessionData.redirection === "true")) ||
           this.redirection == "true" ||
           this.platform == "report" ||
-          this.platform == "gurukul"
+          this.platform == "gurukul" ||
+          this.platform == "futures"
       );
 
       // Platform details

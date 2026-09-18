@@ -26,38 +26,4 @@ export default {
         });
     });
   },
-
-  /**
-   * Get list of colleges/universities for forms
-   */
-  getColleges() {
-    return new Promise((resolve) => {
-      fastAPIClient
-        .get("/school/colleges")
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          resolve({ error: error });
-          throw new Error("Colleges API returned an error:", error);
-        });
-    });
-  },
-
-  /**
-   * Get list of states from database
-   */
-  getStates() {
-    return new Promise((resolve) => {
-      fastAPIClient
-        .get("/school/states")
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          resolve({ error: error });
-          throw new Error("States API returned an error:", error);
-        });
-    });
-  },
 };

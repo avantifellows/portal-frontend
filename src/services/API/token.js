@@ -1,13 +1,11 @@
 import { fastAPIClient } from "./rootClient";
 import {
-  createAccessTokenEndpoint,
+  createLaunchTokenEndpoint,
   refreshTokenEndpoint,
   verifyTokenEndpoint,
 } from "./endpoints";
+import { storeSessionTokens, clearSessionTokens } from "./session";
 
-const DEFAULT_COOKIE_DOMAIN = "avantifellows.org";
-const COOKIE_DOMAIN =
-  import.meta.env.VITE_APP_COOKIE_DOMAIN || DEFAULT_COOKIE_DOMAIN;
 const TOKEN_EXPIRED_DETAIL = "Signature has expired";
 
 function emptyTokenResult() {
@@ -15,171 +13,40 @@ function emptyTokenResult() {
   return [false, "", {}];
 }
 
-function isLocalHostname(hostname) {
-  if (!hostname) return true;
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return true;
-  }
-  if (hostname === "::1" || hostname === "0.0.0.0") {
-    return true;
-  }
-  return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
-}
-
-function resolveCookieDomain(hostname) {
-  if (isLocalHostname(hostname)) return "";
-  if (hostname === COOKIE_DOMAIN || hostname.endsWith(`.${COOKIE_DOMAIN}`)) {
-    return COOKIE_DOMAIN;
-  }
-  return "";
-}
-
-function buildCookieAttributes() {
-  const hostname = window.location.hostname;
-  const isLocal = isLocalHostname(hostname);
-  const isSecure = window.location.protocol === "https:";
-  const domain = resolveCookieDomain(hostname);
-  const sameSite = !isLocal && isSecure ? "None" : "Lax";
-  const attributes = [`Path=/`, `SameSite=${sameSite}`];
-
-  if (isSecure) {
-    attributes.push("Secure");
-  }
-  if (domain) {
-    attributes.push(`Domain=${domain}`);
-  }
-
-  return attributes.join("; ");
-}
-
-function setCookie(name, value) {
-  document.cookie = `${name}=${value}; ${buildCookieAttributes()}`;
-}
-
-function clearCookie(name) {
-  const hostname = window.location.hostname;
-  const expires = "Expires=Thu, 01 Jan 1970 00:00:01 GMT";
-  const domain = resolveCookieDomain(hostname);
-
-  document.cookie = `${name}=; ${expires}; Path=/`;
-  if (domain) {
-    document.cookie = `${name}=; ${expires}; Path=/; Domain=${domain}`;
-  }
-}
-
 export default {
   /**
-   * Creates an access token for a user with the specified identifiers and group.
-   *
-   * @param {Object} options - Token creation options.
-   * @param {string} options.subjectId - Identifier used for the JWT subject (defaults to user_id from identifiers if present).
-   * @param {string} options.group - Auth group associated with the user.
-   * @param {Object} [options.identifiers] - Optional identifier bundle to embed in the token
-   *                   (student_id, apaar_id, user_id, display_id, display_id_type).
-   * @returns {Promise<Object>} Token API response. On error, resolves with { error }.
+   * Keeps the tokens returned by verify/signup for this session.
+   * With persist (Gurukul) they are also written as cookies.
+   * @returns {boolean} whether an access token was stored
    */
-  async createAccessToken({
-    subjectId,
-    group,
-    identifiers = {},
-    profile = null,
-    persist = true,
-    audience = null,
-  }) {
-    const canonicalUserId = String(identifiers.user_id ?? subjectId ?? "");
-
-    if (!group || canonicalUserId === "") {
-      console.error(
-        "Token creation failed: Missing group or canonical user identifier",
-        {
-          group,
-          subjectId,
-          identifiers,
-        }
-      );
-      return { error: "Missing required token parameters" };
-    }
-
-    const tokenData = { group };
-
-    if (identifiers.student_id) {
-      tokenData.student_id = identifiers.student_id;
-    }
-    if (identifiers.apaar_id) {
-      tokenData.apaar_id = identifiers.apaar_id;
-    }
-    if (identifiers.teacher_id) {
-      tokenData.teacher_id = identifiers.teacher_id;
-    }
-    if (identifiers.candidate_id) {
-      tokenData.candidate_id = identifiers.candidate_id;
-    }
-    if (identifiers.school_code || identifiers.code) {
-      tokenData.school_code = identifiers.school_code || identifiers.code;
-    }
-    if (identifiers.display_id) {
-      tokenData.display_id = identifiers.display_id;
-    }
-    if (identifiers.display_id_type) {
-      tokenData.display_id_type = identifiers.display_id_type;
-    }
-    if (profile) {
-      tokenData.profile = profile;
-      if (profile?.auth?.user_type) {
-        tokenData.user_type = profile.auth.user_type;
-      }
-    }
-
-    tokenData.user_id = canonicalUserId;
-
-    const params = {
-      type: "user",
-      is_user_valid: true,
-      id: canonicalUserId,
-      data: tokenData,
-      session_mode: persist ? "persistent" : "launch",
-      audience,
-    };
-    return new Promise((resolve) => {
-      fastAPIClient
-        .post(createAccessTokenEndpoint, params)
-        .then((response) => {
-          const accessToken = response.data.access_token;
-          const refreshToken = response.data.refresh_token;
-
-          if (persist && accessToken) {
-            setCookie("access_token", accessToken);
-          }
-
-          if (persist && refreshToken) {
-            setCookie("refresh_token", refreshToken);
-          }
-
-          resolve(response.data);
-        })
-        .catch((error) => {
-          console.error("Token API returned an error:", error);
-          resolve({ error: error });
-        });
-    });
+  storeSessionTokens(tokens, { persist = false } = {}) {
+    if (!tokens?.access_token) return false;
+    storeSessionTokens(tokens, { persist });
+    return true;
   },
 
-  async createLaunchToken(options) {
-    return this.createAccessToken({
-      ...options,
-      persist: false,
-    });
+  /**
+   * Asks the backend for a short-lived launch token for the given audience.
+   * The Authorization header is added by the client from the stored session.
+   * @returns {Promise<Object>} { access_token } or { error }
+   */
+  async createLaunchToken(audience) {
+    try {
+      const response = await fastAPIClient.post(createLaunchTokenEndpoint, {
+        audience,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Token API returned an error:", error);
+      return { error };
+    }
   },
 
   /**
    * Refreshes the access token using the provided refresh token.
    *
    * @param {string} refresh_token - The refresh token used to obtain a new access token.
-   * @returns {Promise} A Promise that resolves when the access token is refreshed successfully.
-   *                   The Promise resolves with an object containing access_token.
-   *                   If there is an error, it rejects with an error object.
-   *
-   * @throws {Error} Throws an error if the Token API returns an error during the refresh process.
+   * @returns {Promise} Resolves with the verifyToken tuple for the new access token.
    */
   async refreshToken(refresh_token, group) {
     return new Promise((resolve) => {
@@ -200,7 +67,10 @@ export default {
             return;
           }
 
-          setCookie("access_token", newAccessToken);
+          storeSessionTokens(
+            { access_token: newAccessToken, refresh_token },
+            { persist: true }
+          );
           const verifyResult = await this.verifyToken(
             newAccessToken,
             refresh_token,
@@ -230,13 +100,15 @@ export default {
    */
   async verifyToken(access_token, refresh_token, group) {
     return new Promise((resolve) => {
-      // const refreshResult = this.refreshToken(refresh_token, group);
-      // resolve(refreshResult);
       fastAPIClient
         .get(verifyTokenEndpoint, {
           headers: { Authorization: `Bearer ${access_token}` },
         })
         .then((response) => {
+          storeSessionTokens(
+            { access_token, refresh_token },
+            { persist: true }
+          );
           resolve([
             response.data.data.group == group,
             response.data.id,
@@ -260,12 +132,10 @@ export default {
   },
 
   /**
-   * Deletes user access and refresh tokens by setting their expiration date in the past.
+   * Forgets the session tokens and expires the access and refresh cookies.
    */
-
   deleteCookies() {
-    clearCookie("access_token");
-    clearCookie("refresh_token");
+    clearSessionTokens();
   },
 
   /**

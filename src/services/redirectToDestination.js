@@ -42,18 +42,7 @@ export async function redirectToDestination(
   }
 
   const buildLaunchToken = async (audience) => {
-    if (!launchContext?.subjectId || !launchContext?.group) {
-      return null;
-    }
-
-    const tokenResponse = await TokenAPI.createLaunchToken({
-      subjectId: launchContext.subjectId,
-      group: launchContext.group,
-      identifiers: launchContext.identifiers || {},
-      profile: launchContext.profile || null,
-      audience,
-    });
-
+    const tokenResponse = await TokenAPI.createLaunchToken(audience);
     return tokenResponse?.access_token || null;
   };
 

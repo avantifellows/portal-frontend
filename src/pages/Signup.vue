@@ -141,6 +141,7 @@ export default {
       loadingSpinnerSvg: assets.loadingSpinnerSvg,
       userId: "",
       formData: {},
+      loadedLocationState: null, // last state we fetched location options for
       privacyPolicyAccepted: true, // privacy policy checkbox state (default: checked)
       toast: useToast(),
     };
@@ -208,24 +209,12 @@ export default {
       handler() {
         this.isUserDataIsComplete();
         this.showBasedOn();
+        this.handleStateChange();
         this.getOptions();
       },
       deep: true,
     },
-    // On a multi-state form the location chain is only known once a state is
-    // picked, and picking a different one invalidates whatever was chosen below.
-    "userData.state": {
-      async handler(state, previousState) {
-        if (!state || state === previousState) return;
-        if (previousState) {
-          this.userData.district = "";
-          this.userData.block_name = "";
-          this.userData.school_name = "";
-        }
-        await this.loadStateScopedLocationOptions(state);
-        this.getOptions();
-      },
-    },
+
     privacyPolicyAccepted: {
       handler() {
         this.isUserDataIsComplete();
@@ -466,6 +455,33 @@ export default {
     },
 
     /**
+     * Reacts to the student picking (or changing) their state.
+     *
+     * Driven from the deep userData watcher rather than a "userData.state"
+     * path watcher: userData starts as {} and updateUserData adds and deletes
+     * keys on it, so that path is not reactive at mount and the watcher never
+     * fired. Without it the form kept whatever the schema shipped with, which
+     * on a multi-state form is nothing, and the district dropdown fell back to
+     * every state's districts merged together.
+     */
+    handleStateChange() {
+      const state = this.userData.state;
+      if (!state || state === this.loadedLocationState) return;
+
+      const hadPreviousState = this.loadedLocationState !== null;
+      this.loadedLocationState = state;
+
+      if (hadPreviousState) {
+        // Whatever was picked below belongs to the state just replaced.
+        delete this.userData.district;
+        delete this.userData.block_name;
+        delete this.userData.school_name;
+      }
+
+      this.loadStateScopedLocationOptions(state);
+    },
+
+    /**
      * Loads the district -> (block ->) school options for one state.
      *
      * A form that covers several states (OLFStudents) cannot have these baked
@@ -489,9 +505,11 @@ export default {
         state
       );
       if (!mapping || mapping.error) {
+        this.loadedLocationState = null; // let the student retry by re-picking
         this.toast.error("Could not load schools for " + state);
         return;
       }
+      if (state !== this.userData.state) return; // a newer pick won the race
 
       const toOptions = (values) =>
         values.map((value) => ({ label: value, value: value }));

@@ -100,6 +100,27 @@ export default {
       // for dropdown
       this.$emit("update", this.value, this.dbKey);
     },
+
+    /**
+     * Clears the selection when the option list is replaced and the current
+     * value is no longer one of the options.
+     *
+     * Options are swapped out at runtime on dependant fields (district after a
+     * state is picked, school after a block). Without this the previous value
+     * survives the swap and is reported as the student's answer even though it
+     * belongs to the old list, and FormKit renders the first option of the new
+     * list as though it had been chosen.
+     */
+    options: {
+      handler(newOptions) {
+        if (this.multipleSelect || !this.value) return;
+        const stillValid = (newOptions ?? []).some(
+          (option) => option.value === this.value
+        );
+        if (!stillValid) this.value = "";
+      },
+      deep: true,
+    },
   },
 };
 </script>

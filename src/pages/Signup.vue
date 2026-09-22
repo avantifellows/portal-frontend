@@ -114,6 +114,7 @@ import UserAPI from "@/services/API/user.js";
 import { buildAuthContext } from "@/services/authContext";
 import FormAPI from "@/services/API/form.js";
 import authGroupAPIService from "@/services/API/groupData.js";
+import SchoolAPI from "@/services/API/school.js";
 import sessionAPIService from "@/services/API/sessionData.js";
 import useAssets from "@/assets/assets.js";
 import { sendSQSMessage } from "@/services/API/sqs";
@@ -210,6 +211,20 @@ export default {
         this.getOptions();
       },
       deep: true,
+    },
+    // On a multi-state form the location chain is only known once a state is
+    // picked, and picking a different one invalidates whatever was chosen below.
+    "userData.state": {
+      async handler(state, previousState) {
+        if (!state || state === previousState) return;
+        if (previousState) {
+          this.userData.district = "";
+          this.userData.block_name = "";
+          this.userData.school_name = "";
+        }
+        await this.loadStateScopedLocationOptions(state);
+        this.getOptions();
+      },
     },
     privacyPolicyAccepted: {
       handler() {
@@ -441,13 +456,69 @@ export default {
         if (fieldAttributes.dependant) {
           if (this.userData[fieldAttributes.dependantField]) {
             fieldAttributes["options"] =
-              fieldAttributes.dependantFieldMapping[
+              fieldAttributes.dependantFieldMapping?.[
                 this.userData[fieldAttributes.dependantField]
-              ];
+              ] ?? fieldAttributes.options;
           }
         }
         return fieldAttributes.options[this.getLocale];
       });
+    },
+
+    /**
+     * Loads the district -> (block ->) school options for one state.
+     *
+     * A form that covers several states (OLFStudents) cannot have these baked
+     * into its schema, because the right districts depend on the state the
+     * student picks. The backend marks those fields stateScoped and we fetch
+     * the mapping here once a state is chosen.
+     */
+    async loadStateScopedLocationOptions(state) {
+      const fields = Object.values(this.formData?.attributes ?? {});
+      const districtField = fields.find((f) => f.key === "district");
+      if (!districtField?.stateScoped) return;
+
+      const blockField = fields.find((f) => f.key === "block_name");
+      const schoolField = fields.find((f) => f.key === "school_name");
+      const authGroup = this.$store.state.authGroupData?.name;
+      if (!authGroup || !state) return;
+
+      const mapping = await SchoolAPI.getDependantMapping(
+        authGroup,
+        Boolean(blockField),
+        state
+      );
+      if (!mapping || mapping.error) {
+        this.toast.error("Could not load schools for " + state);
+        return;
+      }
+
+      const toOptions = (values) =>
+        values.map((value) => ({ label: value, value: value }));
+
+      if (blockField) {
+        const districtToBlocks = mapping.district_block_mapping ?? {};
+        const districts = Object.keys(districtToBlocks).sort();
+        districtField.options = {
+          en: toOptions(districts),
+          hi: toOptions(districts),
+        };
+        blockField.dependantFieldMapping = districtToBlocks;
+        if (schoolField) {
+          schoolField.dependantFieldMapping =
+            mapping.block_school_mapping ?? {};
+        }
+      } else {
+        const districtToSchools = mapping.district_school_mapping ?? {};
+        const districts = Object.keys(districtToSchools).sort();
+        districtField.options = {
+          en: toOptions(districts),
+          hi: toOptions(districts),
+        };
+        if (schoolField) {
+          schoolField.dependantFieldMapping = districtToSchools;
+        }
+      }
     },
 
     /** checks if user data has all the fields required */

@@ -341,6 +341,11 @@ export default {
     isGurukulSource() {
       return this.$route.query.source === "gurukul";
     },
+
+    // Tags Gurukul home-page opens so they can be told apart from shared links.
+    attendanceSubType() {
+      return this.isGurukulSource ? "gurukul-home" : "";
+    },
   },
   methods: {
     setState() {
@@ -364,7 +369,7 @@ export default {
       try {
         await sendSQSMessage(
           this.type,
-          "", // deprecated sub_type
+          this.attendanceSubType,
           this.$store.state.platform,
           this.$store.state.platform_id,
           userId,
@@ -642,7 +647,7 @@ export default {
       if (this.isPopUpFormEnabled) {
         await sendSQSMessage(
           this.type,
-          "", // deprecated sub_type
+          this.attendanceSubType,
           this.$store.state.platform,
           this.$store.state.platform_id,
           user_id,

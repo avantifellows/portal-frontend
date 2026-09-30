@@ -12,3 +12,4 @@ export const verifySchoolEndpoint = "/school/verify";
 export const createLaunchTokenEndpoint = "/auth/launch-token";
 export const verifyTokenEndpoint = "/auth/verify";
 export const refreshTokenEndpoint = "/auth/refresh-token";
+export const createSashaktLaunchEndpoint = "/sashakt/launch";

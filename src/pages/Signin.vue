@@ -657,7 +657,8 @@ export default {
             this.auth_type,
             this.userInformation,
             authGroupData.id,
-            authGroupData.name
+            authGroupData.name,
+            this.$store.state.sessionData?.session_id
           ),
           otp: this.OTPCode,
         });
@@ -842,7 +843,8 @@ export default {
           this.userInformation,
           this.$store.state.authGroupData.input_schema.user_type,
           this.$store.state.authGroupData.id,
-          this.$store.state.authGroupData.name
+          this.$store.state.authGroupData.name,
+          this.$store.state.sessionData?.session_id
         );
 
         if (TESTING_MODE == true) {

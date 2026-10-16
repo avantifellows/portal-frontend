@@ -13,10 +13,12 @@ export function buildStudentVerificationParams(
   authTypes,
   userInformation,
   authGroupId,
-  authGroupName
+  authGroupName,
+  sessionId = null
 ) {
   const params = { auth_group_id: authGroupId };
   if (authGroupName) params["auth_group"] = authGroupName;
+  if (sessionId) params["session_id"] = sessionId;
   if (authTypes.includes("ID"))
     params["student_id"] = userInformation["student_id"];
   if (authTypes.includes("DOB")) {
@@ -31,7 +33,8 @@ export async function validateUser(
   userInformation,
   userType,
   authGroupId,
-  authGroupName
+  authGroupName,
+  sessionId = null
 ) {
   let user = {};
 
@@ -67,7 +70,8 @@ export async function validateUser(
       authTypes,
       userInformation,
       authGroupId,
-      authGroupName
+      authGroupName,
+      sessionId
     );
 
     let verificationResult = await userAPI.verifyStudent(

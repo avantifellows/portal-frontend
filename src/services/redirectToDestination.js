@@ -2,6 +2,11 @@ import { sendSQSMessage } from "@/services/API/sqs";
 import TokenAPI from "@/services/API/token";
 import SashaktAPI from "@/services/API/sashakt";
 
+const STUDENT_ID_PLACEHOLDER = "STUDENT_ID_HERE";
+
+const fillStudentId = (link, studentId) =>
+  (link || "").split(STUDENT_ID_PLACEHOLDER).join(encodeURIComponent(studentId));
+
 /** Redirects user to the appropriate destination platform
  * @param {String} userId - user ID for authentication
  * @param {String} [displayId] - display ID for user-facing contexts
@@ -166,7 +171,7 @@ export async function redirectToDestination(
       break;
     }
     case "google-forms": {
-      fullURL = redirectLink;
+      fullURL = fillStudentId(redirectLink, reportDisplayId);
       break;
     }
     case "gurukul": {
@@ -187,7 +192,7 @@ export async function redirectToDestination(
       break;
     }
     case "others": {
-      fullURL = redirectLink;
+      fullURL = fillStudentId(redirectLink, reportDisplayId);
       break;
     }
     default: {

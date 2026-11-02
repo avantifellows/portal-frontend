@@ -5,7 +5,9 @@ import SashaktAPI from "@/services/API/sashakt";
 const STUDENT_ID_PLACEHOLDER = "STUDENT_ID_HERE";
 
 const fillStudentId = (link, studentId) =>
-  (link || "").split(STUDENT_ID_PLACEHOLDER).join(encodeURIComponent(studentId));
+  (link || "")
+    .split(STUDENT_ID_PLACEHOLDER)
+    .join(encodeURIComponent(studentId));
 
 /** Redirects user to the appropriate destination platform
  * @param {String} userId - user ID for authentication

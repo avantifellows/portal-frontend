@@ -62,7 +62,8 @@
     <div
       v-if="
         $store.state.sessionData.type == 'sign-in' ||
-        $store.state.platform == 'gurukul'
+        $store.state.platform == 'gurukul' ||
+        $store.state.platform == 'futures'
       "
       class="mt-[30px] flex w-48 mx-auto justify-between items-center"
     >
@@ -74,7 +75,8 @@
     <button
       v-if="
         $store.state.sessionData.type == 'sign-in' ||
-        $store.state.platform == 'gurukul'
+        $store.state.platform == 'gurukul' ||
+        $store.state.platform == 'futures'
       "
       @click="redirectToSignIn"
       class="mt-[20px] mx-auto pt-2 text-primary text-base"
@@ -246,6 +248,8 @@ export default {
           resultText = "Start Session";
         else if (this.$store.state.platform == "gurukul")
           resultText = "Start Learning on Gurukul!";
+        else if (this.$store.state.platform == "futures")
+          resultText = "Continue to Futures";
         else if (
           ["youtube", "meet", "zoom"].includes(this.$store.state.platform)
         )
@@ -373,7 +377,8 @@ export default {
             sessionData.redirection === "true")) ||
           this.$route.query.redirection === "true" ||
           resolvedPlatform === "report" ||
-          resolvedPlatform === "gurukul"
+          resolvedPlatform === "gurukul" ||
+          resolvedPlatform === "futures"
       );
       this.$store.dispatch("setPlatform", resolvedPlatform);
       this.$store.dispatch(
@@ -675,7 +680,7 @@ export default {
         "date_of_birth" in this.userData ? this.userData["date_of_birth"] : ""
       );
 
-      if (this.$store.state.platform != "gurukul") {
+      if (!["gurukul", "futures"].includes(this.$store.state.platform)) {
         UserAPI.postUserSessionActivity(
           this.userData["user_id"],
           "sign-up",
@@ -712,7 +717,7 @@ export default {
       );
 
       if (redirected) {
-        if (this.$store.state.platform != "gurukul") {
+        if (!["gurukul", "futures"].includes(this.$store.state.platform)) {
           UserAPI.postUserSessionActivity(
             this.userData["user_id"],
             "attendance-on-sign-up",

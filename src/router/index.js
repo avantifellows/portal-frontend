@@ -34,7 +34,12 @@ const LEGACY_ALLOWED_PARAMS = [
   "sub_type", // ignored (deprecated)
 ];
 
-const SESSIONLESS_PLATFORMS = ["gurukul", "report", "teacher-web-app"];
+const SESSIONLESS_PLATFORMS = [
+  "gurukul",
+  "report",
+  "teacher-web-app",
+  "futures",
+];
 
 const routes = [
   {
